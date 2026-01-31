@@ -3,25 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Who Play? - Mobile Fix</title>
+    <title>Who Play? - Final Mobile Fix</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
     <style>
         :root { --primary: #e74c3c; --dark: #121212; --bg: #000; }
         
-        /* Ključno za mobilni: box-sizing sprečava širenje elemenata van ekrana */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         body, html { 
             margin: 0; padding: 0; 
-            height: 100svh; width: 100%;
+            height: 100%; width: 100%;
             font-family: -apple-system, system-ui, sans-serif; 
             overflow: hidden; background: var(--bg);
+            position: fixed; /* Sprečava bounce efekt na iOS-u */
         }
 
-        #map { height: 100%; width: 100%; position: absolute; z-index: 1; }
+        #map { height: 100%; width: 100%; position: absolute; top: 0; left: 0; z-index: 1; }
 
+        /* Header */
         header {
             position: fixed; top: 0; left: 0; width: 100%; z-index: 2000;
             display: flex; justify-content: space-between; align-items: center;
@@ -32,52 +33,47 @@
         .nav-links { display: flex; gap: 8px; }
         .nav-btn {
             background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.2); color: white;
-            padding: 8px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; backdrop-filter: blur(5px);
+            padding: 8px 12px; border-radius: 20px; font-size: 12px; font-weight: bold;
         }
 
+        /* Controls */
         .controls-container {
             position: fixed; right: 15px; bottom: 100px;
             z-index: 2000; display: flex; flex-direction: column; gap: 12px;
-        }
-        .btn-circle {
-            width: 50px; height: 50px; background: white; border: none;
-            border-radius: 50%; box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-            display: flex; justify-content: center; align-items: center; font-size: 20px;
+            transition: bottom 0.3s;
         }
 
-        /* POPRAVLJENA ADMIN KARTICA - Nema više prelivanja */
+        /* ADMIN KARTICA - Koristimo transform da je uvek drži na dnu */
         #admin-card {
-            position: fixed; bottom: 0; left: 0; 
-            width: 100%; z-index: 9999; 
+            position: fixed; bottom: 0; left: 0; width: 100%; z-index: 9999;
             background: var(--dark); color: white;
             padding: 15px 20px calc(15px + env(safe-area-inset-bottom));
             border-radius: 20px 20px 0 0;
             display: flex; justify-content: space-between; align-items: center;
             border-top: 2px solid var(--primary);
+            transition: transform 0.3s ease-out;
         }
-        .logout-btn { background: var(--primary); border: none; color: white; padding: 10px 18px; border-radius: 10px; font-weight: bold; }
 
         /* MODALI */
         .overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 10000; display: flex; justify-content: center; align-items: center;
-            background: rgba(0,0,0,0.92); backdrop-filter: blur(8px);
+            background: rgba(0,0,0,0.92);
         }
         .modal { background: white; padding: 25px; border-radius: 25px; width: 90%; max-width: 320px; text-align: center; }
         
-        /* INPUT - Font 16px sprečava auto-zoom na telefonu */
+        /* INPUT 16px font je OBAVEZAN protiv auto-zooma */
         input { 
             width: 100%; padding: 14px; margin: 8px 0; border: 1px solid #ddd; 
-            border-radius: 10px; font-size: 16px; box-sizing: border-box; 
-            appearance: none; -webkit-appearance: none;
+            border-radius: 10px; font-size: 16px !important; box-sizing: border-box; 
+            appearance: none;
         }
         .btn-action { width: 100%; background: var(--primary); border: none; color: white; padding: 14px; border-radius: 12px; font-weight: bold; font-size: 16px; margin-top: 10px; }
         
         .hidden { display: none !important; }
 
         .pulse-marker {
-            width: 14px; height: 14px; background: #3498db; border: 2px solid white;
-            border-radius: 50%; position: relative;
+            width: 14px; height: 14px; background: #3498db; border: 2px solid white; border-radius: 50%; position: relative;
         }
         .pulse-marker::after {
             content: ''; width: 36px; height: 36px; background: rgba(52, 152, 219, 0.4);
@@ -92,7 +88,7 @@
     <div id="welcome-screen" class="overlay">
         <div class="modal">
             <h2 style="margin-top:0;">Who Play?</h2>
-            <p style="color:#555; font-size: 14px;">Nezvanični podaci. Isključivo za zabavu.</p>
+            <p style="color:#555; font-size: 14px;">Sajt je za zabavu. Podaci su nezvanični.</p>
             <button class="btn-action" onclick="prihvatiUslove()">PRIHVATAM</button>
         </div>
     </div>
@@ -102,15 +98,15 @@
             <h3>Registracija</h3>
             <input type="text" id="reg-nick" placeholder="Nickname">
             <input type="email" id="reg-email" placeholder="Email">
-            <button class="btn-action" onclick="registerAdmin()">Registruj me</button>
+            <button class="btn-action" onclick="registerAdmin()">Potvrdi</button>
             <button onclick="toggleModal('register-screen', false)" style="background:none; border:none; margin-top:10px; color:#999">Zatvori</button>
         </div>
     </div>
 
     <div id="login-screen" class="overlay hidden">
         <div class="modal">
-            <h3>Admin Login</h3>
-            <input type="email" id="login-email" placeholder="Unesite Email">
+            <h3>Login</h3>
+            <input type="email" id="login-email" placeholder="Email">
             <button class="btn-action" onclick="loginAdmin()">Prijavi se</button>
             <button onclick="toggleModal('login-screen', false)" style="background:none; border:none; margin-top:10px; color:#999">Zatvori</button>
         </div>
@@ -124,17 +120,17 @@
         </div>
     </header>
 
-    <div class="controls-container">
-        <button id="info-btn" class="btn-circle hidden" onclick="toggleModal('welcome-screen', true)">i</button>
-        <button id="recenter-btn" class="btn-circle hidden" onclick="locirajMe()">🎯</button>
+    <div class="controls-container" id="side-controls">
+        <button id="info-btn" class="nav-btn hidden" style="width:40px; height:40px; border-radius:50%; padding:0;" onclick="toggleModal('welcome-screen', true)">i</button>
+        <button id="recenter-btn" class="nav-btn hidden" style="width:40px; height:40px; border-radius:50%; padding:0;" onclick="locirajMe()">🎯</button>
     </div>
 
     <div id="admin-card" class="hidden">
-        <div style="max-width: 60%;">
+        <div style="max-width: 65%;">
             <small style="color:#aaa; display:block">Admin:</small>
-            <strong id="admin-nick-display" style="display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"></strong>
+            <strong id="admin-nick-display"></strong>
         </div>
-        <button class="logout-btn" onclick="logoutAdmin()">Logout</button>
+        <button style="background:var(--primary); border:none; color:white; padding:8px 15px; border-radius:8px;" onclick="logoutAdmin()">Logout</button>
     </div>
 
     <div id="map"></div>
@@ -149,11 +145,19 @@
         const db = firebase.database();
 
         var map = L.map('map', { zoomControl: false, tap: false, attributionControl: false }).setView([44.8178, 20.4489], 13);
-        L.tileLayer('https://{s}.google.com/vt/lyrs=y,h&x={x}&y={y}&z={z}', {
-            maxZoom: 20, subdomains:['mt0','mt1','mt2','mt3']
-        }).addTo(map);
+        L.tileLayer('https://{s}.google.com/vt/lyrs=y,h&x={x}&y={y}&z={z}', { maxZoom: 20, subdomains:['mt0','mt1','mt2','mt3'] }).addTo(map);
 
         var userMarker, lastKnownLatLng;
+
+        // --- FIXED VIEWPORT LOGIC ---
+        // Ovo sprečava tastaturu da uništi layout
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', () => {
+                let offset = window.innerHeight - window.visualViewport.height;
+                document.getElementById('admin-card').style.transform = `translateY(-${offset}px)`;
+                document.getElementById('side-controls').style.bottom = `${offset + 100}px`;
+            });
+        }
 
         function prihvatiUslove() {
             localStorage.setItem('usloviWhoPlay', 'true');
@@ -191,7 +195,7 @@
                     localStorage.setItem('loggedAdmin', JSON.stringify(userData));
                     setupAdminUI(userData);
                     toggleModal('login-screen', false);
-                } else alert("Email nije pronađen.");
+                } else alert("Email nije nađen.");
             });
         }
 
@@ -205,11 +209,7 @@
 
         map.on('locationfound', e => { 
             lastKnownLatLng = e.latlng;
-            const pulseIcon = L.divIcon({
-                className: 'custom-div-icon',
-                html: "<div class='pulse-marker'></div>",
-                iconSize: [14, 14], iconAnchor: [7, 7]
-            });
+            const pulseIcon = L.divIcon({ className: 'custom-div-icon', html: "<div class='pulse-marker'></div>", iconSize: [14, 14], iconAnchor: [7, 7] });
             if (userMarker) userMarker.setLatLng(e.latlng);
             else userMarker = L.marker(e.latlng, {icon: pulseIcon}).addTo(map);
         });
