@@ -2,14 +2,15 @@
 <html lang="sr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Who Play? - Live Sports Map</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
     <style>
         :root { --primary: #e74c3c; --dark: #2c3e50; --light: #ecf0f1; }
-        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
+        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', sans-serif; overflow: hidden; background: #000; }
+        
         #map { height: 100vh; width: 100%; position: absolute; z-index: 1; }
 
         /* Welcome Overlay */
@@ -20,52 +21,66 @@
                         url('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/10/370/560');
             background-size: cover; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
         }
-        .welcome-content { background: white; padding: 40px; border-radius: 20px; text-align: center; max-width: 450px; margin: 20px; }
+        .welcome-content { background: white; padding: 30px; border-radius: 20px; text-align: center; max-width: 400px; margin: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
 
-        /* Header */
+        /* Header - Desktop First */
         header {
             position: absolute; top: 0; left: 0; width: 100%; z-index: 2000;
             display: flex; justify-content: space-between; align-items: center;
-            padding: 15px 5%; box-sizing: border-box; background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(5px); color: white;
+            padding: 10px 5%; box-sizing: border-box; background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px); color: white; transition: 0.3s;
         }
-        .logo { font-size: 24px; font-weight: 800; color: var(--primary); }
+        .logo { font-size: 22px; font-weight: 800; color: var(--primary); text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+        .nav-links { display: flex; gap: 10px; }
         .nav-links button {
-            background: transparent; border: 1px solid white; color: white;
-            padding: 8px 15px; margin-left: 10px; border-radius: 5px; cursor: pointer;
+            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); color: white;
+            padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 14px;
         }
 
-        /* Novi stilovi za Explore i Re-center */
-        .btn-explore { background: var(--primary) !important; border-color: var(--primary) !important; font-weight: bold; }
-        #recenter-btn {
-            position: absolute; bottom: 100px; right: 20px; z-index: 2000;
-            background: white; border: none; width: 50px; height: 50px; border-radius: 50%;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3); cursor: pointer; display: flex;
-            justify-content: center; align-items: center; font-size: 20px;
+        /* Mobile Adaptacija (Ispod 768px) */
+        @media (max-width: 768px) {
+            header { padding: 10px; flex-direction: column; gap: 10px; }
+            .logo { font-size: 20px; }
+            .nav-links { width: 100%; justify-content: center; }
+            .nav-links button { flex: 1; padding: 10px 5px; font-size: 12px; }
+            
+            .admin-panel { 
+                bottom: 0 !important; left: 0 !important; transform: none !important; 
+                width: 100% !important; border-radius: 20px 20px 0 0 !important; 
+                padding: 20px !important; box-sizing: border-box;
+            }
         }
+
+        /* Re-center dugme */
+        #recenter-btn {
+            position: absolute; bottom: 30px; right: 20px; z-index: 2000;
+            background: white; border: none; width: 55px; height: 55px; border-radius: 50%;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4); cursor: pointer; font-size: 24px;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        /* Admin Panel */
+        .admin-panel {
+            position: absolute; bottom: 20px; left: 20px; z-index: 2000;
+            background: white; padding: 20px; border-radius: 12px;
+            width: 320px; box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+        .admin-panel h4 { margin: 0 0 10px 0; color: var(--dark); }
+        .hidden { display: none !important; }
+        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+        .btn-save { width: 100%; background: #27ae60; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
         /* Pulsirajuća tačkica */
         .user-location-pulse {
-            width: 12px; height: 12px; background: #3498db; border: 2px solid white;
-            border-radius: 50%; position: relative;
+            width: 15px; height: 15px; background: #3498db; border: 2px solid white;
+            border-radius: 50%; position: relative; box-shadow: 0 0 10px rgba(0,0,0,0.5);
         }
         .user-location-pulse::after {
-            content: ''; width: 30px; height: 30px; background: rgba(52, 152, 219, 0.4);
-            border-radius: 50%; position: absolute; top: -11px; left: -11px;
-            animation: pulse 1.5s infinite;
+            content: ''; width: 40px; height: 40px; background: rgba(52, 152, 219, 0.4);
+            border-radius: 50%; position: absolute; top: -14.5px; left: -14.5px;
+            animation: pulse 1.8s infinite;
         }
-        @keyframes pulse {
-            0% { transform: scale(0.5); opacity: 1; }
-            100% { transform: scale(2.5); opacity: 0; }
-        }
-
-        .admin-panel {
-            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
-            z-index: 2000; background: white; padding: 15px; border-radius: 10px;
-            width: 90%; max-width: 400px;
-        }
-        .hidden { display: none !important; }
-        input { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        @keyframes pulse { 0% { transform: scale(0.5); opacity: 1; } 100% { transform: scale(2.5); opacity: 0; } }
     </style>
 </head>
 <body>
@@ -73,29 +88,30 @@
     <div id="welcome-screen" class="welcome-overlay">
         <div class="welcome-content">
             <h1>Who Play?</h1>
-            <p>Sajt je isključivo za zabavu. Podaci nisu zvanični.</p>
-            <button onclick="prihvatiUslove()" id="accept-btn" style="background: var(--primary); color:white; padding: 15px 30px; border:none; border-radius: 50px; cursor:pointer; font-weight:bold;">PRISTAJEM</button>
+            <p>Podaci nisu zvanični. Zabavni karakter.</p>
+            <button onclick="prihvatiUslove()" style="background: var(--primary); color:white; padding: 15px 40px; border:none; border-radius: 50px; cursor:pointer; font-weight:bold; width: 100%;">PRIHVATAM</button>
         </div>
     </div>
 
     <header id="main-header" class="hidden">
         <div class="logo">WHO PLAY?</div>
         <div class="nav-links">
-            <button onclick="alert('Uskoro...')">Login</button>
-            <button id="explore-btn" class="btn-explore" onclick="locirajMe(true)">EXPLORE</button>
+            <button onclick="alert('Registracija...')">Registruj se</button>
+            <button onclick="alert('Admin Login...')">Admin Login</button>
+            <button id="explore-btn" style="background: var(--primary); font-weight: bold;" onclick="locirajMe(true)">EXPLORE</button>
         </div>
     </header>
 
-    <button id="recenter-btn" class="hidden" onclick="locirajMe(false)" title="Vrati me na moju poziciju">📍</button>
+    <button id="recenter-btn" class="hidden" onclick="locirajMe(false)">📍</button>
 
     <div id="map"></div>
 
     <div id="admin-panel" class="admin-panel hidden">
-        <strong>Novi teren</strong>
-        <input type="text" id="imeTerena" placeholder="Naziv terena">
-        <input type="text" id="rezultat" placeholder="Rezultat (npr. 1:0)">
-        <button onclick="sacuvajUFirebase()" style="width:100%; background:#27ae60; color:white; border:none; padding:10px; border-radius:5px;">Objavi uživo</button>
-        <button onclick="otkazi()" style="width:100%; background:none; border:none; color:red; cursor:pointer;">Otkaži</button>
+        <h4>Dodaj novi teren</h4>
+        <input type="text" id="imeTerena" placeholder="Naziv (npr. Teren Kalemegdan)">
+        <input type="text" id="rezultat" placeholder="Rezultat (npr. 2:2)">
+        <button class="btn-save" onclick="sacuvajUFirebase()">OBJAVI UŽIVO</button>
+        <button onclick="otkazi()" style="width:100%; background:none; border:none; color:#777; margin-top:10px; cursor:pointer;">Zatvori</button>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
@@ -108,24 +124,22 @@
         const database = firebase.database();
         const tereniRef = database.ref('tereni');
 
-        var map = L.map('map', { zoomControl: false }).setView([44.8178, 20.4489], 13);
+        var map = L.map('map', { zoomControl: false, tap: false }).setView([44.8178, 20.4489], 13);
         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
 
-        var userMarker, userCircle;
-        var privremeniMarker;
-        var trenutneKoordinate = null;
+        var userMarker, privremeniMarker, trenutneKoordinate;
 
         function prihvatiUslove() {
             localStorage.setItem('usloviWhoPlay', 'true');
             document.getElementById('welcome-screen').classList.add('hidden');
             document.getElementById('main-header').classList.remove('hidden');
+            map.invalidateSize(); // Osvežava mapu da ne bi bila siva
         }
 
         window.onload = function() {
             if (localStorage.getItem('usloviWhoPlay') === 'true') prihvatiUslove();
         };
 
-        // --- LOKACIJA ---
         function locirajMe(prviPut) {
             map.locate({setView: true, maxZoom: 16});
             if (prviPut) {
@@ -138,22 +152,22 @@
             const pulseIcon = L.divIcon({
                 className: 'custom-div-icon',
                 html: "<div class='user-location-pulse'></div>",
-                iconSize: [12, 12],
-                iconAnchor: [6, 6]
+                iconSize: [15, 15], iconAnchor: [7.5, 7.5]
             });
-
-            if (userMarker) {
-                userMarker.setLatLng(e.latlng);
-            } else {
-                userMarker = L.marker(e.latlng, {icon: pulseIcon}).addTo(map);
-            }
+            if (userMarker) userMarker.setLatLng(e.latlng);
+            else userMarker = L.marker(e.latlng, {icon: pulseIcon}).addTo(map);
         });
 
-        // --- MAP CLICK (ADMIN) ---
+        // Optimizacija klika za mobilni
         map.on('click', function(e) {
             trenutneKoordinate = e.latlng;
             if (privremeniMarker) map.removeLayer(privremeniMarker);
             privremeniMarker = L.marker(e.latlng).addTo(map);
+            
+            // Fokusiraj mapu malo iznad klika na mobilnom da panel ne prekrije marker
+            if (window.innerWidth < 768) {
+                map.panTo([e.latlng.lat - 0.005, e.latlng.lng]);
+            }
             document.getElementById('admin-panel').classList.remove('hidden');
         });
 
@@ -167,12 +181,15 @@
             const rez = document.getElementById('rezultat').value;
             if (ime && trenutneKoordinate) {
                 tereniRef.push().set({ ime, rezultat: rez, lat: trenutneKoordinate.lat, lng: trenutneKoordinate.lng });
+                document.getElementById('imeTerena').value = "";
+                document.getElementById('rezultat').value = "";
                 otkazi();
             }
         }
 
         tereniRef.on('value', (snapshot) => {
             const data = snapshot.val();
+            // Ovde bi trebalo dodati čišćenje starih markera u punoj verziji
             for (let id in data) {
                 const t = data[id];
                 L.marker([t.lat, t.lng]).addTo(map).bindPopup(`<b>${t.ime}</b><br>Rezultat: ${t.rezultat}`);
