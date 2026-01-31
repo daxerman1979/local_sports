@@ -3,24 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Who Play? - Final Mobile Fix</title>
+    <title>Who Play? - Mobile Fix</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
     <style>
         :root { --primary: #e74c3c; --dark: #121212; --bg: #000; }
         
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        /* OVO SPREČAVA BILO KAKVO ZUMIRANJE I POMERANJE STRANICE */
+        * { 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation; /* Dozvoljava klik, zabranjuje pinch-zoom */
+        }
         
         body, html { 
             margin: 0; padding: 0; 
-            height: 100%; width: 100%;
+            height: 100svh; width: 100%;
             font-family: -apple-system, system-ui, sans-serif; 
-            overflow: hidden; background: var(--bg);
-            position: fixed; /* Sprečava bounce efekt na iOS-u */
+            overflow: hidden; 
+            background: var(--bg);
+            position: fixed; /* Zaključava celu stranicu na mestu */
         }
 
-        #map { height: 100%; width: 100%; position: absolute; top: 0; left: 0; z-index: 1; }
+        #map { 
+            height: 100%; width: 100%; 
+            position: absolute; top: 0; left: 0; z-index: 1; 
+            touch-action: pan-x pan-y; /* Dozvoljava mrdanje mape, ali ne i stranice */
+        }
 
         /* Header */
         header {
@@ -28,22 +38,23 @@
             display: flex; justify-content: space-between; align-items: center;
             padding: env(safe-area-inset-top) 15px 10px 15px;
             background: linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%);
+            pointer-events: none; /* Propušta klikove na mapu kroz prazan prostor */
         }
+        .logo, .nav-links { pointer-events: auto; } /* Ali dugmad rade */
+
         .logo { font-size: 18px; font-weight: 900; color: var(--primary); }
-        .nav-links { display: flex; gap: 8px; }
         .nav-btn {
             background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.2); color: white;
             padding: 8px 12px; border-radius: 20px; font-size: 12px; font-weight: bold;
         }
 
-        /* Controls */
+        /* Bočne kontrole */
         .controls-container {
             position: fixed; right: 15px; bottom: 100px;
             z-index: 2000; display: flex; flex-direction: column; gap: 12px;
-            transition: bottom 0.3s;
         }
 
-        /* ADMIN KARTICA - Koristimo transform da je uvek drži na dnu */
+        /* ADMIN KARTICA - ZAKUCANA ZA DNO */
         #admin-card {
             position: fixed; bottom: 0; left: 0; width: 100%; z-index: 9999;
             background: var(--dark); color: white;
@@ -51,23 +62,23 @@
             border-radius: 20px 20px 0 0;
             display: flex; justify-content: space-between; align-items: center;
             border-top: 2px solid var(--primary);
-            transition: transform 0.3s ease-out;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.5);
         }
 
         /* MODALI */
         .overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 10000; display: flex; justify-content: center; align-items: center;
-            background: rgba(0,0,0,0.92);
+            background: rgba(0,0,0,0.9);
         }
-        .modal { background: white; padding: 25px; border-radius: 25px; width: 90%; max-width: 320px; text-align: center; }
+        .modal { background: white; padding: 25px; border-radius: 25px; width: 90%; max-width: 320px; text-align: center; color: #111; }
         
-        /* INPUT 16px font je OBAVEZAN protiv auto-zooma */
         input { 
             width: 100%; padding: 14px; margin: 8px 0; border: 1px solid #ddd; 
-            border-radius: 10px; font-size: 16px !important; box-sizing: border-box; 
-            appearance: none;
+            border-radius: 10px; font-size: 16px !important; /* Font 16px sprečava zoom na iOS */
+            box-sizing: border-box; 
         }
+        
         .btn-action { width: 100%; background: var(--primary); border: none; color: white; padding: 14px; border-radius: 12px; font-weight: bold; font-size: 16px; margin-top: 10px; }
         
         .hidden { display: none !important; }
@@ -88,7 +99,7 @@
     <div id="welcome-screen" class="overlay">
         <div class="modal">
             <h2 style="margin-top:0;">Who Play?</h2>
-            <p style="color:#555; font-size: 14px;">Sajt je za zabavu. Podaci su nezvanični.</p>
+            <p>Sajt je za zabavu. Podaci su nezvanični.</p>
             <button class="btn-action" onclick="prihvatiUslove()">PRIHVATAM</button>
         </div>
     </div>
@@ -99,7 +110,7 @@
             <input type="text" id="reg-nick" placeholder="Nickname">
             <input type="email" id="reg-email" placeholder="Email">
             <button class="btn-action" onclick="registerAdmin()">Potvrdi</button>
-            <button onclick="toggleModal('register-screen', false)" style="background:none; border:none; margin-top:10px; color:#999">Zatvori</button>
+            <button onclick="toggleModal('register-screen', false)" style="background:none; border:none; margin-top:10px; color:#777">Zatvori</button>
         </div>
     </div>
 
@@ -108,7 +119,7 @@
             <h3>Login</h3>
             <input type="email" id="login-email" placeholder="Email">
             <button class="btn-action" onclick="loginAdmin()">Prijavi se</button>
-            <button onclick="toggleModal('login-screen', false)" style="background:none; border:none; margin-top:10px; color:#999">Zatvori</button>
+            <button onclick="toggleModal('login-screen', false)" style="background:none; border:none; margin-top:10px; color:#777">Zatvori</button>
         </div>
     </div>
 
@@ -120,17 +131,17 @@
         </div>
     </header>
 
-    <div class="controls-container" id="side-controls">
-        <button id="info-btn" class="nav-btn hidden" style="width:40px; height:40px; border-radius:50%; padding:0;" onclick="toggleModal('welcome-screen', true)">i</button>
-        <button id="recenter-btn" class="nav-btn hidden" style="width:40px; height:40px; border-radius:50%; padding:0;" onclick="locirajMe()">🎯</button>
+    <div class="controls-container">
+        <button id="info-btn" class="nav-btn hidden" style="width:44px; height:44px; border-radius:50%; padding:0;" onclick="toggleModal('welcome-screen', true)">i</button>
+        <button id="recenter-btn" class="nav-btn hidden" style="width:44px; height:44px; border-radius:50%; padding:0;" onclick="locirajMe()">🎯</button>
     </div>
 
     <div id="admin-card" class="hidden">
         <div style="max-width: 65%;">
-            <small style="color:#aaa; display:block">Admin:</small>
-            <strong id="admin-nick-display"></strong>
+            <small style="color:#aaa; display:block">Ulogovan:</small>
+            <strong id="admin-nick-display" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block;"></strong>
         </div>
-        <button style="background:var(--primary); border:none; color:white; padding:8px 15px; border-radius:8px;" onclick="logoutAdmin()">Logout</button>
+        <button style="background:var(--primary); border:none; color:white; padding:10px 15px; border-radius:10px; font-weight:bold" onclick="logoutAdmin()">Logout</button>
     </div>
 
     <div id="map"></div>
@@ -144,20 +155,22 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        var map = L.map('map', { zoomControl: false, tap: false, attributionControl: false }).setView([44.8178, 20.4489], 13);
-        L.tileLayer('https://{s}.google.com/vt/lyrs=y,h&x={x}&y={y}&z={z}', { maxZoom: 20, subdomains:['mt0','mt1','mt2','mt3'] }).addTo(map);
+        var map = L.map('map', { 
+            zoomControl: false, 
+            tap: false, 
+            attributionControl: false,
+            dragging: true,
+            touchZoom: true,
+            doubleClickZoom: false,
+            scrollWheelZoom: true
+        }).setView([44.8178, 20.4489], 13);
+
+        L.tileLayer('https://{s}.google.com/vt/lyrs=y,h&x={x}&y={y}&z={z}', { 
+            maxZoom: 20, 
+            subdomains:['mt0','mt1','mt2','mt3'] 
+        }).addTo(map);
 
         var userMarker, lastKnownLatLng;
-
-        // --- FIXED VIEWPORT LOGIC ---
-        // Ovo sprečava tastaturu da uništi layout
-        if (window.visualViewport) {
-            window.visualViewport.addEventListener('resize', () => {
-                let offset = window.innerHeight - window.visualViewport.height;
-                document.getElementById('admin-card').style.transform = `translateY(-${offset}px)`;
-                document.getElementById('side-controls').style.bottom = `${offset + 100}px`;
-            });
-        }
 
         function prihvatiUslove() {
             localStorage.setItem('usloviWhoPlay', 'true');
@@ -182,7 +195,7 @@
             const email = document.getElementById('reg-email').value.toLowerCase();
             if(!nick || !email) return;
             db.ref('admins').push({ nickname: nick, email: email }).then(() => {
-                alert("Uspešno! Prijavite se.");
+                alert("Uspešno!");
                 toggleModal('register-screen', false);
             });
         }
@@ -195,7 +208,7 @@
                     localStorage.setItem('loggedAdmin', JSON.stringify(userData));
                     setupAdminUI(userData);
                     toggleModal('login-screen', false);
-                } else alert("Email nije nađen.");
+                } else alert("Email nije pronađen.");
             });
         }
 
@@ -226,6 +239,17 @@
                 .bindPopup(`<b>${data[id].ime}</b><br>Rezultat: ${data[id].rezultat}`);
             }
         });
+
+        // REŠENJE ZA TASTATURU NA MOBILNOM
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', () => {
+                const adminCard = document.getElementById('admin-card');
+                if (!adminCard.classList.contains('hidden')) {
+                    const offset = window.innerHeight - window.visualViewport.height;
+                    adminCard.style.bottom = offset > 0 ? `${offset}px` : '0px';
+                }
+            });
+        }
     </script>
 </body>
 </html>
