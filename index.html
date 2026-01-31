@@ -3,24 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Who Play? - Uživo Rezultati</title>
+    <title>Who Play? - Admin System</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
     <style>
-        :root { --primary: #e74c3c; --dark: #2c3e50; --light: #ecf0f1; }
+        :root { --primary: #e74c3c; --dark: #2c3e50; --success: #27ae60; }
         body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', sans-serif; overflow: hidden; background: #000; }
         #map { height: 100vh; width: 100%; position: absolute; z-index: 1; }
 
-        /* Welcome Overlay */
-        .welcome-overlay {
+        /* Welcome & Auth Overlays */
+        .overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 10000; display: flex; justify-content: center; align-items: center;
-            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
-                        url('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/10/370/560');
-            background-size: cover; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
         }
-        .welcome-content { background: white; padding: 30px; border-radius: 20px; text-align: center; max-width: 400px; margin: 20px; }
+        .modal-content { background: white; padding: 30px; border-radius: 20px; text-align: center; max-width: 350px; width: 90%; }
 
         /* Header */
         header {
@@ -36,79 +34,73 @@
             padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 13px;
         }
 
-        /* Disclaimer dugme (i) */
-        #info-btn {
-            position: absolute; top: 80px; right: 20px; z-index: 2000;
-            background: rgba(255,255,255,0.8); border: none; width: 35px; height: 35px;
-            border-radius: 50%; font-weight: bold; cursor: pointer; font-family: serif; font-size: 18px;
+        /* Admin Card na dnu */
+        #admin-card {
+            position: absolute; bottom: 20px; left: 20px; z-index: 3000;
+            background: var(--dark); color: white; padding: 15px 20px;
+            border-radius: 15px; display: flex; align-items: center; gap: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5); border-left: 5px solid var(--primary);
         }
+        #admin-card button { background: var(--primary); border: none; color: white; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
 
-        /* GPS Dugme */
-        #recenter-btn {
-            position: absolute; bottom: 40px; right: 20px; z-index: 2000;
-            background: white; border: none; width: 55px; height: 55px; border-radius: 50%;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3); cursor: pointer; font-size: 24px;
-            display: flex; justify-content: center; align-items: center;
-        }
+        /* Forms */
+        input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
+        .btn-main { width: 100%; background: var(--primary); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
-        /* Admin Panel - Unapređen stil */
-        .admin-panel {
-            position: absolute; bottom: 30px; left: 20px; z-index: 2000;
-            background: white; padding: 20px; border-radius: 15px;
-            width: 320px; box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-        }
+        #recenter-btn { position: absolute; bottom: 100px; right: 20px; z-index: 2000; background: white; border: none; width: 50px; height: 50px; border-radius: 50%; box-shadow: 0 4px 15px rgba(0,0,0,0.3); cursor: pointer; font-size: 20px; }
         .hidden { display: none !important; }
-        
-        @media (max-width: 768px) {
-            header { padding: 8px; flex-direction: column; }
-            .nav-links { width: 100%; }
-            .nav-links button { flex: 1; padding: 10px 5px; font-size: 11px; }
-            .admin-panel { bottom: 0 !important; left: 0 !important; width: 100% !important; border-radius: 20px 20px 0 0 !important; }
-        }
 
-        .user-location-pulse {
-            width: 14px; height: 14px; background: #3498db; border: 2px solid white;
-            border-radius: 50%; position: relative;
+        @media (max-width: 768px) {
+            header { padding: 10px; flex-direction: column; }
+            #admin-card { left: 0; bottom: 0; width: 100%; border-radius: 0; box-sizing: border-box; justify-content: space-between; }
         }
-        .user-location-pulse::after {
-            content: ''; width: 35px; height: 35px; background: rgba(52, 152, 219, 0.3);
-            border-radius: 50%; position: absolute; top: -12.5px; left: -12.5px;
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse { 0% { transform: scale(0.6); opacity: 1; } 100% { transform: scale(2.2); opacity: 0; } }
     </style>
 </head>
 <body>
 
-    <div id="welcome-screen" class="welcome-overlay">
-        <div class="welcome-content">
-            <h1>Who Play?</h1>
-            <p>Sajt je isključivo za zabavu. Podaci su nezvanični. Vlasnik ne odgovara za sadržaj korisnika.</p>
-            <button onclick="prihvatiUslove()" style="background: var(--primary); color:white; padding: 15px 40px; border:none; border-radius: 50px; cursor:pointer; font-weight:bold; width: 100%;">RAZUMEM I PRIHVATAM</button>
+    <div id="welcome-screen" class="overlay">
+        <div class="modal-content">
+            <h1 style="color: var(--dark)">Who Play?</h1>
+            <p>Sajt je za zabavu. Podaci su nezvanični.</p>
+            <button class="btn-main" onclick="prihvatiUslove()">PRIHVATAM</button>
+        </div>
+    </div>
+
+    <div id="register-screen" class="overlay hidden">
+        <div class="modal-content">
+            <h3>Registracija Admina</h3>
+            <input type="text" id="reg-nick" placeholder="Nickname">
+            <input type="email" id="reg-email" placeholder="Email adresa">
+            <button class="btn-main" onclick="registerAdmin()">Registruj me</button>
+            <button onclick="toggleModal('register-screen', false)" style="background:none; border:none; color: #777; margin-top:10px; cursor:pointer;">Zatvori</button>
+        </div>
+    </div>
+
+    <div id="login-screen" class="overlay hidden">
+        <div class="modal-content">
+            <h3>Admin Login</h3>
+            <input type="email" id="login-email" placeholder="Unesite vaš email">
+            <button class="btn-main" onclick="loginAdmin()">Prijavi se</button>
+            <button onclick="toggleModal('login-screen', false)" style="background:none; border:none; color: #777; margin-top:10px; cursor:pointer;">Zatvori</button>
         </div>
     </div>
 
     <header id="main-header" class="hidden">
         <div class="logo">Who Play?</div>
-        <div class="nav-links">
-            <button onclick="alert('Registracija uskoro...')">Registracija</button>
-            <button onclick="aktivirajAdminMod()" style="background: #f39c12; border:none; color: black; font-weight: bold;">Admin Login</button>
-            <button id="explore-btn" style="background: var(--primary); border:none; font-weight: bold;" onclick="locirajMe(true)">EXPLORE</button>
+        <div id="guest-nav" class="nav-links">
+            <button onclick="toggleModal('register-screen', true)">Registracija</button>
+            <button onclick="toggleModal('login-screen', true)" style="background: #f39c12; color: black;">Admin Login</button>
+            <button style="background: var(--primary)" onclick="locirajMe(true)">EXPLORE</button>
         </div>
     </header>
 
-    <button id="info-btn" class="hidden" onclick="prikaziUslovePonovo()">i</button>
-    <button id="recenter-btn" class="hidden" onclick="locirajMe(false)">📍</button>
-
-    <div id="map"></div>
-
-    <div id="admin-panel" class="admin-panel hidden">
-        <h4 style="margin:0 0 10px 0;">Admin: Dodaj teren</h4>
-        <input type="text" id="imeTerena" placeholder="Naziv terena" style="width:100%; padding:10px; margin-bottom:10px; border-radius:8px; border:1px solid #ddd;">
-        <input type="text" id="rezultat" placeholder="Rezultat (npr. 0:0)" style="width:100%; padding:10px; margin-bottom:10px; border-radius:8px; border:1px solid #ddd;">
-        <button onclick="sacuvajUFirebase()" style="width:100%; background:#27ae60; color:white; border:none; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer;">OBJAVI</button>
-        <button onclick="iskljuciAdminMod()" style="width:100%; background:none; border:none; color:#777; margin-top:10px; cursor:pointer;">Isključi Admin Mod</button>
+    <div id="admin-card" class="hidden">
+        <div>Admin: <strong id="admin-nick-display"></strong></div>
+        <button onclick="logoutAdmin()">Logout</button>
     </div>
+
+    <button id="recenter-btn" class="hidden" onclick="locirajMe(false)">📍</button>
+    <div id="map"></div>
 
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
@@ -117,107 +109,91 @@
     <script>
         const firebaseConfig = { databaseURL: "https://allsportslocal-ea1d4-default-rtdb.europe-west1.firebasedatabase.app" };
         firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-        const tereniRef = database.ref('tereni');
+        const db = firebase.database();
 
         var map = L.map('map', { zoomControl: false, tap: false }).setView([44.8178, 20.4489], 13);
         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
 
-        var userMarker, privremeniMarker, trenutneKoordinate;
+        var currentUser = null;
         var lastKnownLatLng = null;
-        var adminModAktivan = false;
 
         function prihvatiUslove() {
             localStorage.setItem('usloviWhoPlay', 'true');
             document.getElementById('welcome-screen').classList.add('hidden');
             document.getElementById('main-header').classList.remove('hidden');
-            document.getElementById('info-btn').classList.remove('hidden');
-            map.invalidateSize();
-            aktivirajGPS();
-        }
-
-        function prikaziUslovePonovo() {
-            document.getElementById('welcome-screen').classList.remove('hidden');
+            map.locate({watch: true});
         }
 
         window.onload = function() {
             if (localStorage.getItem('usloviWhoPlay') === 'true') prihvatiUslove();
+            // Provera da li je ostao ulogovan
+            const savedAdmin = localStorage.getItem('loggedAdmin');
+            if (savedAdmin) setupAdminUI(JSON.parse(savedAdmin));
         };
 
-        function aktivirajGPS() {
-            map.locate({ watch: true, enableHighAccuracy: true });
+        function toggleModal(id, show) {
+            document.getElementById(id).classList.toggle('hidden', !show);
         }
 
-        map.on('locationfound', function(e) {
-            lastKnownLatLng = e.latlng;
-            const pulseIcon = L.divIcon({
-                className: 'custom-div-icon',
-                html: "<div class='user-location-pulse'></div>",
-                iconSize: [14, 14], iconAnchor: [7, 7]
+        // --- REGISTRACIJA ---
+        function registerAdmin() {
+            const nick = document.getElementById('reg-nick').value;
+            const email = document.getElementById('reg-email').value.toLowerCase();
+            if(!nick || !email) return alert("Popuni sva polja!");
+
+            db.ref('admins').push({ nickname: nick, email: email })
+            .then(() => {
+                alert("Uspešna registracija! Sada se možeš ulogovati.");
+                toggleModal('register-screen', false);
             });
-            if (userMarker) userMarker.setLatLng(e.latlng);
-            else userMarker = L.marker(e.latlng, {icon: pulseIcon}).addTo(map);
-        });
-
-        function locirajMe(prviPut) {
-            if (prviPut) {
-                document.getElementById('explore-btn').classList.add('hidden');
-                document.getElementById('recenter-btn').classList.remove('hidden');
-            }
-            if (lastKnownLatLng) map.flyTo(lastKnownLatLng, 16);
-            else map.locate({setView: true, maxZoom: 16});
         }
 
-        // --- ADMIN LOGIKA ---
-        function aktivirajAdminMod() {
-            let pass = prompt("Unesite admin lozinku:");
-            if (pass === "admin123") { // Privremena lozinka
-                adminModAktivan = true;
-                alert("Admin mod aktiviran. Sada možeš kliknuti na mapu da dodaš teren.");
-            } else {
-                alert("Pogrešna lozinka.");
-            }
+        // --- LOGIN ---
+        function loginAdmin() {
+            const email = document.getElementById('login-email').value.toLowerCase();
+            db.ref('admins').orderByChild('email').equalTo(email).once('value', snapshot => {
+                if (snapshot.exists()) {
+                    const userData = Object.values(snapshot.val())[0];
+                    localStorage.setItem('loggedAdmin', JSON.stringify(userData));
+                    setupAdminUI(userData);
+                    toggleModal('login-screen', false);
+                } else {
+                    alert("Email nije pronađen. Registrujte se prvo.");
+                }
+            });
         }
 
-        function iskljuciAdminMod() {
-            adminModAktivan = false;
-            otkazi();
-            alert("Admin mod isključen.");
+        function setupAdminUI(user) {
+            currentUser = user;
+            document.getElementById('guest-nav').classList.add('hidden');
+            document.getElementById('admin-card').classList.remove('hidden');
+            document.getElementById('admin-nick-display').innerText = user.nickname;
+            alert("Dobrodošao nazad, " + user.nickname + "!");
         }
 
-        map.on('click', function(e) {
-            if (!adminModAktivan) return; // Ako nije admin mod, ne dešava se ništa
-            
-            trenutneKoordinate = e.latlng;
-            if (privremeniMarker) map.removeLayer(privremeniMarker);
-            privremeniMarker = L.marker(e.latlng).addTo(map);
-            
-            if (window.innerWidth < 768) map.panTo([e.latlng.lat - 0.005, e.latlng.lng]);
-            document.getElementById('admin-panel').classList.remove('hidden');
-        });
-
-        function otkazi() {
-            if (privremeniMarker) map.removeLayer(privremeniMarker);
-            document.getElementById('admin-panel').classList.add('hidden');
+        function logoutAdmin() {
+            localStorage.removeItem('loggedAdmin');
+            location.reload();
         }
 
-        function sacuvajUFirebase() {
-            const ime = document.getElementById('imeTerena').value;
-            const rez = document.getElementById('rezultat').value;
-            if (ime && trenutneKoordinate) {
-                tereniRef.push().set({ ime, rezultat: rez, lat: trenutneKoordinate.lat, lng: trenutneKoordinate.lng });
-                otkazi();
-            }
+        // --- MAPA & GPS ---
+        map.on('locationfound', e => { lastKnownLatLng = e.latlng; });
+        
+        function locirajMe(prvi) {
+            if(prvi) document.getElementById('recenter-btn').classList.remove('hidden');
+            if(lastKnownLatLng) map.flyTo(lastKnownLatLng, 16);
         }
 
-        tereniRef.on('value', (snapshot) => {
-            const data = snapshot.val();
-            // Ovde bi trebalo dodati čišćenje starih markera u punoj verziji
+        // Prikaz terena
+        db.ref('tereni').on('value', snap => {
+            const data = snap.val();
             for (let id in data) {
-                const t = data[id];
-                L.marker([t.lat, t.lng]).addTo(map).bindPopup(`<b>${t.ime}</b><br>Rezultat: ${t.rezultat}`);
+                L.marker([data[id].lat, data[id].lng]).addTo(map)
+                .bindPopup(`<b>${data[id].ime}</b><br>Rezultat: ${data[id].rezultat}`);
             }
         });
+
+        // Ovde ćemo kasnije dodati Admin klik funkciju samo za ulogovane
     </script>
 </body>
 </html>
