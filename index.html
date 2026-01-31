@@ -3,135 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Who Play? - Mobile App</title>
+    <title>Who Play? - Universal Responsive</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
     <style>
-        :root { --primary: #e74c3c; --dark: #121212; --accent: #3498db; }
+        :root { --primary: #e74c3c; --dark: #121212; --bg: #000; }
         
-        /* Fix za mobilni viewport */
         body, html { 
             margin: 0; padding: 0; 
             height: 100svh; width: 100vw;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-            overflow: hidden; background: #000;
+            font-family: -apple-system, system-ui, sans-serif; 
+            overflow: hidden; background: var(--bg);
         }
 
         #map { height: 100%; width: 100%; position: absolute; z-index: 1; }
 
-        /* Mobilni Header - Minimalistički */
+        /* HEADER - Popravljen za sve ekrane */
         header {
             position: fixed; top: 0; left: 0; width: 100%; z-index: 2000;
             display: flex; justify-content: space-between; align-items: center;
-            padding: env(safe-area-inset-top) 15px 10px 15px; 
-            background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
-            color: white; pointer-events: none; /* Propušta klikove na mapu osim na dugmad */
+            padding: env(safe-area-inset-top) 15px 10px 15px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%);
+            box-sizing: border-box;
         }
-        .logo { font-size: 20px; font-weight: 900; color: var(--primary); pointer-events: auto; }
-        .nav-links { pointer-events: auto; }
-        .nav-links button {
-            background: rgba(255,255,255,0.2); border: none; color: white;
-            padding: 8px 12px; border-radius: 20px; font-size: 12px; font-weight: bold;
-            backdrop-filter: blur(5px);
+        .logo { font-size: clamp(16px, 4vw, 22px); font-weight: 900; color: var(--primary); text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .nav-links { display: flex; gap: 5px; }
+        
+        button { border: none; cursor: pointer; transition: 0.2s; }
+
+        /* Dugmad u headeru */
+        .nav-btn {
+            background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.2); color: white;
+            padding: 8px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; backdrop-filter: blur(5px);
+            white-space: nowrap;
         }
 
-        /* Info (i) i GPS Dugme - Pozicionirani za palac */
-        .side-controls {
-            position: fixed; right: 15px; top: 50%; transform: translateY(-50%);
-            z-index: 2000; display: flex; flex-direction: column; gap: 15px;
+        /* Bočne kontrole (i i 🎯) */
+        .controls-container {
+            position: fixed; right: 15px; bottom: 120px;
+            z-index: 2000; display: flex; flex-direction: column; gap: 12px;
         }
-        .circle-btn {
-            width: 50px; height: 50px; background: white; border: none;
-            border-radius: 50%; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            display: flex; justify-content: center; align-items: center;
-            font-size: 20px; cursor: pointer;
+        .btn-circle {
+            width: 50px; height: 50px; background: white; 
+            border-radius: 50%; box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            display: flex; justify-content: center; align-items: center; font-size: 20px;
         }
 
-        /* Admin Kartica na dnu - Mobile App Style */
+        /* ADMIN KARTICA - Rešen problem sa širinom */
         #admin-card {
-            position: fixed; bottom: 0; left: 0; width: 100%; z-index: 9000;
-            background: var(--dark); color: white; 
-            padding: 20px 20px calc(20px + env(safe-area-inset-bottom));
-            border-radius: 25px 25px 0 0;
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 600px; /* Limitirano za desktop/tablet */
+            z-index: 9999; background: var(--dark); color: white;
+            padding: 15px 20px calc(15px + env(safe-area-inset-bottom));
+            border-radius: 20px 20px 0 0;
             display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
+            box-sizing: border-box; box-shadow: 0 -8px 24px rgba(0,0,0,0.6);
+            border-top: 2px solid var(--primary);
         }
-        .logout-btn { background: var(--primary); border: none; color: white; padding: 12px 20px; border-radius: 12px; font-weight: bold; }
+        .logout-btn { background: var(--primary); color: white; padding: 10px 18px; border-radius: 10px; font-weight: bold; font-size: 14px; }
 
-        /* Modali - Full Screen na mobilnom */
+        /* Modal / Overlay */
         .overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 10000; display: flex; justify-content: center; align-items: center;
-            background: rgba(0,0,0,0.9); backdrop-filter: blur(10px);
+            background: rgba(0,0,0,0.92); backdrop-filter: blur(8px);
         }
-        .modal-content { 
-            background: white; padding: 30px; border-radius: 30px; 
-            width: 85%; max-width: 400px; text-align: center;
+        .modal { background: white; padding: 25px; border-radius: 25px; width: 90%; max-width: 340px; text-align: center; }
+        .btn-action { width: 100%; background: var(--primary); color: white; padding: 14px; border-radius: 12px; font-weight: bold; font-size: 16px; margin-top: 10px; }
+        
+        input { width: 100%; padding: 14px; margin: 8px 0; border: 1px solid #ddd; border-radius: 10px; font-size: 16px; box-sizing: border-box; }
+        .hidden { display: none !important; }
+
+        /* Specifično za male telefone */
+        @media (max-width: 380px) {
+            .nav-btn { padding: 6px 10px; font-size: 11px; }
+            .logo { font-size: 15px; }
+            #admin-card { padding: 12px 15px; }
         }
 
-        /* Pulsirajuća tačka */
-        .user-location-pulse {
-            width: 14px; height: 14px; background: var(--accent); border: 2px solid white;
+        .pulse-marker {
+            width: 14px; height: 14px; background: #3498db; border: 2px solid white;
             border-radius: 50%; position: relative;
         }
-        .user-location-pulse::after {
-            content: ''; width: 40px; height: 40px; background: rgba(52, 152, 219, 0.3);
-            border-radius: 50%; position: absolute; top: -15px; left: -15px;
-            animation: pulse 2s infinite;
+        .pulse-marker::after {
+            content: ''; width: 36px; height: 36px; background: rgba(52, 152, 219, 0.4);
+            border-radius: 50%; position: absolute; top: -13px; left: -13px;
+            animation: pulse-ring 2s infinite;
         }
-        @keyframes pulse { 0% { transform: scale(0.6); opacity: 1; } 100% { transform: scale(2.5); opacity: 0; } }
-
-        .hidden { display: none !important; }
-        input { width: 100%; padding: 15px; margin: 10px 0; border: 1px solid #ddd; border-radius: 12px; font-size: 16px; outline: none; }
-        .btn-confirm { width: 100%; background: var(--primary); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: bold; font-size: 16px; }
+        @keyframes pulse-ring { 0% { transform: scale(0.5); opacity: 1; } 100% { transform: scale(2.2); opacity: 0; } }
     </style>
 </head>
 <body>
 
     <div id="welcome-screen" class="overlay">
-        <div class="modal-content">
-            <h2 style="margin-top:0">Who Play?</h2>
-            <p style="color: #666">Nezvanični podaci. Isključivo za zabavu. Vlasnik ne odgovara za sadržaj.</p>
-            <button class="btn-confirm" onclick="prihvatiUslove()">PRIHVATAM</button>
+        <div class="modal">
+            <h2 style="margin-top:0;">Who Play?</h2>
+            <p style="color:#555; font-size: 14px;">Nezvanični podaci. Isključivo za zabavu.</p>
+            <button class="btn-action" onclick="prihvatiUslove()">PRIHVATAM</button>
         </div>
-    </div>
-
-    <header id="main-header" class="hidden">
-        <div class="logo">Who Play?</div>
-        <div id="guest-nav" class="nav-links">
-            <button onclick="toggleModal('register-screen', true)">Reg</button>
-            <button onclick="toggleModal('login-screen', true)">Login</button>
-        </div>
-    </header>
-
-    <div class="side-controls">
-        <button id="info-btn" class="circle-btn hidden" onclick="toggleModal('welcome-screen', true)">i</button>
-        <button id="recenter-btn" class="circle-btn hidden" onclick="locirajMe()">🎯</button>
-    </div>
-
-    <div id="admin-card" class="hidden">
-        <div><small style="color:#aaa; display:block">Ulogovan kao</small><strong id="admin-nick-display"></strong></div>
-        <button class="logout-btn" onclick="logoutAdmin()">Izloguj se</button>
     </div>
 
     <div id="register-screen" class="overlay hidden">
-        <div class="modal-content">
+        <div class="modal">
             <h3>Registracija</h3>
             <input type="text" id="reg-nick" placeholder="Nickname">
-            <input type="email" id="reg-email" placeholder="Email">
-            <button class="btn-confirm" onclick="registerAdmin()">Potvrdi</button>
-            <button onclick="toggleModal('register-screen', false)" style="background:none; border:none; margin-top:15px; color:#999">Nazad</button>
+            <input type="email" id="reg-email" placeholder="Vaš Email">
+            <button class="btn-action" onclick="registerAdmin()">Registruj me</button>
+            <button onclick="toggleModal('register-screen', false)" style="background:none; margin-top:10px; color:#999">Zatvori</button>
         </div>
     </div>
 
     <div id="login-screen" class="overlay hidden">
-        <div class="modal-content">
-            <h3>Login</h3>
-            <input type="email" id="login-email" placeholder="Vaš email">
-            <button class="btn-confirm" onclick="loginAdmin()">Prijavi se</button>
-            <button onclick="toggleModal('login-screen', false)" style="background:none; border:none; margin-top:15px; color:#999">Nazad</button>
+        <div class="modal">
+            <h3>Admin Login</h3>
+            <input type="email" id="login-email" placeholder="Vaš Email">
+            <button class="btn-action" onclick="loginAdmin()">Prijavi se</button>
+            <button onclick="toggleModal('login-screen', false)" style="background:none; margin-top:10px; color:#999">Zatvori</button>
         </div>
+    </div>
+
+    <header id="main-header" class="hidden">
+        <div class="logo">WHO PLAY?</div>
+        <div id="guest-nav" class="nav-links">
+            <button class="nav-btn" onclick="toggleModal('register-screen', true)">Reg</button>
+            <button class="nav-btn" onclick="toggleModal('login-screen', true)">Login</button>
+        </div>
+    </header>
+
+    <div class="controls-container">
+        <button id="info-btn" class="btn-circle hidden" onclick="toggleModal('welcome-screen', true)">i</button>
+        <button id="recenter-btn" class="btn-circle hidden" onclick="locirajMe()">🎯</button>
+    </div>
+
+    <div id="admin-card" class="hidden">
+        <div style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 60%;">
+            <small style="color:#aaa; display:block">Ulogovan:</small>
+            <strong id="admin-nick-display"></strong>
+        </div>
+        <button class="logout-btn" onclick="logoutAdmin()">Logout</button>
     </div>
 
     <div id="map"></div>
@@ -145,8 +155,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // Mobile optimized map: Satelit + Ulice + Granice (bez POI)
-        var map = L.map('map', { zoomControl: false, tap: false, bounceAtZoomLimits: false }).setView([44.8178, 20.4489], 13);
+        var map = L.map('map', { zoomControl: false, tap: false, attributionControl: false }).setView([44.8178, 20.4489], 13);
         L.tileLayer('https://{s}.google.com/vt/lyrs=y,h&x={x}&y={y}&z={z}', {
             maxZoom: 20, subdomains:['mt0','mt1','mt2','mt3']
         }).addTo(map);
@@ -176,7 +185,7 @@
             const email = document.getElementById('reg-email').value.toLowerCase();
             if(!nick || !email) return;
             db.ref('admins').push({ nickname: nick, email: email }).then(() => {
-                alert("Uspešno! Prijavite se.");
+                alert("Uspešno!");
                 toggleModal('register-screen', false);
             });
         }
@@ -189,7 +198,7 @@
                     localStorage.setItem('loggedAdmin', JSON.stringify(userData));
                     setupAdminUI(userData);
                     toggleModal('login-screen', false);
-                } else alert("Email nije registrovan.");
+                } else alert("Email nije pronađen.");
             });
         }
 
@@ -205,7 +214,7 @@
             lastKnownLatLng = e.latlng;
             const pulseIcon = L.divIcon({
                 className: 'custom-div-icon',
-                html: "<div class='user-location-pulse'></div>",
+                html: "<div class='pulse-marker'></div>",
                 iconSize: [14, 14], iconAnchor: [7, 7]
             });
             if (userMarker) userMarker.setLatLng(e.latlng);
@@ -213,7 +222,7 @@
         });
         
         function locirajMe() {
-            if(lastKnownLatLng) map.flyTo(lastKnownLatLng, 17, { duration: 1 });
+            if(lastKnownLatLng) map.flyTo(lastKnownLatLng, 17);
             else map.locate({setView: true, maxZoom: 17});
         }
 
