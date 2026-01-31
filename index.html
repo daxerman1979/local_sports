@@ -12,7 +12,7 @@
         body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', sans-serif; overflow: hidden; background: #000; }
         #map { height: 100vh; width: 100%; position: absolute; z-index: 1; }
 
-        /* Welcome & Auth Overlays */
+        /* Overlays */
         .overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 10000; display: flex; justify-content: center; align-items: center;
@@ -20,7 +20,6 @@
         }
         .modal-content { background: white; padding: 30px; border-radius: 20px; text-align: center; max-width: 350px; width: 90%; }
 
-        /* Header */
         header {
             position: absolute; top: 0; left: 0; width: 100%; z-index: 2000;
             display: flex; justify-content: space-between; align-items: center;
@@ -34,7 +33,19 @@
             padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 13px;
         }
 
-        /* Admin Card na dnu */
+        /* Pulsirajuća tačkica */
+        .user-location-pulse {
+            width: 14px; height: 14px; background: #3498db; border: 2px solid white;
+            border-radius: 50%; position: relative;
+        }
+        .user-location-pulse::after {
+            content: ''; width: 35px; height: 35px; background: rgba(52, 152, 219, 0.3);
+            border-radius: 50%; position: absolute; top: -12.5px; left: -12.5px;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0% { transform: scale(0.6); opacity: 1; } 100% { transform: scale(2.2); opacity: 0; } }
+
+        /* Admin Card */
         #admin-card {
             position: absolute; bottom: 20px; left: 20px; z-index: 3000;
             background: var(--dark); color: white; padding: 15px 20px;
@@ -43,11 +54,10 @@
         }
         #admin-card button { background: var(--primary); border: none; color: white; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
 
-        /* Forms */
         input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
         .btn-main { width: 100%; background: var(--primary); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
-        #recenter-btn { position: absolute; bottom: 100px; right: 20px; z-index: 2000; background: white; border: none; width: 50px; height: 50px; border-radius: 50%; box-shadow: 0 4px 15px rgba(0,0,0,0.3); cursor: pointer; font-size: 20px; }
+        #recenter-btn { position: absolute; bottom: 100px; right: 20px; z-index: 2000; background: white; border: none; width: 50px; height: 50px; border-radius: 50%; box-shadow: 0 4px 15px rgba(0,0,0,0.3); cursor: pointer; font-size: 20px; display: flex; justify-content: center; align-items: center; }
         .hidden { display: none !important; }
 
         @media (max-width: 768px) {
@@ -61,7 +71,7 @@
     <div id="welcome-screen" class="overlay">
         <div class="modal-content">
             <h1 style="color: var(--dark)">Who Play?</h1>
-            <p>Sajt je za zabavu. Podaci su nezvanični.</p>
+            <p>Sajt je isključivo za zabavu. Podaci su nezvanični.</p>
             <button class="btn-main" onclick="prihvatiUslove()">PRIHVATAM</button>
         </div>
     </div>
@@ -79,7 +89,7 @@
     <div id="login-screen" class="overlay hidden">
         <div class="modal-content">
             <h3>Admin Login</h3>
-            <input type="email" id="login-email" placeholder="Unesite vaš email">
+            <input type="email" id="login-email" placeholder="Email adresa">
             <button class="btn-main" onclick="loginAdmin()">Prijavi se</button>
             <button onclick="toggleModal('login-screen', false)" style="background:none; border:none; color: #777; margin-top:10px; cursor:pointer;">Zatvori</button>
         </div>
@@ -111,44 +121,43 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+        // INICIJALIZACIJA MAPE SA ULICAMA I IMENIMA (Google Hybrid stil)
         var map = L.map('map', { zoomControl: false, tap: false }).setView([44.8178, 20.4489], 13);
-        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
+        
+        L.tileLayer('https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+            maxZoom: 20,
+            subdomains:['mt0','mt1','mt2','mt3'],
+            attribution: 'Google Maps'
+        }).addTo(map);
 
-        var currentUser = null;
-        var lastKnownLatLng = null;
+        var userMarker, lastKnownLatLng;
 
         function prihvatiUslove() {
             localStorage.setItem('usloviWhoPlay', 'true');
             document.getElementById('welcome-screen').classList.add('hidden');
             document.getElementById('main-header').classList.remove('hidden');
-            map.locate({watch: true});
+            map.locate({watch: true, enableHighAccuracy: true});
         }
 
         window.onload = function() {
             if (localStorage.getItem('usloviWhoPlay') === 'true') prihvatiUslove();
-            // Provera da li je ostao ulogovan
             const savedAdmin = localStorage.getItem('loggedAdmin');
             if (savedAdmin) setupAdminUI(JSON.parse(savedAdmin));
         };
 
-        function toggleModal(id, show) {
-            document.getElementById(id).classList.toggle('hidden', !show);
-        }
+        function toggleModal(id, show) { document.getElementById(id).classList.toggle('hidden', !show); }
 
-        // --- REGISTRACIJA ---
+        // --- AUTH LOGIKA ---
         function registerAdmin() {
             const nick = document.getElementById('reg-nick').value;
             const email = document.getElementById('reg-email').value.toLowerCase();
-            if(!nick || !email) return alert("Popuni sva polja!");
-
-            db.ref('admins').push({ nickname: nick, email: email })
-            .then(() => {
-                alert("Uspešna registracija! Sada se možeš ulogovati.");
+            if(!nick || !email) return alert("Popuni polja!");
+            db.ref('admins').push({ nickname: nick, email: email }).then(() => {
+                alert("Uspešno! Prijavite se.");
                 toggleModal('register-screen', false);
             });
         }
 
-        // --- LOGIN ---
         function loginAdmin() {
             const email = document.getElementById('login-email').value.toLowerCase();
             db.ref('admins').orderByChild('email').equalTo(email).once('value', snapshot => {
@@ -157,34 +166,36 @@
                     localStorage.setItem('loggedAdmin', JSON.stringify(userData));
                     setupAdminUI(userData);
                     toggleModal('login-screen', false);
-                } else {
-                    alert("Email nije pronađen. Registrujte se prvo.");
-                }
+                } else alert("Email nije pronađen.");
             });
         }
 
         function setupAdminUI(user) {
-            currentUser = user;
             document.getElementById('guest-nav').classList.add('hidden');
             document.getElementById('admin-card').classList.remove('hidden');
             document.getElementById('admin-nick-display').innerText = user.nickname;
-            alert("Dobrodošao nazad, " + user.nickname + "!");
         }
 
-        function logoutAdmin() {
-            localStorage.removeItem('loggedAdmin');
-            location.reload();
-        }
+        function logoutAdmin() { localStorage.removeItem('loggedAdmin'); location.reload(); }
 
-        // --- MAPA & GPS ---
-        map.on('locationfound', e => { lastKnownLatLng = e.latlng; });
+        // --- GPS & PULSE ---
+        map.on('locationfound', e => { 
+            lastKnownLatLng = e.latlng;
+            const pulseIcon = L.divIcon({
+                className: 'custom-div-icon',
+                html: "<div class='user-location-pulse'></div>",
+                iconSize: [14, 14], iconAnchor: [7, 7]
+            });
+            if (userMarker) userMarker.setLatLng(e.latlng);
+            else userMarker = L.marker(e.latlng, {icon: pulseIcon}).addTo(map);
+        });
         
         function locirajMe(prvi) {
             if(prvi) document.getElementById('recenter-btn').classList.remove('hidden');
             if(lastKnownLatLng) map.flyTo(lastKnownLatLng, 16);
         }
 
-        // Prikaz terena
+        // PRIKAZ TERENA
         db.ref('tereni').on('value', snap => {
             const data = snap.val();
             for (let id in data) {
@@ -192,8 +203,6 @@
                 .bindPopup(`<b>${data[id].ime}</b><br>Rezultat: ${data[id].rezultat}`);
             }
         });
-
-        // Ovde ćemo kasnije dodati Admin klik funkciju samo za ulogovane
     </script>
 </body>
 </html>
