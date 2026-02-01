@@ -3,21 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Who Play? - OpenStreetMap</title>
+    <title>Who Play? - No Zoom Fix</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
     <style>
         :root { --primary: #e74c3c; --dark: #121212; }
 
+        /* Onemogućavamo bilo kakav scroll na body-u da bi mapa bila stabilna */
         html, body { 
             margin: 0; padding: 0; width: 100%; height: 100%; 
             overflow: hidden; position: fixed; 
             background: #000;
             font-family: -apple-system, system-ui, sans-serif;
+            /* Sprečava elastični skrol na iOS */
+            touch-action: none; 
         }
 
-        #map { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1; }
+        #map { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1; touch-action: pan-x pan-y; }
 
         header {
             position: fixed; top: 0; left: 0; width: 100%; z-index: 2000;
@@ -58,16 +61,19 @@
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 10000; display: flex; justify-content: center; align-items: center;
             background: rgba(0,0,0,0.92); backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
         .modal { background: white; padding: 20px; border-radius: 20px; width: 85%; max-width: 300px; text-align: center; }
         
+        /* KLJUČNA POPRAVKA: Font mora biti tačno 16px ili više da iOS ne bi zumirao */
         input { 
             width: 100%; padding: 14px; margin: 8px 0; border: 1px solid #ddd; 
             border-radius: 10px; font-size: 16px !important; box-sizing: border-box; 
             appearance: none; -webkit-appearance: none;
+            background: #f9f9f9;
         }
         
-        .btn-action { width: 100%; background: var(--primary); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; font-size: 16px; }
+        .btn-action { width: 100%; background: var(--primary); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; font-size: 16px; margin-top: 5px; }
         .hidden { display: none !important; }
 
         .pulse-marker { width: 12px; height: 12px; background: #3498db; border: 2px solid white; border-radius: 50%; position: relative; }
@@ -88,19 +94,19 @@
     <div id="register-screen" class="overlay hidden">
         <div class="modal">
             <h4>Registracija</h4>
-            <input type="text" id="reg-nick" placeholder="Nickname">
-            <input type="email" id="reg-email" placeholder="Email">
+            <input type="text" id="reg-nick" placeholder="Nickname" autocomplete="off">
+            <input type="email" id="reg-email" placeholder="Email" autocomplete="off">
             <button class="btn-action" onclick="registerAdmin()">Registruj me</button>
-            <button onclick="toggleModal('register-screen', false)" style="background:none; border:none; margin-top:8px; color:#999; font-size: 12px;">Zatvori</button>
+            <button onclick="toggleModal('register-screen', false)" style="background:none; border:none; margin-top:12px; color:#999; font-size: 13px;">Zatvori</button>
         </div>
     </div>
 
     <div id="login-screen" class="overlay hidden">
         <div class="modal">
             <h4>Admin Login</h4>
-            <input type="email" id="login-email" placeholder="Unesite email">
+            <input type="email" id="login-email" placeholder="Unesite email" autocomplete="email">
             <button class="btn-action" onclick="loginAdmin()">Prijavi se</button>
-            <button onclick="toggleModal('login-screen', false)" style="background:none; border:none; margin-top:8px; color:#999; font-size: 12px;">Zatvori</button>
+            <button onclick="toggleModal('login-screen', false)" style="background:none; border:none; margin-top:12px; color:#999; font-size: 13px;">Zatvori</button>
         </div>
     </div>
 
@@ -141,20 +147,18 @@
             zoomSnap: 0.1, bounceAtZoomLimits: false 
         }).setView([44.8178, 20.4489], 13);
 
-        // ZAMENJENO: OpenStreetMap umesto Google-a
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
             attribution: '© OpenStreetMap contributors'
         }).addTo(map);
 
         var userMarker, lastKnownLatLng;
-        var courtMarkers = L.layerGroup().addTo(map); // Grupa za markere da se ne dupliraju
+        var courtMarkers = L.layerGroup().addTo(map);
 
-        document.addEventListener('focusout', function(e) {
-            if (e.target.tagName === 'INPUT') {
-                window.scrollTo(0, 0);
-                document.body.scrollTop = 0;
-            }
+        // RESET SKALE NAKON KUCANJA: Force reset viewport-a
+        document.addEventListener('focusout', function() {
+            window.scrollTo(0, 0);
+            document.body.scrollTop = 0;
         });
 
         function prihvatiUslove() {
@@ -163,7 +167,7 @@
             document.getElementById('main-header').classList.remove('hidden');
             document.getElementById('info-btn').classList.remove('hidden');
             document.getElementById('recenter-btn').classList.remove('hidden');
-            map.invalidateSize();
+            setTimeout(() => { map.invalidateSize(); }, 300);
             map.locate({watch: true, enableHighAccuracy: true});
         }
 
@@ -173,7 +177,11 @@
             if (savedAdmin) setupAdminUI(JSON.parse(savedAdmin));
         };
 
-        function toggleModal(id, show) { document.getElementById(id).classList.toggle('hidden', !show); }
+        function toggleModal(id, show) { 
+            document.getElementById(id).classList.toggle('hidden', !show); 
+            // Resetuj skalu odmah pri otvaranju/zatvaranju
+            window.scrollTo(0, 0);
+        }
 
         function registerAdmin() {
             const nick = document.getElementById('reg-nick').value;
@@ -186,7 +194,7 @@
         }
 
         function loginAdmin() {
-            const email = document.getElementById('login-email').value.toLowerCase();
+            const email = document.getElementById('login-email').value.toLowerCase().trim();
             db.ref('admins').orderByChild('email').equalTo(email).once('value', snapshot => {
                 if (snapshot.exists()) {
                     const userData = Object.values(snapshot.val())[0];
@@ -217,7 +225,6 @@
             else map.locate({setView: true, maxZoom: 17});
         }
 
-        // Osvežavanje markera bez dupliranja
         db.ref('tereni').on('value', snap => {
             courtMarkers.clearLayers(); 
             const data = snap.val();
