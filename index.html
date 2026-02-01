@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Who Play? - Admin Mode</title>
+    <title>Who Play? - Admin Pro</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
@@ -12,13 +12,14 @@
 
         html, body { 
             margin: 0; padding: 0; width: 100%; height: 100%; 
-            overflow: hidden; position: fixed; background: #000;
+            overflow: hidden; position: fixed; 
+            background: #000;
             font-family: -apple-system, system-ui, sans-serif;
+            touch-action: none; 
         }
 
-        #map { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1; }
+        #map { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1; touch-action: pan-x pan-y; }
 
-        /* UI Elementi */
         header {
             position: fixed; top: 0; left: 0; width: 100%; z-index: 2000;
             display: flex; justify-content: space-between; align-items: center;
@@ -33,56 +34,61 @@
             padding: 6px 10px; border-radius: 15px; font-size: 11px; font-weight: bold;
         }
 
-        /* Admin Panel koji klizi odozdo */
+        /* --- NOVI ADMIN PANEL --- */
         #admin-panel {
             position: fixed; bottom: 0; left: 0; width: 100%; z-index: 9999;
             background: var(--dark); color: white;
-            padding: 15px 15px calc(15px + env(safe-area-inset-bottom));
+            padding: 15px 15px calc(20px + env(safe-area-inset-bottom));
             border-radius: 20px 20px 0 0;
             border-top: 3px solid var(--primary);
             box-sizing: border-box;
-            transform: translateY(100%);
-            transition: transform 0.3s ease;
+            transform: translateY(105%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         #admin-panel.active { transform: translateY(0); }
 
         .sport-grid {
-            display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
-            margin: 10px 0; max-height: 150px; overflow-y: auto;
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+            margin: 15px 0; max-height: 180px; overflow-y: auto; padding: 5px;
         }
         .sport-item {
-            background: #222; border: 1px solid #333; border-radius: 10px;
-            padding: 8px; text-align: center; font-size: 20px; cursor: pointer;
+            background: #1a1a1a; border: 2px solid #333; border-radius: 12px;
+            padding: 10px 5px; text-align: center; font-size: 22px; cursor: pointer;
+            transition: 0.2s;
         }
-        .sport-item.selected { border-color: var(--primary); background: rgba(231, 76, 60, 0.2); }
-        .sport-item span { display: block; font-size: 9px; margin-top: 4px; color: #aaa; text-transform: uppercase; }
+        .sport-item.selected { border-color: var(--primary); background: rgba(231, 76, 60, 0.1); transform: scale(1.05); }
+        .sport-item span { display: block; font-size: 8px; margin-top: 5px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
 
         .controls-container {
-            position: fixed; right: 12px; bottom: 85px;
+            position: fixed; right: 12px; bottom: 90px;
             z-index: 2000; display: flex; flex-direction: column; gap: 10px;
         }
         .circle-btn {
-            width: 42px; height: 42px; background: white; border: none;
-            border-radius: 50%; box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-            display: flex; justify-content: center; align-items: center; font-size: 18px;
+            width: 44px; height: 44px; background: white; border: none;
+            border-radius: 50%; box-shadow: 0 3px 12px rgba(0,0,0,0.4);
+            display: flex; justify-content: center; align-items: center; font-size: 20px;
         }
 
         .overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 10000; display: flex; justify-content: center; align-items: center;
             background: rgba(0,0,0,0.92); backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
-        .modal { background: white; padding: 20px; border-radius: 20px; width: 85%; max-width: 300px; text-align: center; }
+        .modal { background: white; padding: 20px; border-radius: 20px; width: 85%; max-width: 320px; text-align: center; }
         
+        /* NO-ZOOM INPUT FIX */
         input { 
-            width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; 
-            border-radius: 10px; font-size: 16px !important; box-sizing: border-box; 
+            width: 100%; padding: 14px; margin: 8px 0; border: 1px solid #ddd; 
+            border-radius: 12px; font-size: 16px !important; box-sizing: border-box; 
+            appearance: none; -webkit-appearance: none; background: #f9f9f9;
         }
         
-        .btn-save { width: 100%; background: var(--accent); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; font-size: 16px; }
+        .btn-action { width: 100%; background: var(--primary); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: bold; font-size: 16px; }
+        .btn-save { width: 100%; background: var(--accent); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: bold; font-size: 16px; margin-top: 10px; }
+        
         .hidden { display: none !important; }
 
-        /* Stil za markere korisnika */
         .pulse-marker { width: 12px; height: 12px; background: #3498db; border: 2px solid white; border-radius: 50%; position: relative; }
         .pulse-marker::after { content: ''; width: 30px; height: 30px; background: rgba(52, 152, 219, 0.3); border-radius: 50%; position: absolute; top: -11px; left: -11px; animation: pulse-ring 2s infinite; }
         @keyframes pulse-ring { 0% { transform: scale(0.6); opacity: 1; } 100% { transform: scale(2); opacity: 0; } }
@@ -92,56 +98,67 @@
 
     <div id="welcome-screen" class="overlay">
         <div class="modal">
-            <h3 style="margin-top:0;">Who Play?</h3>
-            <p style="font-size: 13px; color: #555;">Satelitski prikaz terena uživo.</p>
-            <button class="btn-save" style="background:var(--primary)" onclick="prihvatiUslove()">ZAPOČNI</button>
+            <h3 style="margin-top:0; color: #111;">Who Play?</h3>
+            <p style="font-size: 13px; color: #555;">Pronađi teren, vidi rezultat, igraj!</p>
+            <button class="btn-action" onclick="prihvatiUslove()">PRIHVATAM</button>
+        </div>
+    </div>
+
+    <div id="register-screen" class="overlay hidden">
+        <div class="modal">
+            <h4>Registracija Admina</h4>
+            <input type="text" id="reg-nick" placeholder="Nickname" autocomplete="off">
+            <input type="email" id="reg-email" placeholder="Email" autocomplete="off">
+            <button class="btn-action" onclick="registerAdmin()">Registruj me</button>
+            <button onclick="toggleModal('register-screen', false)" style="background:none; border:none; margin-top:12px; color:#999; font-size: 13px;">Zatvori</button>
         </div>
     </div>
 
     <div id="login-screen" class="overlay hidden">
         <div class="modal">
             <h4>Admin Login</h4>
-            <input type="email" id="login-email" placeholder="Email">
-            <button class="btn-save" style="background:var(--primary)" onclick="loginAdmin()">Prijavi se</button>
-            <button onclick="toggleModal('login-screen', false)" style="border:none; background:none; margin-top:10px; color:#999;">Zatvori</button>
+            <input type="email" id="login-email" placeholder="Unesite email" autocomplete="email">
+            <button class="btn-action" onclick="loginAdmin()">Prijavi se</button>
+            <button onclick="toggleModal('login-screen', false)" style="background:none; border:none; margin-top:12px; color:#999; font-size: 13px;">Zatvori</button>
         </div>
     </div>
 
     <header id="main-header" class="hidden">
         <div class="logo">WHO PLAY?</div>
         <div id="guest-nav" class="nav-links">
-            <button class="nav-btn" onclick="toggleModal('login-screen', true)">Admin</button>
+            <button class="nav-btn" onclick="toggleModal('register-screen', true)" style="margin-right:5px;">Reg</button>
+            <button class="nav-btn" onclick="toggleModal('login-screen', true)">Login</button>
         </div>
         <div id="admin-info" class="nav-links hidden">
-            <span id="admin-name" style="color:white; font-size:10px; margin-right:5px;"></span>
+            <span id="admin-name" style="color:white; font-size:11px; margin-right:8px; font-weight:bold;"></span>
             <button class="nav-btn" onclick="logoutAdmin()" style="background:var(--primary)">Logout</button>
         </div>
     </header>
 
     <div id="admin-panel">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <strong style="color:var(--primary)">NOVI TEREN</strong>
-            <button onclick="zatvoriPanel()" style="background:none; border:none; color:#666; font-size:20px;">×</button>
+            <strong style="color:var(--primary); letter-spacing:1px;">DODAJ SPORTSKI TEREN</strong>
+            <button onclick="zatvoriPanel()" style="background:#333; border:none; color:white; width:30px; height:30px; border-radius:50%; font-size:16px;">✕</button>
         </div>
         
-        <input type="text" id="court-name" placeholder="Naziv stadiona / hale">
+        <input type="text" id="court-name" placeholder="Naziv (npr. Stadion JNA, Hala Sportova)">
         
-        <div class="sport-grid" id="sport-selector">
-            <div class="sport-item" onclick="selectSport('⚽', 'fudbal')">⚽<span>Fudbal</span></div>
-            <div class="sport-item" onclick="selectSport('🏀', 'kosarka')">🏀<span>Košarka</span></div>
-            <div class="sport-item" onclick="selectSport('🎾', 'tenis')">🎾<span>Tenis</span></div>
-            <div class="sport-item" onclick="selectSport('🏐', 'odbojka')">🏐<span>Odbojka</span></div>
-            <div class="sport-item" onclick="selectSport('🤾', 'rukomet')">🤾<span>Rukomet</span></div>
-            <div class="sport-item" onclick="selectSport('🏒', 'hokej')">🏒<span>Hokej</span></div>
-            <div class="sport-item" onclick="selectSport('🎱', 'bilijar')">🎱<span>Bilijar</span></div>
-            <div class="sport-item" onclick="selectSport('🥊', 'boks')">🥊<span>Boks</span></div>
-            <div class="sport-item" onclick="selectSport('🏊', 'bazen')">🏊<span>Bazen</span></div>
-            <div class="sport-item" onclick="selectSport('🏃', 'atletika')">🏃<span>Staza</span></div>
-            <div class="sport-item" onclick="selectSport('🏋️', 'gym')">🏋️<span>Teretana</span></div>
-            <div class="sport-item" onclick="selectSport('🧩', 'drugo')">🧩<span>Ostalo</span></div>
+        <div class="sport-grid">
+            <div class="sport-item selected" onclick="selectSport('⚽', 'fudbal', this)">⚽<span>Fudbal</span></div>
+            <div class="sport-item" onclick="selectSport('🏀', 'kosarka', this)">🏀<span>Košarka</span></div>
+            <div class="sport-item" onclick="selectSport('🎾', 'tenis', this)">🎾<span>Tenis</span></div>
+            <div class="sport-item" onclick="selectSport('🏐', 'odbojka', this)">🏐<span>Odbojka</span></div>
+            <div class="sport-item" onclick="selectSport('🤾', 'rukomet', this)">🤾<span>Rukomet</span></div>
+            <div class="sport-item" onclick="selectSport('🏒', 'hokej', this)">🏒<span>Hokej</span></div>
+            <div class="sport-item" onclick="selectSport('🥊', 'boks', this)">🥊<span>Boks</span></div>
+            <div class="sport-item" onclick="selectSport('🏊', 'bazen', this)">🏊<span>Bazen</span></div>
+            <div class="sport-item" onclick="selectSport('🏃', 'atletika', this)">🏃<span>Atletika</span></div>
+            <div class="sport-item" onclick="selectSport('🏋️', 'gym', this)">🏋️<span>Teretana</span></div>
+            <div class="sport-item" onclick="selectSport('🎱', 'bilijar', this)">🎱<span>Bilijar</span></div>
+            <div class="sport-item" onclick="selectSport('🧩', 'ostalo', this)">🧩<span>Ostalo</span></div>
         </div>
 
-        <button class="btn-save" onclick="saveCourt()">SAČUVAJ LOKACIJU</button>
+        <button class="btn-save" onclick="saveCourt()">SAČUVAJ NA MAPI</button>
     </div>
 
     <div class="controls-container">
@@ -159,23 +176,29 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        var map = L.map('map', { zoomControl: false, tap: false, attributionControl: false }).setView([44.8178, 20.4489], 13);
-        
-        // Satelit + Labele
+        var map = L.map('map', { 
+            zoomControl: false, tap: false, attributionControl: false, 
+            zoomSnap: 0.1, bounceAtZoomLimits: false 
+        }).setView([44.8178, 20.4489], 13);
+
         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png').addTo(map);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', { zIndex: 1000 }).addTo(map);
 
         var userMarker, tempMarker, lastKnownLatLng;
         var courtMarkers = L.layerGroup().addTo(map);
         var selectedSport = { emoji: '⚽', slug: 'fudbal' };
         var isAdmin = false;
         var tempCoords = null;
+        var prvaLokacija = false;
+
+        document.addEventListener('focusout', function() { window.scrollTo(0, 0); });
 
         function prihvatiUslove() {
             localStorage.setItem('usloviWhoPlay', 'true');
             document.getElementById('welcome-screen').classList.add('hidden');
             document.getElementById('main-header').classList.remove('hidden');
             document.getElementById('recenter-btn').classList.remove('hidden');
+            setTimeout(() => { map.invalidateSize(); }, 300);
             map.locate({watch: true, enableHighAccuracy: true, setView: false});
         }
 
@@ -185,7 +208,21 @@
             if (savedAdmin) setupAdminUI(JSON.parse(savedAdmin));
         };
 
-        // --- ADMIN LOGIKA ---
+        function toggleModal(id, show) { 
+            document.getElementById(id).classList.toggle('hidden', !show); 
+            window.scrollTo(0, 0);
+        }
+
+        // ADMIN SISTEM
+        function registerAdmin() {
+            const nick = document.getElementById('reg-nick').value;
+            const email = document.getElementById('reg-email').value.toLowerCase().trim();
+            if(!nick || !email) return alert("Popunite polja");
+            db.ref('admins').push({ nickname: nick, email: email }).then(() => {
+                alert("Uspešno registrovan!");
+                toggleModal('register-screen', false);
+            });
+        }
 
         function loginAdmin() {
             const email = document.getElementById('login-email').value.toLowerCase().trim();
@@ -195,7 +232,7 @@
                     localStorage.setItem('loggedAdmin', JSON.stringify(user));
                     setupAdminUI(user);
                     toggleModal('login-screen', false);
-                } else alert("Niste admin.");
+                } else alert("Niste registrovani kao admin.");
             });
         }
 
@@ -208,41 +245,37 @@
 
         function logoutAdmin() { localStorage.removeItem('loggedAdmin'); location.reload(); }
 
-        // KLIK NA MAPU ZA ADMINA
+        // DODAVANJE TERENA NA KLIK
         map.on('click', function(e) {
             if (!isAdmin) return;
-            
             tempCoords = e.latlng;
             if (tempMarker) map.removeLayer(tempMarker);
-            
-            // Postavi privremeni nišan
             tempMarker = L.marker(e.latlng, {
                 icon: L.divIcon({ className: '', html: '📍', iconSize: [30, 30], iconAnchor: [15, 30] })
             }).addTo(map);
-
             document.getElementById('admin-panel').classList.add('active');
         });
 
-        function selectSport(emoji, slug) {
+        function selectSport(emoji, slug, el) {
             selectedSport = { emoji, slug };
-            document.querySelectorAll('.sport-item').forEach(el => el.classList.remove('selected'));
-            event.currentTarget.classList.add('selected');
+            document.querySelectorAll('.sport-item').forEach(item => item.classList.remove('selected'));
+            el.classList.add('selected');
         }
 
         function saveCourt() {
             const name = document.getElementById('court-name').value;
-            if (!name || !tempCoords) return alert("Unesite naziv!");
-
-            const courtData = {
+            if (!name || !tempCoords) return alert("Unesite naziv terena!");
+            
+            const data = {
                 ime: name,
                 sport: selectedSport.slug,
                 emoji: selectedSport.emoji,
                 lat: tempCoords.lat,
                 lng: tempCoords.lng,
-                rezultat: "Uskoro"
+                rezultat: "Aktivno"
             };
 
-            db.ref('tereni').push(courtData).then(() => {
+            db.ref('tereni').push(data).then(() => {
                 zatvoriPanel();
                 document.getElementById('court-name').value = "";
             });
@@ -251,10 +284,10 @@
         function zatvoriPanel() {
             document.getElementById('admin-panel').classList.remove('active');
             if (tempMarker) map.removeLayer(tempMarker);
+            window.scrollTo(0, 0);
         }
 
-        // --- RENDER TERENA ---
-
+        // PRIKAZ MARKERA SA LOPTICAMA
         db.ref('tereni').on('value', snap => {
             courtMarkers.clearLayers();
             const data = snap.val();
@@ -263,38 +296,33 @@
                 const marker = L.marker([c.lat, c.lng], {
                     icon: L.divIcon({
                         className: '',
-                        html: `<div style="font-size:24px; filter: drop-shadow(0 2px 2px black);">${c.emoji}</div>`,
-                        iconSize: [30, 30], iconAnchor: [15, 15]
+                        html: `<div style="font-size:28px; filter: drop-shadow(0 3px 3px rgba(0,0,0,0.6));">${c.emoji}</div>`,
+                        iconSize: [32, 32], iconAnchor: [16, 16]
                     })
                 });
 
-                // Profi kartica u popupu
-                const popupHtml = `
-                    <div style="text-align:center; min-width:140px;">
-                        <div style="font-size:40px; margin-bottom:5px;">${c.emoji}</div>
-                        <div style="font-weight:900; text-transform:uppercase; color:#333; font-size:14px;">${c.ime}</div>
-                        <div style="color:var(--primary); font-size:12px; font-weight:bold; margin-top:3px;">${c.rezultat}</div>
-                        <hr style="border:0; border-top:1px solid #eee; margin:10px 0;">
-                        <div style="font-size:9px; color:#999;">KLIKNI ZA NAVIGACIJU</div>
+                const cardHtml = `
+                    <div style="text-align:center; min-width:160px; padding:5px;">
+                        <div style="font-size:45px; margin-bottom:5px;">${c.emoji}</div>
+                        <div style="font-weight:900; color:#111; font-size:15px; text-transform:uppercase; line-height:1.2;">${c.ime}</div>
+                        <div style="background:var(--primary); color:white; display:inline-block; padding:3px 10px; border-radius:10px; font-size:11px; font-weight:bold; margin-top:8px;">${c.rezultat}</div>
                     </div>
                 `;
-
-                marker.bindPopup(popupHtml).addTo(courtMarkers);
+                marker.bindPopup(cardHtml).addTo(courtMarkers);
             }
         });
 
-        // --- LOKACIJA KORISNIKA ---
+        // LOKACIJA
         map.on('locationfound', e => { 
             lastKnownLatLng = e.latlng;
-            const pulseIcon = L.divIcon({ className: 'custom-div-icon', html: "<div class='pulse-marker'></div>", iconSize: [12, 12], iconAnchor: [6, 6] });
+            const pulseIcon = L.divIcon({ className: '', html: "<div class='pulse-marker'></div>", iconSize: [12, 12], iconAnchor: [6, 6] });
             if (userMarker) userMarker.setLatLng(e.latlng);
             else {
                 userMarker = L.marker(e.latlng, {icon: pulseIcon}).addTo(map);
-                map.setView(e.latlng, 16);
+                if (!prvaLokacija) { map.setView(e.latlng, 16); prvaLokacija = true; }
             }
         });
         function locirajMe() { if(lastKnownLatLng) map.flyTo(lastKnownLatLng, 17); }
-        function toggleModal(id, show) { document.getElementById(id).classList.toggle('hidden', !show); }
     </script>
 </body>
 </html>
