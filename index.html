@@ -275,7 +275,7 @@
             const email = document.getElementById('reg-email').value.toLowerCase().trim();
             if(!nick || !email) return;
             db.ref('admins').push({ nickname: nick, email: email }).then(() => {
-                alert("Registrovano!"); toggleModal('register-screen', false);
+                alert("Uspešna registracija!"); toggleModal('register-screen', false);
             });
         }
 
@@ -334,13 +334,11 @@
                 const c = snap.val();
                 if(!c) return;
                 
-                // Popunjavanje polja u panelu
                 document.getElementById('target-court-name').innerText = c.ime;
                 document.getElementById('team-a').value = c.timA || '';
                 document.getElementById('team-b').value = c.timB || '';
                 document.getElementById('match-date').value = c.datum || '';
                 
-                // Logika prikaza adekvatnog pod-panela
                 if(c.status === 'live') {
                     setupLivePanel(c);
                 } else {
@@ -364,34 +362,38 @@
             const bB = document.getElementById('btns-b');
             bA.innerHTML = bB.innerHTML = '';
             
-            // Basket dobija +1 +2 +3, ostali +1
             const pts = (c.sport === 'kosarka') ? [1, 2, 3] : [1];
             pts.forEach(p => {
                 let b1 = document.createElement('button'); 
                 b1.className='score-btn'; 
                 b1.innerText='+'+p;
-                b1.onclick = () => db.ref('tereni/'+currentCourtId+'/scoreA').transaction(v => (v||0)+p);
+                b1.onclick = function() {
+                    db.ref('tereni/'+currentCourtId+'/scoreA').transaction(v => (v||0)+p);
+                };
                 bA.appendChild(b1);
                 
                 let b2 = document.createElement('button'); 
                 b2.className='score-btn'; 
                 b2.innerText='+'+p;
-                b2.onclick = () => db.ref('tereni/'+currentCourtId+'/scoreB').transaction(v => (v||0)+p);
+                b2.onclick = function() {
+                    db.ref('tereni/'+currentCourtId+'/scoreB').transaction(v => (v||0)+p);
+                };
                 bB.appendChild(b2);
             });
         }
 
         function updateStatus(s) {
-            const upData = {
+            const timA = document.getElementById('team-a').value;
+            const timB = document.getElementById('team-b').value;
+            const datum = document.getElementById('match-date').value;
+
+            db.ref('tereni/'+currentCourtId).update({
                 status: s,
-                timA: document.getElementById('team-a').value,
-                timB: document.getElementById('team-b').value,
-                datum: document.getElementById('match-date').value
-            };
-            
-            db.ref('tereni/'+currentCourtId).update(upData).then(() => {
+                timA: timA,
+                timB: timB,
+                datum: datum
+            }).then(() => {
                 if(s === 'live') {
-                    // Ako prelazimo u live, odmah osveži panel da pokaže score dugmiće
                     otvoriUredi(currentCourtId);
                 } else {
                     zatvoriSvePanele();
