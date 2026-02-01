@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Who Play? Full Pro</title>
+    <title>Who Play? Live Pro</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
@@ -33,7 +33,6 @@
             padding: 6px 10px; border-radius: 15px; font-size: 11px; font-weight: bold;
         }
 
-        /* Paneli odozdo */
         #admin-panel, #match-panel {
             position: fixed; bottom: 0; left: 0; width: 100%; z-index: 9999;
             background: var(--dark); color: white;
@@ -48,7 +47,6 @@
         .sport-item.selected { border-color: var(--primary); background: rgba(231, 76, 60, 0.2); }
         .sport-item span { display: block; font-size: 8px; margin-top: 4px; color: #888; text-transform: uppercase; }
 
-        /* Kontrole rezultata */
         .live-controls { display: flex; justify-content: space-around; align-items: center; background: #1a1a1a; padding: 15px; border-radius: 15px; margin-top: 10px; border: 1px solid #333; }
         .score-display { font-size: 36px; font-weight: 900; color: var(--accent); margin: 5px 0; }
         .score-btn-group { display: flex; gap: 5px; justify-content: center; }
@@ -71,7 +69,6 @@
         }
         .modal { background: white; padding: 20px; border-radius: 20px; width: 85%; max-width: 320px; text-align: center; }
         
-        /* 16px font sprečava zoom na iOS */
         input { 
             width: 100%; padding: 14px; margin: 8px 0; border: 1px solid #ddd; 
             border-radius: 12px; font-size: 16px !important; box-sizing: border-box; background: #f9f9f9;
@@ -86,6 +83,10 @@
         .pulse-marker { width: 12px; height: 12px; background: #3498db; border: 2px solid white; border-radius: 50%; position: relative; }
         .pulse-marker::after { content: ''; width: 30px; height: 30px; background: rgba(52, 152, 219, 0.3); border-radius: 50%; position: absolute; top: -11px; left: -11px; animation: pulse-ring 2s infinite; }
         @keyframes pulse-ring { 0% { transform: scale(0.6); opacity: 1; } 100% { transform: scale(2); opacity: 0; } }
+        
+        /* NOVO: Animacije iznad loptice na mapi */
+        .map-label-najava { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); background: var(--blue); color: white; font-size: 9px; padding: 2px 5px; border-radius: 4px; white-space: nowrap; font-weight: bold; border: 1px solid white; }
+        .map-label-live { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); background: red; color: white; font-size: 9px; padding: 2px 5px; border-radius: 4px; white-space: nowrap; font-weight: bold; animation: blink 1s infinite; border: 1px solid white; }
         
         .live-tag { background: red; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; animation: blink 1s infinite; font-weight: bold; display: inline-block; }
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
@@ -135,7 +136,7 @@
     <div id="admin-panel">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
             <strong style="color:var(--primary)">DODAJ TEREN</strong>
-            <button onclick="zatvoriSve Panele()" style="color:white; background:#333; border:none; width:30px; height:30px; border-radius:50%;">×</button>
+            <button onclick="zatvoriSvePanele()" style="color:white; background:#333; border:none; width:30px; height:30px; border-radius:50%; display:flex; justify-content:center; align-items:center;">×</button>
         </div>
         <input type="text" id="court-name" placeholder="Ime stadiona / hale">
         <div class="sport-grid">
@@ -159,7 +160,7 @@
         <div id="match-setup">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
                 <strong id="target-court-name" style="color:var(--blue)">UREDI MEČ</strong>
-                <button onclick="zatvoriSvePanele()" style="color:white; background:#333; border:none; width:30px; height:30px; border-radius:50%;">×</button>
+                <button onclick="zatvoriSvePanele()" style="color:white; background:#333; border:none; width:30px; height:30px; border-radius:50%; display:flex; justify-content:center; align-items:center;">×</button>
             </div>
             <input type="text" id="team-a" placeholder="Domaćin (Tim A)">
             <input type="text" id="team-b" placeholder="Gost (Tim B)">
@@ -171,13 +172,13 @@
         <div id="match-live" class="hidden">
             <div class="live-controls">
                 <div style="text-align:center; width:45%;">
-                    <div id="label-team-a" style="font-size:11px; font-weight:bold; overflow:hidden; text-overflow:ellipsis;">TIM A</div>
+                    <div id="label-team-a" style="font-size:11px; font-weight:bold;">TIM A</div>
                     <div id="score-a" class="score-display">0</div>
                     <div id="btns-a" class="score-btn-group"></div>
                 </div>
                 <div style="font-weight:bold; color:#444;">VS</div>
                 <div style="text-align:center; width:45%;">
-                    <div id="label-team-b" style="font-size:11px; font-weight:bold; overflow:hidden; text-overflow:ellipsis;">TIM B</div>
+                    <div id="label-team-b" style="font-size:11px; font-weight:bold;">TIM B</div>
                     <div id="score-b" class="score-display">0</div>
                     <div id="btns-b" class="score-btn-group"></div>
                 </div>
@@ -231,11 +232,10 @@
 
         function toggleModal(id, s) { document.getElementById(id).classList.toggle('hidden', !s); window.scrollTo(0,0); }
 
-        // --- ADMIN SISTEM ---
         function registerAdmin() {
             const n = document.getElementById('reg-nick').value;
             const e = document.getElementById('reg-email').value.toLowerCase().trim();
-            if(!n || !e) return alert("Popunite polja");
+            if(!n || !e) return;
             db.ref('admins').push({ nickname: n, email: e }).then(() => {
                 alert("Uspešno!"); toggleModal('register-screen', false);
             });
@@ -261,12 +261,11 @@
 
         function logoutAdmin() { localStorage.removeItem('loggedAdmin'); location.reload(); }
 
-        // --- MAPA I DODAVANJE ---
         map.on('click', e => {
             if (!isAdmin) return;
             tempCoords = e.latlng;
             if (tempMarker) map.removeLayer(tempMarker);
-            tempMarker = L.marker(e.latlng, { icon: L.divIcon({ html: '📍', iconSize:[30,30] }) }).addTo(map);
+            tempMarker = L.marker(e.latlng, { icon: L.divIcon({ html: '📍', iconSize:[30,30], iconAnchor:[15,30] }) }).addTo(map);
             document.getElementById('admin-panel').classList.add('active');
         });
 
@@ -286,7 +285,6 @@
             }).then(() => zatvoriSvePanele());
         }
 
-        // --- LIVE SCORE ---
         function otvoriUredi(id) {
             currentCourtId = id;
             db.ref('tereni/' + id).once('value', snap => {
@@ -295,7 +293,6 @@
                 document.getElementById('team-a').value = c.timA || '';
                 document.getElementById('team-b').value = c.timB || '';
                 document.getElementById('match-date').value = c.datum || '';
-                
                 if(c.status === 'live') setupLivePanel(c);
                 else {
                     document.getElementById('match-setup').classList.remove('hidden');
@@ -308,9 +305,9 @@
         function updateStatus(s) {
             const data = {
                 status: s,
-                timA: document.getElementById('team-a').value,
-                timB: document.getElementById('team-b').value,
-                datum: document.getElementById('match-date').value
+                timA: document.getElementById('team-a').value || "",
+                timB: document.getElementById('team-b').value || "",
+                datum: document.getElementById('match-date').value || ""
             };
             db.ref('tereni/' + currentCourtId).update(data);
             if(s === 'live') otvoriUredi(currentCourtId);
@@ -323,7 +320,6 @@
             document.getElementById('label-team-b').innerText = c.timB || 'TIM B';
             document.getElementById('score-a').innerText = c.scoreA || 0;
             document.getElementById('score-b').innerText = c.scoreB || 0;
-
             const bA = document.getElementById('btns-a'); const bB = document.getElementById('btns-b');
             bA.innerHTML = bB.innerHTML = '';
             const pts = (c.sport === 'kosarka') ? [1, 2, 3] : [1];
@@ -338,32 +334,41 @@
         }
 
         function resetMatch() {
-            if(confirm("Obriši meč i oslobodi teren?")) {
+            if(confirm("Obriši meč?")) {
                 db.ref('tereni/'+currentCourtId).update({ status:'slobodno', scoreA:0, scoreB:0, timA:'', timB:'', datum:'' });
                 zatvoriSvePanele();
             }
         }
 
         function zatvoriSvePanele() {
-            document.querySelectorAll('#admin-panel, #match-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById('admin-panel').classList.remove('active');
+            document.getElementById('match-panel').classList.remove('active');
             if(tempMarker) map.removeLayer(tempMarker);
             window.scrollTo(0,0);
         }
 
-        // --- RENDERING ---
         db.ref('tereni').on('value', snap => {
             courtMarkers.clearLayers();
             const data = snap.val();
             for (let id in data) {
                 const c = data[id];
+                
+                // NOVO: Dinamičke labele iznad loptice
+                let labelExtra = "";
+                if(c.status === 'najava' && c.datum) labelExtra = `<div class="map-label-najava">${c.datum}</div>`;
+                if(c.status === 'live') labelExtra = `<div class="map-label-live">LIVE</div>`;
+
                 const marker = L.marker([c.lat, c.lng], {
-                    icon: L.divIcon({ html: `<div style="font-size:28px; filter:drop-shadow(0 2px 2px black);">${c.emoji}</div>`, iconAnchor:[14,14] })
+                    icon: L.divIcon({ 
+                        html: `<div style="position:relative; font-size:28px; filter:drop-shadow(0 2px 2px black);">${labelExtra}${c.emoji}</div>`, 
+                        iconAnchor:[14,14], className:'' 
+                    })
                 });
 
-                let info = `<span style="color:#888;">Trenutno slobodno</span>`;
-                if(c.status === 'najava') info = `<b style="color:var(--blue)">NAJAVA:</b><br>${c.timA} vs ${c.timB}<br><small>${c.datum}</small>`;
-                if(c.status === 'live') info = `<span class="live-tag">LIVE 🔴</span><br><b style="font-size:16px;">${c.timA} ${c.scoreA}:${c.scoreB} ${c.timB}</b>`;
-                if(c.status === 'zavrseno') info = `<b style="color:orange;">ZAVRŠENO:</b><br>${c.timA} ${c.scoreA}:${c.scoreB} ${c.timB}`;
+                let info = `<span style="color:#888;">Slobodan teren</span>`;
+                if(c.status === 'najava') info = `<b style="color:var(--blue)">NAJAVA:</b><br>${c.timA || ''} vs ${c.timB || ''}<br><small>${c.datum || ''}</small>`;
+                if(c.status === 'live') info = `<span class="live-tag">LIVE 🔴</span><br><b style="font-size:16px;">${c.timA || ''} ${c.scoreA || 0}:${c.scoreB || 0} ${c.timB || ''}</b>`;
+                if(c.status === 'zavrseno') info = `<b style="color:orange;">ZAVRŠENO:</b><br>${c.timA || ''} ${c.scoreA || 0}:${c.scoreB || 0} ${c.timB || ''}`;
 
                 let btn = isAdmin ? `<button onclick="otvoriUredi('${id}')" style="margin-top:10px; width:100%; padding:8px; background:#444; color:white; border:none; border-radius:8px; font-weight:bold;">UREDI MEČ</button>` : '';
 
