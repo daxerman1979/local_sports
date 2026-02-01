@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Who Play? Ultimate Sports Tracker Pro</title>
+    <title>WhoPlay - Live Sports Map</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
     <style>
-        :root { --primary: #e74c3c; --dark: #121212; --accent: #2ecc71; --blue: #3498db; }
+        :root { --primary: #e74c3c; --dark: #121212; --accent: #2ecc71; --blue: #3498db; --grey: #7f8c8d; }
 
         html, body { 
             margin: 0; padding: 0; width: 100%; height: 100%; 
@@ -38,7 +38,7 @@
             pointer-events: none; box-sizing: border-box;
         }
         .logo, .nav-links { pointer-events: auto; }
-        .logo { font-size: 16px; font-weight: 900; color: var(--primary); text-shadow: 0 0 10px rgba(0,0,0,1); }
+        .logo { font-size: 20px; font-weight: 900; color: var(--primary); text-shadow: 0 0 10px rgba(0,0,0,1); letter-spacing: 1px; }
         .nav-btn {
             background: rgba(0,0,0,0.7); border: 1px solid rgba(255,255,255,0.3); color: white;
             padding: 6px 12px; border-radius: 15px; font-size: 11px; font-weight: bold;
@@ -63,7 +63,7 @@
         .score-btn-group { display: flex; gap: 5px; justify-content: center; flex-wrap: wrap; }
         .score-btn { background: #333; border: 1px solid #444; color: white; padding: 8px 12px; border-radius: 6px; font-weight: bold; font-size: 12px; min-width: 40px; }
         .btn-minus { background: #c0392b !important; }
-        .btn-period { width: 100%; background: var(--blue); color: white; border: none; padding: 10px; border-radius: 10px; font-weight: bold; margin-top: 10px; text-transform: uppercase; font-size: 11px; }
+        .btn-period { width: 100%; background: var(--blue); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; margin-top: 10px; text-transform: uppercase; font-size: 11px; }
         .btn-period:disabled { background: #444 !important; opacity: 0.5; }
 
         .controls-container { position: fixed; right: 12px; bottom: 90px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
@@ -79,7 +79,10 @@
 
         .hidden { display: none !important; }
 
-        .icon-container { transition: transform 0.3s ease; transform-origin: center; }
+        /* VIZUELNI STATUSI MARKERA */
+        .icon-container { transition: all 0.3s ease; transform-origin: center; }
+        .marker-live { filter: drop-shadow(0 0 8px white) !important; }
+        .marker-ft { opacity: 0.6; filter: grayscale(0.8) !important; }
         #map.zoom-far .icon-container { transform: scale(0.4); }
         #map.zoom-far .map-scoreboard { display: none !important; }
 
@@ -104,8 +107,8 @@
 
     <div id="startup-screen">
         <div class="startup-card">
-            <h2 style="margin-top:0;">Who Play?</h2>
-            <p style="color:#666; font-size:14px; margin-bottom:20px;">Dobrodošli nazad!</p>
+            <h1 style="margin-top:0; color:var(--primary);">WHOPLAY</h1>
+            <p style="color:#666; font-size:14px; margin-bottom:20px;">Pronađi igru u svom gradu.</p>
             <button class="btn-action" onclick="toggleModal('login-screen', true)">LOG IN ADMIN</button>
             <button class="btn-action" style="background:#555; margin-top:10px;" onclick="toggleModal('register-screen', true)">REGISTRACIJA</button>
             <button class="btn-explore" onclick="startExplore()">NASTAVI ISTRAŽIVANJE 🌍</button>
@@ -132,7 +135,7 @@
     </div>
 
     <header id="main-header" class="hidden">
-        <div class="logo">WHO PLAY?</div>
+        <div class="logo">WHOPLAY</div>
         <div id="guest-nav" class="nav-links">
             <button class="nav-btn" onclick="toggleModal('register-screen', true)">Reg</button>
             <button class="nav-btn" onclick="toggleModal('login-screen', true)">Login</button>
@@ -340,9 +343,7 @@
         function setupLivePanel(c) {
             document.getElementById('match-setup').classList.add('hidden');
             document.getElementById('match-live').classList.remove('hidden');
-            
             const pc = document.getElementById('period-controls');
-            pc.innerHTML = '';
             
             db.ref('tereni/' + currentCourtId).on('value', snap => {
                 const data = snap.val();
@@ -352,7 +353,6 @@
                 document.getElementById('label-team-a').innerText = data.timA || 'T1';
                 document.getElementById('label-team-b').innerText = data.timB || 'T2';
                 
-                // Osveži dugmad perioda na svaku promenu arhiva
                 pc.innerHTML = '';
                 if(data.status !== 'zavrseno') {
                     let btnLabel = "";
@@ -362,7 +362,7 @@
                     if(["fudbal", "rukomet"].includes(data.sport)) { btnLabel = "KRAJ 1.P"; maxClicks = 1; }
                     else if(data.sport === "hokej") { btnLabel = "KRAJ TREĆINE"; maxClicks = 2; }
                     else if(data.sport === "kosarka") { btnLabel = "KRAJ ČETVRTINE"; maxClicks = 3; }
-                    else if(["tenis", "odbojka"].includes(data.sport)) { btnLabel = "KRAJ SETA"; maxClicks = 99; }
+                    else if(["tenis", "odbojka"].includes(data.sport)) { btnLabel = "KRAJ SETA"; maxClicks = 4; } // Dozvoljava 5 setova (4 klika)
                     
                     if(btnLabel) {
                         let b = document.createElement('button');
@@ -380,7 +380,6 @@
                     document.getElementById('live-status-label').innerText = "MEČ JE ZAVRŠEN (FT)";
                     document.getElementById('live-status-label').style.color = "#888";
                 }
-
                 renderujPoeneAdmin(data);
             });
         }
@@ -453,13 +452,23 @@
             const sA = c.scoreA || 0; const sB = c.scoreB || 0;
             const arh = c.arhiva ? `<span style="color:#aaa; margin-right:5px;">(${c.arhiva})</span>` : "";
             let sb = "";
-            if(c.status === 'najava') sb = `<div class="map-scoreboard"><div class="status-part bg-upcoming">UPCOMING</div><div style="padding:0 5px;">${c.datum} | ${c.timA}-${c.timB}</div></div>`;
-            else if(c.status === 'live') sb = `<div class="map-scoreboard"><div class="status-part bg-live">LIVE</div><div style="padding:0 5px;">${arh}${c.timA} ${sA}-${sB} ${c.timB}</div></div>`;
-            else if(c.status === 'zavrseno') sb = `<div class="map-scoreboard"><div class="status-part bg-ft">FT</div><div style="padding:0 5px;">${arh}${c.timA} ${sA}-${sB} ${c.timB}</div></div>`;
+            let statusClass = "";
+            
+            if(c.status === 'najava') {
+                sb = `<div class="map-scoreboard"><div class="status-part bg-upcoming">UPCOMING</div><div style="padding:0 5px;">${c.datum} | ${c.timA}-${c.timB}</div></div>`;
+            } else if(c.status === 'live') {
+                statusClass = "marker-live";
+                sb = `<div class="map-scoreboard"><div class="status-part bg-live">LIVE</div><div style="padding:0 5px;">${arh}${c.timA} ${sA}-${sB} ${c.timB}</div></div>`;
+            } else if(c.status === 'zavrseno') {
+                statusClass = "marker-ft";
+                sb = `<div class="map-scoreboard"><div class="status-part bg-ft">FT</div><div style="padding:0 5px;">${arh}${c.timA} ${sA}-${sB} ${c.timB}</div></div>`;
+            }
+            
             const u = JSON.parse(localStorage.getItem('loggedAdmin'));
             const isOwner = isAdmin && u && c.vlasnik === u.email;
+
             L.marker([c.lat, c.lng], {
-                icon: L.divIcon({ html: `<div class="icon-container" style="position:relative; font-size:28px; filter:drop-shadow(0 2px 2px black);">${sb}${c.emoji}</div>`, iconAnchor:[14,14], className:'' })
+                icon: L.divIcon({ html: `<div class="icon-container ${statusClass}" style="position:relative; font-size:28px; filter:drop-shadow(0 2px 2px black);">${sb}${c.emoji}</div>`, iconAnchor:[14,14], className:'' })
             }).bindPopup(`<div style="text-align:center;">${c.emoji}<br><b>${c.ime}</b>${isOwner ? `<br><button onclick="otvoriUredi('${id}')" style="width:100%; margin-top:10px; padding:5px; background:#444; color:white; border:none; border-radius:5px;">UREDI</button>` : ''}</div>`).addTo(courtMarkers);
         }
 
