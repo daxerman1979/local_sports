@@ -233,13 +233,16 @@
             else container.classList.remove('zoom-far');
         });
 
+        // POPRAVKA: Explore pokreće lociranje, ali LOGIN NE
         function startExplore() {
             document.getElementById('startup-screen').classList.add('hidden');
             document.getElementById('map').classList.remove('map-blur');
             document.getElementById('main-header').classList.remove('hidden');
             document.getElementById('recenter-btn').classList.remove('hidden');
-            // Lociraj, ali setView: false sprečava skakanje kamere stalno
+            
+            // Rešava tvoj problem sa stalnim vraćanjem na centar
             map.locate({watch: true, enableHighAccuracy: true, setView: false});
+            
             setTimeout(() => { 
                 map.invalidateSize(); 
                 if(lastKnownLatLng) map.flyTo(lastKnownLatLng, 16);
@@ -249,7 +252,16 @@
 
         window.onload = function() {
             const savedAdmin = localStorage.getItem('loggedAdmin');
-            if (savedAdmin) setupAdminUI(JSON.parse(savedAdmin));
+            if (savedAdmin) {
+                setupAdminUI(JSON.parse(savedAdmin));
+                // Ako je admin ulogovan, odmah sklanjamo startup i blur ali BEZ FLYTO
+                document.getElementById('startup-screen').classList.add('hidden');
+                document.getElementById('map').classList.remove('map-blur');
+                document.getElementById('main-header').classList.remove('hidden');
+                document.getElementById('recenter-btn').classList.remove('hidden');
+                map.locate({watch: true, enableHighAccuracy: true, setView: false});
+                setTimeout(() => map.invalidateSize(), 500);
+            }
         };
 
         function toggleModal(id, s) { document.getElementById(id).classList.toggle('hidden', !s); }
@@ -268,7 +280,7 @@
             db.ref('admins').orderByChild('email').equalTo(e).once('value', snap => {
                 if (snap.exists()) {
                     localStorage.setItem('loggedAdmin', JSON.stringify(Object.values(snap.val())[0]));
-                    location.reload();
+                    location.reload(); // Osveži da se učita Admin UI bez skoka na mapu
                 } else alert("Niste admin.");
             });
         }
@@ -323,6 +335,8 @@
                     document.getElementById('match-live').classList.remove('hidden');
                     document.getElementById('label-team-a').innerText = c.timA || 'T1';
                     document.getElementById('label-team-b').innerText = c.timB || 'T2';
+                    
+                    // POPRAVKA: || 0 sprečava undefined
                     document.getElementById('score-a').innerText = c.scoreA || 0;
                     document.getElementById('score-b').innerText = c.scoreB || 0;
                     
@@ -354,7 +368,7 @@
         }
 
         function resetMatch() {
-            if(confirm("Resetuj?")) {
+            if(confirm("Reset?")) {
                 db.ref('tereni/'+currentCourtId).update({ status:'slobodno', scoreA:0, scoreB:0, timA:'', timB:'', datum:'' });
                 zatvoriSvePanele();
             }
@@ -375,13 +389,17 @@
             for (let id in data) {
                 const c = data[id];
                 let sb = "";
+                // POPRAVKA: || 0 na rezultatima na mapi
+                const sA = c.scoreA || 0;
+                const sB = c.scoreB || 0;
+
                 if(c.status === 'najava') sb = `<div class="map-scoreboard"><div class="status-part bg-upcoming">UPCOMING</div><div style="padding:0 5px;">${c.datum} | ${c.timA}-${c.timB}</div></div>`;
-                else if(c.status === 'live') sb = `<div class="map-scoreboard"><div class="status-part bg-live">LIVE</div><div style="padding:0 5px;">${c.timA} ${c.scoreA}-${c.scoreB} ${c.timB}</div></div>`;
-                else if(c.status === 'zavrseno') sb = `<div class="map-scoreboard"><div class="status-part bg-ft">FT</div><div style="padding:0 5px;">${c.timA} ${c.scoreA}-${c.scoreB} ${c.timB}</div></div>`;
+                else if(c.status === 'live') sb = `<div class="map-scoreboard"><div class="status-part bg-live">LIVE</div><div style="padding:0 5px;">${c.timA} ${sA}-${sB} ${c.timB}</div></div>`;
+                else if(c.status === 'zavrseno') sb = `<div class="map-scoreboard"><div class="status-part bg-ft">FT</div><div style="padding:0 5px;">${c.timA} ${sA}-${sB} ${c.timB}</div></div>`;
                 
                 L.marker([c.lat, c.lng], {
                     icon: L.divIcon({ html: `<div class="icon-container" style="position:relative; font-size:28px; filter:drop-shadow(0 2px 2px black);">${sb}${c.emoji}</div>`, iconAnchor:[14,14], className:'' })
-                }).bindPopup(`<div style="text-align:center;">${c.emoji}<br><b>${c.ime}</b>${isAdmin ? `<br><button onclick="otvoriUredi('${id}')" style="width:100%; margin-top:10px; padding:8px; background:#444; color:white; border:none; border-radius:5px;">UREDI</button>` : ''}</div>`).addTo(courtMarkers);
+                }).bindPopup(`<div style="text-align:center;">${c.emoji}<br><b>${c.ime}</b>${isAdmin ? `<br><button onclick="otvoriUredi('${id}')" style="width:100%; margin-top:10px; padding:5px; background:#444; color:white; border:none; border-radius:5px;">UREDI</button>` : ''}</div>`).addTo(courtMarkers);
             }
         });
 
