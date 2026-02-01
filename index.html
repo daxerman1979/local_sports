@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Who Play? Pro Secure</title>
+    <title>Who Play? Full Pro Final</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
@@ -20,6 +20,7 @@
         #map { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1; transition: filter 0.5s ease; }
         .map-blur { filter: blur(10px) brightness(0.6); }
 
+        /* Startup Ekran */
         #startup-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 10001; display: flex; justify-content: center; align-items: center;
@@ -44,6 +45,7 @@
             padding: 6px 12px; border-radius: 15px; font-size: 11px; font-weight: bold;
         }
 
+        /* Paneli */
         #admin-panel, #match-panel {
             position: fixed; bottom: 0; left: 0; width: 100%; z-index: 9999;
             background: var(--dark); color: white;
@@ -74,6 +76,9 @@
         .btn-explore { width: 100%; background: var(--accent); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: bold; font-size: 16px; margin-top: 10px; }
         .btn-reset-light { width: 100%; background: #555; color: white; border: none; padding: 12px; border-radius: 12px; font-weight: bold; margin-top: 8px; }
 
+        .hidden { display: none !important; }
+
+        /* SKALIRANJE ZUMA */
         .icon-container { transition: transform 0.3s ease; transform-origin: center; }
         #map.zoom-far .icon-container { transform: scale(0.4); }
         #map.zoom-far .map-scoreboard { display: none !important; }
@@ -401,10 +406,9 @@
                 icon: L.divIcon({ html: `<div class="icon-container" style="position:relative; font-size:28px; filter:drop-shadow(0 2px 2px black);">${sb}${c.emoji}</div>`, iconAnchor:[14,14], className:'' })
             });
 
-            // LOGIKA: Samo vlasnik vidi dugme UREDI
-            let btn = (isAdmin && c.adminEmail === loggedUserEmail) ? `<br><button onclick="otvoriUredi('${id}')" style="width:100%; margin-top:10px; padding:8px; background:#444; color:white; border:none; border-radius:8px; font-weight:bold;">UREDI</button>` : '';
+            let editBtn = (isAdmin && c.adminEmail === loggedUserEmail) ? `<br><button onclick="otvoriUredi('${id}')" style="width:100%; margin-top:10px; padding:8px; background:#444; color:white; border:none; border-radius:8px; font-weight:bold;">UREDI</button>` : '';
 
-            marker.bindPopup(`<div style="text-align:center;">${c.emoji}<br><b>${c.ime}</b>${btn}</div>`).addTo(courtMarkers);
+            marker.bindPopup(`<div style="text-align:center;">${c.emoji}<br><b>${c.ime}</b>${editBtn}</div>`).addTo(courtMarkers);
         }
 
         function locirajMe() {
