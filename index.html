@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Who Play? Live Pro</title>
+    <title>Who Play? Live Scoreboard</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
@@ -38,7 +38,7 @@
             background: var(--dark); color: white;
             padding: 15px 15px calc(25px + env(safe-area-inset-bottom));
             border-radius: 20px 20px 0 0; border-top: 3px solid var(--primary);
-            box-sizing: border-box; transform: translateY(105%); transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-sizing: border-box; transform: translateY(105%); transition: 0.3s ease;
         }
         .active { transform: translateY(0) !important; }
 
@@ -65,7 +65,7 @@
         .overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 10000; display: flex; justify-content: center; align-items: center;
-            background: rgba(0,0,0,0.92); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            background: rgba(0,0,0,0.92); backdrop-filter: blur(10px);
         }
         .modal { background: white; padding: 20px; border-radius: 20px; width: 85%; max-width: 320px; text-align: center; }
         
@@ -80,23 +80,35 @@
 
         .hidden { display: none !important; }
 
+        /* Stilovi za Scoreboard Traku na mapi */
+        .map-scoreboard {
+            position: absolute; bottom: 35px; left: 50%; transform: translateX(-50%);
+            display: flex; align-items: center; background: rgba(0,0,0,0.85);
+            color: white; border-radius: 4px; overflow: hidden;
+            white-space: nowrap; border: 1px solid rgba(255,255,255,0.2);
+            font-size: 10px; height: 18px; box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+            min-width: 80px;
+        }
+        .status-part {
+            padding: 0 5px; height: 100%; display: flex; align-items: center;
+            font-weight: 900; font-size: 8px; text-transform: uppercase;
+        }
+        .info-part { padding: 0 6px; font-weight: 600; }
+        
+        .bg-upcoming { background: #2ecc71; }
+        .bg-live { background: #e74c3c; animation: blink 1s infinite; }
+        .bg-ft { background: #555; }
+
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
         .pulse-marker { width: 12px; height: 12px; background: #3498db; border: 2px solid white; border-radius: 50%; position: relative; }
-        .pulse-marker::after { content: ''; width: 30px; height: 30px; background: rgba(52, 152, 219, 0.3); border-radius: 50%; position: absolute; top: -11px; left: -11px; animation: pulse-ring 2s infinite; }
-        @keyframes pulse-ring { 0% { transform: scale(0.6); opacity: 1; } 100% { transform: scale(2); opacity: 0; } }
-        
-        /* NOVO: Animacije iznad loptice na mapi */
-        .map-label-najava { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); background: var(--blue); color: white; font-size: 9px; padding: 2px 5px; border-radius: 4px; white-space: nowrap; font-weight: bold; border: 1px solid white; }
-        .map-label-live { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); background: red; color: white; font-size: 9px; padding: 2px 5px; border-radius: 4px; white-space: nowrap; font-weight: bold; animation: blink 1s infinite; border: 1px solid white; }
-        
-        .live-tag { background: red; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; animation: blink 1s infinite; font-weight: bold; display: inline-block; }
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
 
     <div id="welcome-screen" class="overlay">
         <div class="modal">
-            <h3 style="margin-top:0; color: #111;">Who Play?</h3>
+            <h3 style="margin-top:0;">Who Play?</h3>
             <p style="font-size: 13px; color: #555;">Sportski tereni i rezultati uživo.</p>
             <button class="btn-action" onclick="prihvatiUslove()">PRIHVATAM</button>
         </div>
@@ -105,19 +117,19 @@
     <div id="register-screen" class="overlay hidden">
         <div class="modal">
             <h4>Registracija Admina</h4>
-            <input type="text" id="reg-nick" placeholder="Nickname" autocomplete="off">
-            <input type="email" id="reg-email" placeholder="Email" autocomplete="off">
+            <input type="text" id="reg-nick" placeholder="Nickname">
+            <input type="email" id="reg-email" placeholder="Email">
             <button class="btn-action" onclick="registerAdmin()">Registruj me</button>
-            <button onclick="toggleModal('register-screen', false)" style="background:none; border:none; margin-top:12px; color:#999; font-size:13px;">Zatvori</button>
+            <button onclick="toggleModal('register-screen', false)" style="background:none; border:none; margin-top:12px; color:#999;">Zatvori</button>
         </div>
     </div>
 
     <div id="login-screen" class="overlay hidden">
         <div class="modal">
             <h4>Admin Login</h4>
-            <input type="email" id="login-email" placeholder="Unesite email" autocomplete="email">
+            <input type="email" id="login-email" placeholder="Unesite email">
             <button class="btn-action" onclick="loginAdmin()">Prijavi se</button>
-            <button onclick="toggleModal('login-screen', false)" style="background:none; border:none; margin-top:12px; color:#999; font-size:13px;">Zatvori</button>
+            <button onclick="toggleModal('login-screen', false)" style="background:none; border:none; margin-top:12px; color:#999;">Zatvori</button>
         </div>
     </div>
 
@@ -162,29 +174,29 @@
                 <strong id="target-court-name" style="color:var(--blue)">UREDI MEČ</strong>
                 <button onclick="zatvoriSvePanele()" style="color:white; background:#333; border:none; width:30px; height:30px; border-radius:50%; display:flex; justify-content:center; align-items:center;">×</button>
             </div>
-            <input type="text" id="team-a" placeholder="Domaćin (Tim A)">
-            <input type="text" id="team-b" placeholder="Gost (Tim B)">
-            <input type="text" id="match-date" placeholder="Datum/Vreme (npr. Danas 20h)">
+            <input type="text" id="team-a" placeholder="Tim 1">
+            <input type="text" id="team-b" placeholder="Tim 2">
+            <input type="text" id="match-date" placeholder="Datum (npr. 12.05. 20h)">
             <button class="btn-save" onclick="updateStatus('najava')">NAJAVI MEČ</button>
-            <button class="btn-action" style="background:var(--accent); margin-top:8px;" onclick="updateStatus('live')">POČNI LIVE 🔴</button>
+            <button class="btn-action" style="background:var(--accent); margin-top:8px;" onclick="updateStatus('live')">GO LIVE 🔴</button>
         </div>
 
         <div id="match-live" class="hidden">
             <div class="live-controls">
                 <div style="text-align:center; width:45%;">
-                    <div id="label-team-a" style="font-size:11px; font-weight:bold;">TIM A</div>
+                    <div id="label-team-a" style="font-size:11px; font-weight:bold;">TIM 1</div>
                     <div id="score-a" class="score-display">0</div>
                     <div id="btns-a" class="score-btn-group"></div>
                 </div>
                 <div style="font-weight:bold; color:#444;">VS</div>
                 <div style="text-align:center; width:45%;">
-                    <div id="label-team-b" style="font-size:11px; font-weight:bold;">TIM B</div>
+                    <div id="label-team-b" style="font-size:11px; font-weight:bold;">TIM 2</div>
                     <div id="score-b" class="score-display">0</div>
                     <div id="btns-b" class="score-btn-group"></div>
                 </div>
             </div>
-            <button class="btn-save" style="background:orange; margin-top:12px;" onclick="updateStatus('zavrseno')">ZAVRŠI MEČ</button>
-            <button class="btn-action btn-reset" onclick="resetMatch()">RESETUJ TEREN (NOVI MEČ)</button>
+            <button class="btn-save" style="background:orange; margin-top:12px;" onclick="updateStatus('zavrseno')">ZAVRŠI (FT)</button>
+            <button class="btn-action btn-reset" onclick="resetMatch()">RESETUJ SVE</button>
         </div>
     </div>
 
@@ -303,21 +315,20 @@
         }
 
         function updateStatus(s) {
-            const data = {
+            db.ref('tereni/' + currentCourtId).update({
                 status: s,
                 timA: document.getElementById('team-a').value || "",
                 timB: document.getElementById('team-b').value || "",
                 datum: document.getElementById('match-date').value || ""
-            };
-            db.ref('tereni/' + currentCourtId).update(data);
+            });
             if(s === 'live') otvoriUredi(currentCourtId);
         }
 
         function setupLivePanel(c) {
             document.getElementById('match-setup').classList.add('hidden');
             document.getElementById('match-live').classList.remove('hidden');
-            document.getElementById('label-team-a').innerText = c.timA || 'TIM A';
-            document.getElementById('label-team-b').innerText = c.timB || 'TIM B';
+            document.getElementById('label-team-a').innerText = c.timA || 'T1';
+            document.getElementById('label-team-b').innerText = c.timB || 'T2';
             document.getElementById('score-a').innerText = c.scoreA || 0;
             document.getElementById('score-b').innerText = c.scoreB || 0;
             const bA = document.getElementById('btns-a'); const bB = document.getElementById('btns-b');
@@ -334,7 +345,7 @@
         }
 
         function resetMatch() {
-            if(confirm("Obriši meč?")) {
+            if(confirm("Resetuj sve?")) {
                 db.ref('tereni/'+currentCourtId).update({ status:'slobodno', scoreA:0, scoreB:0, timA:'', timB:'', datum:'' });
                 zatvoriSvePanele();
             }
@@ -352,41 +363,43 @@
             const data = snap.val();
             for (let id in data) {
                 const c = data[id];
-                
-                // NOVO: Dinamičke labele iznad loptice
-                let labelExtra = "";
-                if(c.status === 'najava' && c.datum) labelExtra = `<div class="map-label-najava">${c.datum}</div>`;
-                if(c.status === 'live') labelExtra = `<div class="map-label-live">LIVE</div>`;
+                let scoreboard = "";
+
+                if(c.status === 'najava') {
+                    scoreboard = `<div class="map-scoreboard">
+                        <div class="status-part bg-upcoming">UPCOMING</div>
+                        <div class="info-part">${c.datum || ''} | ${c.timA || 'T1'} - ${c.timB || 'T2'}</div>
+                    </div>`;
+                } else if(c.status === 'live') {
+                    scoreboard = `<div class="map-scoreboard">
+                        <div class="status-part bg-live">LIVE</div>
+                        <div class="info-part">${c.timA || 'T1'} ${c.scoreA || 0} - ${c.scoreB || 0} ${c.timB || 'T2'}</div>
+                    </div>`;
+                } else if(c.status === 'zavrseno') {
+                    scoreboard = `<div class="map-scoreboard">
+                        <div class="status-part bg-ft">FT</div>
+                        <div class="info-part">${c.timA || 'T1'} ${c.scoreA || 0} - ${c.scoreB || 0} ${c.timB || 'T2'}</div>
+                    </div>`;
+                }
 
                 const marker = L.marker([c.lat, c.lng], {
                     icon: L.divIcon({ 
-                        html: `<div style="position:relative; font-size:28px; filter:drop-shadow(0 2px 2px black);">${labelExtra}${c.emoji}</div>`, 
+                        html: `<div style="position:relative; font-size:28px; filter:drop-shadow(0 2px 2px black);">${scoreboard}${c.emoji}</div>`, 
                         iconAnchor:[14,14], className:'' 
                     })
                 });
 
-                let info = `<span style="color:#888;">Slobodan teren</span>`;
-                if(c.status === 'najava') info = `<b style="color:var(--blue)">NAJAVA:</b><br>${c.timA || ''} vs ${c.timB || ''}<br><small>${c.datum || ''}</small>`;
-                if(c.status === 'live') info = `<span class="live-tag">LIVE 🔴</span><br><b style="font-size:16px;">${c.timA || ''} ${c.scoreA || 0}:${c.scoreB || 0} ${c.timB || ''}</b>`;
-                if(c.status === 'zavrseno') info = `<b style="color:orange;">ZAVRŠENO:</b><br>${c.timA || ''} ${c.scoreA || 0}:${c.scoreB || 0} ${c.timB || ''}`;
+                let popupInfo = `<b>${c.ime}</b><br><small>${c.status === 'slobodno' ? 'Slobodno' : c.status}</small>`;
+                let btn = isAdmin ? `<button onclick="otvoriUredi('${id}')" style="margin-top:10px; width:100%; padding:8px; background:#444; color:white; border:none; border-radius:8px;">UREDI</button>` : '';
 
-                let btn = isAdmin ? `<button onclick="otvoriUredi('${id}')" style="margin-top:10px; width:100%; padding:8px; background:#444; color:white; border:none; border-radius:8px; font-weight:bold;">UREDI MEČ</button>` : '';
-
-                marker.bindPopup(`<div style="text-align:center; min-width:160px;">
-                    <div style="font-size:35px;">${c.emoji}</div>
-                    <strong style="text-transform:uppercase; font-size:14px;">${c.ime}</strong><hr style="opacity:0.2; margin:8px 0;">
-                    ${info} ${btn}
-                </div>`).addTo(courtMarkers);
+                marker.bindPopup(`<div style="text-align:center; min-width:140px;">${c.emoji}<br>${popupInfo}${btn}</div>`).addTo(courtMarkers);
             }
         });
 
         map.on('locationfound', e => { 
             lastKnownLatLng = e.latlng;
             if (userMarker) userMarker.setLatLng(e.latlng);
-            else {
-                userMarker = L.marker(e.latlng, {icon: L.divIcon({className:'', html:"<div class='pulse-marker'></div>"})}).addTo(map);
-                if(!prvaLokacija) { map.setView(e.latlng, 16); prvaLokacija = true; }
-            }
+            else userMarker = L.marker(e.latlng, {icon: L.divIcon({className:'', html:"<div class='pulse-marker'></div>"})}).addTo(map);
         });
         function locirajMe() { if(lastKnownLatLng) map.flyTo(lastKnownLatLng, 17); }
     </script>
