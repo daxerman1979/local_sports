@@ -62,8 +62,9 @@
 
         .live-controls { display: flex; justify-content: space-around; align-items: center; background: #1a1a1a; padding: 15px; border-radius: 15px; margin-top: 10px; border: 1px solid #333; }
         .score-display { font-size: 36px; font-weight: 900; color: var(--accent); margin: 5px 0; }
-        .score-btn-group { display: flex; gap: 5px; justify-content: center; }
-        .score-btn { background: #333; border: 1px solid #444; color: white; padding: 6px 10px; border-radius: 6px; font-weight: bold; font-size: 12px; }
+        .score-btn-group { display: flex; gap: 5px; justify-content: center; flex-wrap: wrap; }
+        .score-btn { background: #333; border: 1px solid #444; color: white; padding: 8px 12px; border-radius: 6px; font-weight: bold; font-size: 12px; min-width: 40px; }
+        .btn-minus { background: #c0392b !important; }
 
         .controls-container { position: fixed; right: 12px; bottom: 90px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
         .circle-btn { width: 44px; height: 44px; background: white; border: none; border-radius: 50%; box-shadow: 0 4px 12px rgba(0,0,0,0.4); display: flex; justify-content: center; align-items: center; font-size: 20px; }
@@ -346,7 +347,6 @@
             document.getElementById('match-setup').classList.add('hidden');
             document.getElementById('match-live').classList.remove('hidden');
             
-            // AKTIVIRANO SLUŠANJE PROMENA U REALNOM VREMENU
             db.ref('tereni/' + currentCourtId).on('value', snap => {
                 const data = snap.val();
                 if(!data) return;
@@ -358,15 +358,30 @@
 
             const bA = document.getElementById('btns-a'); const bB = document.getElementById('btns-b');
             bA.innerHTML = bB.innerHTML = '';
-            const pts = (c.sport === 'kosarka') ? [1, 2, 3] : [1];
-            pts.forEach(p => {
-                let b1 = document.createElement('button'); b1.className='score-btn'; b1.innerText='+'+p;
-                b1.onclick = () => db.ref('tereni/'+currentCourtId+'/scoreA').transaction(v => (v||0)+p);
-                bA.appendChild(b1);
-                let b2 = document.createElement('button'); b2.className='score-btn'; b2.innerText='+'+p;
-                b2.onclick = () => db.ref('tereni/'+currentCourtId+'/scoreB').transaction(v => (v||0)+p);
-                bB.appendChild(b2);
+            
+            // LOGIKA ZA POENE PO SPORTU
+            let plusPoints = [1];
+            if(c.sport === 'kosarka') plusPoints = [1, 2, 3];
+            
+            // Dugmići za Tim A
+            plusPoints.forEach(p => {
+                let btn = document.createElement('button'); btn.className='score-btn'; btn.innerText='+'+p;
+                btn.onclick = () => db.ref('tereni/'+currentCourtId+'/scoreA').transaction(v => (v||0)+p);
+                bA.appendChild(btn);
             });
+            let minA = document.createElement('button'); minA.className='score-btn btn-minus'; minA.innerText='-1';
+            minA.onclick = () => db.ref('tereni/'+currentCourtId+'/scoreA').transaction(v => Math.max(0, (v||0)-1));
+            bA.appendChild(minA);
+
+            // Dugmići za Tim B
+            plusPoints.forEach(p => {
+                let btn = document.createElement('button'); btn.className='score-btn'; btn.innerText='+'+p;
+                btn.onclick = () => db.ref('tereni/'+currentCourtId+'/scoreB').transaction(v => (v||0)+p);
+                bB.appendChild(btn);
+            });
+            let minB = document.createElement('button'); minB.className='score-btn btn-minus'; minB.innerText='-1';
+            minB.onclick = () => db.ref('tereni/'+currentCourtId+'/scoreB').transaction(v => Math.max(0, (v||0)-1));
+            bB.appendChild(minB);
         }
 
         function updateStatus(s) {
@@ -391,9 +406,7 @@
         }
 
         function zatvoriSvePanele() {
-            // PREKIDA SE SLUŠANJE BAZE ZA SPECIFIČAN TEREN KADA SE PANEL ZATVORI
             if (currentCourtId) db.ref('tereni/' + currentCourtId).off('value');
-            
             document.getElementById('admin-panel').classList.remove('active');
             document.getElementById('match-panel').classList.remove('active');
             if(tempMarker) map.removeLayer(tempMarker);
