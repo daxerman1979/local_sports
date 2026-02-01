@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Who Play? Live Scoreboard</title>
+    <title>Who Play? Pro Scaler</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
@@ -80,7 +80,11 @@
 
         .hidden { display: none !important; }
 
-        /* Stilovi za Scoreboard Traku na mapi */
+        /* SKALIRANJE MARKERA I TABLI */
+        .icon-container { transition: transform 0.3s ease; transform-origin: center; }
+        .zoom-far .icon-container { transform: scale(0.4); } /* Smanjeno na 40% kad je daleko */
+        .zoom-far .map-scoreboard { display: none; } /* Sakrij tablu kad je predaleko */
+
         .map-scoreboard {
             position: absolute; bottom: 35px; left: 50%; transform: translateX(-50%);
             display: flex; align-items: center; background: rgba(0,0,0,0.85);
@@ -89,10 +93,7 @@
             font-size: 10px; height: 18px; box-shadow: 0 2px 5px rgba(0,0,0,0.5);
             min-width: 80px;
         }
-        .status-part {
-            padding: 0 5px; height: 100%; display: flex; align-items: center;
-            font-weight: 900; font-size: 8px; text-transform: uppercase;
-        }
+        .status-part { padding: 0 5px; height: 100%; display: flex; align-items: center; font-weight: 900; font-size: 8px; text-transform: uppercase; }
         .info-part { padding: 0 6px; font-weight: 600; }
         
         .bg-upcoming { background: #2ecc71; }
@@ -100,7 +101,6 @@
         .bg-ft { background: #555; }
 
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-
         .pulse-marker { width: 12px; height: 12px; background: #3498db; border: 2px solid white; border-radius: 50%; position: relative; }
     </style>
 </head>
@@ -219,13 +219,21 @@
         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', { zIndex: 1000 }).addTo(map);
 
-        var userMarker, tempMarker, lastKnownLatLng, currentCourtId = null;
+        var userMarker, tempMarker, lastKnownLatLng, currentCourtId = null, matchListener = null;
         var courtMarkers = L.layerGroup().addTo(map);
         var isAdmin = false;
         var selectedSport = { emoji: '⚽', slug: 'fudbal' };
         var prvaLokacija = false;
 
         document.addEventListener('focusout', () => window.scrollTo(0,0));
+
+        // DETEKCIJA ZUMA ZA SKALIRANJE
+        map.on('zoomend', function() {
+            const z = map.getZoom();
+            const container = document.getElementById('map');
+            if (z < 14) container.classList.add('zoom-far');
+            else container.classList.remove('zoom-far');
+        });
 
         function prihvatiUslove() {
             localStorage.setItem('usloviWhoPlay', 'true');
@@ -297,20 +305,46 @@
             }).then(() => zatvoriSvePanele());
         }
 
+        // --- LIVE SCORE ADMIN ---
         function otvoriUredi(id) {
             currentCourtId = id;
-            db.ref('tereni/' + id).once('value', snap => {
+            if(matchListener) db.ref('tereni/' + id).off('value', matchListener);
+            
+            matchListener = db.ref('tereni/' + id).on('value', snap => {
                 const c = snap.val();
+                if(!c) return;
                 document.getElementById('target-court-name').innerText = c.ime;
                 document.getElementById('team-a').value = c.timA || '';
                 document.getElementById('team-b').value = c.timB || '';
                 document.getElementById('match-date').value = c.datum || '';
-                if(c.status === 'live') setupLivePanel(c);
-                else {
+                
+                if(c.status === 'live') {
+                    document.getElementById('match-setup').classList.add('hidden');
+                    document.getElementById('match-live').classList.remove('hidden');
+                    document.getElementById('label-team-a').innerText = c.timA || 'T1';
+                    document.getElementById('label-team-b').innerText = c.timB || 'T2';
+                    document.getElementById('score-a').innerText = c.scoreA || 0;
+                    document.getElementById('score-b').innerText = c.scoreB || 0;
+                    setupButtons(c);
+                } else {
                     document.getElementById('match-setup').classList.remove('hidden');
                     document.getElementById('match-live').classList.add('hidden');
                 }
-                document.getElementById('match-panel').classList.add('active');
+            });
+            document.getElementById('match-panel').classList.add('active');
+        }
+
+        function setupButtons(c) {
+            const bA = document.getElementById('btns-a'); const bB = document.getElementById('btns-b');
+            if(bA.innerHTML !== "") return; // Ne crtaj ponovo ako već postoje
+            const pts = (c.sport === 'kosarka') ? [1, 2, 3] : [1];
+            pts.forEach(p => {
+                let btnA = document.createElement('button'); btnA.className = 'score-btn'; btnA.innerText = '+'+p;
+                btnA.onclick = () => db.ref('tereni/'+currentCourtId+'/scoreA').transaction(v => (v||0)+p);
+                bA.appendChild(btnA);
+                let btnB = document.createElement('button'); btnB.className = 'score-btn'; btnB.innerText = '+'+p;
+                btnB.onclick = () => db.ref('tereni/'+currentCourtId+'/scoreB').transaction(v => (v||0)+p);
+                bB.appendChild(btnB);
             });
         }
 
@@ -320,27 +354,6 @@
                 timA: document.getElementById('team-a').value || "",
                 timB: document.getElementById('team-b').value || "",
                 datum: document.getElementById('match-date').value || ""
-            });
-            if(s === 'live') otvoriUredi(currentCourtId);
-        }
-
-        function setupLivePanel(c) {
-            document.getElementById('match-setup').classList.add('hidden');
-            document.getElementById('match-live').classList.remove('hidden');
-            document.getElementById('label-team-a').innerText = c.timA || 'T1';
-            document.getElementById('label-team-b').innerText = c.timB || 'T2';
-            document.getElementById('score-a').innerText = c.scoreA || 0;
-            document.getElementById('score-b').innerText = c.scoreB || 0;
-            const bA = document.getElementById('btns-a'); const bB = document.getElementById('btns-b');
-            bA.innerHTML = bB.innerHTML = '';
-            const pts = (c.sport === 'kosarka') ? [1, 2, 3] : [1];
-            pts.forEach(p => {
-                let btnA = document.createElement('button'); btnA.className = 'score-btn'; btnA.innerText = '+'+p;
-                btnA.onclick = () => db.ref('tereni/'+currentCourtId+'/scoreA').transaction(v => (v||0)+p);
-                bA.appendChild(btnA);
-                let btnB = document.createElement('button'); btnB.className = 'score-btn'; btnB.innerText = '+'+p;
-                btnB.onclick = () => db.ref('tereni/'+currentCourtId+'/scoreB').transaction(v => (v||0)+p);
-                bB.appendChild(btnB);
             });
         }
 
@@ -354,45 +367,33 @@
         function zatvoriSvePanele() {
             document.getElementById('admin-panel').classList.remove('active');
             document.getElementById('match-panel').classList.remove('active');
+            document.getElementById('btns-a').innerHTML = "";
+            document.getElementById('btns-b').innerHTML = "";
+            if(currentCourtId && matchListener) db.ref('tereni/'+currentCourtId).off('value');
             if(tempMarker) map.removeLayer(tempMarker);
             window.scrollTo(0,0);
         }
 
+        // --- MAP RENDER ---
         db.ref('tereni').on('value', snap => {
             courtMarkers.clearLayers();
             const data = snap.val();
             for (let id in data) {
                 const c = data[id];
                 let scoreboard = "";
-
-                if(c.status === 'najava') {
-                    scoreboard = `<div class="map-scoreboard">
-                        <div class="status-part bg-upcoming">UPCOMING</div>
-                        <div class="info-part">${c.datum || ''} | ${c.timA || 'T1'} - ${c.timB || 'T2'}</div>
-                    </div>`;
-                } else if(c.status === 'live') {
-                    scoreboard = `<div class="map-scoreboard">
-                        <div class="status-part bg-live">LIVE</div>
-                        <div class="info-part">${c.timA || 'T1'} ${c.scoreA || 0} - ${c.scoreB || 0} ${c.timB || 'T2'}</div>
-                    </div>`;
-                } else if(c.status === 'zavrseno') {
-                    scoreboard = `<div class="map-scoreboard">
-                        <div class="status-part bg-ft">FT</div>
-                        <div class="info-part">${c.timA || 'T1'} ${c.scoreA || 0} - ${c.scoreB || 0} ${c.timB || 'T2'}</div>
-                    </div>`;
-                }
+                if(c.status === 'najava') scoreboard = `<div class="map-scoreboard"><div class="status-part bg-upcoming">UPCOMING</div><div class="info-part">${c.datum || ''} | ${c.timA || 'T1'} - ${c.timB || 'T2'}</div></div>`;
+                else if(c.status === 'live') scoreboard = `<div class="map-scoreboard"><div class="status-part bg-live">LIVE</div><div class="info-part">${c.timA || 'T1'} ${c.scoreA || 0} - ${c.scoreB || 0} ${c.timB || 'T2'}</div></div>`;
+                else if(c.status === 'zavrseno') scoreboard = `<div class="map-scoreboard"><div class="status-part bg-ft">FT</div><div class="info-part">${c.timA || 'T1'} ${c.scoreA || 0} - ${c.scoreB || 0} ${c.timB || 'T2'}</div></div>`;
 
                 const marker = L.marker([c.lat, c.lng], {
                     icon: L.divIcon({ 
-                        html: `<div style="position:relative; font-size:28px; filter:drop-shadow(0 2px 2px black);">${scoreboard}${c.emoji}</div>`, 
+                        html: `<div class="icon-container" style="position:relative; font-size:28px; filter:drop-shadow(0 2px 2px black);">${scoreboard}${c.emoji}</div>`, 
                         iconAnchor:[14,14], className:'' 
                     })
                 });
 
-                let popupInfo = `<b>${c.ime}</b><br><small>${c.status === 'slobodno' ? 'Slobodno' : c.status}</small>`;
                 let btn = isAdmin ? `<button onclick="otvoriUredi('${id}')" style="margin-top:10px; width:100%; padding:8px; background:#444; color:white; border:none; border-radius:8px;">UREDI</button>` : '';
-
-                marker.bindPopup(`<div style="text-align:center; min-width:140px;">${c.emoji}<br>${popupInfo}${btn}</div>`).addTo(courtMarkers);
+                marker.bindPopup(`<div style="text-align:center; min-width:140px;">${c.emoji}<br><b>${c.ime}</b>${btn}</div>`).addTo(courtMarkers);
             }
         });
 
