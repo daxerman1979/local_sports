@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Who Play? - Realna Mapa</title>
+    <title>Who Play? - Stable Map</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
@@ -25,8 +25,7 @@
             display: flex; justify-content: space-between; align-items: center;
             padding: env(safe-area-inset-top) 12px 8px 12px;
             background: linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%);
-            pointer-events: none;
-            box-sizing: border-box;
+            pointer-events: none; box-sizing: border-box;
         }
         .logo, .nav-links { pointer-events: auto; }
         .logo { font-size: 16px; font-weight: 900; color: var(--primary); text-shadow: 0 0 10px rgba(0,0,0,0.5); }
@@ -51,15 +50,13 @@
             padding: 12px 15px calc(12px + env(safe-area-inset-bottom));
             border-radius: 15px 15px 0 0;
             display: flex; justify-content: space-between; align-items: center;
-            border-top: 2px solid var(--primary);
-            box-sizing: border-box;
+            border-top: 2px solid var(--primary); box-sizing: border-box;
         }
 
         .overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 10000; display: flex; justify-content: center; align-items: center;
             background: rgba(0,0,0,0.92); backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
         }
         .modal { background: white; padding: 20px; border-radius: 20px; width: 85%; max-width: 300px; text-align: center; }
         
@@ -90,8 +87,8 @@
     <div id="register-screen" class="overlay hidden">
         <div class="modal">
             <h4>Registracija</h4>
-            <input type="text" id="reg-nick" placeholder="Nickname" autocomplete="off">
-            <input type="email" id="reg-email" placeholder="Email" autocomplete="off">
+            <input type="text" id="reg-nick" placeholder="Nickname">
+            <input type="email" id="reg-email" placeholder="Email">
             <button class="btn-action" onclick="registerAdmin()">Registruj me</button>
             <button onclick="toggleModal('register-screen', false)" style="background:none; border:none; margin-top:12px; color:#999; font-size: 13px;">Zatvori</button>
         </div>
@@ -100,7 +97,7 @@
     <div id="login-screen" class="overlay hidden">
         <div class="modal">
             <h4>Admin Login</h4>
-            <input type="email" id="login-email" placeholder="Unesite email" autocomplete="email">
+            <input type="email" id="login-email" placeholder="Unesite email">
             <button class="btn-action" onclick="loginAdmin()">Prijavi se</button>
             <button onclick="toggleModal('login-screen', false)" style="background:none; border:none; margin-top:12px; color:#999; font-size: 13px;">Zatvori</button>
         </div>
@@ -143,23 +140,13 @@
             zoomSnap: 0.1, bounceAtZoomLimits: false 
         }).setView([44.8178, 20.4489], 13);
 
-        // REALNA MAPA: Esri World Imagery (Satelit)
-        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-            attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EBP, and the GIS User Community'
-        }).addTo(map);
-
-        // Opciono: Možemo dodati i imena ulica preko satelita ako želiš (Hybrid look)
-        L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-labels/{z}/{x}/{y}{r}.png', {
-            opacity: 0.5
-        }).addTo(map);
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
 
         var userMarker, lastKnownLatLng;
         var courtMarkers = L.layerGroup().addTo(map);
+        var prvaLokacijaPronađena = false; // KLJUČNA PROMENLJIVA
 
-        // Popravka za skrolovanje ekrana na iPhone-u nakon kucanja
-        document.addEventListener('focusout', function() {
-            window.scrollTo(0, 0);
-        });
+        document.addEventListener('focusout', function() { window.scrollTo(0, 0); });
 
         function prihvatiUslove() {
             localStorage.setItem('usloviWhoPlay', 'true');
@@ -168,7 +155,9 @@
             document.getElementById('info-btn').classList.remove('hidden');
             document.getElementById('recenter-btn').classList.remove('hidden');
             setTimeout(() => { map.invalidateSize(); }, 300);
-            map.locate({watch: true, enableHighAccuracy: true});
+            
+            // Rešavamo tvoj problem: watch:true ali bez stalnog pomeranja kamere (setView:false)
+            map.locate({watch: true, enableHighAccuracy: true, setView: false});
         }
 
         window.onload = function() {
@@ -187,7 +176,7 @@
             const email = document.getElementById('reg-email').value.toLowerCase().trim();
             if(!nick || !email) return;
             db.ref('admins').push({ nickname: nick, email: email }).then(() => {
-                alert("Uspešno registrovan!");
+                alert("Uspešno!");
                 toggleModal('register-screen', false);
             });
         }
@@ -215,13 +204,28 @@
         map.on('locationfound', e => { 
             lastKnownLatLng = e.latlng;
             const pulseIcon = L.divIcon({ className: 'custom-div-icon', html: "<div class='pulse-marker'></div>", iconSize: [12, 12], iconAnchor: [6, 6] });
-            if (userMarker) userMarker.setLatLng(e.latlng);
-            else userMarker = L.marker(e.latlng, {icon: pulseIcon}).addTo(map);
+            
+            if (userMarker) {
+                userMarker.setLatLng(e.latlng);
+            } else {
+                userMarker = L.marker(e.latlng, {icon: pulseIcon}).addTo(map);
+            }
+
+            // Automatski centriraj SAMO PRVI PUT kada se aplikacija otvori
+            if (!prvaLokacijaPronađena) {
+                map.setView(e.latlng, 16);
+                prvaLokacijaPronađena = true;
+            }
         });
         
         function locirajMe() {
-            if(lastKnownLatLng) map.flyTo(lastKnownLatLng, 17);
-            else map.locate({setView: true, maxZoom: 17});
+            if(lastKnownLatLng) {
+                map.flyTo(lastKnownLatLng, 17);
+            } else {
+                // Ako još nema lokacije, tražimo je i forsiramo centar
+                map.locate({setView: true, maxZoom: 17});
+                prvaLokacijaPronađena = false; // Resetujemo da bi sledeći "found" centrirao
+            }
         }
 
         db.ref('tereni').on('value', snap => {
