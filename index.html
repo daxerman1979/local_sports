@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Who Play? Pro Set System</title>
+    <title>Who Play? Ultimate Sports Tracker</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
@@ -20,7 +20,6 @@
         #map { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1; transition: filter 0.5s ease; }
         .map-blur { filter: blur(10px) brightness(0.6); }
 
-        /* Startup Ekran */
         #startup-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 10001; display: flex; justify-content: center; align-items: center;
@@ -45,7 +44,6 @@
             padding: 6px 12px; border-radius: 15px; font-size: 11px; font-weight: bold;
         }
 
-        /* Paneli */
         #admin-panel, #match-panel {
             position: fixed; bottom: 0; left: 0; width: 100%; z-index: 9999;
             background: var(--dark); color: white;
@@ -65,7 +63,7 @@
         .score-btn-group { display: flex; gap: 5px; justify-content: center; flex-wrap: wrap; }
         .score-btn { background: #333; border: 1px solid #444; color: white; padding: 8px 12px; border-radius: 6px; font-weight: bold; font-size: 12px; min-width: 40px; }
         .btn-minus { background: #c0392b !important; }
-        .btn-finish-set { width: 100%; background: var(--blue); color: white; border: none; padding: 10px; border-radius: 10px; font-weight: bold; margin-top: 10px; text-transform: uppercase; font-size: 12px; }
+        .btn-period { width: 100%; background: var(--blue); color: white; border: none; padding: 10px; border-radius: 10px; font-weight: bold; margin-top: 10px; text-transform: uppercase; font-size: 11px; }
 
         .controls-container { position: fixed; right: 12px; bottom: 90px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
         .circle-btn { width: 44px; height: 44px; background: white; border: none; border-radius: 50%; box-shadow: 0 4px 12px rgba(0,0,0,0.4); display: flex; justify-content: center; align-items: center; font-size: 20px; }
@@ -80,7 +78,6 @@
 
         .hidden { display: none !important; }
 
-        /* SKALIRANJE ZUMA */
         .icon-container { transition: transform 0.3s ease; transform-origin: center; }
         #map.zoom-far .icon-container { transform: scale(0.4); }
         #map.zoom-far .map-scoreboard { display: none !important; }
@@ -184,7 +181,7 @@
 
         <div id="match-live" class="hidden">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                <span style="color:var(--accent); font-weight:bold;">LIVE REZULTAT</span>
+                <span id="live-status-label" style="color:var(--accent); font-weight:bold;">LIVE REZULTAT</span>
                 <button onclick="zatvoriSvePanele()" style="color:white; background:#333; border:none; width:30px; height:30px; border-radius:50%; display:flex; justify-content:center; align-items:center;">×</button>
             </div>
             <div class="live-controls">
@@ -200,10 +197,8 @@
                     <div id="btns-b" class="score-btn-group"></div>
                 </div>
             </div>
-            <div id="set-controls" class="hidden">
-                <button class="btn-finish-set" onclick="finishSet()">KRAJ SETA</button>
-            </div>
-            <button class="btn-save" style="background:orange; margin-top:12px; width:100%; border:none; padding:14px; border-radius:12px; color:white; font-weight:bold;" onclick="updateStatus('zavrseno')">ZAVRŠI (FT)</button>
+            <div id="period-controls"></div>
+            <button id="ft-btn" class="btn-save" style="background:orange; margin-top:12px; width:100%; border:none; padding:14px; border-radius:12px; color:white; font-weight:bold;" onclick="updateStatus('zavrseno')">ZAVRŠI (FT)</button>
             <button class="btn-action btn-reset" style="background:#555; margin-top:8px;" onclick="resetMatch()">RESETUJ MEČ</button>
         </div>
     </div>
@@ -313,12 +308,12 @@
         function saveCourt() {
             const n = document.getElementById('court-name').value;
             const u = JSON.parse(localStorage.getItem('loggedAdmin'));
-            if(!n || !u) return;
+            if(!n || !u || !tempCoords) return;
             db.ref('tereni').push({
                 ime: n, sport: selectedSport.slug, emoji: selectedSport.emoji,
                 lat: tempCoords.lat, lng: tempCoords.lng, status: 'slobodno',
                 scoreA: 0, scoreB: 0, timA: '', timB: '', datum: '',
-                setovi: '', vlasnik: u.email
+                arhiva: '', vlasnik: u.email
             }).then(() => { zatvoriSvePanele(); osveziTereneUCentru(); });
         }
 
@@ -332,7 +327,7 @@
                 document.getElementById('team-b').value = c.timB || '';
                 document.getElementById('match-date').value = c.datum || '';
                 
-                if(c.status === 'live') setupLivePanel(c);
+                if(c.status === 'live' || c.status === 'zavrseno') setupLivePanel(c);
                 else {
                     document.getElementById('match-setup').classList.remove('hidden');
                     document.getElementById('match-live').classList.add('hidden');
@@ -345,58 +340,80 @@
             document.getElementById('match-setup').classList.add('hidden');
             document.getElementById('match-live').classList.remove('hidden');
             
-            if(c.sport === 'tenis' || c.sport === 'odbojka') {
-                document.getElementById('set-controls').classList.remove('hidden');
+            const pc = document.getElementById('period-controls');
+            pc.innerHTML = '';
+            
+            // Logika za dugmad perioda (poluvreme, trećina, četvrtina)
+            if(c.status !== 'zavrseno') {
+                let btnLabel = "";
+                if(["fudbal", "rukomet"].includes(c.sport)) btnLabel = "KRAJ 1.P";
+                else if(c.sport === "hokej") btnLabel = "KRAJ TREĆINE";
+                else if(c.sport === "kosarka") btnLabel = "KRAJ ČETVRTINE";
+                else if(["tenis", "odbojka"].includes(c.sport)) btnLabel = "KRAJ SETA";
+                
+                if(btnLabel) {
+                    let b = document.createElement('button');
+                    b.className = 'btn-period';
+                    b.innerText = btnLabel;
+                    b.onclick = () => arhivirajPeriod();
+                    pc.appendChild(b);
+                }
+                document.getElementById('ft-btn').classList.remove('hidden');
+                document.getElementById('live-status-label').innerText = "LIVE REZULTAT";
+                document.getElementById('live-status-label').style.color = "var(--accent)";
             } else {
-                document.getElementById('set-controls').classList.add('hidden');
+                document.getElementById('ft-btn').classList.add('hidden');
+                document.getElementById('live-status-label').innerText = "MEČ JE ZAVRŠEN (FT)";
+                document.getElementById('live-status-label').style.color = "#888";
             }
 
             db.ref('tereni/' + currentCourtId).on('value', snap => {
                 const data = snap.val();
                 if(!data) return;
-                document.getElementById('label-team-a').innerText = data.timA || 'T1';
-                document.getElementById('label-team-b').innerText = data.timB || 'T2';
                 document.getElementById('score-a').innerText = data.scoreA || 0;
                 document.getElementById('score-b').innerText = data.scoreB || 0;
+                document.getElementById('label-team-a').innerText = data.timA || 'T1';
+                document.getElementById('label-team-b').innerText = data.timB || 'T2';
+                
+                renderujPoeneAdmin(data);
             });
+        }
 
+        function renderujPoeneAdmin(c) {
             const bA = document.getElementById('btns-a'); const bB = document.getElementById('btns-b');
             bA.innerHTML = bB.innerHTML = '';
             
-            let plusPoints = [1];
-            if(c.sport === 'kosarka') plusPoints = [1, 2, 3];
-            
-            plusPoints.forEach(p => {
-                let btn = document.createElement('button'); btn.className='score-btn'; btn.innerText='+'+p;
-                btn.onclick = () => db.ref('tereni/'+currentCourtId+'/scoreA').transaction(v => (v||0)+p);
-                bA.appendChild(btn);
-            });
-            let minA = document.createElement('button'); minA.className='score-btn btn-minus'; minA.innerText='-1';
-            minA.onclick = () => db.ref('tereni/'+currentCourtId+'/scoreA').transaction(v => Math.max(0, (v||0)-1));
-            bA.appendChild(minA);
+            if(c.status === 'zavrseno') return; // Nema dugmića ako je FT
 
-            plusPoints.forEach(p => {
-                let btn = document.createElement('button'); btn.className='score-btn'; btn.innerText='+'+p;
-                btn.onclick = () => db.ref('tereni/'+currentCourtId+'/scoreB').transaction(v => (v||0)+p);
-                bB.appendChild(btn);
+            let plusPoints = (c.sport === 'kosarka') ? [1, 2, 3] : [1];
+            
+            [ {id: 'scoreA', el: bA}, {id: 'scoreB', el: bB} ].forEach(side => {
+                plusPoints.forEach(p => {
+                    let btn = document.createElement('button'); btn.className='score-btn'; btn.innerText='+'+p;
+                    btn.onclick = () => db.ref('tereni/'+currentCourtId+'/'+side.id).transaction(v => (v||0)+p);
+                    side.el.appendChild(btn);
+                });
+                let min = document.createElement('button'); min.className='score-btn btn-minus'; min.innerText='-1';
+                min.onclick = () => db.ref('tereni/'+currentCourtId+'/'+side.id).transaction(v => Math.max(0, (v||0)-1));
+                side.el.appendChild(min);
             });
-            let minB = document.createElement('button'); minB.className='score-btn btn-minus'; minB.innerText='-1';
-            minB.onclick = () => db.ref('tereni/'+currentCourtId+'/scoreB').transaction(v => Math.max(0, (v||0)-1));
-            bB.appendChild(minB);
         }
 
-        function finishSet() {
+        function arhivirajPeriod() {
             db.ref('tereni/' + currentCourtId).once('value', snap => {
                 const c = snap.val();
-                let noviSet = `${c.scoreA}:${c.scoreB}`;
-                let staraLista = c.setovi || "";
-                let azuriranaLista = staraLista ? staraLista + ", " + noviSet : noviSet;
+                let rez = `${c.scoreA}:${c.scoreB}`;
+                let novaArhiva = c.arhiva ? c.arhiva + ", " + rez : rez;
                 
-                db.ref('tereni/' + currentCourtId).update({
-                    setovi: azuriranaLista,
-                    scoreA: 0,
-                    scoreB: 0
-                });
+                let updateData = { arhiva: novaArhiva };
+                // Ako nije tenis/odbojka, nastavljamo dodavanje na ukupni rezultat, 
+                // ako su setovi, resetujemo poene
+                if(["tenis", "odbojka"].includes(c.sport)) {
+                    updateData.scoreA = 0;
+                    updateData.scoreB = 0;
+                }
+                
+                db.ref('tereni/' + currentCourtId).update(updateData);
             });
         }
 
@@ -404,12 +421,12 @@
             db.ref('tereni/'+currentCourtId).update({
                 status: s, timA: document.getElementById('team-a').value,
                 timB: document.getElementById('team-b').value, datum: document.getElementById('match-date').value
-            }).then(() => { if(s==='live') otvoriUredi(currentCourtId); });
+            }).then(() => { otvoriUredi(currentCourtId); });
         }
 
         function resetMatch() {
             if(confirm("Potpuni reset meča?")) {
-                db.ref('tereni/'+currentCourtId).update({ status:'slobodno', scoreA:0, scoreB:0, timA:'', timB:'', datum:'', setovi:'' });
+                db.ref('tereni/'+currentCourtId).update({ status:'slobodno', scoreA:0, scoreB:0, timA:'', timB:'', datum:'', arhiva:'' });
                 zatvoriSvePanele();
             }
         }
@@ -437,12 +454,12 @@
 
         function renderujMarker(id, c) {
             const sA = c.scoreA || 0; const sB = c.scoreB || 0;
-            const prikazSetova = c.setovi ? `<span style="color:#aaa; margin-right:5px;">(${c.setovi})</span>` : "";
+            const arh = c.arhiva ? `<span style="color:#aaa; margin-right:5px;">(${c.arhiva})</span>` : "";
             let sb = "";
             
             if(c.status === 'najava') sb = `<div class="map-scoreboard"><div class="status-part bg-upcoming">UPCOMING</div><div style="padding:0 5px;">${c.datum} | ${c.timA}-${c.timB}</div></div>`;
-            else if(c.status === 'live') sb = `<div class="map-scoreboard"><div class="status-part bg-live">LIVE</div><div style="padding:0 5px;">${prikazSetova}${c.timA} ${sA}-${sB} ${c.timB}</div></div>`;
-            else if(c.status === 'zavrseno') sb = `<div class="map-scoreboard"><div class="status-part bg-ft">FT</div><div style="padding:0 5px;">${prikazSetova}${c.timA} ${sA}-${sB} ${c.timB}</div></div>`;
+            else if(c.status === 'live') sb = `<div class="map-scoreboard"><div class="status-part bg-live">LIVE</div><div style="padding:0 5px;">${arh}${c.timA} ${sA}-${sB} ${c.timB}</div></div>`;
+            else if(c.status === 'zavrseno') sb = `<div class="map-scoreboard"><div class="status-part bg-ft">FT</div><div style="padding:0 5px;">${arh}${c.timA} ${sA}-${sB} ${c.timB}</div></div>`;
             
             const u = JSON.parse(localStorage.getItem('loggedAdmin'));
             const isOwner = isAdmin && u && c.vlasnik === u.email;
