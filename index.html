@@ -233,7 +233,7 @@
             else container.classList.remove('zoom-far');
         });
 
-        // POPRAVKA: Explore pokreće lociranje, ali LOGIN NE
+        // POPRAVKA: Potpuno smo izbacili setView:true bilo gde pri lociranju
         function startExplore() {
             document.getElementById('startup-screen').classList.add('hidden');
             document.getElementById('map').classList.remove('map-blur');
@@ -245,8 +245,8 @@
             
             setTimeout(() => { 
                 map.invalidateSize(); 
+                // Samo OVDE jednom letimo na tvoju poziciju kad klikneš Explore
                 if(lastKnownLatLng) map.flyTo(lastKnownLatLng, 16);
-                else map.locate({setView: true, maxZoom: 16});
             }, 600);
         }
 
@@ -254,11 +254,11 @@
             const savedAdmin = localStorage.getItem('loggedAdmin');
             if (savedAdmin) {
                 setupAdminUI(JSON.parse(savedAdmin));
-                // Ako je admin ulogovan, odmah sklanjamo startup i blur ali BEZ FLYTO
                 document.getElementById('startup-screen').classList.add('hidden');
                 document.getElementById('map').classList.remove('map-blur');
                 document.getElementById('main-header').classList.remove('hidden');
                 document.getElementById('recenter-btn').classList.remove('hidden');
+                // Admin se locira, ali kamera ne mrda
                 map.locate({watch: true, enableHighAccuracy: true, setView: false});
                 setTimeout(() => map.invalidateSize(), 500);
             }
@@ -280,7 +280,7 @@
             db.ref('admins').orderByChild('email').equalTo(e).once('value', snap => {
                 if (snap.exists()) {
                     localStorage.setItem('loggedAdmin', JSON.stringify(Object.values(snap.val())[0]));
-                    location.reload(); // Osveži da se učita Admin UI bez skoka na mapu
+                    location.reload(); 
                 } else alert("Niste admin.");
             });
         }
@@ -335,8 +335,6 @@
                     document.getElementById('match-live').classList.remove('hidden');
                     document.getElementById('label-team-a').innerText = c.timA || 'T1';
                     document.getElementById('label-team-b').innerText = c.timB || 'T2';
-                    
-                    // POPRAVKA: || 0 sprečava undefined
                     document.getElementById('score-a').innerText = c.scoreA || 0;
                     document.getElementById('score-b').innerText = c.scoreB || 0;
                     
@@ -389,7 +387,6 @@
             for (let id in data) {
                 const c = data[id];
                 let sb = "";
-                // POPRAVKA: || 0 na rezultatima na mapi
                 const sA = c.scoreA || 0;
                 const sB = c.scoreB || 0;
 
