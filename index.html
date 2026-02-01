@@ -218,7 +218,6 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // LOGIKA ZA ZADNJU LOKACIJU
         const lastLat = localStorage.getItem('lastLat') || 44.8178;
         const lastLng = localStorage.getItem('lastLng') || 20.4489;
         const lastZoom = localStorage.getItem('lastZoom') || 13;
@@ -233,7 +232,6 @@
         var selectedSport = { emoji: '⚽', slug: 'fudbal' };
         var tempCoords = null;
 
-        // PAMĆENJE LOKACIJE PRI SVAKOM POMERANJU
         map.on('moveend', function() {
             const center = map.getCenter();
             localStorage.setItem('lastLat', center.lat);
@@ -275,10 +273,9 @@
         function registerAdmin() {
             const nick = document.getElementById('reg-nick').value.trim();
             const email = document.getElementById('reg-email').value.toLowerCase().trim();
-            if(!nick || !email) return alert("Popuni polja.");
+            if(!nick || !email) return;
             db.ref('admins').push({ nickname: nick, email: email }).then(() => {
-                alert("Registrovano! Prijavite se.");
-                toggleModal('register-screen', false);
+                alert("Registrovano!"); toggleModal('register-screen', false);
             });
         }
 
@@ -323,23 +320,15 @@
                 ime: n, sport: selectedSport.slug, emoji: selectedSport.emoji,
                 lat: tempCoords.lat, lng: tempCoords.lng, status: 'slobodno',
                 scoreA: 0, scoreB: 0, timA: '', timB: '', datum: '',
-                vlasnik: u.email // VEŽEMO TEREN ZA ADMINA
-            }).then(() => { 
-                document.getElementById('court-name').value = "";
-                zatvoriSvePanele(); 
-                osveziTereneUCentru(); 
-            });
+                vlasnik: u.email
+            }).then(() => { zatvoriSvePanele(); osveziTereneUCentru(); });
         }
 
         function otvoriUredi(id) {
+            currentCourtId = id;
             db.ref('tereni/' + id).once('value', snap => {
                 const c = snap.val();
-                const u = JSON.parse(localStorage.getItem('loggedAdmin'));
-                if(!c || !u || c.vlasnik !== u.email) {
-                    alert("Nemate dozvolu za ovaj teren.");
-                    return;
-                }
-                currentCourtId = id;
+                if(!c) return;
                 document.getElementById('target-court-name').innerText = c.ime;
                 document.getElementById('team-a').value = c.timA || '';
                 document.getElementById('team-b').value = c.timB || '';
@@ -421,16 +410,14 @@
             else if(c.status === 'live') sb = `<div class="map-scoreboard"><div class="status-part bg-live">LIVE</div><div style="padding:0 5px;">${c.timA} ${sA}-${sB} ${c.timB}</div></div>`;
             else if(c.status === 'zavrseno') sb = `<div class="map-scoreboard"><div class="status-part bg-ft">FT</div><div style="padding:0 5px;">${c.timA} ${sA}-${sB} ${c.timB}</div></div>`;
             
-            // PROVERA VLASNIŠTVA ZA PRIKAZ DUGMETA "UREDI"
             const u = JSON.parse(localStorage.getItem('loggedAdmin'));
             const isOwner = isAdmin && u && c.vlasnik === u.email;
 
             L.marker([c.lat, c.lng], {
                 icon: L.divIcon({ html: `<div class="icon-container" style="position:relative; font-size:28px; filter:drop-shadow(0 2px 2px black);">${sb}${c.emoji}</div>`, iconAnchor:[14,14], className:'' })
-            }).bindPopup(`<div style="text-align:center;">${c.emoji}<br><b>${c.ime}</b>${isOwner ? `<br><button onclick="otvoriUredi('${id}')" style="width:100%; margin-top:10px; padding:8px; background:var(--primary); color:white; border:none; border-radius:8px; font-weight:bold;">UREDI</button>` : ''}</div>`).addTo(courtMarkers);
+            }).bindPopup(`<div style="text-align:center;">${c.emoji}<br><b>${c.ime}</b>${isOwner ? `<br><button onclick="otvoriUredi('${id}')" style="width:100%; margin-top:10px; padding:5px; background:#444; color:white; border:none; border-radius:5px;">UREDI</button>` : ''}</div>`).addTo(courtMarkers);
         }
 
-        // RUČNO LOCIRANJE SAMO NA DUGME
         function locirajMe() {
             map.locate({setView: false, enableHighAccuracy: true});
             map.once('locationfound', e => {
