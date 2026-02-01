@@ -275,7 +275,7 @@
             const email = document.getElementById('reg-email').value.toLowerCase().trim();
             if(!nick || !email) return;
             db.ref('admins').push({ nickname: nick, email: email }).then(() => {
-                alert("Registrovano!"); toggleModal('register-screen', false);
+                alert("Uspešna registracija!"); toggleModal('register-screen', false);
             });
         }
 
@@ -320,7 +320,7 @@
                 ime: n, sport: selectedSport.slug, emoji: selectedSport.emoji,
                 lat: tempCoords.lat, lng: tempCoords.lng, status: 'slobodno',
                 scoreA: 0, scoreB: 0, timA: '', timB: '', datum: '',
-                vlasnik: u.email
+                vlasnik: u.email // Ovde pamtimo ko je kreirao teren
             }).then(() => { zatvoriSvePanele(); osveziTereneUCentru(); });
         }
 
@@ -333,29 +333,36 @@
                 document.getElementById('team-a').value = c.timA || '';
                 document.getElementById('team-b').value = c.timB || '';
                 document.getElementById('match-date').value = c.datum || '';
-                if(c.status === 'live') setupLivePanel(c);
-                else {
+                
+                // Ovde je logika za "Uredi" panel i score gumbe
+                if(c.status === 'live') {
+                    setupLivePanel(c);
+                } else {
                     document.getElementById('match-setup').classList.remove('hidden');
                     document.getElementById('match-live').classList.add('hidden');
                 }
-                document.getElementById('match-panel').classList.add('active');
             });
+            document.getElementById('match-panel').classList.add('active');
         }
 
         function setupLivePanel(c) {
             document.getElementById('match-setup').classList.add('hidden');
             document.getElementById('match-live').classList.remove('hidden');
-            document.getElementById('label-team-a').innerText = c.timA || 'T1';
-            document.getElementById('label-team-b').innerText = c.timB || 'T2';
+            document.getElementById('label-team-a').innerText = c.timA || 'TIM 1';
+            document.getElementById('label-team-b').innerText = c.timB || 'TIM 2';
             document.getElementById('score-a').innerText = c.scoreA || 0;
             document.getElementById('score-b').innerText = c.scoreB || 0;
-            const bA = document.getElementById('btns-a'); const bB = document.getElementById('btns-b');
+            
+            const bA = document.getElementById('btns-a'); 
+            const bB = document.getElementById('btns-b');
             bA.innerHTML = bB.innerHTML = '';
+            
             const pts = (c.sport === 'kosarka') ? [1, 2, 3] : [1];
             pts.forEach(p => {
                 let b1 = document.createElement('button'); b1.className='score-btn'; b1.innerText='+'+p;
                 b1.onclick = () => db.ref('tereni/'+currentCourtId+'/scoreA').transaction(v => (v||0)+p);
                 bA.appendChild(b1);
+                
                 let b2 = document.createElement('button'); b2.className='score-btn'; b2.innerText='+'+p;
                 b2.onclick = () => db.ref('tereni/'+currentCourtId+'/scoreB').transaction(v => (v||0)+p);
                 bB.appendChild(b2);
@@ -364,9 +371,14 @@
 
         function updateStatus(s) {
             db.ref('tereni/'+currentCourtId).update({
-                status: s, timA: document.getElementById('team-a').value,
-                timB: document.getElementById('team-b').value, datum: document.getElementById('match-date').value
-            }).then(() => { if(s==='live') otvoriUredi(currentCourtId); });
+                status: s, 
+                timA: document.getElementById('team-a').value,
+                timB: document.getElementById('team-b').value, 
+                datum: document.getElementById('match-date').value
+            }).then(() => { 
+                if(s==='live') otvoriUredi(currentCourtId); 
+                else zatvoriSvePanele();
+            });
         }
 
         function ponistiIzmene() {
@@ -410,8 +422,9 @@
             else if(c.status === 'live') sb = `<div class="map-scoreboard"><div class="status-part bg-live">LIVE</div><div style="padding:0 5px;">${c.timA} ${sA}-${sB} ${c.timB}</div></div>`;
             else if(c.status === 'zavrseno') sb = `<div class="map-scoreboard"><div class="status-part bg-ft">FT</div><div style="padding:0 5px;">${c.timA} ${sA}-${sB} ${c.timB}</div></div>`;
             
-            const u = JSON.parse(localStorage.getItem('loggedAdmin'));
-            const isOwner = isAdmin && u && c.vlasnik === u.email;
+            // Provera vlasništva
+            const logged = JSON.parse(localStorage.getItem('loggedAdmin'));
+            const isOwner = isAdmin && logged && c.vlasnik === logged.email;
 
             L.marker([c.lat, c.lng], {
                 icon: L.divIcon({ html: `<div class="icon-container" style="position:relative; font-size:28px; filter:drop-shadow(0 2px 2px black);">${sb}${c.emoji}</div>`, iconAnchor:[14,14], className:'' })
