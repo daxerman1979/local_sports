@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Who Play? - Stable Map</title>
+    <title>Who Play? - Hybrid Satellite</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
@@ -28,7 +28,7 @@
             pointer-events: none; box-sizing: border-box;
         }
         .logo, .nav-links { pointer-events: auto; }
-        .logo { font-size: 16px; font-weight: 900; color: var(--primary); text-shadow: 0 0 10px rgba(0,0,0,0.5); }
+        .logo { font-size: 16px; font-weight: 900; color: var(--primary); text-shadow: 0 0 10px rgba(0,0,0,0.8); }
         .nav-btn {
             background: rgba(0,0,0,0.7); border: 1px solid rgba(255,255,255,0.3); color: white;
             padding: 6px 10px; border-radius: 15px; font-size: 11px; font-weight: bold;
@@ -69,6 +69,7 @@
         .btn-action { width: 100%; background: var(--primary); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; font-size: 16px; margin-top: 5px; }
         .hidden { display: none !important; }
 
+        /* Marker animacija */
         .pulse-marker { width: 12px; height: 12px; background: #3498db; border: 2px solid white; border-radius: 50%; position: relative; }
         .pulse-marker::after { content: ''; width: 30px; height: 30px; background: rgba(52, 152, 219, 0.3); border-radius: 50%; position: absolute; top: -11px; left: -11px; animation: pulse-ring 2s infinite; }
         @keyframes pulse-ring { 0% { transform: scale(0.6); opacity: 1; } 100% { transform: scale(2); opacity: 0; } }
@@ -140,11 +141,18 @@
             zoomSnap: 0.1, bounceAtZoomLimits: false 
         }).setView([44.8178, 20.4489], 13);
 
+        // 1. SLOJ: Esri Satelit (Osnova)
         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
+
+        // 2. SLOJ: CartoDB Labels (Ulice, gradovi, granice - providno preko satelita)
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', {
+            pane: 'shadowPane', // Postavlja labele iznad svega, ali ispod markera
+            zIndex: 1000
+        }).addTo(map);
 
         var userMarker, lastKnownLatLng;
         var courtMarkers = L.layerGroup().addTo(map);
-        var prvaLokacijaPronađena = false; // KLJUČNA PROMENLJIVA
+        var prvaLokacijaPronađena = false;
 
         document.addEventListener('focusout', function() { window.scrollTo(0, 0); });
 
@@ -156,7 +164,7 @@
             document.getElementById('recenter-btn').classList.remove('hidden');
             setTimeout(() => { map.invalidateSize(); }, 300);
             
-            // Rešavamo tvoj problem: watch:true ali bez stalnog pomeranja kamere (setView:false)
+            // Prati lokaciju bez nasilnog pomeranja kamere
             map.locate({watch: true, enableHighAccuracy: true, setView: false});
         }
 
@@ -211,7 +219,6 @@
                 userMarker = L.marker(e.latlng, {icon: pulseIcon}).addTo(map);
             }
 
-            // Automatski centriraj SAMO PRVI PUT kada se aplikacija otvori
             if (!prvaLokacijaPronađena) {
                 map.setView(e.latlng, 16);
                 prvaLokacijaPronađena = true;
@@ -222,9 +229,8 @@
             if(lastKnownLatLng) {
                 map.flyTo(lastKnownLatLng, 17);
             } else {
-                // Ako još nema lokacije, tražimo je i forsiramo centar
                 map.locate({setView: true, maxZoom: 17});
-                prvaLokacijaPronađena = false; // Resetujemo da bi sledeći "found" centrirao
+                prvaLokacijaPronađena = false; 
             }
         }
 
