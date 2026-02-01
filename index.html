@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Who Play? Geo-Search Pro</title>
+    <title>Who Play? Final Pro Fix</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
@@ -74,6 +74,7 @@
         input { width: 100%; padding: 14px; margin: 8px 0; border: 1px solid #ddd; border-radius: 12px; font-size: 16px !important; box-sizing: border-box; background: #f9f9f9; }
         .btn-action { width: 100%; background: var(--primary); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: bold; font-size: 16px; margin-top: 5px; }
         .btn-explore { width: 100%; background: var(--accent); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: bold; font-size: 16px; margin-top: 10px; }
+        .btn-reset-light { width: 100%; background: #555; color: white; border: none; padding: 12px; border-radius: 12px; font-weight: bold; margin-top: 8px; }
 
         .hidden { display: none !important; }
 
@@ -104,10 +105,10 @@
     <div id="startup-screen">
         <div class="startup-card">
             <h2 style="margin-top:0;">Who Play?</h2>
-            <p style="color:#666; font-size:14px; margin-bottom:20px;">Dobrodošli! Izaberite opciju za nastavak.</p>
+            <p style="color:#666; font-size:14px; margin-bottom:20px;">Dobrodošli nazad!</p>
             <button class="btn-action" onclick="toggleModal('login-screen', true)">LOG IN ADMIN</button>
             <button class="btn-action" style="background:#555; margin-top:10px;" onclick="toggleModal('register-screen', true)">REGISTRACIJA</button>
-            <button class="btn-explore" onclick="startExplore()">EXPLORE MAP 🌍</button>
+            <button class="btn-explore" onclick="startExplore()">NASTAVI ISTRAŽIVANJE 🌍</button>
         </div>
     </div>
 
@@ -176,6 +177,7 @@
             <input type="text" id="match-date" placeholder="Datum (npr. 12.05. 20h)">
             <button class="btn-save" style="width:100%; background:var(--accent); color:white; border:none; padding:14px; border-radius:12px; font-weight:bold;" onclick="updateStatus('najava')">NAJAVI MEČ</button>
             <button class="btn-action" style="background:var(--accent); margin-top:8px;" onclick="updateStatus('live')">GO LIVE 🔴</button>
+            <button class="btn-reset-light" onclick="ponistiIzmene()">ODUSTANI / RESET</button>
         </div>
 
         <div id="match-live" class="hidden">
@@ -197,7 +199,7 @@
                 </div>
             </div>
             <button class="btn-save" style="background:orange; margin-top:12px; width:100%; border:none; padding:14px; border-radius:12px; color:white; font-weight:bold;" onclick="updateStatus('zavrseno')">ZAVRŠI (FT)</button>
-            <button class="btn-action btn-reset" onclick="resetMatch()">RESETUJ SVE</button>
+            <button class="btn-action btn-reset" style="background:#555; margin-top:8px;" onclick="resetMatch()">RESETUJ MEČ</button>
         </div>
     </div>
 
@@ -216,28 +218,34 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        var map = L.map('map', { zoomControl: false, tap: false, attributionControl: false }).setView([44.8178, 20.4489], 13);
+        // LOGIKA ZA ZADNJU LOKACIJU
+        const lastLat = localStorage.getItem('lastLat') || 44.8178;
+        const lastLng = localStorage.getItem('lastLng') || 20.4489;
+        const lastZoom = localStorage.getItem('lastZoom') || 13;
+
+        var map = L.map('map', { zoomControl: false, tap: false, attributionControl: false }).setView([lastLat, lastLng], lastZoom);
         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', { zIndex: 1000 }).addTo(map);
 
-        var userMarker, tempMarker, lastKnownLatLng, currentCourtId = null, matchListener = null;
+        var userMarker, tempMarker, lastKnownLatLng, currentCourtId = null;
         var courtMarkers = L.layerGroup().addTo(map);
         var isAdmin = false;
         var selectedSport = { emoji: '⚽', slug: 'fudbal' };
 
-        // SKALIRANJE NA ZUM
+        // PAMĆENJE LOKACIJE PRI SVAKOM POMERANJU
+        map.on('moveend', function() {
+            const center = map.getCenter();
+            localStorage.setItem('lastLat', center.lat);
+            localStorage.setItem('lastLng', center.lng);
+            localStorage.setItem('lastZoom', map.getZoom());
+            osveziTereneUCentru();
+        });
+
         map.on('zoomend', function() {
             const z = map.getZoom();
             const container = document.getElementById('map');
             if (z < 14) container.classList.add('zoom-far');
             else container.classList.remove('zoom-far');
-            // NOVO: Kad zumiraš/odzumiraš, centar se menja, osveži terene
-            osveziTereneUCentru();
-        });
-
-        // NOVO: Kad prestaneš da pomeraš mapu prstom, osveži terene oko centra ekrana
-        map.on('moveend', function() {
-            osveziTereneUCentru();
         });
 
         function startExplore() {
@@ -245,13 +253,8 @@
             document.getElementById('map').classList.remove('map-blur');
             document.getElementById('main-header').classList.remove('hidden');
             document.getElementById('recenter-btn').classList.remove('hidden');
-            
-            map.locate({watch: true, enableHighAccuracy: true, setView: false});
-            
-            setTimeout(() => { 
-                map.invalidateSize(); 
-                if(lastKnownLatLng) map.flyTo(lastKnownLatLng, 16);
-            }, 600);
+            map.invalidateSize();
+            osveziTereneUCentru();
         }
 
         window.onload = function() {
@@ -262,7 +265,6 @@
                 document.getElementById('map').classList.remove('map-blur');
                 document.getElementById('main-header').classList.remove('hidden');
                 document.getElementById('recenter-btn').classList.remove('hidden');
-                map.locate({watch: true, enableHighAccuracy: true, setView: false});
                 setTimeout(() => { map.invalidateSize(); osveziTereneUCentru(); }, 500);
             }
         };
@@ -357,8 +359,15 @@
             }).then(() => { if(s==='live') otvoriUredi(currentCourtId); });
         }
 
+        function ponistiIzmene() {
+            document.getElementById('team-a').value = "";
+            document.getElementById('team-b').value = "";
+            document.getElementById('match-date').value = "";
+            zatvoriSvePanele();
+        }
+
         function resetMatch() {
-            if(confirm("Reset?")) {
+            if(confirm("Potpuni reset meča?")) {
                 db.ref('tereni/'+currentCourtId).update({ status:'slobodno', scoreA:0, scoreB:0, timA:'', timB:'', datum:'' });
                 zatvoriSvePanele();
             }
@@ -367,36 +376,26 @@
         function zatvoriSvePanele() {
             document.getElementById('admin-panel').classList.remove('active');
             document.getElementById('match-panel').classList.remove('active');
-            document.getElementById('btns-a').innerHTML = ""; document.getElementById('btns-b').innerHTML = "";
             if(tempMarker) map.removeLayer(tempMarker);
             window.scrollTo(0,0);
         }
 
-        // NOVO: FUNKCIJA ZA DINAMIČKO OSVEŽAVANJE OKO CENTRA (20km)
         function osveziTereneUCentru() {
             const center = map.getCenter();
-            // Gasimo staro slušanje ako postoji
             db.ref('tereni').off(); 
-            
-            // Slušamo sve terene (Realtime Database nema GeoQuery po defaultu, pa filtriramo na klijentu)
             db.ref('tereni').on('value', snap => {
                 courtMarkers.clearLayers();
                 const data = snap.val();
                 for (let id in data) {
                     const c = data[id];
-                    const dist = center.distanceTo([c.lat, c.lng]); // Distanca u metrima
-                    
-                    if (dist < 20000) { // 20.000 metara = 20 km
-                        renderujMarker(id, c);
-                    }
+                    if (center.distanceTo([c.lat, c.lng]) < 20000) renderujMarker(id, c);
                 }
             });
         }
 
         function renderujMarker(id, c) {
+            const sA = c.scoreA || 0; const sB = c.scoreB || 0;
             let sb = "";
-            const sA = c.scoreA || 0;
-            const sB = c.scoreB || 0;
             if(c.status === 'najava') sb = `<div class="map-scoreboard"><div class="status-part bg-upcoming">UPCOMING</div><div style="padding:0 5px;">${c.datum} | ${c.timA}-${c.timB}</div></div>`;
             else if(c.status === 'live') sb = `<div class="map-scoreboard"><div class="status-part bg-live">LIVE</div><div style="padding:0 5px;">${c.timA} ${sA}-${sB} ${c.timB}</div></div>`;
             else if(c.status === 'zavrseno') sb = `<div class="map-scoreboard"><div class="status-part bg-ft">FT</div><div style="padding:0 5px;">${c.timA} ${sA}-${sB} ${c.timB}</div></div>`;
@@ -406,13 +405,16 @@
             }).bindPopup(`<div style="text-align:center;">${c.emoji}<br><b>${c.ime}</b>${isAdmin ? `<br><button onclick="otvoriUredi('${id}')" style="width:100%; margin-top:10px; padding:5px; background:#444; color:white; border:none; border-radius:5px;">UREDI</button>` : ''}</div>`).addTo(courtMarkers);
         }
 
-        map.on('locationfound', e => { 
-            lastKnownLatLng = e.latlng;
-            if (userMarker) userMarker.setLatLng(e.latlng);
-            else userMarker = L.marker(e.latlng, {icon: L.divIcon({className:'', html:"<div class='pulse-marker'></div>"})}).addTo(map);
-        });
-        
-        function locirajMe() { if(lastKnownLatLng) map.flyTo(lastKnownLatLng, 17); }
+        // RUČNO LOCIRANJE SAMO NA DUGME
+        function locirajMe() {
+            map.locate({setView: false, enableHighAccuracy: true});
+            map.once('locationfound', e => {
+                lastKnownLatLng = e.latlng;
+                if (userMarker) userMarker.setLatLng(e.latlng);
+                else userMarker = L.marker(e.latlng, {icon: L.divIcon({className:'', html:"<div class='pulse-marker'></div>"})}).addTo(map);
+                map.flyTo(e.latlng, 17);
+            });
+        }
     </script>
 </body>
 </html>
