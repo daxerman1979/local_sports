@@ -345,10 +345,17 @@
         function setupLivePanel(c) {
             document.getElementById('match-setup').classList.add('hidden');
             document.getElementById('match-live').classList.remove('hidden');
-            document.getElementById('label-team-a').innerText = c.timA || 'T1';
-            document.getElementById('label-team-b').innerText = c.timB || 'T2';
-            document.getElementById('score-a').innerText = c.scoreA || 0;
-            document.getElementById('score-b').innerText = c.scoreB || 0;
+            
+            // AKTIVIRANO SLUŠANJE PROMENA U REALNOM VREMENU
+            db.ref('tereni/' + currentCourtId).on('value', snap => {
+                const data = snap.val();
+                if(!data) return;
+                document.getElementById('label-team-a').innerText = data.timA || 'T1';
+                document.getElementById('label-team-b').innerText = data.timB || 'T2';
+                document.getElementById('score-a').innerText = data.scoreA || 0;
+                document.getElementById('score-b').innerText = data.scoreB || 0;
+            });
+
             const bA = document.getElementById('btns-a'); const bB = document.getElementById('btns-b');
             bA.innerHTML = bB.innerHTML = '';
             const pts = (c.sport === 'kosarka') ? [1, 2, 3] : [1];
@@ -384,6 +391,9 @@
         }
 
         function zatvoriSvePanele() {
+            // PREKIDA SE SLUŠANJE BAZE ZA SPECIFIČAN TEREN KADA SE PANEL ZATVORI
+            if (currentCourtId) db.ref('tereni/' + currentCourtId).off('value');
+            
             document.getElementById('admin-panel').classList.remove('active');
             document.getElementById('match-panel').classList.remove('active');
             if(tempMarker) map.removeLayer(tempMarker);
