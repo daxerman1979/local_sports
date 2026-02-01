@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Who Play? FINAL PRO</title>
+    <title>Who Play? FINAL STABLE</title>
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
@@ -487,117 +487,4 @@ function setupLivePanel(c) {
 
 function updateStatus(status) {
     const timA = document.getElementById('team-a').value;
-    const timB = document.getElementById('team-b').value;
-    const datum = document.getElementById('match-date').value;
-
-    db.ref('tereni/' + currentCourtId).update({
-        status:status,
-        timA:timA,
-        timB:timB,
-        datum:datum
-    });
-}
-
-function resetMatch() {
-    if (!confirm("Potpuni reset meča?")) return;
-    db.ref('tereni/' + currentCourtId).update({
-        status:'slobodno',
-        scoreA:0,
-        scoreB:0,
-        timA:'',
-        timB:'',
-        datum:''
-    }).then(() => zatvoriSvePanele());
-}
-
-function ponistiIzmene() {
-    zatvoriSvePanele();
-}
-
-function zatvoriSvePanele() {
-    document.getElementById('admin-panel').classList.remove('active');
-    document.getElementById('match-panel').classList.remove('active');
-    if (tempMarker) map.removeLayer(tempMarker);
-    currentCourtId = null;
-    window.scrollTo(0, 0);
-}
-
-/* ========================== MAP MARKERS ========================== */
-function osveziTereneUCentru() {
-    const center = map.getCenter();
-
-    if (courtsListener) db.ref('tereni').off('value', courtsListener);
-
-    courtsListener = db.ref('tereni').on('value', snap => {
-        courtMarkers.clearLayers();
-        const data = snap.val();
-        if (!data) return;
-
-        for (let id in data) {
-            const c = data[id];
-            if (center.distanceTo([c.lat, c.lng]) < 20000) {
-                renderujMarker(id, c);
-            }
-        }
-    });
-}
-
-function renderujMarker(id, c) {
-    const sA = c.scoreA || 0;
-    const sB = c.scoreB || 0;
-    let sb = '';
-
-    if (c.status === 'najava')
-        sb = `<div class="map-scoreboard"><div class="status-part bg-upcoming">UPCOMING</div><div style="padding:0 5px;">${c.datum || ''} | ${c.timA || ''}-${c.timB || ''}</div></div>`;
-    else if (c.status === 'live')
-        sb = `<div class="map-scoreboard"><div class="status-part bg-live">LIVE</div><div style="padding:0 5px;">${c.timA || ''} ${sA}-${sB} ${c.timB || ''}</div></div>`;
-    else if (c.status === 'zavrseno')
-        sb = `<div class="map-scoreboard"><div class="status-part bg-ft">FT</div><div style="padding:0 5px;">${c.timA || ''} ${sA}-${sB} ${c.timB || ''}</div></div>`;
-
-    const logged = JSON.parse(localStorage.getItem('loggedAdmin'));
-    const isOwner = isAdmin && logged && c.vlasnik === logged.email;
-
-    const iconHTML = `
-        <div class="icon-container" style="position:relative;font-size:28px;filter:drop-shadow(0 2px 2px black);">
-            ${sb}${c.emoji}
-        </div>
-    `;
-
-    L.marker([c.lat, c.lng], {
-        icon: L.divIcon({
-            html: iconHTML,
-            iconAnchor:[14,14],
-            className:''
-        })
-    })
-    .bindPopup(`
-        <div style="text-align:center;">
-            <div style="font-size:26px;">${c.emoji}</div>
-            <b>${c.ime}</b><br>
-            ${c.status === 'najava' ? `<div style="font-size:12px;margin-top:4px;color:#555;">${c.timA} - ${c.timB}<br>${c.datum || ''}</div>` : ''}
-            ${c.status === 'live' ? `<div style="font-size:14px;margin-top:4px;color:red;font-weight:bold;">LIVE ${sA}:${sB}</div>` : ''}
-            ${c.status === 'zavrseno' ? `<div style="font-size:12px;margin-top:4px;color:#555;">FT ${sA}:${sB}</div>` : ''}
-            ${isOwner ? `
-                <button onclick="otvoriUredi('${id}')" style="width:100%;margin-top:10px;padding:8px;background:var(--primary);color:white;border:none;border-radius:8px;font-weight:bold;">
-                    ⚙️ UREDI MEČ
-                </button>` : ''}
-        </div>
-    `)
-    .addTo(courtMarkers);
-}
-
-/* ========================== GEOLOCATE ========================== */
-function locirajMe() {
-    map.locate({ setView:false, enableHighAccuracy:true });
-    map.once('locationfound', e => {
-        lastKnownLatLng = e.latlng;
-        if (userMarker) userMarker.setLatLng(e.latlng);
-        else userMarker = L.marker(e.latlng, {
-            icon: L.divIcon({ className:'', html:"<div class='pulse-marker'></div>" })
-        }).addTo(map);
-        map.flyTo(e.latlng, 17);
-    });
-}
-</script>
-</body>
-</html>
+    const timB
