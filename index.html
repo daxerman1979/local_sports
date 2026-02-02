@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>WHOPLAY - Live Sports Map</title>
+    <title>WHOPLAY - Smart Sports Map</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
@@ -209,7 +209,6 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // MEMORIJA MAPE
         const lastLat = localStorage.getItem('lastLat') || 44.8178;
         const lastLng = localStorage.getItem('lastLng') || 20.4489;
         const lastZoom = localStorage.getItem('lastZoom') || 13;
@@ -224,7 +223,6 @@
         var selectedSport = { emoji: '⚽', slug: 'fudbal' };
         var tempCoords = null;
 
-        // ČUVANJE LOKACIJE PRI POMERANJU
         map.on('moveend', function() {
             const center = map.getCenter();
             localStorage.setItem('lastLat', center.lat);
@@ -301,7 +299,7 @@
             db.ref('tereni').push({
                 ime: n, sport: selectedSport.slug, emoji: selectedSport.emoji,
                 lat: tempCoords.lat, lng: tempCoords.lng, status: 'slobodno',
-                scoreA: 0, scoreB: 0, timA: '', timB: '', datum: '', arhiva: '', vlasnik: u.email
+                scoreA: 0, scoreB: 0, timA: '', timB: '', datum: '', arhiva: '', setA: 0, setB: 0, vlasnik: u.email
             }).then(() => { zatvoriSvePanele(); osveziTereneUCentru(); });
         }
 
@@ -331,6 +329,10 @@
             db.ref('tereni/' + currentCourtId).on('value', snap => {
                 const data = snap.val();
                 if(!data) return;
+                
+                // AUTOMATIKA ZA ODBOJKU I TENIS
+                if (data.status === 'live') proveriPravila(data);
+
                 document.getElementById('score-a').innerText = data.scoreA || 0;
                 document.getElementById('score-b').innerText = data.scoreB || 0;
                 document.getElementById('label-team-a').innerText = data.timA || 'TIM 1';
@@ -343,7 +345,6 @@
                     if(["fudbal", "rukomet"].includes(data.sport)) { btnLabel = "KRAJ 1.P"; maxClicks = 1; }
                     else if(data.sport === "hokej") { btnLabel = "KRAJ TREĆINE"; maxClicks = 2; }
                     else if(data.sport === "kosarka") { btnLabel = "KRAJ ČETVRTINE"; maxClicks = 3; }
-                    else if(["tenis", "odbojka"].includes(data.sport)) { btnLabel = "KRAJ SETA"; maxClicks = 4; }
                     
                     if(btnLabel) {
                         let b = document.createElement('button'); b.className = 'btn-period'; b.innerText = btnLabel;
@@ -354,6 +355,42 @@
                     document.getElementById('ft-btn').classList.remove('hidden');
                 } else { document.getElementById('ft-btn').classList.add('hidden'); }
                 renderujPoeneAdmin(data);
+            });
+        }
+
+        function proveriPravila(c) {
+            let sA = c.scoreA || 0; let sB = c.scoreB || 0;
+            let setA = c.setA || 0; let setB = c.setB || 0;
+            let finishSet = false;
+
+            if (c.sport === 'odbojka') {
+                let limit = (setA + setB === 4) ? 15 : 25; // 5. set do 15
+                if ((sA >= limit || sB >= limit) && Math.abs(sA - sB) >= 2) finishSet = true;
+                if (finishSet) {
+                    let winner = sA > sB ? 'setA' : 'setB';
+                    arhivirajAutomatski(idPoenWinner = winner);
+                }
+                if (setA >= 3 || setB >= 3) updateStatus('zavrseno');
+            } 
+            else if (c.sport === 'tenis') {
+                if ((sA >= 6 || sB >= 6) && Math.abs(sA - sB) >= 2) finishSet = true;
+                if (sA === 7 || sB === 7) finishSet = true; // Tie-break kraj
+                if (finishSet) {
+                    let winner = sA > sB ? 'setA' : 'setB';
+                    arhivirajAutomatski(winner);
+                }
+                if (setA >= 2 || setB >= 2) updateStatus('zavrseno'); // Match do 2 dobijena
+            }
+        }
+
+        function arhivirajAutomatski(winner) {
+            db.ref('tereni/' + currentCourtId).once('value', snap => {
+                const c = snap.val();
+                let rez = `${c.scoreA}:${c.scoreB}`;
+                let novaArhiva = c.arhiva ? c.arhiva + ", " + rez : rez;
+                let updateData = { arhiva: novaArhiva, scoreA: 0, scoreB: 0 };
+                updateData[winner] = (c[winner] || 0) + 1;
+                db.ref('tereni/' + currentCourtId).update(updateData);
             });
         }
 
@@ -379,9 +416,7 @@
                 const c = snap.val();
                 let rez = `${c.scoreA}:${c.scoreB}`;
                 let novaArhiva = c.arhiva ? c.arhiva + ", " + rez : rez;
-                let updateData = { arhiva: novaArhiva };
-                if(["tenis", "odbojka"].includes(c.sport)) { updateData.scoreA = 0; updateData.scoreB = 0; }
-                db.ref('tereni/' + currentCourtId).update(updateData);
+                db.ref('tereni/' + currentCourtId).update({ arhiva: novaArhiva });
             });
         }
 
@@ -393,8 +428,8 @@
         }
 
         function resetMatch() {
-            if(confirm("Obriši rezultat meča?")) {
-                db.ref('tereni/'+currentCourtId).update({ status:'slobodno', scoreA:0, scoreB:0, timA:'', timB:'', datum:'', arhiva:'' });
+            if(confirm("Reset meča?")) {
+                db.ref('tereni/'+currentCourtId).update({ status:'slobodno', scoreA:0, scoreB:0, setA:0, setB:0, timA:'', timB:'', datum:'', arhiva:'' });
                 zatvoriSvePanele();
             }
         }
@@ -422,16 +457,18 @@
 
         function renderujMarker(id, c) {
             const arh = c.arhiva ? `<span style="color:#aaa; margin-right:5px;">(${c.arhiva})</span>` : "";
+            const sets = (c.sport === 'tenis' || c.sport === 'odbojka') ? `<b>${c.setA||0}-${c.setB||0}</b>` : `${c.scoreA||0}-${c.scoreB||0}`;
             let sb = ""; let stClass = "";
             
             if(c.status === 'najava') {
                 sb = `<div class="map-scoreboard"><div class="status-part bg-upcoming">NAJAVA</div><div style="padding:0 5px;">${c.timA}-${c.timB} (${c.datum})</div></div>`;
             } else if(c.status === 'live') {
                 stClass = "marker-live";
-                sb = `<div class="map-scoreboard"><div class="status-part bg-live">LIVE</div><div style="padding:0 5px;">${arh}${c.timA} ${c.scoreA}-${c.scoreB} ${c.timB}</div></div>`;
+                let currentPoints = (c.sport === 'tenis' || c.sport === 'odbojka') ? ` <small style="color:var(--accent)">${c.scoreA}:${c.scoreB}</small>` : "";
+                sb = `<div class="map-scoreboard"><div class="status-part bg-live">LIVE</div><div style="padding:0 5px;">${arh}${c.timA} ${sets}${currentPoints} ${c.timB}</div></div>`;
             } else if(c.status === 'zavrseno') {
                 stClass = "marker-ft";
-                sb = `<div class="map-scoreboard"><div class="status-part bg-ft">FT</div><div style="padding:0 5px;">${arh}${c.timA} ${c.scoreA}-${c.scoreB} ${c.timB}</div></div>`;
+                sb = `<div class="map-scoreboard"><div class="status-part bg-ft">FT</div><div style="padding:0 5px;">${arh}${c.timA} ${sets} ${c.timB}</div></div>`;
             } else {
                 sb = `<div class="map-scoreboard"><div class="status-part bg-free">TEREN</div><div style="padding:0 5px;">${c.ime}</div></div>`;
             }
