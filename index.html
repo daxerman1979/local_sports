@@ -331,11 +331,14 @@
             db.ref('tereni/' + currentCourtId).on('value', snap => {
                 const data = snap.val();
                 if(!data) return;
+                
                 if (data.status === 'live') proveriPravila(data);
+
                 document.getElementById('score-a').innerText = data.scoreA || 0;
                 document.getElementById('score-b').innerText = data.scoreB || 0;
                 document.getElementById('label-team-a').innerText = data.timA || 'TIM 1';
                 document.getElementById('label-team-b').innerText = data.timB || 'TIM 2';
+                
                 pc.innerHTML = '';
                 if(data.status !== 'zavrseno') {
                     let btnLabel = ""; let maxClicks = 99;
@@ -343,6 +346,7 @@
                     if(["fudbal", "rukomet"].includes(data.sport)) { btnLabel = "KRAJ 1.P"; maxClicks = 1; }
                     else if(data.sport === "hokej") { btnLabel = "KRAJ TREĆINE"; maxClicks = 2; }
                     else if(data.sport === "kosarka") { btnLabel = "KRAJ ČETVRTINE"; maxClicks = 3; }
+                    
                     if(btnLabel) {
                         let b = document.createElement('button'); b.className = 'btn-period'; b.innerText = btnLabel;
                         if(arhiviranoCount >= maxClicks) b.disabled = true;
@@ -402,22 +406,21 @@
         function arhivirajPeriod() {
             db.ref('tereni/' + currentCourtId).once('value', snap => {
                 const c = snap.val();
-                let sA = c.scoreA || 0;
-                let sB = c.scoreB || 0;
+                let sA = c.scoreA || 0; let sB = c.scoreB || 0;
                 let arhivaArr = c.arhiva ? c.arhiva.split(', ') : [];
                 
                 let sumA = 0; let sumB = 0;
                 arhivaArr.forEach(par => {
-                    let p = par.split(':');
-                    sumA += parseInt(p[0]); sumB += parseInt(p[1]);
+                    let parts = par.split(':');
+                    if (parts.length === 2) {
+                        sumA += parseInt(parts[0]); sumB += parseInt(parts[1]);
+                    }
                 });
 
                 let diffA = sA - sumA;
                 let diffB = sB - sumB;
                 
-                // Za košarku i hokej upisujemo samo razliku poena u toj četvrtini
-                let rez = `${diffA}:${diffB}`;
-                if (c.sport === 'odbojka' || c.sport === 'tenis') rez = `${sA}:${sB}`;
+                let rez = (c.sport === 'kosarka' || c.sport === 'hokej') ? `${diffA}:${diffB}` : `${sA}:${sB}`;
 
                 let novaArhiva = c.arhiva ? c.arhiva + ", " + rez : rez;
                 let updateData = { arhiva: novaArhiva };
@@ -467,6 +470,7 @@
             const isSetBased = (c.sport === 'tenis' || c.sport === 'odbojka');
             const mainScore = isSetBased ? `${c.setA||0}-${c.setB||0}` : `${c.scoreA||0}-${c.scoreB||0}`;
             let sb = ""; let stClass = "";
+            
             if(c.status === 'najava') {
                 sb = `<div class="map-scoreboard">
                         <div class="score-main-row"><div class="status-part bg-upcoming">NAJAVA</div><div style="padding:0 5px;">${c.timA}-${c.timB}</div></div>
@@ -488,8 +492,10 @@
             } else {
                 sb = `<div class="map-scoreboard"><div class="score-main-row"><div class="status-part bg-free">TEREN</div><div style="padding:0 5px;">${c.ime}</div></div></div>`;
             }
+            
             const u = JSON.parse(localStorage.getItem('loggedAdmin'));
             const isOwner = isAdmin && u && c.vlasnik === u.email;
+
             L.marker([c.lat, c.lng], {
                 icon: L.divIcon({ html: `<div class="icon-container ${stClass}" style="position:relative; font-size:28px;">${sb}${c.emoji}</div>`, iconAnchor:[14,14], className:'' })
             }).bindPopup(`<div style="text-align:center;"><b>${c.ime}</b>${isOwner ? `<br><button onclick="otvoriUredi('${id}')" style="width:100%; margin-top:10px; padding:5px; background:#444; color:white; border:none; border-radius:5px;">UREDI</button>` : ''}</div>`).addTo(courtMarkers);
