@@ -65,11 +65,17 @@
 
         .map-scoreboard {
             position: absolute; bottom: 35px; left: 50%; transform: translateX(-50%);
-            display: flex; flex-direction: column; background: rgba(0,0,0,0.9);
-            color: white; border-radius: 4px; overflow: hidden;
+            display: flex; flex-direction: column; background: rgba(0,0,0,0.95);
+            color: white; border-radius: 6px; overflow: hidden;
             border: 1px solid rgba(255,255,255,0.2);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-            min-width: 90px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            min-width: 100px;
+        }
+        .score-name-row {
+            height: 12px; background: rgba(255,255,255,0.05); font-size: 7px;
+            display: flex; align-items: center; justify-content: center;
+            color: #ddd; text-transform: uppercase; font-weight: bold;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
         .score-main-row { display: flex; align-items: center; height: 18px; white-space: nowrap; font-size: 10px; }
         .score-sub-row { display: flex; justify-content: center; align-items: center; height: 12px; background: rgba(255,255,255,0.1); font-size: 8px; color: #aaa; border-top: 1px solid rgba(255,255,255,0.1); }
@@ -345,7 +351,7 @@
                     const arhiviranoCount = data.arhiva ? data.arhiva.split(',').length : 0;
                     if(["fudbal", "rukomet"].includes(data.sport)) { btnLabel = "KRAJ 1.P"; maxClicks = 1; }
                     else if(data.sport === "hokej") { btnLabel = "KRAJ TREĆINE"; maxClicks = 2; }
-                    else if(data.sport === "kosarka") { btnLabel = "KRAJ ČETVRTINE"; maxClicks = 3; }
+                    else if(data.sport === "kosarka") { btnLabel = "KRAJ ČETVRTINE"; maxClicks = 4; } // Podržavamo do 4
                     
                     if(btnLabel) {
                         let b = document.createElement('button'); b.className = 'btn-period'; b.innerText = btnLabel;
@@ -458,10 +464,18 @@
         }
 
         function osveziTereneUCentru() {
+            const center = map.getCenter();
+            db.ref('tereni').off();
             db.ref('tereni').on('value', snap => {
                 courtMarkers.clearLayers();
                 const data = snap.val();
-                for (let id in data) { renderujMarker(id, data[id]); }
+                for (let id in data) { 
+                    const c = data[id];
+                    // Filtriranje: 20km od centra mape
+                    if (center.distanceTo([c.lat, c.lng]) < 20000) {
+                        renderujMarker(id, c); 
+                    }
+                }
             });
         }
 
@@ -473,6 +487,7 @@
             
             if(c.status === 'najava') {
                 sb = `<div class="map-scoreboard">
+                        <div class="score-name-row">${c.ime}</div>
                         <div class="score-main-row"><div class="status-part bg-upcoming">NAJAVA</div><div style="padding:0 5px;">${c.timA}-${c.timB}</div></div>
                         <div class="score-sub-row">${c.datum}</div>
                       </div>`;
@@ -480,17 +495,22 @@
                 stClass = "marker-live";
                 let currentPoints = isSetBased ? ` <small style="color:var(--accent); font-weight:bold;">[${c.scoreA}:${c.scoreB}]</small>` : "";
                 sb = `<div class="map-scoreboard">
+                        <div class="score-name-row">${c.ime}</div>
                         <div class="score-main-row"><div class="status-part bg-live">LIVE</div><div style="padding:0 5px;">${c.timA} ${mainScore}${currentPoints} ${c.timB}</div></div>
                         ${arh ? `<div class="score-sub-row">(${arh})</div>` : ''}
                       </div>`;
             } else if(c.status === 'zavrseno') {
                 stClass = "marker-ft";
                 sb = `<div class="map-scoreboard">
+                        <div class="score-name-row">${c.ime}</div>
                         <div class="score-main-row"><div class="status-part bg-ft">FT</div><div style="padding:0 5px;">${c.timA} ${mainScore} ${c.timB}</div></div>
                         ${arh ? `<div class="score-sub-row">(${arh})</div>` : ''}
                       </div>`;
             } else {
-                sb = `<div class="map-scoreboard"><div class="score-main-row"><div class="status-part bg-free">TEREN</div><div style="padding:0 5px;">${c.ime}</div></div></div>`;
+                sb = `<div class="map-scoreboard">
+                        <div class="score-name-row">${c.ime}</div>
+                        <div class="score-main-row"><div class="status-part bg-free">TEREN</div><div style="padding:0 5px; font-size:8px; color:#aaa;">SLOBODNO</div></div>
+                      </div>`;
             }
             
             const u = JSON.parse(localStorage.getItem('loggedAdmin'));
