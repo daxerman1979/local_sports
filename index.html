@@ -63,25 +63,31 @@
         .btn-minus { background: #c0392b !important; }
         .btn-period { width: 100%; background: var(--blue); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; margin-top: 10px; text-transform: uppercase; font-size: 11px; }
 
-        /* SCOREBOARD DIZAJN */
+        /* NOVI DIZAJN KARTICE - TRI REDA */
         .map-scoreboard {
             position: absolute; bottom: 35px; left: 50%; transform: translateX(-50%);
-            display: flex; flex-direction: column; background: rgba(0,0,0,0.95);
+            display: flex; flex-direction: column; background: rgba(0,0,0,0.98);
             color: white; border-radius: 6px; overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.2);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-            min-width: 100px;
+            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.7);
+            min-width: 110px;
         }
         .score-name-row {
-            height: 14px; background: rgba(255,255,255,0.1); font-size: 7px;
+            height: 15px; background: rgba(255,255,255,0.15); font-size: 8px;
             display: flex; align-items: center; justify-content: center;
             color: #fff; text-transform: uppercase; font-weight: 900;
-            border-bottom: 1px solid rgba(255,255,255,0.1); padding: 0 5px;
+            padding: 0 8px; border-bottom: 1px solid rgba(255,255,255,0.1);
+            letter-spacing: 0.5px;
         }
-        .score-main-row { display: flex; align-items: center; height: 18px; white-space: nowrap; font-size: 10px; }
-        .score-sub-row { display: flex; justify-content: center; align-items: center; height: 12px; background: rgba(255,255,255,0.05); font-size: 8px; color: #aaa; border-top: 1px solid rgba(255,255,255,0.1); }
+        .score-main-row { display: flex; align-items: center; height: 22px; white-space: nowrap; font-size: 11px; }
+        .score-sub-row { 
+            display: flex; justify-content: center; align-items: center; 
+            padding: 2px 5px; background: rgba(255,255,255,0.05); 
+            font-size: 8px; color: #ccc; border-top: 1px solid rgba(255,255,255,0.1);
+            min-height: 12px;
+        }
         
-        .status-part { padding: 0 5px; height: 100%; display: flex; align-items: center; font-weight: 900; font-size: 8px; text-transform: uppercase; }
+        .status-part { padding: 0 6px; height: 100%; display: flex; align-items: center; font-weight: 900; font-size: 8px; text-transform: uppercase; }
         .bg-upcoming { background: #2ecc71; }
         .bg-live { background: #e74c3c; animation: blink 1s infinite; }
         .bg-ft { background: #555; }
@@ -89,8 +95,7 @@
 
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
         .icon-container { transition: all 0.3s ease; }
-        .marker-live { filter: drop-shadow(0 0 8px white) !important; }
-        .marker-ft { filter: grayscale(0.5) !important; }
+        .marker-live { filter: drop-shadow(0 0 10px white) !important; }
         
         input { width: 100%; padding: 14px; margin: 8px 0; border: 1px solid #ddd; border-radius: 12px; font-size: 16px; box-sizing: border-box; background: #f9f9f9; }
         .btn-action { width: 100%; background: var(--primary); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: bold; font-size: 16px; margin-top: 5px; }
@@ -350,9 +355,9 @@
                 pc.innerHTML = '';
                 if(data.status !== 'zavrseno') {
                     let btnLabel = "";
-                    if(["fudbal", "rukomet"].includes(data.sport)) { btnLabel = "KRAJ 1.P"; }
-                    else if(data.sport === "hokej") { btnLabel = "KRAJ TREĆINE"; }
-                    else if(data.sport === "kosarka") { btnLabel = "KRAJ ČETVRTINE"; }
+                    if(["fudbal", "rukomet"].includes(data.sport)) btnLabel = "KRAJ 1.P";
+                    else if(data.sport === "hokej") btnLabel = "KRAJ TREĆINE";
+                    else if(data.sport === "kosarka") btnLabel = "KRAJ ČETVRTINE";
                     
                     if(btnLabel) {
                         let b = document.createElement('button'); b.className = 'btn-period'; b.innerText = btnLabel;
