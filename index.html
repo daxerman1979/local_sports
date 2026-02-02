@@ -63,7 +63,6 @@
         .btn-minus { background: #c0392b !important; }
         .btn-period { width: 100%; background: var(--blue); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; margin-top: 10px; text-transform: uppercase; font-size: 11px; }
 
-        /* KARTICA NA MAPI */
         .map-scoreboard {
             position: absolute; bottom: 35px; left: 50%; transform: translateX(-50%);
             display: flex; flex-direction: column; background: rgba(0,0,0,0.9);
@@ -72,14 +71,8 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.5);
             min-width: 90px;
         }
-        .score-main-row {
-            display: flex; align-items: center; height: 18px; white-space: nowrap; font-size: 10px; /* Smanjen font sa 12+ na 10 */
-        }
-        .score-sub-row {
-            display: flex; justify-content: center; align-items: center;
-            height: 12px; background: rgba(255,255,255,0.1);
-            font-size: 8px; color: #aaa; border-top: 1px solid rgba(255,255,255,0.1);
-        }
+        .score-main-row { display: flex; align-items: center; height: 18px; white-space: nowrap; font-size: 10px; }
+        .score-sub-row { display: flex; justify-content: center; align-items: center; height: 12px; background: rgba(255,255,255,0.1); font-size: 8px; color: #aaa; border-top: 1px solid rgba(255,255,255,0.1); }
         .status-part { padding: 0 5px; height: 100%; display: flex; align-items: center; font-weight: 900; font-size: 8px; text-transform: uppercase; }
         .bg-upcoming { background: #2ecc71; }
         .bg-live { background: #e74c3c; animation: blink 1s infinite; }
@@ -409,9 +402,28 @@
         function arhivirajPeriod() {
             db.ref('tereni/' + currentCourtId).once('value', snap => {
                 const c = snap.val();
-                let rez = `${c.scoreA}:${c.scoreB}`;
+                let sA = c.scoreA || 0;
+                let sB = c.scoreB || 0;
+                let arhivaArr = c.arhiva ? c.arhiva.split(', ') : [];
+                
+                let sumA = 0; let sumB = 0;
+                arhivaArr.forEach(par => {
+                    let p = par.split(':');
+                    sumA += parseInt(p[0]); sumB += parseInt(p[1]);
+                });
+
+                let diffA = sA - sumA;
+                let diffB = sB - sumB;
+                
+                // Za košarku i hokej upisujemo samo razliku poena u toj četvrtini
+                let rez = `${diffA}:${diffB}`;
+                if (c.sport === 'odbojka' || c.sport === 'tenis') rez = `${sA}:${sB}`;
+
                 let novaArhiva = c.arhiva ? c.arhiva + ", " + rez : rez;
-                db.ref('tereni/' + currentCourtId).update({ arhiva: novaArhiva });
+                let updateData = { arhiva: novaArhiva };
+                if (c.sport === 'odbojka' || c.sport === 'tenis') { updateData.scoreA = 0; updateData.scoreB = 0; }
+                
+                db.ref('tereni/' + currentCourtId).update(updateData);
             });
         }
 
