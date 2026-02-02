@@ -79,10 +79,10 @@
 
         .hidden { display: none !important; }
 
-        /* VIZUELNI STATUSI MARKERA */
-        .icon-container { transition: all 0.3s ease; transform-origin: center; }
+        .icon-container { transition: all 0.3s ease; transform-origin: center; opacity: 1 !important; }
         .marker-live { filter: drop-shadow(0 0 8px white) !important; }
-        .marker-ft { opacity: 0.6; filter: grayscale(0.8) !important; }
+        .marker-ft { filter: grayscale(0.5) !important; } /* Samo blagi grayscale, nema providnosti */
+        
         #map.zoom-far .icon-container { transform: scale(0.4); }
         #map.zoom-far .map-scoreboard { display: none !important; }
 
@@ -362,7 +362,7 @@
                     if(["fudbal", "rukomet"].includes(data.sport)) { btnLabel = "KRAJ 1.P"; maxClicks = 1; }
                     else if(data.sport === "hokej") { btnLabel = "KRAJ TREĆINE"; maxClicks = 2; }
                     else if(data.sport === "kosarka") { btnLabel = "KRAJ ČETVRTINE"; maxClicks = 3; }
-                    else if(["tenis", "odbojka"].includes(data.sport)) { btnLabel = "KRAJ SETA"; maxClicks = 4; } // Dozvoljava 5 setova (4 klika)
+                    else if(["tenis", "odbojka"].includes(data.sport)) { btnLabel = "KRAJ SETA"; maxClicks = 4; }
                     
                     if(btnLabel) {
                         let b = document.createElement('button');
@@ -468,7 +468,7 @@
             const isOwner = isAdmin && u && c.vlasnik === u.email;
 
             L.marker([c.lat, c.lng], {
-                icon: L.divIcon({ html: `<div class="icon-container ${statusClass}" style="position:relative; font-size:28px; filter:drop-shadow(0 2px 2px black);">${sb}${c.emoji}</div>`, iconAnchor:[14,14], className:'' })
+                icon: L.divIcon({ html: `<div class="icon-container ${statusClass}" style="position:relative; font-size:28px; filter:drop-shadow(0 2px 2px black); opacity:1 !important;">${sb}${c.emoji}</div>`, iconAnchor:[14,14], className:'' })
             }).bindPopup(`<div style="text-align:center;">${c.emoji}<br><b>${c.ime}</b>${isOwner ? `<br><button onclick="otvoriUredi('${id}')" style="width:100%; margin-top:10px; padding:5px; background:#444; color:white; border:none; border-radius:5px;">UREDI</button>` : ''}</div>`).addTo(courtMarkers);
         }
 
