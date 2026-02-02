@@ -63,15 +63,23 @@
         .btn-minus { background: #c0392b !important; }
         .btn-period { width: 100%; background: var(--blue); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; margin-top: 10px; text-transform: uppercase; font-size: 11px; }
 
+        /* SCOREBOARD REORGANIZACIJA */
         .map-scoreboard {
             position: absolute; bottom: 35px; left: 50%; transform: translateX(-50%);
-            display: flex; align-items: center; background: rgba(0,0,0,0.85);
-            color: white; border-radius: 4px; overflow: hidden;
-            white-space: nowrap; border: 1px solid rgba(255,255,255,0.2);
-            font-size: 10px; height: 18px; box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-            min-width: 80px;
+            display: flex; flex-direction: column; background: rgba(0,0,0,0.9);
+            color: white; border-radius: 6px; overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            min-width: 120px;
         }
-        .status-part { padding: 0 5px; height: 100%; display: flex; align-items: center; font-weight: 900; font-size: 8px; text-transform: uppercase; }
+        .score-row-main { display: flex; align-items: center; height: 20px; width: 100%; }
+        .score-row-sub { 
+            display: flex; justify-content: center; align-items: center; 
+            height: 14px; background: rgba(255,255,255,0.1); 
+            font-size: 9px; color: #bbb; letter-spacing: 0.5px;
+        }
+        .status-part { padding: 0 6px; height: 100%; display: flex; align-items: center; font-weight: 900; font-size: 8px; text-transform: uppercase; }
+        
         .bg-upcoming { background: #2ecc71; }
         .bg-live { background: #e74c3c; animation: blink 1s infinite; }
         .bg-ft { background: #555; }
@@ -330,7 +338,6 @@
                 const data = snap.val();
                 if(!data) return;
                 
-                // AUTOMATIKA ZA ODBOJKU I TENIS
                 if (data.status === 'live') proveriPravila(data);
 
                 document.getElementById('score-a').innerText = data.scoreA || 0;
@@ -364,22 +371,19 @@
             let finishSet = false;
 
             if (c.sport === 'odbojka') {
-                let limit = (setA + setB === 4) ? 15 : 25; // 5. set do 15
+                let limit = (setA + setB === 4) ? 15 : 25;
                 if ((sA >= limit || sB >= limit) && Math.abs(sA - sB) >= 2) finishSet = true;
-                if (finishSet) {
-                    let winner = sA > sB ? 'setA' : 'setB';
-                    arhivirajAutomatski(idPoenWinner = winner);
-                }
+                if (finishSet) arhivirajAutomatski(sA > sB ? 'setA' : 'setB');
                 if (setA >= 3 || setB >= 3) updateStatus('zavrseno');
             } 
             else if (c.sport === 'tenis') {
-                if ((sA >= 6 || sB >= 6) && Math.abs(sA - sB) >= 2) finishSet = true;
-                if (sA === 7 || sB === 7) finishSet = true; // Tie-break kraj
-                if (finishSet) {
-                    let winner = sA > sB ? 'setA' : 'setB';
-                    arhivirajAutomatski(winner);
-                }
-                if (setA >= 2 || setB >= 2) updateStatus('zavrseno'); // Match do 2 dobijena
+                if (((sA >= 6 || sB >= 6) && Math.abs(sA - sB) >= 2) || sA === 7 || sB === 7) finishSet = true;
+                if (finishSet) arhivirajAutomatski(sA > sB ? 'setA' : 'setB');
+                if (setA >= 2 || setB >= 2) updateStatus('zavrseno');
+            }
+            else if (c.sport === 'hokej') {
+                // Hokej obično nema automatski kraj seta jer se igra na vreme, 
+                // ali pratimo ako admin završi periode.
             }
         }
 
@@ -416,7 +420,9 @@
                 const c = snap.val();
                 let rez = `${c.scoreA}:${c.scoreB}`;
                 let novaArhiva = c.arhiva ? c.arhiva + ", " + rez : rez;
-                db.ref('tereni/' + currentCourtId).update({ arhiva: novaArhiva });
+                // Kod košarke arhiva ne resetuje glavni skor
+                let updateData = { arhiva: novaArhiva };
+                db.ref('tereni/' + currentCourtId).update(updateData);
             });
         }
 
@@ -456,19 +462,30 @@
         }
 
         function renderujMarker(id, c) {
-            const arh = c.arhiva ? `<span style="color:#aaa; margin-right:5px;">(${c.arhiva})</span>` : "";
-            const sets = (c.sport === 'tenis' || c.sport === 'odbojka') ? `<b>${c.setA||0}-${c.setB||0}</b>` : `${c.scoreA||0}-${c.scoreB||0}`;
+            const arh = c.arhiva ? c.arhiva : "";
+            const isPointsBased = (c.sport === 'tenis' || c.sport === 'odbojka');
+            const mainScore = isPointsBased ? `${c.setA||0}-${c.setB||0}` : `${c.scoreA||0}-${c.scoreB||0}`;
+            
             let sb = ""; let stClass = "";
             
             if(c.status === 'najava') {
-                sb = `<div class="map-scoreboard"><div class="status-part bg-upcoming">NAJAVA</div><div style="padding:0 5px;">${c.timA}-${c.timB} (${c.datum})</div></div>`;
+                sb = `<div class="map-scoreboard">
+                        <div class="score-row-main"><div class="status-part bg-upcoming">NAJAVA</div><div style="padding:0 5px;">${c.timA}-${c.timB}</div></div>
+                        <div class="score-row-sub">${c.datum}</div>
+                      </div>`;
             } else if(c.status === 'live') {
                 stClass = "marker-live";
-                let currentPoints = (c.sport === 'tenis' || c.sport === 'odbojka') ? ` <small style="color:var(--accent)">${c.scoreA}:${c.scoreB}</small>` : "";
-                sb = `<div class="map-scoreboard"><div class="status-part bg-live">LIVE</div><div style="padding:0 5px;">${arh}${c.timA} ${sets}${currentPoints} ${c.timB}</div></div>`;
+                let currentPoints = isPointsBased ? ` <small style="color:var(--accent); font-weight:bold;">[${c.scoreA}:${c.scoreB}]</small>` : "";
+                sb = `<div class="map-scoreboard">
+                        <div class="score-row-main"><div class="status-part bg-live">LIVE</div><div style="padding:0 5px;">${c.timA} ${mainScore}${currentPoints} ${c.timB}</div></div>
+                        ${arh ? `<div class="score-row-sub">(${arh})</div>` : ''}
+                      </div>`;
             } else if(c.status === 'zavrseno') {
                 stClass = "marker-ft";
-                sb = `<div class="map-scoreboard"><div class="status-part bg-ft">FT</div><div style="padding:0 5px;">${arh}${c.timA} ${sets} ${c.timB}</div></div>`;
+                sb = `<div class="map-scoreboard">
+                        <div class="score-row-main"><div class="status-part bg-ft">FT</div><div style="padding:0 5px;">${c.timA} ${mainScore} ${c.timB}</div></div>
+                        ${arh ? `<div class="score-row-sub">(${arh})</div>` : ''}
+                      </div>`;
             } else {
                 sb = `<div class="map-scoreboard"><div class="status-part bg-free">TEREN</div><div style="padding:0 5px;">${c.ime}</div></div>`;
             }
