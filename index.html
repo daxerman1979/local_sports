@@ -88,6 +88,8 @@
         .hidden { display: none !important; }
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10002; display: flex; justify-content: center; align-items: center; background: rgba(0,0,0,0.9); backdrop-filter: blur(5px); }
         .modal { background: white; padding: 20px; border-radius: 20px; width: 85%; max-width: 320px; text-align: center; }
+        .pulse-marker { width: 12px; height: 12px; background: #3498db; border: 2px solid white; border-radius: 50%; box-shadow: 0 0 10px #3498db; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.5); opacity: 0.5; } 100% { transform: scale(1); opacity: 1; } }
     </style>
 </head>
 <body>
@@ -167,6 +169,7 @@
             <input type="text" id="match-date" placeholder="Datum (npr. 12.05. 20h)">
             <button class="btn-action" style="background:var(--accent)" onclick="updateStatus('najava')">NAJAVI MEČ</button>
             <button class="btn-action" style="background:var(--accent); margin-top:8px;" onclick="updateStatus('live')">GO LIVE 🔴</button>
+            <button class="btn-action" style="background:#555; margin-top:8px;" onclick="resetMatch()">RESET MEČA</button>
             <button class="btn-action" style="background:#c0392b; margin-top:8px;" onclick="obrisiTeren()">OBRIŠI TEREN SA MAPE</button>
         </div>
 
@@ -190,7 +193,7 @@
             </div>
             <div id="period-controls"></div>
             <button id="ft-btn" class="btn-action" style="background:orange; margin-top:12px;" onclick="updateStatus('zavrseno')">ZAVRŠI (FT)</button>
-            <button class="btn-action" style="background:#c0392b; margin-top:8px;" onclick="obrisiTeren()">OBRIŠI TEREN SA MAPE</button>
+            <button class="btn-action" style="background:#555; margin-top:8px;" onclick="resetMatch()">RESET MEČA</button>
         </div>
     </div>
 
@@ -206,7 +209,12 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        var map = L.map('map', { zoomControl: false, tap: false, attributionControl: false }).setView([44.8178, 20.4489], 13);
+        // MEMORIJA MAPE
+        const lastLat = localStorage.getItem('lastLat') || 44.8178;
+        const lastLng = localStorage.getItem('lastLng') || 20.4489;
+        const lastZoom = localStorage.getItem('lastZoom') || 13;
+
+        var map = L.map('map', { zoomControl: false, tap: false, attributionControl: false }).setView([lastLat, lastLng], lastZoom);
         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', { zIndex: 1000 }).addTo(map);
 
@@ -215,6 +223,15 @@
         var isAdmin = false;
         var selectedSport = { emoji: '⚽', slug: 'fudbal' };
         var tempCoords = null;
+
+        // ČUVANJE LOKACIJE PRI POMERANJU
+        map.on('moveend', function() {
+            const center = map.getCenter();
+            localStorage.setItem('lastLat', center.lat);
+            localStorage.setItem('lastLng', center.lng);
+            localStorage.setItem('lastZoom', map.getZoom());
+            osveziTereneUCentru();
+        });
 
         function startExplore() {
             document.getElementById('startup-screen').classList.add('hidden');
@@ -375,12 +392,16 @@
             }).then(() => { otvoriUredi(currentCourtId); });
         }
 
+        function resetMatch() {
+            if(confirm("Obriši rezultat meča?")) {
+                db.ref('tereni/'+currentCourtId).update({ status:'slobodno', scoreA:0, scoreB:0, timA:'', timB:'', datum:'', arhiva:'' });
+                zatvoriSvePanele();
+            }
+        }
+
         function obrisiTeren() {
-            if(confirm("Da li ste sigurni da želite da trajno obrišete ovaj teren sa mape?")) {
-                db.ref('tereni/'+currentCourtId).remove().then(() => {
-                    zatvoriSvePanele();
-                    osveziTereneUCentru();
-                });
+            if(confirm("Trajno obrisati teren sa mape?")) {
+                db.ref('tereni/'+currentCourtId).remove().then(() => { zatvoriSvePanele(); });
             }
         }
 
@@ -425,7 +446,7 @@
 
         function locirajMe() {
             map.locate({setView: true, maxZoom: 16});
-            map.once('locationfound', e => {
+            map.on('locationfound', e => {
                 if (userMarker) userMarker.setLatLng(e.latlng);
                 else userMarker = L.marker(e.latlng, {icon: L.divIcon({className:'', html:"<div class='pulse-marker'></div>"})}).addTo(map);
             });
