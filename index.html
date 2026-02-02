@@ -63,31 +63,31 @@
         .btn-minus { background: #c0392b !important; }
         .btn-period { width: 100%; background: var(--blue); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; margin-top: 10px; text-transform: uppercase; font-size: 11px; }
 
-        /* FIX: MAP SCOREBOARD DESIGN */
+        /* REVIDIRAN DIZAJN KARTICE NA MAPI */
         .map-scoreboard {
             position: absolute; bottom: 35px; left: 50%; transform: translateX(-50%);
-            display: flex; flex-direction: column; background: rgba(0,0,0,0.95);
+            display: flex; flex-direction: column; background: rgba(0,0,0,0.96);
             color: white; border-radius: 8px; overflow: hidden;
             border: 1px solid rgba(255,255,255,0.4);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.8);
-            min-width: 130px; z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.8);
+            min-width: 120px; z-index: 1000;
         }
         .score-name-row {
-            min-height: 18px; background: rgba(255,255,255,0.2); font-size: 9px;
+            min-height: 16px; background: rgba(255,255,255,0.18); font-size: 9px;
             display: flex; align-items: center; justify-content: center;
             color: #fff; text-transform: uppercase; font-weight: 900;
-            padding: 2px 8px; border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 3px 10px; border-bottom: 1px solid rgba(255,255,255,0.15);
             letter-spacing: 0.5px; text-align: center;
         }
         .score-main-row { 
             display: flex; align-items: center; min-height: 24px; 
-            font-size: 12px; font-weight: bold;
+            white-space: nowrap; font-size: 12px; font-weight: bold;
         }
         .score-sub-row { 
             display: flex; justify-content: center; align-items: center; 
-            padding: 4px 6px; background: rgba(255,255,255,0.08); 
-            font-size: 9px; color: #fff; border-top: 1px solid rgba(255,255,255,0.1);
-            min-height: 14px; white-space: normal; text-align: center;
+            padding: 4px 6px; background: rgba(0,0,0,0.5); 
+            font-size: 9px; color: #ddd; border-top: 1px solid rgba(255,255,255,0.1);
+            min-height: 14px; white-space: normal; line-height: 1.2;
         }
         
         .status-part { padding: 0 6px; height: 100%; display: flex; align-items: center; font-weight: 900; font-size: 8px; text-transform: uppercase; min-height: 24px; }
@@ -467,17 +467,19 @@
             if(tempMarker) map.removeLayer(tempMarker);
         }
 
+        // POPRAVLJENO: Centriranje i filtriranje 20km
         function osveziTereneUCentru() {
-            const centar = map.getCenter();
+            const currentCenter = map.getCenter();
             db.ref('tereni').off();
             db.ref('tereni').on('value', snap => {
                 courtMarkers.clearLayers();
                 const data = snap.val();
                 for (let id in data) { 
                     const c = data[id];
-                    // Leaflet distanceTo vraća u metrima (20km = 20000m)
-                    const distanca = centar.distanceTo(L.latLng(c.lat, c.lng));
-                    if (distanca <= 20000) {
+                    const courtPos = L.latLng(c.lat, c.lng);
+                    const distance = currentCenter.distanceTo(courtPos); // U metrima
+                    
+                    if (distance <= 20000) { // 20km
                         renderujMarker(id, c); 
                     }
                 }
