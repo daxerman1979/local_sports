@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>WhoPlay - Live Sports Map</title>
+    <title>WHOPLAY - Live Sports Map</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
@@ -20,7 +20,6 @@
         #map { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1; transition: filter 0.8s ease; }
         .map-blur { filter: blur(15px) brightness(0.5); }
 
-        /* STARTUP EKRAN */
         #startup-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 10001; display: flex; justify-content: center; align-items: center;
@@ -31,21 +30,19 @@
             box-shadow: 0 15px 45px rgba(0,0,0,0.6);
         }
         .startup-card h1 { font-size: 30px; font-weight: 900; color: var(--primary); margin: 0 0 10px 0; }
-        .startup-card p { color: #666; font-size: 14px; margin-bottom: 25px; }
         .btn-start { width: 100%; padding: 15px; border-radius: 12px; border: none; font-size: 16px; font-weight: bold; margin-bottom: 10px; cursor: pointer; }
 
         header {
             position: fixed; top: 0; left: 0; width: 100%; z-index: 2000;
             display: flex; justify-content: space-between; align-items: center;
             padding: env(safe-area-inset-top) 12px 8px 12px;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0) 100%);
+            background: linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%);
             pointer-events: none; box-sizing: border-box;
         }
         .logo, .nav-links { pointer-events: auto; }
         .logo { font-size: 20px; font-weight: 900; color: var(--primary); text-shadow: 0 0 10px rgba(0,0,0,1); }
-        .nav-btn { background: rgba(0,0,0,0.7); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 6px 12px; border-radius: 15px; font-size: 11px; font-weight: bold; }
+        .nav-btn { background: rgba(0,0,0,0.7); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 6px 12px; border-radius: 15px; font-size: 11px; font-weight: bold; margin-left: 5px; }
 
-        /* PANELI */
         #admin-panel, #match-panel {
             position: fixed; bottom: 0; left: 0; width: 100%; z-index: 9999;
             background: var(--dark); color: white;
@@ -66,7 +63,6 @@
         .btn-minus { background: #c0392b !important; }
         .btn-period { width: 100%; background: var(--blue); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; margin-top: 10px; text-transform: uppercase; font-size: 11px; }
 
-        /* SCOREBOARD LOGIKA */
         .map-scoreboard {
             position: absolute; bottom: 35px; left: 50%; transform: translateX(-50%);
             display: flex; align-items: center; background: rgba(0,0,0,0.85);
@@ -82,7 +78,7 @@
         .bg-free { background: #333; }
 
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-        .icon-container { transition: all 0.3s ease; opacity: 1 !important; }
+        .icon-container { transition: all 0.3s ease; }
         .marker-live { filter: drop-shadow(0 0 8px white) !important; }
         .marker-ft { filter: grayscale(0.5) !important; }
         
@@ -127,6 +123,10 @@
 
     <header id="main-header" class="hidden">
         <div class="logo">WHOPLAY</div>
+        <div id="guest-nav" class="nav-links">
+            <button class="nav-btn" onclick="toggleModal('register-screen', true)">Reg</button>
+            <button class="nav-btn" onclick="toggleModal('login-screen', true)">Login</button>
+        </div>
         <div id="admin-info" class="nav-links hidden">
             <span id="admin-name" style="color:white; font-size:11px; margin-right:8px; font-weight:bold;"></span>
             <button class="nav-btn" onclick="logoutAdmin()">Logout</button>
@@ -167,7 +167,7 @@
             <input type="text" id="match-date" placeholder="Datum (npr. 12.05. 20h)">
             <button class="btn-action" style="background:var(--accent)" onclick="updateStatus('najava')">NAJAVI MEČ</button>
             <button class="btn-action" style="background:var(--accent); margin-top:8px;" onclick="updateStatus('live')">GO LIVE 🔴</button>
-            <button class="btn-action" style="background:#555; margin-top:8px;" onclick="zatvoriSvePanele()">ODUSTANI</button>
+            <button class="btn-action" style="background:#c0392b; margin-top:8px;" onclick="obrisiTeren()">OBRIŠI TEREN SA MAPE</button>
         </div>
 
         <div id="match-live" class="hidden">
@@ -190,7 +190,7 @@
             </div>
             <div id="period-controls"></div>
             <button id="ft-btn" class="btn-action" style="background:orange; margin-top:12px;" onclick="updateStatus('zavrseno')">ZAVRŠI (FT)</button>
-            <button class="btn-action" style="background:#555; margin-top:8px;" onclick="resetMatch()">RESETUJ MEČ</button>
+            <button class="btn-action" style="background:#c0392b; margin-top:8px;" onclick="obrisiTeren()">OBRIŠI TEREN SA MAPE</button>
         </div>
     </div>
 
@@ -240,7 +240,7 @@
             const email = document.getElementById('reg-email').value.toLowerCase().trim();
             if(!nick || !email) return;
             db.ref('admins').push({ nickname: nick, email: email }).then(() => {
-                alert("Registrovano!"); toggleModal('register-screen', false);
+                alert("Uspešno!"); toggleModal('register-screen', false);
             });
         }
 
@@ -256,6 +256,7 @@
 
         function setupAdminUI(u) {
             isAdmin = true;
+            document.getElementById('guest-nav').classList.add('hidden');
             document.getElementById('admin-info').classList.remove('hidden');
             document.getElementById('admin-name').innerText = u.nickname;
         }
@@ -334,9 +335,7 @@
                         pc.appendChild(b);
                     }
                     document.getElementById('ft-btn').classList.remove('hidden');
-                } else {
-                    document.getElementById('ft-btn').classList.add('hidden');
-                }
+                } else { document.getElementById('ft-btn').classList.add('hidden'); }
                 renderujPoeneAdmin(data);
             });
         }
@@ -376,10 +375,12 @@
             }).then(() => { otvoriUredi(currentCourtId); });
         }
 
-        function resetMatch() {
-            if(confirm("Reset meča?")) {
-                db.ref('tereni/'+currentCourtId).update({ status:'slobodno', scoreA:0, scoreB:0, timA:'', timB:'', datum:'', arhiva:'' });
-                zatvoriSvePanele();
+        function obrisiTeren() {
+            if(confirm("Da li ste sigurni da želite da trajno obrišete ovaj teren sa mape?")) {
+                db.ref('tereni/'+currentCourtId).remove().then(() => {
+                    zatvoriSvePanele();
+                    osveziTereneUCentru();
+                });
             }
         }
 
@@ -411,7 +412,6 @@
                 stClass = "marker-ft";
                 sb = `<div class="map-scoreboard"><div class="status-part bg-ft">FT</div><div style="padding:0 5px;">${arh}${c.timA} ${c.scoreA}-${c.scoreB} ${c.timB}</div></div>`;
             } else {
-                // IME TERENA SE VIDI SAMO KADA JE SLOBODAN
                 sb = `<div class="map-scoreboard"><div class="status-part bg-free">TEREN</div><div style="padding:0 5px;">${c.ime}</div></div>`;
             }
             
