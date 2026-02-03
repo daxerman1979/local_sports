@@ -66,7 +66,7 @@
         .map-scoreboard {
             position: absolute; bottom: 45px; left: 50%; transform: translateX(-50%);
             display: flex; flex-direction: column; 
-            width: max-content; min-width: 130px; max-width: 260px;
+            width: max-content; min-width: 130px; max-width: 280px;
             background: #000; border-radius: 12px; border: 2px solid #ffffff;
             box-shadow: 0 12px 30px rgba(0,0,0,1); overflow: hidden; z-index: 1000;
         }
@@ -324,7 +324,7 @@
             db.ref('tereni').push({
                 ime: n, sport: selectedSport.slug, emoji: selectedSport.emoji,
                 lat: tempCoords.lat, lng: tempCoords.lng, status: 'slobodno',
-                scoreA: 0, scoreB: 0, timA: '', timB: '', datum: '', arhiva: '', setA: 0, setB: 0, vlasnik: u.email
+                scoreA: 0, scoreB: 0, timA: '', timB: '', datum: '', arhiva: '', setA: 0, setB: 0, vlasnik: u.email, penA: 0, penB: 0
             }).then(() => { zatvoriSvePanele(); osveziTereneUCentru(); });
         }
 
@@ -368,24 +368,26 @@
                 let countPeriods = arhivaStr ? arhivaStr.split(', ').length : 0;
 
                 let nextLabel = "";
-                let suffix = "";
+                let namePrefix = "";
+                let isPenalMode = false;
+
                 if (data.sport === "fudbal" || data.sport === "rukomet") {
-                    if (countPeriods === 0) nextLabel = "KRAJ 1.P";
-                    else if (countPeriods === 1) nextLabel = "KRAJ 2.P (FT)";
-                    else if (countPeriods === 2) { nextLabel = "KRAJ PRODUŽETKA"; suffix = " (ET)"; }
-                    else if (countPeriods === 3) { nextLabel = "KRAJ PENALA"; suffix = " (P)"; }
+                    if (countPeriods === 0) { nextLabel = "KRAJ 1.P"; namePrefix = "1P "; }
+                    else if (countPeriods === 1) { nextLabel = "KRAJ 2.P (FT)"; namePrefix = "2P "; }
+                    else if (countPeriods === 2) { nextLabel = "KRAJ PRODUŽETKA"; namePrefix = "ET "; }
+                    else if (countPeriods === 3) { nextLabel = "KRAJ PENALA"; namePrefix = "PEN "; isPenalMode = true; }
                 } else if (data.sport === "hokej") {
-                    if (countPeriods < 3) nextLabel = `KRAJ ${countPeriods+1}. TREĆINE`;
-                    else if (countPeriods === 3) { nextLabel = "KRAJ PRODUŽETKA"; suffix = " (ET)"; }
-                    else if (countPeriods === 4) { nextLabel = "KRAJ PENALA"; suffix = " (P)"; }
+                    if (countPeriods < 3) { nextLabel = `KRAJ ${countPeriods+1}. TREĆINE`; namePrefix = `${countPeriods+1}T `; }
+                    else if (countPeriods === 3) { nextLabel = "KRAJ PRODUŽETKA"; namePrefix = "ET "; }
+                    else if (countPeriods === 4) { nextLabel = "KRAJ PENALA"; namePrefix = "PEN "; isPenalMode = true; }
                 } else if (data.sport === "kosarka") {
-                    if (countPeriods < 4) nextLabel = `KRAJ ${countPeriods+1}. ČETVRTINE`;
-                    else { nextLabel = "KRAJ PRODUŽETKA"; suffix = " (ET)"; }
+                    if (countPeriods < 4) { nextLabel = `KRAJ ${countPeriods+1}. ČETVRTINE`; namePrefix = `${countPeriods+1}Q `; }
+                    else { nextLabel = "KRAJ PRODUŽETKA"; namePrefix = "ET "; }
                 }
 
                 if (nextLabel && data.status === 'live') {
                     let b = document.createElement('button'); b.className = 'btn-period'; b.innerText = nextLabel;
-                    b.onclick = () => arhivirajPeriod(suffix);
+                    b.onclick = () => arhivirajPeriod(namePrefix, isPenalMode);
                     pc.appendChild(b);
                 }
 
@@ -409,7 +411,9 @@
         function arhivirajAutomatski(winner) {
             db.ref('tereni/' + currentCourtId).once('value', snap => {
                 const c = snap.val();
-                let rez = `${c.scoreA}:${c.scoreB}`;
+                let arhivaArr = c.arhiva ? c.arhiva.split(', ') : [];
+                let setNum = arhivaArr.length + 1;
+                let rez = `S${setNum} ${c.scoreA}:${c.scoreB}`;
                 let novaArhiva = c.arhiva ? c.arhiva + ", " + rez : rez;
                 let updateData = { arhiva: novaArhiva, scoreA: 0, scoreB: 0 };
                 updateData[winner] = (c[winner] || 0) + 1;
@@ -434,15 +438,14 @@
             });
         }
 
-        function arhivirajPeriod(labelSuffix) {
+        function arhivirajPeriod(namePrefix, isPenal) {
             db.ref('tereni/' + currentCourtId).once('value', snap => {
                 const c = snap.val();
                 let arhivaArr = c.arhiva ? c.arhiva.split(', ') : [];
                 let sumA = 0; let sumB = 0;
                 
-                // Izbacujemo ET i P oznake iz racunice zbira za košarku/hokej
                 arhivaArr.forEach(par => { 
-                    let cisto = par.replace(' (ET)', '').replace(' (P)', '');
+                    let cisto = par.split(' ')[1] || par;
                     let parts = cisto.split(':'); 
                     if (parts.length === 2) { sumA += parseInt(parts[0]); sumB += parseInt(parts[1]); } 
                 });
@@ -450,12 +453,20 @@
                 let diffA = c.scoreA - sumA;
                 let diffB = c.scoreB - sumB;
                 
-                // Rezultat perioda (za basket/hokej razlika, za fudbal total) + oznaka ako postoji
-                let rez = (c.sport === 'kosarka' || c.sport === 'hokej') ? `${diffA}:${diffB}` : `${c.scoreA}:${c.scoreB}`;
-                let konacniRez = rez + (labelSuffix || "");
-                
-                let novaArhiva = c.arhiva ? c.arhiva + ", " + konacniRez : konacniRez;
-                db.ref('tereni/' + currentCourtId).update({ arhiva: novaArhiva });
+                if (isPenal) {
+                    // Penali se ne dodaju u glavni skor, samo u arhivu i specijalna polja
+                    db.ref('tereni/' + currentCourtId).update({
+                        arhiva: c.arhiva + ", " + namePrefix + c.scoreA + ":" + c.scoreB,
+                        penA: c.scoreA,
+                        penB: c.scoreB,
+                        scoreA: sumA, // Vraćamo na skor pre penala
+                        scoreB: sumB
+                    });
+                } else {
+                    let rezPerioda = (c.sport === 'kosarka' || c.sport === 'hokej') ? `${diffA}:${diffB}` : `${c.scoreA}:${c.scoreB}`;
+                    let novaArhiva = c.arhiva ? c.arhiva + ", " + namePrefix + rezPerioda : namePrefix + rezPerioda;
+                    db.ref('tereni/' + currentCourtId).update({ arhiva: novaArhiva });
+                }
             });
         }
 
@@ -468,7 +479,7 @@
 
         function resetMatch() {
             if(confirm("Reset meča?")) {
-                db.ref('tereni/'+currentCourtId).update({ status:'slobodno', scoreA:0, scoreB:0, setA:0, setB:0, timA:'', timB:'', datum:'', arhiva:'' });
+                db.ref('tereni/'+currentCourtId).update({ status:'slobodno', scoreA:0, scoreB:0, setA:0, setB:0, timA:'', timB:'', datum:'', arhiva:'', penA:0, penB:0 });
                 zatvoriSvePanele();
             }
         }
@@ -502,12 +513,18 @@
 
         function renderujMarker(id, c) {
             const isSetBased = (c.sport === 'tenis' || c.sport === 'odbojka');
-            const mainScore = isSetBased ? `${c.setA||0}-${c.setB||0}` : `${c.scoreA||0}-${c.scoreB||0}`;
+            let displayScore = isSetBased ? `${c.setA||0}-${c.setB||0}` : `${c.scoreA||0}-${c.scoreB||0}`;
+            
+            // Ako postoje penali, dodajemo ih u zagradu
+            if (c.penA > 0 || c.penB > 0) {
+                displayScore += ` (pen. ${c.penA}:${c.penB})`;
+            }
+
             let statusLabel = "FREE", statusClass = "bg-free", matchText = "SLOBODAN TEREN", bottomRow = "";
 
             if(c.status === 'najava') { statusLabel = "NAJAVA"; statusClass = "bg-upcoming"; matchText = `${c.timA} vs ${c.timB}`; bottomRow = `<div class="score-sub-row">${c.datum}</div>`; }
-            else if(c.status === 'live') { statusLabel = "LIVE"; statusClass = "bg-live"; matchText = `${c.timA} ${mainScore} ${c.timB}${isSetBased?` <span style='color:var(--accent)'>[${c.scoreA}:${c.scoreB}]</span>`:""}`; bottomRow = c.arhiva ? `<div class="score-sub-row">${c.arhiva}</div>` : ''; }
-            else if(c.status === 'zavrseno') { statusLabel = "FT"; statusClass = "bg-ft"; matchText = `${c.timA} ${mainScore} ${c.timB}`; bottomRow = c.arhiva ? `<div class="score-sub-row">${c.arhiva}</div>` : ''; }
+            else if(c.status === 'live') { statusLabel = "LIVE"; statusClass = "bg-live"; matchText = `${c.timA} ${displayScore} ${c.timB}${isSetBased?` <span style='color:var(--accent)'>[${c.scoreA}:${c.scoreB}]</span>`:""}`; bottomRow = c.arhiva ? `<div class="score-sub-row">${c.arhiva}</div>` : ''; }
+            else if(c.status === 'zavrseno') { statusLabel = "FT"; statusClass = "bg-ft"; matchText = `${c.timA} ${displayScore} ${c.timB}`; bottomRow = c.arhiva ? `<div class="score-sub-row">${c.arhiva}</div>` : ''; }
 
             const htmlContent = `<div class="icon-container ${c.status === 'live' ? 'marker-live' : ''}" style="position:relative; font-size:32px;"><div class="map-scoreboard"><div class="score-name-row">${c.ime}</div><div class="score-main-row"><div class="status-tag ${statusClass}">${statusLabel}</div><div class="match-info">${matchText}</div></div>${bottomRow}</div>${c.emoji}</div>`;
             const u = JSON.parse(localStorage.getItem('loggedAdmin') || 'null');
