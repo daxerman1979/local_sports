@@ -43,6 +43,22 @@
         .logo { font-size: 22px; font-weight: 900; color: var(--primary); text-shadow: 0 0 10px rgba(0,0,0,1); letter-spacing: 1px; }
         .nav-btn { background: rgba(0,0,0,0.8); border: 2px solid rgba(255,255,255,0.5); color: white; padding: 6px 12px; border-radius: 15px; font-size: 11px; font-weight: 900; margin-left: 5px; }
 
+        /* SEARCH BAR STIL */
+        .search-container {
+            position: fixed; top: 60px; left: 50%; transform: translateX(-50%);
+            z-index: 2000; width: 85%; max-width: 300px; display: flex;
+        }
+        .search-container input {
+            flex-grow: 1; padding: 10px 15px; border-radius: 20px 0 0 20px;
+            border: 2px solid #fff; background: rgba(0,0,0,0.8); color: white;
+            font-weight: 900; font-size: 14px; outline: none;
+        }
+        .search-btn {
+            background: var(--primary); color: white; border: 2px solid #fff;
+            border-left: none; padding: 0 15px; border-radius: 0 20px 20px 0;
+            font-weight: 900; cursor: pointer;
+        }
+
         #admin-panel, #match-panel {
             position: fixed; bottom: 0; left: 0; width: 100%; z-index: 9999;
             background: var(--dark); color: white;
@@ -156,6 +172,11 @@
         </div>
     </header>
 
+    <div id="search-bar" class="search-container hidden">
+        <input type="text" id="city-search" placeholder="Pretraži grad...">
+        <button class="search-btn" onclick="searchCity()">🔍</button>
+    </div>
+
     <div id="admin-panel">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
             <strong style="color:var(--primary); font-weight:900;">DODAJ TEREN</strong>
@@ -229,8 +250,20 @@
         const lastZoom = localStorage.getItem('lastZoom') || 13;
 
         var map = L.map('map', { zoomControl: false, tap: false, attributionControl: false }).setView([lastLat, lastLng], lastZoom);
+        
+        // SATELIT + GRANICE
         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', { zIndex: 1000 }).addTo(map);
+
+        // DODAVANJE GRANICA DRŽAVA (GEOJSON)
+        fetch('https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson')
+            .then(res => res.json())
+            .then(data => {
+                L.geoJson(data, {
+                    style: { color: "#ffffff", weight: 1.5, fillOpacity: 0, dashArray: '5, 5' },
+                    interactive: false
+                }).addTo(map);
+            });
 
         var userMarker, tempMarker, currentCourtId = null;
         var courtMarkers = L.layerGroup().addTo(map);
@@ -250,29 +283,30 @@
             document.getElementById('startup-screen').classList.add('hidden');
             document.getElementById('map').classList.remove('map-blur');
             document.getElementById('main-header').classList.remove('hidden');
+            document.getElementById('search-bar').classList.remove('hidden');
             document.getElementById('recenter-btn').classList.remove('hidden');
             map.invalidateSize();
             osveziTereneUCentru();
         }
 
+        function searchCity() {
+            const query = document.getElementById('city-search').value;
+            if(!query) return;
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}`)
+                .then(res => res.json())
+                .then(data => {
+                    if(data.length > 0) {
+                        map.setView([data[0].lat, data[0].lon], 13);
+                    } else { alert("Grad nije pronađen."); }
+                });
+        }
+
         window.onload = function() {
             const savedAdmin = localStorage.getItem('loggedAdmin');
-            if (savedAdmin) {
-                setupAdminUI(JSON.parse(savedAdmin));
-                startExplore();
-            }
+            if (savedAdmin) { setupAdminUI(JSON.parse(savedAdmin)); startExplore(); }
         };
 
         function toggleModal(id, s) { document.getElementById(id).classList.toggle('hidden', !s); }
-
-        function registerAdmin() {
-            const nick = document.getElementById('reg-nick').value.trim();
-            const email = document.getElementById('reg-email').value.toLowerCase().trim();
-            if(!nick || !email) return;
-            db.ref('admins').push({ nickname: nick, email: email }).then(() => {
-                alert("Uspešno!"); toggleModal('register-screen', false);
-            });
-        }
 
         function loginAdmin() {
             const e = document.getElementById('login-email').value.toLowerCase().trim();
@@ -280,9 +314,7 @@
                 if (snap.exists()) {
                     const userData = Object.values(snap.val())[0];
                     localStorage.setItem('loggedAdmin', JSON.stringify(userData));
-                    setupAdminUI(userData);
-                    toggleModal('login-screen', false);
-                    osveziTereneUCentru();
+                    setupAdminUI(userData); toggleModal('login-screen', false); osveziTereneUCentru();
                 } else alert("Niste admin.");
             });
         }
@@ -295,12 +327,10 @@
         }
 
         function logoutAdmin() { 
-            isAdmin = false;
-            localStorage.removeItem('loggedAdmin'); 
+            isAdmin = false; localStorage.removeItem('loggedAdmin'); 
             document.getElementById('admin-info').classList.add('hidden');
             document.getElementById('guest-nav').classList.remove('hidden');
-            zatvoriSvePanele();
-            osveziTereneUCentru(); 
+            zatvoriSvePanele(); osveziTereneUCentru(); 
         }
 
         map.on('click', e => {
@@ -331,13 +361,11 @@
         function otvoriUredi(id) {
             currentCourtId = id;
             db.ref('tereni/' + id).once('value', snap => {
-                const c = snap.val();
-                if(!c) return;
+                const c = snap.val(); if(!c) return;
                 document.getElementById('target-court-name').innerText = c.ime;
                 document.getElementById('team-a').value = c.timA || '';
                 document.getElementById('team-b').value = c.timB || '';
                 document.getElementById('match-date').value = c.datum || '';
-                
                 setupControlView(c.status);
                 if(c.status === 'live' || c.status === 'zavrseno') setupLivePanel(c);
                 document.getElementById('match-panel').classList.add('active');
@@ -357,22 +385,16 @@
         function setupLivePanel(c) {
             const pc = document.getElementById('period-controls');
             db.ref('tereni/' + currentCourtId).on('value', snap => {
-                const data = snap.val();
-                if(!data) return;
+                const data = snap.val(); if(!data) return;
                 if (data.status === 'live') proveriPravila(data);
-
                 document.getElementById('score-a').innerText = data.scoreA || 0;
                 document.getElementById('score-b').innerText = data.scoreB || 0;
                 document.getElementById('label-team-a').innerText = data.timA || 'TIM 1';
                 document.getElementById('label-team-b').innerText = data.timB || 'TIM 2';
-                
                 pc.innerHTML = '';
                 let arhivaStr = data.arhiva || "";
                 let countPeriods = arhivaStr ? arhivaStr.split(', ').length : 0;
-
-                let nextLabel = "";
-                let namePrefix = "";
-                let isPenalMode = false;
+                let nextLabel = "", namePrefix = "", isPenalMode = false;
 
                 if (data.sport === "fudbal" || data.sport === "rukomet") {
                     if (countPeriods === 0) { nextLabel = "KRAJ 1.P"; namePrefix = "1P "; }
@@ -390,8 +412,7 @@
 
                 if (nextLabel && data.status === 'live') {
                     let b = document.createElement('button'); b.className = 'btn-period'; b.innerText = nextLabel;
-                    b.onclick = () => arhivirajPeriod(namePrefix, isPenalMode);
-                    pc.appendChild(b);
+                    b.onclick = () => arhivirajPeriod(namePrefix, isPenalMode); pc.appendChild(b);
                 }
                 renderujPoeneAdmin(data);
             });
@@ -425,18 +446,15 @@
 
         function renderujPoeneAdmin(c) {
             const bA = document.getElementById('btns-a'); const bB = document.getElementById('btns-b');
-            bA.innerHTML = bB.innerHTML = '';
-            if(c.status === 'zavrseno') return;
+            bA.innerHTML = bB.innerHTML = ''; if(c.status === 'zavrseno') return;
             let plusPoints = (c.sport === 'kosarka') ? [1, 2, 3] : [1];
             [ {id: 'scoreA', el: bA}, {id: 'scoreB', el: bB} ].forEach(side => {
                 plusPoints.forEach(p => {
                     let btn = document.createElement('button'); btn.className='score-btn'; btn.innerText='+'+p;
-                    btn.onclick = () => db.ref('tereni/'+currentCourtId+'/'+side.id).transaction(v => (v||0)+p);
-                    side.el.appendChild(btn);
+                    btn.onclick = () => db.ref('tereni/'+currentCourtId+'/'+side.id).transaction(v => (v||0)+p); side.el.appendChild(btn);
                 });
                 let min = document.createElement('button'); min.className='score-btn btn-minus'; min.innerText='-1';
-                min.onclick = () => db.ref('tereni/'+currentCourtId+'/'+side.id).transaction(v => Math.max(0, (v||0)-1));
-                side.el.appendChild(min);
+                min.onclick = () => db.ref('tereni/'+currentCourtId+'/'+side.id).transaction(v => Math.max(0, (v||0)-1)); side.el.appendChild(min);
             });
         }
 
@@ -445,21 +463,16 @@
                 const c = snap.val();
                 let arhivaArr = c.arhiva ? c.arhiva.split(', ') : [];
                 let sumA = 0; let sumB = 0;
-                
                 arhivaArr.forEach(par => { 
                     let cisto = par.split(' ')[1] || par;
                     let parts = cisto.split(':'); 
                     if (parts.length === 2) { sumA += parseInt(parts[0]); sumB += parseInt(parts[1]); } 
                 });
-                
-                let diffA = c.scoreA - sumA;
-                let diffB = c.scoreB - sumB;
-                
+                let diffA = c.scoreA - sumA; let diffB = c.scoreB - sumB;
                 if (isPenal) {
                     db.ref('tereni/' + currentCourtId).update({
                         arhiva: (c.arhiva ? c.arhiva + ", " : "") + namePrefix + c.scoreA + ":" + c.scoreB,
-                        penA: c.scoreA, penB: c.scoreB,
-                        scoreA: sumA, scoreB: sumB
+                        penA: c.scoreA, penB: c.scoreB, scoreA: sumA, scoreB: sumB
                     });
                 } else {
                     let rezPerioda = `${diffA}:${diffB}`;
@@ -473,17 +486,8 @@
             const teamAInput = document.getElementById('team-a').value;
             const teamBInput = document.getElementById('team-b').value;
             const dateInput = document.getElementById('match-date').value;
-
-            const updateObj = {
-                status: s, 
-                timA: teamAInput,
-                timB: teamBInput, 
-                datum: dateInput
-            };
-            
-            db.ref('tereni/'+currentCourtId).update(updateObj).then(() => {
-                setupControlView(s);
-            });
+            const updateObj = { status: s, timA: teamAInput, timB: teamBInput, datum: dateInput };
+            db.ref('tereni/'+currentCourtId).update(updateObj).then(() => { setupControlView(s); });
         }
 
         function resetMatch() {
@@ -494,9 +498,7 @@
         }
 
         function obrisiTeren() {
-            if(confirm("Trajno obrisati teren sa mape?")) {
-                db.ref('tereni/'+currentCourtId).remove().then(() => { zatvoriSvePanele(); });
-            }
+            if(confirm("Trajno obrisati teren sa mape?")) { db.ref('tereni/'+currentCourtId).remove().then(() => { zatvoriSvePanele(); }); }
         }
 
         function zatvoriSvePanele() {
@@ -523,11 +525,7 @@
         function renderujMarker(id, c) {
             const isSetBased = (c.sport === 'tenis' || c.sport === 'odbojka');
             let displayScore = isSetBased ? `${c.setA||0}-${c.setB||0}` : `${c.scoreA||0}-${c.scoreB||0}`;
-            
-            if (c.penA > 0 || c.penB > 0) {
-                displayScore += ` (pen. ${c.penA}:${c.penB})`;
-            }
-
+            if (c.penA > 0 || c.penB > 0) { displayScore += ` (pen. ${c.penA}:${c.penB})`; }
             let statusLabel = "FREE", statusClass = "bg-free", matchText = "SLOBODAN TEREN", bottomRow = "";
 
             if(c.status === 'najava') { statusLabel = "NAJAVA"; statusClass = "bg-upcoming"; matchText = `${c.timA} vs ${c.timB}`; bottomRow = `<div class="score-sub-row">${c.datum}</div>`; }
