@@ -63,7 +63,6 @@
         .btn-minus { background: #c0392b !important; }
         .btn-period { width: 100%; background: var(--blue); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: 900; margin-top: 10px; text-transform: uppercase; font-size: 11px; }
 
-        /* ULTRA JASAN IZGLED KARTICE */
         .map-scoreboard {
             position: absolute; bottom: 45px; left: 50%; transform: translateX(-50%);
             display: flex; flex-direction: column; 
@@ -286,7 +285,9 @@
             db.ref('admins').orderByChild('email').equalTo(e).once('value', snap => {
                 if (snap.exists()) {
                     localStorage.setItem('loggedAdmin', JSON.stringify(Object.values(snap.val())[0]));
-                    location.reload(); 
+                    setupAdminUI(Object.values(snap.val())[0]);
+                    toggleModal('login-screen', false);
+                    osveziTereneUCentru();
                 } else alert("Niste admin.");
             });
         }
@@ -298,7 +299,14 @@
             document.getElementById('admin-name').innerText = u.nickname;
         }
 
-        function logoutAdmin() { localStorage.removeItem('loggedAdmin'); location.reload(); }
+        function logoutAdmin() { 
+            isAdmin = false;
+            localStorage.removeItem('loggedAdmin'); 
+            document.getElementById('admin-info').classList.add('hidden');
+            document.getElementById('guest-nav').classList.remove('hidden');
+            zatvoriSvePanele();
+            osveziTereneUCentru(); 
+        }
 
         map.on('click', e => {
             if (!isAdmin) return;
@@ -535,7 +543,8 @@
                 </div>
             `;
             
-            const u = JSON.parse(localStorage.getItem('loggedAdmin'));
+            const uStr = localStorage.getItem('loggedAdmin');
+            const u = uStr ? JSON.parse(uStr) : null;
             const isOwner = isAdmin && u && c.vlasnik === u.email;
 
             L.marker([c.lat, c.lng], {
