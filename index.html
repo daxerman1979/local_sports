@@ -63,42 +63,43 @@
         .btn-minus { background: #c0392b !important; }
         .btn-period { width: 100%; background: var(--blue); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; margin-top: 10px; text-transform: uppercase; font-size: 11px; }
 
-        /* REVIDIRAN DIZAJN KARTICE NA MAPI */
+        /* POTPUNO NOVI IZGLED KARTICE */
         .map-scoreboard {
-            position: absolute; bottom: 35px; left: 50%; transform: translateX(-50%);
-            display: flex; flex-direction: column; background: rgba(0,0,0,0.96);
-            color: white; border-radius: 8px; overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.4);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.8);
-            min-width: 120px; z-index: 1000;
+            position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+            display: flex; flex-direction: column; width: 140px;
+            background: #000; border-radius: 10px; border: 2px solid rgba(255,255,255,0.4);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.9); overflow: hidden; z-index: 1000;
         }
         .score-name-row {
-            min-height: 16px; background: rgba(255,255,255,0.18); font-size: 9px;
-            display: flex; align-items: center; justify-content: center;
-            color: #fff; text-transform: uppercase; font-weight: 900;
-            padding: 3px 10px; border-bottom: 1px solid rgba(255,255,255,0.15);
-            letter-spacing: 0.5px; text-align: center;
+            background: #222; color: #fff; font-size: 9px; font-weight: 900;
+            padding: 5px 4px; text-align: center; border-bottom: 1px solid #444;
+            text-transform: uppercase; line-height: 1.1;
         }
-        .score-main-row { 
-            display: flex; align-items: center; min-height: 24px; 
-            white-space: nowrap; font-size: 12px; font-weight: bold;
+        .score-main-row {
+            display: flex; flex-direction: row; align-items: center; background: #111;
         }
-        .score-sub-row { 
-            display: flex; justify-content: center; align-items: center; 
-            padding: 4px 6px; background: rgba(0,0,0,0.5); 
-            font-size: 9px; color: #ddd; border-top: 1px solid rgba(255,255,255,0.1);
-            min-height: 14px; white-space: normal; line-height: 1.2;
+        .status-tag {
+            font-size: 8px; font-weight: 900; padding: 8px 4px; color: #fff;
+            text-transform: uppercase; writing-mode: vertical-lr; transform: rotate(180deg);
+            text-align: center; border-left: 1px solid rgba(255,255,255,0.1);
         }
-        
-        .status-part { padding: 0 6px; height: 100%; display: flex; align-items: center; font-weight: 900; font-size: 8px; text-transform: uppercase; min-height: 24px; }
-        .bg-upcoming { background: #2ecc71; }
-        .bg-live { background: #e74c3c; animation: blink 1s infinite; }
-        .bg-ft { background: #555; }
-        .bg-free { background: #333; }
+        .match-info {
+            flex-grow: 1; padding: 6px; text-align: center; color: #fff; font-weight: bold; font-size: 11px;
+        }
+        .score-sub-row {
+            background: #1a1a1a; color: #aaa; font-size: 8px; padding: 4px;
+            text-align: center; border-top: 1px solid #333; white-space: normal;
+            word-wrap: break-word; line-height: 1.3;
+        }
 
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        .bg-upcoming { background: var(--accent) !important; }
+        .bg-live { background: var(--primary) !important; animation: blink 1s infinite; }
+        .bg-ft { background: #555 !important; }
+        .bg-free { background: var(--blue) !important; }
+
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
         .icon-container { transition: all 0.3s ease; }
-        .marker-live { filter: drop-shadow(0 0 10px white) !important; }
+        .marker-live { filter: drop-shadow(0 0 15px white) !important; }
         
         input { width: 100%; padding: 14px; margin: 8px 0; border: 1px solid #ddd; border-radius: 12px; font-size: 16px; box-sizing: border-box; background: #f9f9f9; }
         .btn-action { width: 100%; background: var(--primary); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: bold; font-size: 16px; margin-top: 5px; }
@@ -467,19 +468,19 @@
             if(tempMarker) map.removeLayer(tempMarker);
         }
 
-        // POPRAVLJENO: Centriranje i filtriranje 20km
+        // NOVO: OSVEŽAVANJE NA 20KM OD CENTRA EKRANA
         function osveziTereneUCentru() {
-            const currentCenter = map.getCenter();
+            const centarEkrana = map.getCenter();
             db.ref('tereni').off();
             db.ref('tereni').on('value', snap => {
                 courtMarkers.clearLayers();
                 const data = snap.val();
                 for (let id in data) { 
                     const c = data[id];
-                    const courtPos = L.latLng(c.lat, c.lng);
-                    const distance = currentCenter.distanceTo(courtPos); // U metrima
+                    const courtLatLng = L.latLng(c.lat, c.lng);
+                    const distanca = centarEkrana.distanceTo(courtLatLng);
                     
-                    if (distance <= 20000) { // 20km
+                    if (distanca <= 20000) { // Samo tereni u krugu od 20km
                         renderujMarker(id, c); 
                     }
                 }
@@ -490,42 +491,54 @@
             const arh = c.arhiva ? c.arhiva : "";
             const isSetBased = (c.sport === 'tenis' || c.sport === 'odbojka');
             const mainScore = isSetBased ? `${c.setA||0}-${c.setB||0}` : `${c.scoreA||0}-${c.scoreB||0}`;
-            let sb = ""; let stClass = "";
             
+            let statusLabel = "";
+            let statusClass = "";
+            let matchText = "";
+            let bottomRow = "";
+
             if(c.status === 'najava') {
-                sb = `<div class="map-scoreboard">
-                        <div class="score-name-row">${c.ime}</div>
-                        <div class="score-main-row"><div class="status-part bg-upcoming">NAJAVA</div><div style="padding:0 8px;">${c.timA}-${c.timB}</div></div>
-                        <div class="score-sub-row">${c.datum}</div>
-                      </div>`;
+                statusLabel = "NAJAVA";
+                statusClass = "bg-upcoming";
+                matchText = `${c.timA} vs ${c.timB}`;
+                bottomRow = `<div class="score-sub-row">${c.datum}</div>`;
             } else if(c.status === 'live') {
-                stClass = "marker-live";
-                let currentPoints = isSetBased ? ` <small style="color:var(--accent); font-weight:bold;">[${c.scoreA}:${c.scoreB}]</small>` : "";
-                sb = `<div class="map-scoreboard">
-                        <div class="score-name-row">${c.ime}</div>
-                        <div class="score-main-row"><div class="status-part bg-live">LIVE</div><div style="padding:0 8px;">${c.timA} ${mainScore}${currentPoints} ${c.timB}</div></div>
-                        ${arh ? `<div class="score-sub-row">(${arh})</div>` : ''}
-                      </div>`;
+                statusLabel = "LIVE";
+                statusClass = "bg-live";
+                let currentPoints = isSetBased ? `<br><span style="color:var(--accent)">[${c.scoreA}:${c.scoreB}]</span>` : "";
+                matchText = `${c.timA} ${mainScore} ${c.timB}${currentPoints}`;
+                bottomRow = arh ? `<div class="score-sub-row">${arh}</div>` : '';
             } else if(c.status === 'zavrseno') {
-                stClass = "marker-ft";
-                sb = `<div class="map-scoreboard">
-                        <div class="score-name-row">${c.ime}</div>
-                        <div class="score-main-row"><div class="status-part bg-ft">FT</div><div style="padding:0 8px;">${c.timA} ${mainScore} ${c.timB}</div></div>
-                        ${arh ? `<div class="score-sub-row">(${arh})</div>` : ''}
-                      </div>`;
+                statusLabel = "FT";
+                statusClass = "bg-ft";
+                matchText = `${c.timA} ${mainScore} ${c.timB}`;
+                bottomRow = arh ? `<div class="score-sub-row">${arh}</div>` : '';
             } else {
-                sb = `<div class="map-scoreboard">
-                        <div class="score-name-row">${c.ime}</div>
-                        <div class="score-main-row"><div class="status-part bg-free">TEREN</div><div style="padding:0 8px; font-size:8px; color:#aaa;">SLOBODNO</div></div>
-                      </div>`;
+                statusLabel = "FREE";
+                statusClass = "bg-free";
+                matchText = "SLOBODAN TEREN";
             }
+
+            const htmlContent = `
+                <div class="icon-container ${c.status === 'live' ? 'marker-live' : ''}" style="position:relative; font-size:30px;">
+                    <div class="map-scoreboard">
+                        <div class="score-name-row">${c.ime}</div>
+                        <div class="score-main-row">
+                            <div class="status-tag ${statusClass}">${statusLabel}</div>
+                            <div class="match-info">${matchText}</div>
+                        </div>
+                        ${bottomRow}
+                    </div>
+                    ${c.emoji}
+                </div>
+            `;
             
             const u = JSON.parse(localStorage.getItem('loggedAdmin'));
             const isOwner = isAdmin && u && c.vlasnik === u.email;
 
             L.marker([c.lat, c.lng], {
-                icon: L.divIcon({ html: `<div class="icon-container ${stClass}" style="position:relative; font-size:28px;">${sb}${c.emoji}</div>`, iconAnchor:[14,14], className:'' })
-            }).bindPopup(`<div style="text-align:center;"><b>${c.ime}</b>${isOwner ? `<br><button onclick="otvoriUredi('${id}')" style="width:100%; margin-top:10px; padding:5px; background:#444; color:white; border:none; border-radius:5px;">UREDI</button>` : ''}</div>`).addTo(courtMarkers);
+                icon: L.divIcon({ html: htmlContent, iconAnchor:[15,15], className:'' })
+            }).bindPopup(`<div style="text-align:center;"><b>${c.ime}</b>${isOwner ? `<br><button onclick="otvoriUredi('${id}')" style="width:100%; margin-top:10px; padding:8px; background:#444; color:white; border:none; border-radius:5px; font-weight:bold;">UREDI LOKACIJU</button>` : ''}</div>`).addTo(courtMarkers);
         }
 
         function locirajMe() {
