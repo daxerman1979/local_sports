@@ -43,20 +43,24 @@
         .logo { font-size: 22px; font-weight: 900; color: var(--primary); text-shadow: 0 0 10px rgba(0,0,0,1); letter-spacing: 1px; }
         .nav-btn { background: rgba(0,0,0,0.8); border: 2px solid rgba(255,255,255,0.5); color: white; padding: 6px 12px; border-radius: 15px; font-size: 11px; font-weight: 900; margin-left: 5px; }
 
-        /* SEARCH BAR STIL */
-        .search-container {
-            position: fixed; top: 60px; left: 50%; transform: translateX(-50%);
-            z-index: 2000; width: 85%; max-width: 300px; display: flex;
+        /* NOVI DISKRETNI SEARCH */
+        .search-wrapper {
+            position: fixed; top: 70px; right: 15px; z-index: 2000;
+            display: flex; align-items: center; justify-content: flex-end;
+            transition: all 0.4s ease;
         }
-        .search-container input {
-            flex-grow: 1; padding: 10px 15px; border-radius: 20px 0 0 20px;
-            border: 2px solid #fff; background: rgba(0,0,0,0.8); color: white;
-            font-weight: 900; font-size: 14px; outline: none;
+        .search-input {
+            width: 0; opacity: 0; padding: 8px 0; border: none; border-radius: 20px;
+            background: rgba(0,0,0,0.9); color: white; font-weight: 900;
+            transition: all 0.4s ease; outline: none; border: 2px solid transparent;
         }
-        .search-btn {
-            background: var(--primary); color: white; border: 2px solid #fff;
-            border-left: none; padding: 0 15px; border-radius: 0 20px 20px 0;
-            font-weight: 900; cursor: pointer;
+        .search-input.expanded {
+            width: 180px; opacity: 1; padding: 8px 15px; border: 2px solid #fff; margin-right: 5px;
+        }
+        .search-toggle-btn {
+            width: 38px; height: 38px; background: rgba(0,0,0,0.8); border: 2px solid #fff;
+            color: white; border-radius: 50%; display: flex; justify-content: center;
+            align-items: center; cursor: pointer; font-size: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
 
         #admin-panel, #match-panel {
@@ -172,9 +176,9 @@
         </div>
     </header>
 
-    <div id="search-bar" class="search-container hidden">
-        <input type="text" id="city-search" placeholder="Pretraži grad...">
-        <button class="search-btn" onclick="searchCity()">🔍</button>
+    <div id="search-bar" class="search-wrapper hidden">
+        <input type="text" id="city-search" class="search-input" placeholder="Grad...">
+        <div class="search-toggle-btn" onclick="toggleSearch()">🔍</div>
     </div>
 
     <div id="admin-panel">
@@ -245,24 +249,14 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        const lastLat = localStorage.getItem('lastLat') || 44.8178;
-        const lastLng = localStorage.getItem('lastLng') || 20.4489;
-        const lastZoom = localStorage.getItem('lastZoom') || 13;
-
-        var map = L.map('map', { zoomControl: false, tap: false, attributionControl: false }).setView([lastLat, lastLng], lastZoom);
+        var map = L.map('map', { zoomControl: false, tap: false, attributionControl: false }).setView([localStorage.getItem('lastLat')||44.81, localStorage.getItem('lastLng')||20.44], localStorage.getItem('lastZoom')||13);
         
-        // SATELIT + GRANICE
         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', { zIndex: 1000 }).addTo(map);
 
-        // DODAVANJE GRANICA DRŽAVA (GEOJSON)
         fetch('https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson')
-            .then(res => res.json())
-            .then(data => {
-                L.geoJson(data, {
-                    style: { color: "#ffffff", weight: 1.5, fillOpacity: 0, dashArray: '5, 5' },
-                    interactive: false
-                }).addTo(map);
+            .then(res => res.json()).then(data => {
+                L.geoJson(data, { style: { color: "#ffffff", weight: 1.5, fillOpacity: 0, dashArray: '5, 5' }, interactive: false }).addTo(map);
             });
 
         var userMarker, tempMarker, currentCourtId = null;
@@ -285,18 +279,26 @@
             document.getElementById('main-header').classList.remove('hidden');
             document.getElementById('search-bar').classList.remove('hidden');
             document.getElementById('recenter-btn').classList.remove('hidden');
-            map.invalidateSize();
-            osveziTereneUCentru();
+            map.invalidateSize(); osveziTereneUCentru();
+        }
+
+        // NOVI TOGGLE SEARCH LOGIKA
+        function toggleSearch() {
+            const inp = document.getElementById('city-search');
+            if(inp.classList.contains('expanded')) {
+                if(inp.value) { searchCity(); }
+                else { inp.classList.remove('expanded'); }
+            } else { inp.classList.add('expanded'); inp.focus(); }
         }
 
         function searchCity() {
             const query = document.getElementById('city-search').value;
             if(!query) return;
             fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}`)
-                .then(res => res.json())
-                .then(data => {
-                    if(data.length > 0) {
+                .then(res => res.json()).then(data => {
+                    if(data.length > 0) { 
                         map.setView([data[0].lat, data[0].lon], 13);
+                        document.getElementById('city-search').classList.remove('expanded');
                     } else { alert("Grad nije pronađen."); }
                 });
         }
