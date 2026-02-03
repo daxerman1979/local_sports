@@ -337,24 +337,30 @@
                 document.getElementById('team-a').value = c.timA || '';
                 document.getElementById('team-b').value = c.timB || '';
                 document.getElementById('match-date').value = c.datum || '';
+                
+                // Prikaz panela zavisno od statusa
+                setupControlView(c.status);
+                
                 if(c.status === 'live' || c.status === 'zavrseno') setupLivePanel(c);
-                else {
-                    document.getElementById('match-setup').classList.remove('hidden');
-                    document.getElementById('match-live').classList.add('hidden');
-                }
                 document.getElementById('match-panel').classList.add('active');
             });
         }
 
+        function setupControlView(status) {
+            if (status === 'live' || status === 'zavrseno') {
+                document.getElementById('match-setup').classList.add('hidden');
+                document.getElementById('match-live').classList.remove('hidden');
+            } else {
+                document.getElementById('match-setup').classList.remove('hidden');
+                document.getElementById('match-live').classList.add('hidden');
+            }
+        }
+
         function setupLivePanel(c) {
-            document.getElementById('match-setup').classList.add('hidden');
-            document.getElementById('match-live').classList.remove('hidden');
             const pc = document.getElementById('period-controls');
-            
             db.ref('tereni/' + currentCourtId).on('value', snap => {
                 const data = snap.val();
                 if(!data) return;
-                
                 if (data.status === 'live') proveriPravila(data);
 
                 document.getElementById('score-a').innerText = data.scoreA || 0;
@@ -363,7 +369,6 @@
                 document.getElementById('label-team-b').innerText = data.timB || 'TIM 2';
                 
                 pc.innerHTML = '';
-                
                 let arhivaStr = data.arhiva || "";
                 let countPeriods = arhivaStr ? arhivaStr.split(', ').length : 0;
 
@@ -390,7 +395,6 @@
                     b.onclick = () => arhivirajPeriod(namePrefix, isPenalMode);
                     pc.appendChild(b);
                 }
-
                 renderujPoeneAdmin(data);
             });
         }
@@ -444,25 +448,25 @@
                 let arhivaArr = c.arhiva ? c.arhiva.split(', ') : [];
                 let sumA = 0; let sumB = 0;
                 
+                // Racunamo zbir svega što je do sada bilo u arhivi
                 arhivaArr.forEach(par => { 
                     let cisto = par.split(' ')[1] || par;
                     let parts = cisto.split(':'); 
                     if (parts.length === 2) { sumA += parseInt(parts[0]); sumB += parseInt(parts[1]); } 
                 });
                 
+                // Razlika postignuta u ovom konkretnom periodu
                 let diffA = c.scoreA - sumA;
                 let diffB = c.scoreB - sumB;
                 
                 if (isPenal) {
-                    // Penali se ne dodaju u glavni skor, samo u arhivu i specijalna polja
                     db.ref('tereni/' + currentCourtId).update({
                         arhiva: c.arhiva + ", " + namePrefix + c.scoreA + ":" + c.scoreB,
-                        penA: c.scoreA,
-                        penB: c.scoreB,
-                        scoreA: sumA, // Vraćamo na skor pre penala
-                        scoreB: sumB
+                        penA: c.scoreA, penB: c.scoreB,
+                        scoreA: sumA, scoreB: sumB
                     });
                 } else {
+                    // Za fudbal/rukomet uvek pišemo trenutni total, za hokej/basket samo razliku tog dela
                     let rezPerioda = (c.sport === 'kosarka' || c.sport === 'hokej') ? `${diffA}:${diffB}` : `${c.scoreA}:${c.scoreB}`;
                     let novaArhiva = c.arhiva ? c.arhiva + ", " + namePrefix + rezPerioda : namePrefix + rezPerioda;
                     db.ref('tereni/' + currentCourtId).update({ arhiva: novaArhiva });
@@ -471,9 +475,16 @@
         }
 
         function updateStatus(s) {
-            db.ref('tereni/'+currentCourtId).update({
-                status: s, timA: document.getElementById('team-a').value,
-                timB: document.getElementById('team-b').value, datum: document.getElementById('match-date').value
+            const updateObj = {
+                status: s, 
+                timA: document.getElementById('team-a').value,
+                timB: document.getElementById('team-b').value, 
+                datum: document.getElementById('match-date').value
+            };
+            
+            db.ref('tereni/'+currentCourtId).update(updateObj).then(() => {
+                setupControlView(s); // Automatska promena prikaza unutar panela
+                if (s === 'live') setupLivePanel(updateObj);
             });
         }
 
@@ -515,7 +526,6 @@
             const isSetBased = (c.sport === 'tenis' || c.sport === 'odbojka');
             let displayScore = isSetBased ? `${c.setA||0}-${c.setB||0}` : `${c.scoreA||0}-${c.scoreB||0}`;
             
-            // Ako postoje penali, dodajemo ih u zagradu
             if (c.penA > 0 || c.penB > 0) {
                 displayScore += ` (pen. ${c.penA}:${c.penB})`;
             }
