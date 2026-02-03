@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>WHOPLAY - Smart Sports Map</title>
+    <title>LOCALIVE - Smart Sports Map</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
@@ -40,7 +40,7 @@
             pointer-events: none; box-sizing: border-box;
         }
         .logo, .nav-links { pointer-events: auto; }
-        .logo { font-size: 20px; font-weight: 900; color: var(--primary); text-shadow: 0 0 10px rgba(0,0,0,1); }
+        .logo { font-size: 22px; font-weight: 900; color: var(--primary); text-shadow: 0 0 10px rgba(0,0,0,1); letter-spacing: 1px; }
         .nav-btn { background: rgba(0,0,0,0.8); border: 2px solid rgba(255,255,255,0.5); color: white; padding: 6px 12px; border-radius: 15px; font-size: 11px; font-weight: 900; margin-left: 5px; }
 
         #admin-panel, #match-panel {
@@ -117,7 +117,7 @@
 
     <div id="startup-screen">
         <div class="startup-card">
-            <h1>WHOPLAY</h1>
+            <h1>LOCALIVE</h1>
             <p style="font-weight:900;">Pronađi igru u svom gradu.</p>
             <button class="btn-start" style="background:var(--primary); color:white;" onclick="toggleModal('login-screen', true)">LOG IN ADMIN</button>
             <button class="btn-start" style="background:#555; color:white;" onclick="toggleModal('register-screen', true)">REGISTRACIJA</button>
@@ -145,7 +145,7 @@
     </div>
 
     <header id="main-header" class="hidden">
-        <div class="logo">WHOPLAY</div>
+        <div class="logo">LOCALIVE</div>
         <div id="guest-nav" class="nav-links">
             <button class="nav-btn" onclick="toggleModal('register-screen', true)">Reg</button>
             <button class="nav-btn" onclick="toggleModal('login-screen', true)">Login</button>
@@ -284,8 +284,9 @@
             const e = document.getElementById('login-email').value.toLowerCase().trim();
             db.ref('admins').orderByChild('email').equalTo(e).once('value', snap => {
                 if (snap.exists()) {
-                    localStorage.setItem('loggedAdmin', JSON.stringify(Object.values(snap.val())[0]));
-                    setupAdminUI(Object.values(snap.val())[0]);
+                    const userData = Object.values(snap.val())[0];
+                    localStorage.setItem('loggedAdmin', JSON.stringify(userData));
+                    setupAdminUI(userData);
                     toggleModal('login-screen', false);
                     osveziTereneUCentru();
                 } else alert("Niste admin.");
