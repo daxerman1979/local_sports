@@ -52,7 +52,7 @@
         }
         .active { transform: translateY(0) !important; }
 
-        .sport-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 15px 0; max-height: 160px; overflow-y: auto; }
+        .sport-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 15px 0; max-height: 160px; overflow-y: auto; }
         .sport-item { background: #1a1a1a; border: 2px solid #333; border-radius: 12px; padding: 10px 5px; text-align: center; font-size: 20px; }
         .sport-item.selected { border-color: var(--primary); background: rgba(231, 76, 60, 0.2); }
         .sport-item span { display: block; font-size: 8px; margin-top: 4px; color: #fff; text-transform: uppercase; font-weight: 900; }
@@ -169,12 +169,6 @@
             <div class="sport-item" onclick="selectSport('🏐', 'odbojka', this)">🏐<span>Odbojka</span></div>
             <div class="sport-item" onclick="selectSport('🤾', 'rukomet', this)">🤾<span>Rukomet</span></div>
             <div class="sport-item" onclick="selectSport('🏒', 'hokej', this)">🏒<span>Hokej</span></div>
-            <div class="sport-item" onclick="selectSport('🥊', 'boks', this)">🥊<span>Boks</span></div>
-            <div class="sport-item" onclick="selectSport('🎱', 'bilijar', this)">🎱<span>Bilijar</span></div>
-            <div class="sport-item" onclick="selectSport('🏊', 'bazen', this)">🏊<span>Bazen</span></div>
-            <div class="sport-item" onclick="selectSport('🏃', 'staza', this)">🏃<span>Staza</span></div>
-            <div class="sport-item" onclick="selectSport('🏋️', 'gym', this)">🏋️<span>Gym</span></div>
-            <div class="sport-item" onclick="selectSport('🧩', 'drugo', this)">🧩<span>Drugo</span></div>
         </div>
         <button class="btn-action" style="background:var(--accent)" onclick="saveCourt()">SAČUVAJ LOKACIJU</button>
     </div>
@@ -369,19 +363,31 @@
                 document.getElementById('label-team-b').innerText = data.timB || 'TIM 2';
                 
                 pc.innerHTML = '';
-                if(data.status !== 'zavrseno') {
-                    let btnLabel = "";
-                    if(["fudbal", "rukomet"].includes(data.sport)) btnLabel = "KRAJ 1.P";
-                    else if(data.sport === "hokej") btnLabel = "KRAJ TREĆINE";
-                    else if(data.sport === "kosarka") btnLabel = "KRAJ ČETVRTINE";
-                    
-                    if(btnLabel) {
-                        let b = document.createElement('button'); b.className = 'btn-period'; b.innerText = btnLabel;
-                        b.onclick = () => arhivirajPeriod();
-                        pc.appendChild(b);
-                    }
-                    document.getElementById('ft-btn').classList.remove('hidden');
-                } else { document.getElementById('ft-btn').classList.add('hidden'); }
+                
+                let arhivaStr = data.arhiva || "";
+                let countPeriods = arhivaStr ? arhivaStr.split(', ').length : 0;
+
+                let nextLabel = "";
+                if (data.sport === "fudbal" || data.sport === "rukomet") {
+                    if (countPeriods === 0) nextLabel = "KRAJ 1.P";
+                    else if (countPeriods === 1) nextLabel = "KRAJ 2.P (FT)";
+                    else if (countPeriods === 2) nextLabel = "KRAJ PRODUŽETKA";
+                    else if (countPeriods === 3) nextLabel = "KRAJ PENALA";
+                } else if (data.sport === "hokej") {
+                    if (countPeriods < 3) nextLabel = `KRAJ ${countPeriods+1}. TREĆINE`;
+                    else if (countPeriods === 3) nextLabel = "KRAJ PRODUŽETKA";
+                    else if (countPeriods === 4) nextLabel = "KRAJ PENALA";
+                } else if (data.sport === "kosarka") {
+                    if (countPeriods < 4) nextLabel = `KRAJ ${countPeriods+1}. ČETVRTINE`;
+                    else nextLabel = "KRAJ PRODUŽETKA";
+                }
+
+                if (nextLabel && data.status === 'live') {
+                    let b = document.createElement('button'); b.className = 'btn-period'; b.innerText = nextLabel;
+                    b.onclick = () => arhivirajPeriod();
+                    pc.appendChild(b);
+                }
+
                 renderujPoeneAdmin(data);
             });
         }
@@ -389,15 +395,12 @@
         function proveriPravila(c) {
             let sA = c.scoreA || 0; let sB = c.scoreB || 0;
             let setA = c.setA || 0; let setB = c.setB || 0;
-            let finishSet = false;
             if (c.sport === 'odbojka') {
                 let limit = (setA + setB === 4) ? 15 : 25;
-                if ((sA >= limit || sB >= limit) && Math.abs(sA - sB) >= 2) finishSet = true;
-                if (finishSet) arhivirajAutomatski(sA > sB ? 'setA' : 'setB');
+                if ((sA >= limit || sB >= limit) && Math.abs(sA - sB) >= 2) arhivirajAutomatski(sA > sB ? 'setA' : 'setB');
                 if (setA >= 3 || setB >= 3) updateStatus('zavrseno');
             } else if (c.sport === 'tenis') {
-                if (((sA >= 6 || sB >= 6) && Math.abs(sA - sB) >= 2) || sA === 7 || sB === 7) finishSet = true;
-                if (finishSet) arhivirajAutomatski(sA > sB ? 'setA' : 'setB');
+                if (((sA >= 6 || sB >= 6) && Math.abs(sA - sB) >= 2) || sA === 7 || sB === 7) arhivirajAutomatski(sA > sB ? 'setA' : 'setB');
                 if (setA >= 2 || setB >= 2) updateStatus('zavrseno');
             }
         }
@@ -433,21 +436,13 @@
         function arhivirajPeriod() {
             db.ref('tereni/' + currentCourtId).once('value', snap => {
                 const c = snap.val();
-                let sA = c.scoreA || 0; let sB = c.scoreB || 0;
                 let arhivaArr = c.arhiva ? c.arhiva.split(', ') : [];
-                
                 let sumA = 0; let sumB = 0;
-                arhivaArr.forEach(par => {
-                    let parts = par.split(':');
-                    if (parts.length === 2) {
-                        sumA += parseInt(parts[0]); sumB += parseInt(parts[1]);
-                    }
-                });
-
-                let diffA = sA - sumA;
-                let diffB = sB - sumB;
+                arhivaArr.forEach(par => { let parts = par.split(':'); if (parts.length === 2) { sumA += parseInt(parts[0]); sumB += parseInt(parts[1]); } });
                 
-                let rez = (c.sport === 'kosarka' || c.sport === 'hokej') ? `${diffA}:${diffB}` : `${sA}:${sB}`;
+                let diffA = c.scoreA - sumA;
+                let diffB = c.scoreB - sumB;
+                let rez = (c.sport === 'kosarka' || c.sport === 'hokej') ? `${diffA}:${diffB}` : `${c.scoreA}:${c.scoreB}`;
                 let novaArhiva = c.arhiva ? c.arhiva + ", " + rez : rez;
                 db.ref('tereni/' + currentCourtId).update({ arhiva: novaArhiva });
             });
@@ -457,7 +452,7 @@
             db.ref('tereni/'+currentCourtId).update({
                 status: s, timA: document.getElementById('team-a').value,
                 timB: document.getElementById('team-b').value, datum: document.getElementById('match-date').value
-            }).then(() => { otvoriUredi(currentCourtId); });
+            });
         }
 
         function resetMatch() {
@@ -489,68 +484,23 @@
                 for (let id in data) { 
                     const c = data[id];
                     const courtLatLng = L.latLng(c.lat, c.lng);
-                    const distanca = centarEkrana.distanceTo(courtLatLng);
-                    
-                    if (distanca <= 20000) { 
-                        renderujMarker(id, c); 
-                    }
+                    if (centarEkrana.distanceTo(courtLatLng) <= 20000) renderujMarker(id, c);
                 }
             });
         }
 
         function renderujMarker(id, c) {
-            const arh = c.arhiva ? c.arhiva : "";
             const isSetBased = (c.sport === 'tenis' || c.sport === 'odbojka');
             const mainScore = isSetBased ? `${c.setA||0}-${c.setB||0}` : `${c.scoreA||0}-${c.scoreB||0}`;
-            
-            let statusLabel = "";
-            let statusClass = "";
-            let matchText = "";
-            let bottomRow = "";
+            let statusLabel = "FREE", statusClass = "bg-free", matchText = "SLOBODAN TEREN", bottomRow = "";
 
-            if(c.status === 'najava') {
-                statusLabel = "NAJAVA";
-                statusClass = "bg-upcoming";
-                matchText = `${c.timA} vs ${c.timB}`;
-                bottomRow = `<div class="score-sub-row">${c.datum}</div>`;
-            } else if(c.status === 'live') {
-                statusLabel = "LIVE";
-                statusClass = "bg-live";
-                let currentPoints = isSetBased ? ` <span style="color:var(--accent)">[${c.scoreA}:${c.scoreB}]</span>` : "";
-                matchText = `${c.timA} ${mainScore} ${c.timB}${currentPoints}`;
-                bottomRow = arh ? `<div class="score-sub-row">${arh}</div>` : '';
-            } else if(c.status === 'zavrseno') {
-                statusLabel = "FT";
-                statusClass = "bg-ft";
-                matchText = `${c.timA} ${mainScore} ${c.timB}`;
-                bottomRow = arh ? `<div class="score-sub-row">${arh}</div>` : '';
-            } else {
-                statusLabel = "FREE";
-                statusClass = "bg-free";
-                matchText = "SLOBODAN TEREN";
-            }
+            if(c.status === 'najava') { statusLabel = "NAJAVA"; statusClass = "bg-upcoming"; matchText = `${c.timA} vs ${c.timB}`; bottomRow = `<div class="score-sub-row">${c.datum}</div>`; }
+            else if(c.status === 'live') { statusLabel = "LIVE"; statusClass = "bg-live"; matchText = `${c.timA} ${mainScore} ${c.timB}${isSetBased?` <span style='color:var(--accent)'>[${c.scoreA}:${c.scoreB}]</span>`:""}`; bottomRow = c.arhiva ? `<div class="score-sub-row">${c.arhiva}</div>` : ''; }
+            else if(c.status === 'zavrseno') { statusLabel = "FT"; statusClass = "bg-ft"; matchText = `${c.timA} ${mainScore} ${c.timB}`; bottomRow = c.arhiva ? `<div class="score-sub-row">${c.arhiva}</div>` : ''; }
 
-            const htmlContent = `
-                <div class="icon-container ${c.status === 'live' ? 'marker-live' : ''}" style="position:relative; font-size:32px;">
-                    <div class="map-scoreboard">
-                        <div class="score-name-row">${c.ime}</div>
-                        <div class="score-main-row">
-                            <div class="status-tag ${statusClass}">${statusLabel}</div>
-                            <div class="match-info">${matchText}</div>
-                        </div>
-                        ${bottomRow}
-                    </div>
-                    ${c.emoji}
-                </div>
-            `;
-            
-            const uStr = localStorage.getItem('loggedAdmin');
-            const u = uStr ? JSON.parse(uStr) : null;
-            const isOwner = isAdmin && u && c.vlasnik === u.email;
-
-            L.marker([c.lat, c.lng], {
-                icon: L.divIcon({ html: htmlContent, iconAnchor:[16,16], className:'' })
-            }).bindPopup(`<div style="text-align:center;"><b style="font-weight:900;">${c.ime}</b>${isOwner ? `<br><button onclick="otvoriUredi('${id}')" style="width:100%; margin-top:10px; padding:10px; background:#000; color:white; border:2px solid white; border-radius:8px; font-weight:900;">UREDI</button>` : ''}</div>`).addTo(courtMarkers);
+            const htmlContent = `<div class="icon-container ${c.status === 'live' ? 'marker-live' : ''}" style="position:relative; font-size:32px;"><div class="map-scoreboard"><div class="score-name-row">${c.ime}</div><div class="score-main-row"><div class="status-tag ${statusClass}">${statusLabel}</div><div class="match-info">${matchText}</div></div>${bottomRow}</div>${c.emoji}</div>`;
+            const u = JSON.parse(localStorage.getItem('loggedAdmin') || 'null');
+            L.marker([c.lat, c.lng], { icon: L.divIcon({ html: htmlContent, iconAnchor:[16,16], className:'' }) }).bindPopup(`<div style="text-align:center;"><b style="font-weight:900;">${c.ime}</b>${isAdmin && u && c.vlasnik === u.email ? `<br><button onclick="otvoriUredi('${id}')" style="width:100%; margin-top:10px; padding:10px; background:#000; color:white; border:2px solid white; border-radius:8px; font-weight:900;">UREDI</button>` : ''}</div>`).addTo(courtMarkers);
         }
 
         function locirajMe() {
@@ -558,7 +508,6 @@
             map.on('locationfound', e => {
                 if (userMarker) userMarker.setLatLng(e.latlng);
                 else userMarker = L.marker(e.latlng, {icon: L.divIcon({className:'', html:"<div class='pulse-marker'></div>"})}).addTo(map);
-                osveziTereneUCentru();
             });
         }
     </script>
