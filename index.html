@@ -368,23 +368,24 @@
                 let countPeriods = arhivaStr ? arhivaStr.split(', ').length : 0;
 
                 let nextLabel = "";
+                let suffix = "";
                 if (data.sport === "fudbal" || data.sport === "rukomet") {
                     if (countPeriods === 0) nextLabel = "KRAJ 1.P";
                     else if (countPeriods === 1) nextLabel = "KRAJ 2.P (FT)";
-                    else if (countPeriods === 2) nextLabel = "KRAJ PRODUŽETKA";
-                    else if (countPeriods === 3) nextLabel = "KRAJ PENALA";
+                    else if (countPeriods === 2) { nextLabel = "KRAJ PRODUŽETKA"; suffix = " (ET)"; }
+                    else if (countPeriods === 3) { nextLabel = "KRAJ PENALA"; suffix = " (P)"; }
                 } else if (data.sport === "hokej") {
                     if (countPeriods < 3) nextLabel = `KRAJ ${countPeriods+1}. TREĆINE`;
-                    else if (countPeriods === 3) nextLabel = "KRAJ PRODUŽETKA";
-                    else if (countPeriods === 4) nextLabel = "KRAJ PENALA";
+                    else if (countPeriods === 3) { nextLabel = "KRAJ PRODUŽETKA"; suffix = " (ET)"; }
+                    else if (countPeriods === 4) { nextLabel = "KRAJ PENALA"; suffix = " (P)"; }
                 } else if (data.sport === "kosarka") {
                     if (countPeriods < 4) nextLabel = `KRAJ ${countPeriods+1}. ČETVRTINE`;
-                    else nextLabel = "KRAJ PRODUŽETKA";
+                    else { nextLabel = "KRAJ PRODUŽETKA"; suffix = " (ET)"; }
                 }
 
                 if (nextLabel && data.status === 'live') {
                     let b = document.createElement('button'); b.className = 'btn-period'; b.innerText = nextLabel;
-                    b.onclick = () => arhivirajPeriod();
+                    b.onclick = () => arhivirajPeriod(suffix);
                     pc.appendChild(b);
                 }
 
@@ -433,17 +434,27 @@
             });
         }
 
-        function arhivirajPeriod() {
+        function arhivirajPeriod(labelSuffix) {
             db.ref('tereni/' + currentCourtId).once('value', snap => {
                 const c = snap.val();
                 let arhivaArr = c.arhiva ? c.arhiva.split(', ') : [];
                 let sumA = 0; let sumB = 0;
-                arhivaArr.forEach(par => { let parts = par.split(':'); if (parts.length === 2) { sumA += parseInt(parts[0]); sumB += parseInt(parts[1]); } });
+                
+                // Izbacujemo ET i P oznake iz racunice zbira za košarku/hokej
+                arhivaArr.forEach(par => { 
+                    let cisto = par.replace(' (ET)', '').replace(' (P)', '');
+                    let parts = cisto.split(':'); 
+                    if (parts.length === 2) { sumA += parseInt(parts[0]); sumB += parseInt(parts[1]); } 
+                });
                 
                 let diffA = c.scoreA - sumA;
                 let diffB = c.scoreB - sumB;
+                
+                // Rezultat perioda (za basket/hokej razlika, za fudbal total) + oznaka ako postoji
                 let rez = (c.sport === 'kosarka' || c.sport === 'hokej') ? `${diffA}:${diffB}` : `${c.scoreA}:${c.scoreB}`;
-                let novaArhiva = c.arhiva ? c.arhiva + ", " + rez : rez;
+                let konacniRez = rez + (labelSuffix || "");
+                
+                let novaArhiva = c.arhiva ? c.arhiva + ", " + konacniRez : konacniRez;
                 db.ref('tereni/' + currentCourtId).update({ arhiva: novaArhiva });
             });
         }
