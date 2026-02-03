@@ -338,9 +338,12 @@
 
         function renderujPoeneAdmin(c) {
             const bA = document.getElementById('btns-a'), bB = document.getElementById('btns-b');
-            bA.innerHTML = bB.innerHTML = ''; if(c.status === 'zavrseno') return;
-            // POPRAVKA: Košarka dobija 1,2,3 - ostali samo +1
+            bA.innerHTML = bB.innerHTML = ''; 
+            if(c.status === 'zavrseno') return;
+            
+            // Definišemo poene: košarka ima 1,2,3 - svi ostali (fudbal, rukomet, hokej, tenis, odbojka) imaju +1
             let pts = (c.sport === 'kosarka') ? [1, 2, 3] : [1];
+            
             [ {id: 'scoreA', el: bA}, {id: 'scoreB', el: bB} ].forEach(side => {
                 pts.forEach(p => { 
                     let btn = document.createElement('button'); btn.className='score-btn'; btn.innerText='+'+p; 
@@ -363,7 +366,7 @@
 
         function proveriPravila(c) {
             let sA = c.scoreA||0, sB = c.scoreB||0, setA = c.setA||0, setB = c.setB||0;
-            if (c.sport === 'odbojka') { let lim = (setA + setB === 4) ? 15 : 25; if ((sA >= lim || sB >= limit) && Math.abs(sA - sB) >= 2) arhivirajAutomatski(sA > sB ? 'setA' : 'setB'); if (setA >= 3 || setB >= 3) updateStatus('zavrseno'); }
+            if (c.sport === 'odbojka') { let lim = (setA + setB === 4) ? 15 : 25; if ((sA >= lim || sB >= lim) && Math.abs(sA - sB) >= 2) arhivirajAutomatski(sA > sB ? 'setA' : 'setB'); if (setA >= 3 || setB >= 3) updateStatus('zavrseno'); }
             else if (c.sport === 'tenis') { if (((sA >= 6 || sB >= 6) && Math.abs(sA - sB) >= 2) || sA === 7 || sB === 7) arhivirajAutomatski(sA > sB ? 'setA' : 'setB'); if (setA >= 2 || setB >= 2) updateStatus('zavrseno'); }
         }
 
@@ -376,7 +379,7 @@
 
         function updateStatus(s) {
             const ud = { status: s, timA: document.getElementById('team-a').value, timB: document.getElementById('team-b').value, datum: document.getElementById('match-date').value };
-            db.ref('tereni/'+currentCourtId).update(ud).then(() => { setupControlView(s); if (s === 'live') setupLivePanel(ud); });
+            db.ref('tereni/'+currentCourtId).update(ud).then(() => { setupControlView(s); });
         }
 
         function resetMatch() { if(confirm("Reset meča?")) { db.ref('tereni/'+currentCourtId).update({ status:'slobodno', scoreA:0, scoreB:0, setA:0, setB:0, timA:'', timB:'', datum:'', arhiva:'', penA:0, penB:0 }); zatvoriSvePanele(); } }
@@ -396,7 +399,8 @@
             else if(c.status === 'live') { sL = "LIVE"; sC = "bg-live"; mT = `${c.timA} ${dS} ${c.timB}${isS?` <span style='color:var(--accent)'>[${c.scoreA}:${c.scoreB}]</span>`:""}`; bR = c.arhiva ? `<div class="score-sub-row">${c.arhiva}</div>` : ''; }
             else if(c.status === 'zavrseno') { sL = "FT"; sC = "bg-ft"; mT = `${c.timA} ${dS} ${c.timB}`; bR = c.arhiva ? `<div class="score-sub-row">${c.arhiva}</div>` : ''; }
             const html = `<div class="icon-container ${c.status === 'live' ? 'marker-live' : ''}" style="position:relative; font-size:32px;"><div class="map-scoreboard"><div class="score-name-row">${c.ime}</div><div class="score-main-row"><div class="status-tag ${sC}">${sL}</div><div class="match-info">${mT}</div></div>${bR}</div>${c.emoji}</div>`;
-            const u = JSON.parse(localStorage.getItem('loggedAdmin') || 'null');
+            const uStr = localStorage.getItem('loggedAdmin');
+            const u = uStr ? JSON.parse(uStr) : null;
             L.marker([c.lat, c.lng], { icon: L.divIcon({ html: html, iconAnchor:[16,16], className:'' }) }).bindPopup(`<div style="text-align:center;"><b style="font-weight:900;">${c.ime}</b>${isAdmin && u && c.vlasnik === u.email ? `<br><button onclick="otvoriUredi('${id}')" style="width:100%; margin-top:10px; padding:10px; background:#000; color:white; border:2px solid white; border-radius:8px; font-weight:900;">UREDI</button>` : ''}</div>`).addTo(courtMarkers);
         }
 
