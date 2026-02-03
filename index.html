@@ -78,7 +78,7 @@
 
         .live-controls { display: flex; justify-content: space-around; align-items: center; background: #1a1a1a; padding: 15px; border-radius: 15px; margin-top: 10px; border: 1px solid #333; }
         .score-display { font-size: 36px; font-weight: 900; color: var(--accent); margin: 5px 0; }
-        .score-btn { background: #333; border: 1px solid #444; color: white; padding: 8px 4px; border-radius: 6px; font-weight: 900; font-size: 12px; margin: 2px; min-width: 35px; }
+        .score-btn { background: #333; border: 1px solid #444; color: white; padding: 8px 4px; border-radius: 6px; font-weight: 900; font-size: 12px; margin: 2px; min-width: 38px; }
         .btn-minus { background: #c0392b !important; }
         .btn-period { width: 100%; background: var(--blue); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: 900; margin-top: 10px; text-transform: uppercase; font-size: 11px; }
 
@@ -339,10 +339,15 @@
         function renderujPoeneAdmin(c) {
             const bA = document.getElementById('btns-a'), bB = document.getElementById('btns-b');
             bA.innerHTML = bB.innerHTML = ''; if(c.status === 'zavrseno') return;
+            // POPRAVKA: Košarka dobija 1,2,3 - ostali samo +1
             let pts = (c.sport === 'kosarka') ? [1, 2, 3] : [1];
             [ {id: 'scoreA', el: bA}, {id: 'scoreB', el: bB} ].forEach(side => {
-                pts.forEach(p => { let btn = document.createElement('button'); btn.className='score-btn'; btn.innerText='+'+p; btn.onclick = () => db.ref('tereni/'+currentCourtId+'/'+side.id).transaction(v => (v||0)+p); side.el.appendChild(btn); });
-                let min = document.createElement('button'); min.className='score-btn btn-minus'; min.innerText='-1'; min.onclick = () => db.ref('tereni/'+currentCourtId+'/'+side.id).transaction(v => Math.max(0, (v||0)-1)); side.el.appendChild(min);
+                pts.forEach(p => { 
+                    let btn = document.createElement('button'); btn.className='score-btn'; btn.innerText='+'+p; 
+                    btn.onclick = () => db.ref('tereni/'+currentCourtId+'/'+side.id).transaction(v => (v||0)+p); side.el.appendChild(btn); 
+                });
+                let min = document.createElement('button'); min.className='score-btn btn-minus'; min.innerText='-1'; 
+                min.onclick = () => db.ref('tereni/'+currentCourtId+'/'+side.id).transaction(v => Math.max(0, (v||0)-1)); side.el.appendChild(min);
             });
         }
 
@@ -358,7 +363,7 @@
 
         function proveriPravila(c) {
             let sA = c.scoreA||0, sB = c.scoreB||0, setA = c.setA||0, setB = c.setB||0;
-            if (c.sport === 'odbojka') { let lim = (setA + setB === 4) ? 15 : 25; if ((sA >= lim || sB >= lim) && Math.abs(sA - sB) >= 2) arhivirajAutomatski(sA > sB ? 'setA' : 'setB'); if (setA >= 3 || setB >= 3) updateStatus('zavrseno'); }
+            if (c.sport === 'odbojka') { let lim = (setA + setB === 4) ? 15 : 25; if ((sA >= lim || sB >= limit) && Math.abs(sA - sB) >= 2) arhivirajAutomatski(sA > sB ? 'setA' : 'setB'); if (setA >= 3 || setB >= 3) updateStatus('zavrseno'); }
             else if (c.sport === 'tenis') { if (((sA >= 6 || sB >= 6) && Math.abs(sA - sB) >= 2) || sA === 7 || sB === 7) arhivirajAutomatski(sA > sB ? 'setA' : 'setB'); if (setA >= 2 || setB >= 2) updateStatus('zavrseno'); }
         }
 
