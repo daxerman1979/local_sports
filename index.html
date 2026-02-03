@@ -17,15 +17,14 @@
             touch-action: none; 
         }
 
-        /* MAPA I BLUR */
+        /* MAPA I BLUR FIX */
         #map { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1; transition: filter 0.8s ease; }
         .map-blur { filter: blur(15px) brightness(0.3); pointer-events: none; }
 
-        /* STARTUP SCREEN - Mora biti iznad svega */
+        /* STARTUP SCREEN */
         #startup-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 10001; display: flex; justify-content: center; align-items: center;
-            background: rgba(0,0,0,0.5); /* Lagana senka da se dugmad bolje vide */
         }
         .startup-card {
             background: white; padding: 35px 25px; border-radius: 30px;
@@ -35,7 +34,7 @@
         }
         .startup-card h1 { font-size: 30px; font-weight: 900; color: var(--primary); margin: 0 0 10px 0; }
 
-        /* UI ELEMENTI */
+        /* UI HEADER */
         header {
             position: fixed; top: 0; left: 0; width: 100%; z-index: 2000;
             display: flex; justify-content: space-between; align-items: center;
@@ -47,7 +46,7 @@
         .logo { font-size: 22px; font-weight: 900; color: var(--primary); text-shadow: 0 0 10px rgba(0,0,0,1); letter-spacing: 1px; }
         .nav-btn { background: rgba(0,0,0,0.8); border: 2px solid rgba(255,255,255,0.5); color: white; padding: 6px 12px; border-radius: 15px; font-size: 11px; font-weight: 900; margin-left: 5px; }
 
-        /* SEARCH */
+        /* DISKRETNI SEARCH */
         .search-wrapper { position: fixed; top: 70px; right: 15px; z-index: 2000; display: flex; align-items: center; }
         .search-input { width: 0; opacity: 0; padding: 8px 0; border-radius: 20px; background: rgba(0,0,0,0.9); color: white; font-weight: 900; transition: 0.4s; outline: none; border: 2px solid transparent; }
         .search-input.expanded { width: 180px; opacity: 1; padding: 8px 15px; border: 2px solid #fff; margin-right: 5px; }
@@ -61,6 +60,13 @@
         .score-back { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transform: rotateY(180deg); background: #000; display: flex; justify-content: center; align-items: center; }
         .score-back img { width: 100%; height: 100%; object-fit: cover; }
 
+        /* DIZAJN KARTICE */
+        .score-name-row { background: #fff; color: #000; font-size: 10px; font-weight: 900; padding: 6px 12px; text-align: center; border-bottom: 2px solid #000; text-transform: uppercase; }
+        .score-main-row { display: flex; background: #000; }
+        .status-tag { font-size: 9px; font-weight: 900; padding: 10px 6px; color: #fff; text-transform: uppercase; writing-mode: vertical-lr; transform: rotate(180deg); text-align: center; border-left: 2px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; }
+        .match-info { flex-grow: 1; padding: 10px 14px; text-align: center; color: #fff; font-weight: 900; font-size: 13px; white-space: nowrap; }
+        .score-sub-row { background: #111; color: #fff; font-size: 9px; padding: 5px 10px; text-align: center; border-top: 1px solid rgba(255,255,255,0.3); font-weight: 900; }
+
         /* PANELI */
         #admin-panel, #match-panel {
             position: fixed; bottom: 0; left: 0; width: 100%; z-index: 9999;
@@ -70,22 +76,16 @@
         }
         .active { transform: translateY(0) !important; }
 
-        /* SCOREBOARD ICONS & TAGS */
-        .score-name-row { background: #fff; color: #000; font-size: 10px; font-weight: 900; padding: 6px 12px; text-align: center; border-bottom: 2px solid #000; text-transform: uppercase; }
-        .score-main-row { display: flex; background: #000; }
-        .status-tag { font-size: 9px; font-weight: 900; padding: 10px 6px; color: #fff; text-transform: uppercase; writing-mode: vertical-lr; transform: rotate(180deg); text-align: center; border-left: 2px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; }
-        .match-info { flex-grow: 1; padding: 10px 14px; text-align: center; color: #fff; font-weight: 900; font-size: 13px; white-space: nowrap; }
-        .score-sub-row { background: #111; color: #fff; font-size: 9px; padding: 5px 10px; text-align: center; border-top: 1px solid rgba(255,255,255,0.3); font-weight: 900; }
-
+        .sport-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 15px 0; }
+        .sport-item { background: #1a1a1a; border: 2px solid #333; border-radius: 12px; padding: 10px 5px; text-align: center; font-size: 20px; }
+        .sport-item.selected { border-color: var(--primary); background: rgba(231, 76, 60, 0.2); }
         .score-display { font-size: 36px; font-weight: 900; color: var(--accent); }
         .score-btn { background: #333; border: 1px solid #444; color: white; padding: 8px 4px; border-radius: 6px; font-weight: 900; min-width: 38px; margin: 2px; }
         .btn-minus { background: #c0392b !important; }
         .btn-period { width: 100%; background: var(--blue); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: 900; margin-top: 10px; text-transform: uppercase; font-size: 11px; }
 
-        .bg-upcoming { background: var(--accent) !important; }
         .bg-live { background: var(--primary) !important; animation: blink 0.8s infinite; }
         .bg-ft { background: #777 !important; }
-        .bg-free { background: var(--blue) !important; }
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
         
         .circle-btn { width: 48px; height: 48px; background: white; border: 3px solid #000; border-radius: 50%; position: fixed; right: 12px; bottom: 95px; z-index: 2000; display: flex; justify-content: center; align-items: center; font-size: 22px; }
@@ -147,6 +147,14 @@
         </div>
         <input type="text" id="court-name" placeholder="Ime stadiona / hale">
         <input type="text" id="ad-url" placeholder="URL Slike Reklame (opciono)">
+        <div class="sport-grid">
+            <div class="sport-item selected" onclick="selectSport('⚽', 'fudbal', this)">⚽<span>Fudbal</span></div>
+            <div class="sport-item" onclick="selectSport('🏀', 'kosarka', this)">🏀<span>Basket</span></div>
+            <div class="sport-item" onclick="selectSport('🎾', 'tenis', this)">🎾<span>Tenis</span></div>
+            <div class="sport-item" onclick="selectSport('🏐', 'odbojka', this)">🏐<span>Odbojka</span></div>
+            <div class="sport-item" onclick="selectSport('🤾', 'rukomet', this)">🤾<span>Rukomet</span></div>
+            <div class="sport-item" onclick="selectSport('🏒', 'hokej', this)">🏒<span>Hokej</span></div>
+        </div>
         <button class="btn-action" style="background:var(--accent)" onclick="saveCourt()">SAČUVAJ LOKACIJU</button>
     </div>
 
@@ -218,11 +226,8 @@
             const nick = document.getElementById('reg-nick').value.trim();
             const email = document.getElementById('reg-email').value.toLowerCase().trim();
             if(!nick || !email) return;
-            db.ref('admins').push({ nickname: nick, email: email }).then(() => { alert("Admin registrovan!"); toggleModal('register-screen', false); });
+            db.ref('admins').push({ nickname: nick, email: email }).then(() => { alert("Registrovan!"); toggleModal('register-screen', false); });
         }
-
-        function toggleSearch() { const inp = document.getElementById('city-search'); if(inp.classList.contains('expanded')) { if(inp.value) searchCity(); else inp.classList.remove('expanded'); } else { inp.classList.add('expanded'); inp.focus(); } }
-        function searchCity() { fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${document.getElementById('city-search').value}`).then(res => res.json()).then(data => { if(data.length > 0) { map.setView([data[0].lat, data[0].lon], 13); document.getElementById('city-search').classList.remove('expanded'); } }); }
 
         function loginAdmin() {
             const e = document.getElementById('login-email').value.toLowerCase().trim();
@@ -231,14 +236,19 @@
                 else alert("Niste admin.");
             });
         }
+
         function setupAdminUI(u) { isAdmin = true; document.getElementById('admin-info').classList.remove('hidden'); document.getElementById('admin-name').innerText = u.nickname; }
         function logoutAdmin() { isAdmin = false; localStorage.removeItem('loggedAdmin'); document.getElementById('admin-info').classList.add('hidden'); zatvoriSvePanele(); osveziTereneUCentru(); }
 
         map.on('click', e => { if (!isAdmin) return; tempCoords = e.latlng; if (tempMarker) map.removeLayer(tempMarker); tempMarker = L.marker(e.latlng, { icon: L.divIcon({ html: '📍', iconSize:[30,30] }) }).addTo(map); document.getElementById('admin-panel').classList.add('active'); });
 
+        function toggleSearch() { const inp = document.getElementById('city-search'); if(inp.classList.contains('expanded')) { if(inp.value) searchCity(); else inp.classList.remove('expanded'); } else { inp.classList.add('expanded'); inp.focus(); } }
+        function searchCity() { fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${document.getElementById('city-search').value}`).then(res => res.json()).then(data => { if(data.length > 0) { map.setView([data[0].lat, data[0].lon], 13); document.getElementById('city-search').classList.remove('expanded'); } }); }
+
         function saveCourt() {
             const n = document.getElementById('court-name').value, ad = document.getElementById('ad-url').value, u = JSON.parse(localStorage.getItem('loggedAdmin'));
-            db.ref('tereni').push({ ime: n, sport: 'fudbal', emoji: '⚽', lat: tempCoords.lat, lng: tempCoords.lng, status: 'slobodno', scoreA: 0, scoreB: 0, timA: '', timB: '', arhiva: '', vlasnik: u.email, reklama: ad, penA: 0, penB: 0 }).then(() => zatvoriSvePanele());
+            if(!n || !u || !tempCoords) return;
+            db.ref('tereni').push({ ime: n, sport: selectedSport.slug, emoji: selectedSport.emoji, lat: tempCoords.lat, lng: tempCoords.lng, status: 'slobodno', scoreA: 0, scoreB: 0, timA: '', timB: '', arhiva: '', vlasnik: u.email, reklama: ad, penA: 0, penB: 0 }).then(() => zatvoriSvePanele());
         }
 
         function otvoriUredi(id) {
@@ -266,10 +276,21 @@
                 pc.innerHTML = '';
                 let arh = data.arhiva || "", count = arh ? arh.split(', ').length : 0;
                 let next = "", pref = "", isPen = false;
-                if (count === 0) { next = "KRAJ 1.P"; pref = "1P "; }
-                else if (count === 1) { next = "KRAJ 2.P (FT)"; pref = "2P "; }
-                else if (count === 2) { next = "KRAJ PRODUŽETKA"; pref = "ET "; }
-                else if (count === 3) { next = "KRAJ PENALA"; pref = "PEN "; isPen = true; }
+
+                if (data.sport === "fudbal" || data.sport === "rukomet") {
+                    if (count === 0) { next = "KRAJ 1.P"; pref = "1P "; }
+                    else if (count === 1) { next = "KRAJ 2.P (FT)"; pref = "2P "; }
+                    else if (count === 2) { next = "KRAJ PRODUŽETKA"; pref = "ET "; }
+                    else if (count === 3) { next = "KRAJ PENALA"; pref = "PEN "; isPen = true; }
+                } else if (data.sport === "hokej") {
+                    if (count < 3) { next = `KRAJ ${count+1}.T`; pref = `${count+1}T `; }
+                    else if (count === 3) { next = "KRAJ PRODUŽETKA"; pref = "ET "; }
+                    else if (count === 4) { next = "KRAJ PENALA"; pref = "PEN "; isPen = true; }
+                } else if (data.sport === "kosarka") {
+                    if (count < 4) { next = `KRAJ ${count+1}.Q`; pref = `${count+1}Q `; }
+                    else { next = "KRAJ PRODUŽETKA"; pref = "ET "; }
+                }
+
                 if (next && data.status === 'live') {
                     let b = document.createElement('button'); b.className = 'btn-period'; b.innerText = next;
                     b.onclick = () => arhivirajPeriod(pref, isPen); pc.appendChild(b);
@@ -281,9 +302,12 @@
         function renderujPoeneAdmin(c) {
             const bA = document.getElementById('btns-a'), bB = document.getElementById('btns-b');
             bA.innerHTML = bB.innerHTML = '';
+            let pts = (c.sport === 'kosarka') ? [1, 2, 3] : [1];
             [ {id: 'scoreA', el: bA}, {id: 'scoreB', el: bB} ].forEach(side => {
-                let b = document.createElement('button'); b.className='score-btn'; b.innerText='+1';
-                b.onclick = () => db.ref('tereni/'+currentCourtId+'/'+side.id).transaction(v => (v||0)+1); side.el.appendChild(b);
+                pts.forEach(p => { 
+                    let b = document.createElement('button'); b.className='score-btn'; b.innerText='+'+p; 
+                    b.onclick = () => db.ref('tereni/'+currentCourtId+'/'+side.id).transaction(v => (v||0)+p); side.el.appendChild(b); 
+                });
                 let m = document.createElement('button'); m.className='score-btn btn-minus'; m.innerText='-1';
                 m.onclick = () => db.ref('tereni/'+currentCourtId+'/'+side.id).transaction(v => Math.max(0, (v||0)-1)); side.el.appendChild(m);
             });
@@ -316,6 +340,7 @@
             const markerId = `marker-${id}`;
             let dS = `${c.scoreA}-${c.scoreB}`;
             if (c.penA > 0 || c.penB > 0) dS += ` (pen. ${c.penA}:${c.penB})`;
+
             const html = `
                 <div id="${markerId}" class="flip-container">
                     <div class="flipper">
@@ -340,6 +365,7 @@
 
         function obrisiTeren() { if(confirm("Obriši?")) db.ref('tereni/'+currentCourtId).remove().then(() => zatvoriSvePanele()); }
         function toggleModal(id, s) { document.getElementById(id).classList.toggle('hidden', !s); }
+        function selectSport(emoji, slug, el) { selectedSport = { emoji, slug }; document.querySelectorAll('.sport-item').forEach(i => i.classList.remove('selected')); el.classList.add('selected'); }
         function zatvoriSvePanele() { document.getElementById('admin-panel').classList.remove('active'); document.getElementById('match-panel').classList.remove('active'); if(tempMarker) map.removeLayer(tempMarker); }
         function locirajMe() { map.locate({setView: true, maxZoom: 16}); }
     </script>
