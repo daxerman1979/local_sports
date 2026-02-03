@@ -339,7 +339,6 @@
                 document.getElementById('match-date').value = c.datum || '';
                 
                 setupControlView(c.status);
-                
                 if(c.status === 'live' || c.status === 'zavrseno') setupLivePanel(c);
                 document.getElementById('match-panel').classList.add('active');
             });
@@ -447,7 +446,6 @@
                 let arhivaArr = c.arhiva ? c.arhiva.split(', ') : [];
                 let sumA = 0; let sumB = 0;
                 
-                // Sabiramo sve golove iz arhive da nađemo "stari" zbir
                 arhivaArr.forEach(par => { 
                     let cisto = par.split(' ')[1] || par;
                     let parts = cisto.split(':'); 
@@ -459,12 +457,11 @@
                 
                 if (isPenal) {
                     db.ref('tereni/' + currentCourtId).update({
-                        arhiva: c.arhiva + ", " + namePrefix + c.scoreA + ":" + c.scoreB,
+                        arhiva: (c.arhiva ? c.arhiva + ", " : "") + namePrefix + c.scoreA + ":" + c.scoreB,
                         penA: c.scoreA, penB: c.scoreB,
                         scoreA: sumA, scoreB: sumB
                     });
                 } else {
-                    // FIX: Za sve sportove sada upisujemo samo razliku postignutu u tom periodu
                     let rezPerioda = `${diffA}:${diffB}`;
                     let novaArhiva = c.arhiva ? c.arhiva + ", " + namePrefix + rezPerioda : namePrefix + rezPerioda;
                     db.ref('tereni/' + currentCourtId).update({ arhiva: novaArhiva });
@@ -473,7 +470,6 @@
         }
 
         function updateStatus(s) {
-            const setupPanel = document.getElementById('match-setup');
             const teamAInput = document.getElementById('team-a').value;
             const teamBInput = document.getElementById('team-b').value;
             const dateInput = document.getElementById('match-date').value;
