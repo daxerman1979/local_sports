@@ -127,8 +127,7 @@
         .pulse-marker { width: 14px; height: 14px; background: #3498db; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 15px #3498db; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.6); opacity: 0.5; } 100% { transform: scale(1); opacity: 1; } }
         
-        /* Tanke bele linije za razdvajanje preklopljenih kartica */
-        .leaflet-cluster-spider-leg { stroke: #ffffff; stroke-width: 2; opacity: 0.8; }
+        .leaflet-cluster-spider-leg { stroke: #ffffff; stroke-width: 1.5; opacity: 1; }
     </style>
 </head>
 <body>
@@ -264,13 +263,13 @@
 
         var userMarker, tempMarker, currentCourtId = null, isAdmin = false, selectedSport = { emoji: '⚽', slug: 'fudbal' }, tempCoords = null;
         
-        // PODEŠAVANJE: disableClusteringAtZoom: 1 osigurava da su kartice uvek vidljive od starta
         var courtMarkers = L.markerClusterGroup({
             showCoverageOnHover: false,
             zoomToBoundsOnClick: false,
-            spiderfyOnMaxZoom: false,
-            disableClusteringAtZoom: 1, // Kartice su uvek odvojene, nema spajanja u krugove
-            spiderfyDistanceMultiplier: 2.5 // Razmak između kartica kada se "razlete"
+            spiderfyOnMaxZoom: true,
+            disableClusteringAtZoom: 1, 
+            spiderfyDistanceMultiplier: 4, // Povećano da bi se kartice razdvojile više na visini
+            maxClusterRadius: 80 // Radijus detekcije preklapanja
         }).addTo(map);
 
         map.on('moveend', () => { const center = map.getCenter(); localStorage.setItem('lastLat', center.lat); localStorage.setItem('lastLng', center.lng); localStorage.setItem('lastZoom', map.getZoom()); osveziTereneUCentru(); });
