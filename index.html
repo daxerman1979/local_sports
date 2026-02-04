@@ -6,6 +6,8 @@
     <title>LOCALIVE - Smart Sports Map</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
     
     <style>
         :root { --primary: #e74c3c; --dark: #121212; --accent: #2ecc71; --blue: #3498db; --grey: #7f8c8d; }
@@ -124,6 +126,10 @@
         .modal { background: white; padding: 20px; border-radius: 20px; width: 85%; max-width: 320px; text-align: center; }
         .pulse-marker { width: 14px; height: 14px; background: #3498db; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 15px #3498db; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.6); opacity: 0.5; } 100% { transform: scale(1); opacity: 1; } }
+        
+        /* Marker Cluster Custom Style */
+        .leaflet-cluster-anim .leaflet-marker-icon, .leaflet-cluster-anim .leaflet-marker-shadow { transition: transform 0.3s ease-out, opacity 0.3s ease-in; }
+        .leaflet-cluster-spider-leg { stroke: #ffffff; stroke-width: 2; opacity: 0.6; }
     </style>
 </head>
 <body>
@@ -239,6 +245,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
 
     <script>
         const firebaseConfig = { 
@@ -257,7 +264,22 @@
             .then(res => res.json()).then(data => { L.geoJson(data, { style: { color: "#ffffff", weight: 1.5, fillOpacity: 0, dashArray: '5, 5' }, interactive: false }).addTo(map); });
 
         var userMarker, tempMarker, currentCourtId = null, isAdmin = false, selectedSport = { emoji: '⚽', slug: 'fudbal' }, tempCoords = null;
-        var courtMarkers = L.layerGroup().addTo(map);
+        
+        // NOVO: Koristimo MarkerClusterGroup umesto LayerGroup-a za automatsko raspoređivanje
+        var courtMarkers = L.markerClusterGroup({
+            showCoverageOnHover: false,
+            zoomToBoundsOnClick: true,
+            spiderfyOnMaxZoom: true, // Ključna opcija za razdvajanje bliskih markera
+            removeOutsideVisibleBounds: true,
+            iconCreateFunction: function(cluster) {
+                // Ikona grupe (prikazuje broj markera u krugu)
+                return L.divIcon({ 
+                    html: '<div style="background:var(--primary); color:white; border-radius:50%; width:30px; height:30px; display:flex; align-items:center; justify-content:center; font-weight:900; border:2px solid white; box-shadow:0 0 10px rgba(0,0,0,0.5);">' + cluster.getChildCount() + '</div>',
+                    className: '',
+                    iconSize: L.point(30, 30)
+                });
+            }
+        }).addTo(map);
 
         map.on('moveend', () => { const center = map.getCenter(); localStorage.setItem('lastLat', center.lat); localStorage.setItem('lastLng', center.lng); localStorage.setItem('lastZoom', map.getZoom()); osveziTereneUCentru(); });
 
@@ -317,10 +339,9 @@
             });
         }
 
-        // ISPRAVLJEN KLIK NA MAPU DA NE PREKLAPA PANELE
         map.on('click', e => { 
             if (!isAdmin) return; 
-            if (e.originalEvent._stopped) return; // Zaustavi ako je kliknuto na marker
+            if (e.originalEvent._stopped) return; 
 
             tempCoords = e.latlng; 
             if (tempMarker) map.removeLayer(tempMarker); 
@@ -346,17 +367,12 @@
         }
 
         function otvoriUredi(id) {
-            // Zaustavljanje propagacije klika do mape
             if (window.event) window.event.stopPropagation();
-            
             currentCourtId = id;
             db.ref('tereni/' + id).once('value', snap => {
                 const c = snap.val(); if(!c) return;
-                
-                // Zatvori admin panel ako je otvoren
                 document.getElementById('admin-panel').classList.remove('active');
                 if(tempMarker) map.removeLayer(tempMarker);
-
                 document.getElementById('target-court-name').innerText = c.ime;
                 document.getElementById('team-a').value = c.timA || ''; document.getElementById('team-b').value = c.timB || '';
                 document.getElementById('match-date').value = c.datum || '';
@@ -450,10 +466,16 @@
 
         function osveziTereneUCentru() {
             const centar = map.getCenter(); db.ref('tereni').off();
-            db.ref('tereni').on('value', snap => { courtMarkers.clearLayers(); const data = snap.val(); for (let id in data) { const c = data[id]; if (centar.distanceTo(L.latLng(c.lat, c.lng)) <= 20000) renderujMarker(id, c); } });
+            db.ref('tereni').on('value', snap => { 
+                courtMarkers.clearLayers(); 
+                const data = snap.val(); 
+                for (let id in data) { 
+                    const c = data[id]; 
+                    if (centar.distanceTo(L.latLng(c.lat, c.lng)) <= 20000) renderujMarker(id, c); 
+                } 
+            });
         }
 
-        // ISPRAVLJENO RENDERUJ MARKER ZA DIREKTAN KLIK
         function renderujMarker(id, c) {
             const isS = (c.sport === 'tenis' || c.sport === 'odbojka'); let dS = isS ? `${c.setA||0}-${c.setB||0}` : `${c.scoreA||0}-${c.scoreB||0}`;
             if (c.penA > 0 || c.penB > 0) dS += ` (pen. ${c.penA}:${c.penB})`;
@@ -464,8 +486,6 @@
 
             const user = auth.currentUser;
             const isOwner = isAdmin && user && c.vlasnik === user.email;
-            
-            // L.DomEvent.stopPropagation osigurava da klik ne "ode" na mapu ispod kartice
             const clickAction = isOwner ? `onclick="L.DomEvent.stopPropagation(event); otvoriUredi('${id}')"` : "";
 
             const html = `
@@ -481,9 +501,11 @@
                     ${c.emoji}
                 </div>`;
             
-            L.marker([c.lat, c.lng], { 
+            const marker = L.marker([c.lat, c.lng], { 
                 icon: L.divIcon({ html: html, iconAnchor:[16,16], className:'' }) 
-            }).addTo(courtMarkers);
+            });
+            
+            courtMarkers.addLayer(marker);
         }
 
         function locirajMe() { map.locate({setView: true, maxZoom: 16}); map.on('locationfound', e => { if (userMarker) userMarker.setLatLng(e.latlng); else userMarker = L.marker(e.latlng, {icon: L.divIcon({className:'', html:"<div class='pulse-marker'></div>"})}).addTo(map); }); }
