@@ -64,7 +64,7 @@
         .score-btn { background: #333; border: 1px solid #444; color: white; padding: 8px 4px; border-radius: 6px; font-weight: 900; font-size: 12px; margin: 2px; min-width: 35px; }
         .btn-period { width: 100%; background: var(--blue); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: 900; margin-top: 10px; text-transform: uppercase; font-size: 11px; }
 
-        /* KARTICA NA MAPI */
+        /* MAP SCOREBOARD */
         .map-scoreboard {
             position: absolute; bottom: 45px; left: 50%; transform: translateX(-50%);
             width: 105px; background: #000; border: 1.5px solid #fff; border-radius: 8px;
@@ -84,12 +84,12 @@
 
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
 
-        /* MODALI */
+        /* MODALS */
         .info-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10005; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
         .info-card { background: #111; border: 2px solid var(--blue); width: 85%; max-width: 300px; border-radius: 20px; padding: 20px; text-align: center; color: white; }
         .info-arhiva { margin-top: 15px; padding: 10px; background: #000; border-radius: 10px; font-size: 13px; color: #ccc; font-weight: 700; }
 
-        input { width: 100%; padding: 14px; margin: 8px 0; border: 2px solid #ddd; border-radius: 12px; font-size: 16px; box-sizing: border-box; background: #fff; font-weight: 900; }
+        input { width: 100%; padding: 14px; margin: 8px 0; border: 2px solid #ddd; border-radius: 12px; font-size: 16px; box-sizing: border-box; background: #fff; font-weight: 900; color: #000; }
         .btn-action { width: 100%; background: var(--primary); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 900; font-size: 16px; margin-top: 5px; cursor: pointer; }
         .circle-btn { width: 48px; height: 48px; background: white; border: 3px solid #000; border-radius: 50%; position: fixed; right: 12px; bottom: 95px; z-index: 2000; display: flex; justify-content: center; align-items: center; font-size: 22px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
         .hidden { display: none !important; }
@@ -102,7 +102,7 @@
     <div id="startup-screen">
         <div class="startup-card">
             <h1>LOCALIVE</h1>
-            <p style="font-weight:900;">Pronađi igru u svom gradu.</p>
+            <p style="font-weight:900; color:#333;">Pronađi igru u svom gradu.</p>
             <button class="btn-action" onclick="toggleModal('login-screen', true)">LOG IN ADMIN</button>
             <button class="btn-action" style="background:#555;" onclick="toggleModal('register-screen', true)">REGISTRACIJA</button>
             <button class="btn-action" style="background:var(--accent);" onclick="startExplore()">ISTRAŽI MAPU 🌍</button>
@@ -111,7 +111,7 @@
 
     <div id="register-screen" class="overlay hidden">
         <div class="modal">
-            <h4 style="font-weight:900;">Registracija Admina</h4>
+            <h4 style="font-weight:900; color:#000;">Registracija Admina</h4>
             <input type="text" id="reg-nick" placeholder="Nickname">
             <input type="email" id="reg-email" placeholder="Email">
             <input type="password" id="reg-pass" placeholder="Lozinka (min. 6 karaktera)">
@@ -122,7 +122,7 @@
 
     <div id="login-screen" class="overlay hidden">
         <div class="modal">
-            <h4 style="font-weight:900;">Admin Login</h4>
+            <h4 style="font-weight:900; color:#000;">Admin Login</h4>
             <input type="email" id="login-email" placeholder="Email">
             <input type="password" id="login-pass" placeholder="Lozinka">
             <button class="btn-action" onclick="loginAdmin()">Prijavi se</button>
@@ -214,7 +214,7 @@
         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', { zIndex: 1000 }).addTo(map);
 
-        var userMarker, tempMarker, currentCourtId = null, isAdmin = false, selectedSport = { emoji: '⚽', slug: 'fudbal' };
+        var userMarker, tempMarker, currentCourtId = null, isAdmin = false, selectedSport = { emoji: '⚽', slug: 'fudbal' }, tempCoords = null;
         var courtMarkers = L.layerGroup().addTo(map);
 
         auth.onAuthStateChanged(user => {
@@ -230,13 +230,15 @@
             }
         });
 
+        // FUNKCIJA ZA REGISTRACIJU KOJA JE NEDOSTAJALA
         function registerAdmin() {
             const email = document.getElementById('reg-email').value.trim();
             const pass = document.getElementById('reg-pass').value;
             const nick = document.getElementById('reg-nick').value.trim();
-            if(!email || !pass || !nick) return alert("Popuni sve!");
+            if(!email || !pass || !nick) return alert("Popuni sva polja!");
             auth.createUserWithEmailAndPassword(email, pass).then(cred => {
                 db.ref('admins/' + cred.user.uid).set({ nickname: nick, email: email, uid: cred.user.uid });
+                alert("Uspešna registracija!");
                 toggleModal('register-screen', false);
             }).catch(e => alert(e.message));
         }
@@ -248,6 +250,7 @@
         }
 
         function logoutAdmin() { auth.signOut().then(() => location.reload()); }
+        
         function startExplore() {
             document.getElementById('startup-screen').classList.add('hidden');
             document.getElementById('map').classList.remove('map-blur');
@@ -316,7 +319,7 @@
                     let b1 = document.createElement('button'); b1.className='score-btn'; b1.innerText='+'+p; b1.onclick=()=>db.ref('tereni/'+currentCourtId+'/scoreA').transaction(v=>(v||0)+p); bA.appendChild(b1);
                     let b2 = document.createElement('button'); b2.className='score-btn'; b2.innerText='+'+p; b2.onclick=()=>db.ref('tereni/'+currentCourtId+'/scoreB').transaction(v=>(v||0)+p); bB.appendChild(b2);
                 });
-                let bp = document.createElement('button'); bp.className='btn-period'; bp.innerText='ARHIVIRAJ PERIOD';
+                let bp = document.createElement('button'); bp.className='btn-period'; bp.innerText='ARHIVIRAJ REZULTAT';
                 bp.onclick = () => {
                     let rez = data.scoreA + ":" + data.scoreB;
                     let arh = data.arhiva ? data.arhiva + " | " + rez : rez;
@@ -331,20 +334,13 @@
         }
 
         function obrisiTeren() { if(confirm("Obrisati?")) { db.ref('tereni/'+currentCourtId).remove(); zatvoriSvePanele(); } }
-        function resetMatch() { db.ref('tereni/'+currentCourtId).update({ status:'slobodno', scoreA:0, scoreB:0, timA:'', timB:'', datum:'', arhiva:'' }); zatvoriSvePanele(); }
         function zatvoriSvePanele() { document.getElementById('admin-panel').classList.remove('active'); document.getElementById('match-panel').classList.remove('active'); if(tempMarker) map.removeLayer(tempMarker); }
 
         function osveziTereneUCentru() {
-            const centar = map.getCenter(), zoom = map.getZoom(); db.ref('tereni').off();
             db.ref('tereni').on('value', snap => { 
                 courtMarkers.clearLayers(); const data = snap.val(); let usedCoords = [];
-                const offsetFactor = (21 - zoom) * 0.00008;
                 for (let id in data) { 
-                    const c = data[id]; if (centar.distanceTo(L.latLng(c.lat, c.lng)) <= 30000) {
-                        let lat = c.lat, lng = c.lng, angle = 0, count = 0;
-                        while(usedCoords.includes(lat.toFixed(4)+","+lng.toFixed(4))) { angle += 0.8; lat += Math.cos(angle)*offsetFactor; lng += Math.sin(angle)*offsetFactor; if(count++ > 30) break; }
-                        usedCoords.push(lat.toFixed(4)+","+lng.toFixed(4)); renderujMarker(id, c, lat, lng); 
-                    }
+                    const c = data[id]; renderujMarker(id, c, c.lat, c.lng); 
                 } 
             });
         }
@@ -354,9 +350,7 @@
             if(c.status === 'najava') sDot = "dot-najava";
             else if(c.status === 'live') sDot = "dot-live";
             else if(c.status === 'zavrseno') sDot = "dot-ft";
-
             const clickAction = (isAdmin && c.vlasnik === auth.currentUser?.email) ? `otvoriUredi('${id}')` : `otvoriDetaljeGost('${id}')`;
-
             const html = `
                 <div class="icon-container" style="position:relative; font-size:26px;" onclick="${clickAction}">
                     <div class="map-scoreboard">
@@ -371,7 +365,7 @@
             L.marker([vLat, vLng], { icon: L.divIcon({ html: html, iconAnchor:[16,16], className:'' }) }).addTo(courtMarkers);
         }
 
-        function locirajMe() { map.locate({setView: true, maxZoom: 16}); map.on('locationfound', e => { if (userMarker) userMarker.setLatLng(e.latlng); else userMarker = L.marker(e.latlng, {icon: L.divIcon({className:'', html:"<div class='pulse-marker'></div>"})}).addTo(map); }); }
+        function locirajMe() { map.locate({setView: true, maxZoom: 16}); }
     </script>
 </body>
 </html>
