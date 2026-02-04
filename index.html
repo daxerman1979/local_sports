@@ -127,7 +127,11 @@
         .pulse-marker { width: 14px; height: 14px; background: #3498db; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 15px #3498db; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.6); opacity: 0.5; } 100% { transform: scale(1); opacity: 1; } }
         
-        .leaflet-cluster-spider-leg { stroke: #ffffff; stroke-width: 1.5; opacity: 1; }
+        /* Stilizacija tanke linije pokazivača */
+        .leaflet-cluster-spider-leg { 
+            stroke: rgba(255, 255, 255, 0.7) !important; 
+            stroke-width: 1px !important; 
+        }
     </style>
 </head>
 <body>
@@ -263,13 +267,14 @@
 
         var userMarker, tempMarker, currentCourtId = null, isAdmin = false, selectedSport = { emoji: '⚽', slug: 'fudbal' }, tempCoords = null;
         
+        // KLJUČNA IZMENA: Povećan radijus i forsiranje spiderfy-a
         var courtMarkers = L.markerClusterGroup({
             showCoverageOnHover: false,
             zoomToBoundsOnClick: false,
-            spiderfyOnMaxZoom: true,
-            disableClusteringAtZoom: 1, 
-            spiderfyDistanceMultiplier: 4, // Povećano da bi se kartice razdvojile više na visini
-            maxClusterRadius: 80 // Radijus detekcije preklapanja
+            spiderfyOnMaxZoom: false, 
+            disableClusteringAtZoom: 1, // Nikada ne spajaj u krugove
+            spiderfyDistanceMultiplier: 5, // Što veći broj, to su kartice razmaknutije
+            maxClusterRadius: 100 // Veći radijus da bi detektovao preklapanje i na visini
         }).addTo(map);
 
         map.on('moveend', () => { const center = map.getCenter(); localStorage.setItem('lastLat', center.lat); localStorage.setItem('lastLng', center.lng); localStorage.setItem('lastZoom', map.getZoom()); osveziTereneUCentru(); });
@@ -460,6 +465,15 @@
                     const c = data[id]; 
                     if (centar.distanceTo(L.latLng(c.lat, c.lng)) <= 20000) renderujMarker(id, c); 
                 } 
+                
+                // NOVO: Forsiramo spiderfy na svim klasterima odmah nakon učitavanja
+                setTimeout(() => {
+                    courtMarkers.eachLayer(function(layer) {
+                        if (layer.__parent) {
+                            layer.__parent.spiderfy();
+                        }
+                    });
+                }, 200);
             });
         }
 
