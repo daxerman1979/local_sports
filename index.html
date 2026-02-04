@@ -242,7 +242,7 @@
 
     <script>
         const firebaseConfig = { 
-            apiKey: "AIzaSyCyyqnqeS-9jurBX-6VIRp8CiPTMbXkXgw", // MORAŠ DODATI API KEY IZ FIREBASE KONZOLE ZA AUTH
+            apiKey: "AIzaSyCyyqnqeS-9jurBX-6VIRp8CiPTMbXkXgw", 
             databaseURL: "https://allsportslocal-ea1d4-default-rtdb.europe-west1.firebasedatabase.app" 
         };
         firebase.initializeApp(firebaseConfig);
@@ -270,7 +270,6 @@
         function toggleSearch() { const inp = document.getElementById('city-search'); if(inp.classList.contains('expanded')) { if(inp.value) searchCity(); else inp.classList.remove('expanded'); } else { inp.classList.add('expanded'); inp.focus(); } }
         function searchCity() { fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${document.getElementById('city-search').value}`).then(res => res.json()).then(data => { if(data.length > 0) { map.setView([data[0].lat, data[0].lon], 13); document.getElementById('city-search').classList.remove('expanded'); } else alert("Grad nije pronađen."); }); }
 
-        // PROVERA LOGIN STATUSA PRI UCITAVANJU
         auth.onAuthStateChanged(user => {
             if (user) {
                 db.ref('admins/' + user.uid).once('value', snap => {
@@ -289,25 +288,16 @@
             const pass = document.getElementById('reg-pass').value;
             const nick = document.getElementById('reg-nick').value.trim();
             if(!email || !pass || !nick) return alert("Popuni sva polja");
-
-            auth.createUserWithEmailAndPassword(email, pass)
-                .then(cred => {
-                    const userData = { nickname: nick, email: email, uid: cred.user.uid };
-                    return db.ref('admins/' + cred.user.uid).set(userData);
-                })
-                .then(() => {
-                    toggleModal('register-screen', false);
-                    alert("Uspešna registracija!");
-                })
-                .catch(err => alert(err.message));
+            auth.createUserWithEmailAndPassword(email, pass).then(cred => {
+                const userData = { nickname: nick, email: email, uid: cred.user.uid };
+                return db.ref('admins/' + cred.user.uid).set(userData);
+            }).then(() => { toggleModal('register-screen', false); alert("Uspešna registracija!"); }).catch(err => alert(err.message));
         }
 
         function loginAdmin() {
             const email = document.getElementById('login-email').value.trim();
             const pass = document.getElementById('login-pass').value;
-            auth.signInWithEmailAndPassword(email, pass)
-                .then(() => toggleModal('login-screen', false))
-                .catch(err => alert("Greška: " + err.message));
+            auth.signInWithEmailAndPassword(email, pass).then(() => toggleModal('login-screen', false)).catch(err => alert("Greška: " + err.message));
         }
 
         function setupAdminUI(u) { 
@@ -327,7 +317,19 @@
             });
         }
 
-        map.on('click', e => { if (!isAdmin) return; tempCoords = e.latlng; if (tempMarker) map.removeLayer(tempMarker); tempMarker = L.marker(e.latlng, { icon: L.divIcon({ html: '📍', iconSize:[30,30], iconAnchor:[15,30] }) }).addTo(map); document.getElementById('admin-panel').classList.add('active'); });
+        // ISPRAVLJEN KLIK NA MAPU DA NE PREKLAPA PANELE
+        map.on('click', e => { 
+            if (!isAdmin) return; 
+            if (e.originalEvent._stopped) return; // Zaustavi ako je kliknuto na marker
+
+            tempCoords = e.latlng; 
+            if (tempMarker) map.removeLayer(tempMarker); 
+            tempMarker = L.marker(e.latlng, { icon: L.divIcon({ html: '📍', iconSize:[30,30], iconAnchor:[15,30] }) }).addTo(map); 
+            
+            document.getElementById('match-panel').classList.remove('active');
+            document.getElementById('admin-panel').classList.add('active'); 
+        });
+
         function selectSport(emoji, slug, el) { selectedSport = { emoji, slug }; document.querySelectorAll('.sport-item').forEach(i => i.classList.remove('selected')); el.classList.add('selected'); }
 
         function saveCourt() {
@@ -344,9 +346,17 @@
         }
 
         function otvoriUredi(id) {
+            // Zaustavljanje propagacije klika do mape
+            if (window.event) window.event.stopPropagation();
+            
             currentCourtId = id;
             db.ref('tereni/' + id).once('value', snap => {
                 const c = snap.val(); if(!c) return;
+                
+                // Zatvori admin panel ako je otvoren
+                document.getElementById('admin-panel').classList.remove('active');
+                if(tempMarker) map.removeLayer(tempMarker);
+
                 document.getElementById('target-court-name').innerText = c.ime;
                 document.getElementById('team-a').value = c.timA || ''; document.getElementById('team-b').value = c.timB || '';
                 document.getElementById('match-date').value = c.datum || '';
@@ -443,31 +453,21 @@
             db.ref('tereni').on('value', snap => { courtMarkers.clearLayers(); const data = snap.val(); for (let id in data) { const c = data[id]; if (centar.distanceTo(L.latLng(c.lat, c.lng)) <= 20000) renderujMarker(id, c); } });
         }
 
+        // ISPRAVLJENO RENDERUJ MARKER ZA DIREKTAN KLIK
         function renderujMarker(id, c) {
-            const isS = (c.sport === 'tenis' || c.sport === 'odbojka'); 
-            let dS = isS ? `${c.setA||0}-${c.setB||0}` : `${c.scoreA||0}-${c.scoreB||0}`;
+            const isS = (c.sport === 'tenis' || c.sport === 'odbojka'); let dS = isS ? `${c.setA||0}-${c.setB||0}` : `${c.scoreA||0}-${c.scoreB||0}`;
             if (c.penA > 0 || c.penB > 0) dS += ` (pen. ${c.penA}:${c.penB})`;
-            
             let sL = "FREE", sC = "bg-free", mT = "SLOBODAN TEREN", bR = "";
-            
-            if(c.status === 'najava') { 
-                sL = "NAJAVA"; sC = "bg-upcoming"; mT = `${c.timA} vs ${c.timB}`; 
-                bR = `<div class="score-sub-row">${c.datum}</div>`; 
-            }
-            else if(c.status === 'live') { 
-                sL = "LIVE"; sC = "bg-live"; mT = `${c.timA} ${dS} ${c.timB}${isS?` <span style='color:var(--accent)'>[${c.scoreA}:${c.scoreB}]</span>`:""}`; 
-                bR = c.arhiva ? `<div class="score-sub-row">${c.arhiva}</div>` : ''; 
-            }
-            else if(c.status === 'zavrseno') { 
-                sL = "FT"; sC = "bg-ft"; mT = `${c.timA} ${dS} ${c.timB}`; 
-                bR = c.arhiva ? `<div class="score-sub-row">${c.arhiva}</div>` : ''; 
-            }
-        
+            if(c.status === 'najava') { sL = "NAJAVA"; sC = "bg-upcoming"; mT = `${c.timA} vs ${c.timB}`; bR = `<div class="score-sub-row">${c.datum}</div>`; }
+            else if(c.status === 'live') { sL = "LIVE"; sC = "bg-live"; mT = `${c.timA} ${dS} ${c.timB}${isS?` <span style='color:var(--accent)'>[${c.scoreA}:${c.scoreB}]</span>`:""}`; bR = c.arhiva ? `<div class="score-sub-row">${c.arhiva}</div>` : ''; }
+            else if(c.status === 'zavrseno') { sL = "FT"; sC = "bg-ft"; mT = `${c.timA} ${dS} ${c.timB}`; bR = c.arhiva ? `<div class="score-sub-row">${c.arhiva}</div>` : ''; }
+
             const user = auth.currentUser;
-            // Proveravamo da li je trenutni korisnik vlasnik kako bismo znali da li da dozvolimo klik
             const isOwner = isAdmin && user && c.vlasnik === user.email;
-            const clickAction = isOwner ? `onclick="otvoriUredi('${id}')"` : "";
-        
+            
+            // L.DomEvent.stopPropagation osigurava da klik ne "ode" na mapu ispod kartice
+            const clickAction = isOwner ? `onclick="L.DomEvent.stopPropagation(event); otvoriUredi('${id}')"` : "";
+
             const html = `
                 <div class="icon-container ${c.status === 'live' ? 'marker-live' : ''}" style="position:relative; font-size:32px;">
                     <div class="map-scoreboard" ${clickAction} style="${isOwner ? 'cursor:pointer;' : ''}">
@@ -480,7 +480,7 @@
                     </div>
                     ${c.emoji}
                 </div>`;
-        
+            
             L.marker([c.lat, c.lng], { 
                 icon: L.divIcon({ html: html, iconAnchor:[16,16], className:'' }) 
             }).addTo(courtMarkers);
