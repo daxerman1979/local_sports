@@ -127,9 +127,8 @@
         .pulse-marker { width: 14px; height: 14px; background: #3498db; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 15px #3498db; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.6); opacity: 0.5; } 100% { transform: scale(1); opacity: 1; } }
         
-        /* Marker Cluster Custom Style */
-        .leaflet-cluster-anim .leaflet-marker-icon, .leaflet-cluster-anim .leaflet-marker-shadow { transition: transform 0.3s ease-out, opacity 0.3s ease-in; }
-        .leaflet-cluster-spider-leg { stroke: #ffffff; stroke-width: 2; opacity: 0.6; }
+        /* Tanke bele linije za razdvajanje preklopljenih kartica */
+        .leaflet-cluster-spider-leg { stroke: #ffffff; stroke-width: 2; opacity: 0.8; }
     </style>
 </head>
 <body>
@@ -265,20 +264,13 @@
 
         var userMarker, tempMarker, currentCourtId = null, isAdmin = false, selectedSport = { emoji: '⚽', slug: 'fudbal' }, tempCoords = null;
         
-        // NOVO: Koristimo MarkerClusterGroup umesto LayerGroup-a za automatsko raspoređivanje
+        // PODEŠAVANJE: disableClusteringAtZoom: 1 osigurava da su kartice uvek vidljive od starta
         var courtMarkers = L.markerClusterGroup({
             showCoverageOnHover: false,
-            zoomToBoundsOnClick: true,
-            spiderfyOnMaxZoom: true, // Ključna opcija za razdvajanje bliskih markera
-            removeOutsideVisibleBounds: true,
-            iconCreateFunction: function(cluster) {
-                // Ikona grupe (prikazuje broj markera u krugu)
-                return L.divIcon({ 
-                    html: '<div style="background:var(--primary); color:white; border-radius:50%; width:30px; height:30px; display:flex; align-items:center; justify-content:center; font-weight:900; border:2px solid white; box-shadow:0 0 10px rgba(0,0,0,0.5);">' + cluster.getChildCount() + '</div>',
-                    className: '',
-                    iconSize: L.point(30, 30)
-                });
-            }
+            zoomToBoundsOnClick: false,
+            spiderfyOnMaxZoom: false,
+            disableClusteringAtZoom: 1, // Kartice su uvek odvojene, nema spajanja u krugove
+            spiderfyDistanceMultiplier: 2.5 // Razmak između kartica kada se "razlete"
         }).addTo(map);
 
         map.on('moveend', () => { const center = map.getCenter(); localStorage.setItem('lastLat', center.lat); localStorage.setItem('lastLng', center.lng); localStorage.setItem('lastZoom', map.getZoom()); osveziTereneUCentru(); });
@@ -342,11 +334,9 @@
         map.on('click', e => { 
             if (!isAdmin) return; 
             if (e.originalEvent._stopped) return; 
-
             tempCoords = e.latlng; 
             if (tempMarker) map.removeLayer(tempMarker); 
             tempMarker = L.marker(e.latlng, { icon: L.divIcon({ html: '📍', iconSize:[30,30], iconAnchor:[15,30] }) }).addTo(map); 
-            
             document.getElementById('match-panel').classList.remove('active');
             document.getElementById('admin-panel').classList.add('active'); 
         });
@@ -399,7 +389,6 @@
                 pc.innerHTML = '';
                 let arhivaStr = data.arhiva || "", countPeriods = arhivaStr ? arhivaStr.split(', ').length : 0;
                 let nextLabel = "", namePrefix = "", isPenalMode = false;
-
                 if (data.sport === "fudbal" || data.sport === "rukomet") {
                     if (countPeriods === 0) { nextLabel = "KRAJ 1.P"; namePrefix = "1P "; }
                     else if (countPeriods === 1) { nextLabel = "KRAJ 2.P (FT)"; namePrefix = "2P "; }
@@ -413,7 +402,6 @@
                     if (countPeriods < 4) { nextLabel = `KRAJ ${countPeriods+1}. ČETVRTINE`; namePrefix = `${countPeriods+1}Q `; }
                     else { nextLabel = "KRAJ PRODUŽETKA"; namePrefix = "ET "; }
                 }
-
                 if (nextLabel && data.status === 'live') {
                     let b = document.createElement('button'); b.className = 'btn-period'; b.innerText = nextLabel;
                     b.onclick = () => arhivirajPeriod(namePrefix, isPenalMode); pc.appendChild(b);
@@ -501,10 +489,7 @@
                     ${c.emoji}
                 </div>`;
             
-            const marker = L.marker([c.lat, c.lng], { 
-                icon: L.divIcon({ html: html, iconAnchor:[16,16], className:'' }) 
-            });
-            
+            const marker = L.marker([c.lat, c.lng], { icon: L.divIcon({ html: html, iconAnchor:[16,16], className:'' }) });
             courtMarkers.addLayer(marker);
         }
 
