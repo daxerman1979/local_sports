@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
     <style>
-        :root { --primary: #e74c3c; --dark: #000000; --accent: #2ecc71; --blue: #3498db; --grey: #7f8c8d; }
+        :root { --primary: #e74c3c; --dark: #000000; --accent: #2ecc71; --blue: #3498db; --white: #ffffff; }
 
         html, body { 
             margin: 0; padding: 0; width: 100%; height: 100%; 
@@ -43,25 +43,6 @@
         .logo { font-size: 22px; font-weight: 900; color: var(--primary); text-shadow: 0 0 10px rgba(0,0,0,1); letter-spacing: 1px; }
         .nav-btn { background: rgba(0,0,0,0.8); border: 2px solid rgba(255,255,255,0.5); color: white; padding: 6px 12px; border-radius: 15px; font-size: 11px; font-weight: 900; margin-left: 5px; }
 
-        .search-wrapper {
-            position: fixed; top: 70px; right: 15px; z-index: 2000;
-            display: flex; align-items: center; justify-content: flex-end;
-            transition: all 0.4s ease;
-        }
-        .search-input {
-            width: 0; opacity: 0; padding: 8px 0; border: none; border-radius: 20px;
-            background: rgba(0,0,0,0.9); color: white; font-weight: 900;
-            transition: all 0.4s ease; outline: none; border: 2px solid transparent;
-        }
-        .search-input.expanded {
-            width: 180px; opacity: 1; padding: 8px 15px; border: 2px solid #fff; margin-right: 5px;
-        }
-        .search-toggle-btn {
-            width: 38px; height: 38px; background: rgba(0,0,0,0.8); border: 2px solid #fff;
-            color: white; border-radius: 50%; display: flex; justify-content: center;
-            align-items: center; cursor: pointer; font-size: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-        }
-
         #admin-panel, #match-panel {
             position: fixed; bottom: 0; left: 0; width: 100%; z-index: 9999;
             background: var(--dark); color: white;
@@ -79,37 +60,39 @@
         .live-controls { display: flex; justify-content: space-around; align-items: center; background: #1a1a1a; padding: 15px; border-radius: 15px; margin-top: 10px; border: 1px solid #333; }
         .score-display { font-size: 36px; font-weight: 900; color: var(--accent); margin: 5px 0; }
         .score-btn { background: #333; border: 1px solid #444; color: white; padding: 8px 4px; border-radius: 6px; font-weight: 900; font-size: 12px; margin: 2px; min-width: 35px; }
-        .btn-minus { background: #c0392b !important; }
         .btn-period { width: 100%; background: var(--blue); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: 900; margin-top: 10px; text-transform: uppercase; font-size: 11px; }
 
-        /* ULTRA COMPACT VERTICAL SCOREBOARD */
+        /* ULTRA PRO SCOREBOARD */
         .map-scoreboard {
-            position: absolute; bottom: 42px; left: 50%; transform: translateX(-50%);
-            width: 100px; background: #000; border: 1.5px solid #fff; border-radius: 8px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.8); overflow: hidden; z-index: 1000;
+            position: absolute; bottom: 45px; left: 50%; transform: translateX(-50%);
+            width: 110px; background: #000; border: 1.5px solid #fff; border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.9); overflow: hidden; z-index: 1000;
         }
         .score-header {
             background: #fff; color: #000; font-size: 8px; font-weight: 900;
             padding: 3px; text-align: center; text-transform: uppercase;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
-        .score-body { padding: 4px; background: #000; }
-        .team-row { display: flex; justify-content: space-between; align-items: center; margin: 1px 0; }
-        .team-name { color: #fff; font-size: 10px; font-weight: 900; text-transform: uppercase; max-width: 70px; overflow: hidden; white-space: nowrap; }
-        .team-score { color: #fff; font-size: 11px; font-weight: 900; min-width: 15px; text-align: right; }
+        .score-body { padding: 6px 6px; background: #000; }
+        .team-row { display: flex; justify-content: space-between; align-items: center; margin: 2px 0; }
+        .team-name { color: #fff; font-size: 10px; font-weight: 900; text-transform: uppercase; max-width: 75px; overflow: hidden; white-space: nowrap; }
+        .team-score { color: var(--accent); font-size: 12px; font-weight: 900; min-width: 18px; text-align: right; }
         
-        /* STATUS INDICATORS */
-        .status-footer { 
-            display: flex; align-items: center; justify-content: center;
-            background: #111; padding: 2px; border-top: 1px solid #333;
+        .status-line { 
+            display: flex; align-items: center; justify-content: space-between;
+            background: #111; padding: 3px 6px; border-top: 1px solid #333;
         }
-        .status-dot { width: 5px; height: 5px; border-radius: 50%; margin-right: 4px; }
-        .status-text { font-size: 7px; font-weight: 900; color: #aaa; text-transform: uppercase; }
+        .status-dot { width: 6px; height: 6px; border-radius: 50%; }
+        .status-text { font-size: 7px; font-weight: 900; color: #fff; text-transform: uppercase; }
 
-        .dot-live { background: #ff3e3e; box-shadow: 0 0 5px #ff3e3e; animation: blink 0.8s infinite; }
-        .dot-najava { background: #2ecc71; box-shadow: 0 0 5px #2ecc71; animation: blink 1.2s infinite; }
+        .dot-live { background: #ff3e3e; box-shadow: 0 0 8px #ff3e3e; animation: blink 0.8s infinite; }
+        .dot-najava { background: #2ecc71; box-shadow: 0 0 8px #2ecc71; animation: blink 1.2s infinite; }
         .dot-ft { background: #777; }
-        .dot-free { background: var(--blue); }
+        
+        .arhiva-row {
+            background: #000; color: #888; font-size: 7px; padding: 2px 6px;
+            text-align: center; border-top: 1px dashed #333; font-weight: 700;
+            line-height: 1.2;
+        }
 
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
         
@@ -166,11 +149,6 @@
             <button class="nav-btn" onclick="logoutAdmin()">Logout</button>
         </div>
     </header>
-
-    <div id="search-bar" class="search-wrapper hidden">
-        <input type="text" id="city-search" class="search-input" placeholder="Grad...">
-        <div class="search-toggle-btn" onclick="toggleSearch()">🔍</div>
-    </div>
 
     <div id="admin-panel">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
@@ -256,12 +234,9 @@
 
         function startExplore() {
             document.getElementById('startup-screen').classList.add('hidden'); document.getElementById('map').classList.remove('map-blur');
-            document.getElementById('main-header').classList.remove('hidden'); document.getElementById('search-bar').classList.remove('hidden');
-            document.getElementById('recenter-btn').classList.remove('hidden'); map.invalidateSize(); osveziTereneUCentru();
+            document.getElementById('main-header').classList.remove('hidden'); document.getElementById('recenter-btn').classList.remove('hidden'); 
+            map.invalidateSize(); osveziTereneUCentru();
         }
-
-        function toggleSearch() { const inp = document.getElementById('city-search'); if(inp.classList.contains('expanded')) { if(inp.value) searchCity(); else inp.classList.remove('expanded'); } else { inp.classList.add('expanded'); inp.focus(); } }
-        function searchCity() { fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${document.getElementById('city-search').value}`).then(res => res.json()).then(data => { if(data.length > 0) { map.setView([data[0].lat, data[0].lon], 13); document.getElementById('city-search').classList.remove('expanded'); } else alert("Grad nije pronađen."); }); }
 
         auth.onAuthStateChanged(user => {
             if (user) {
@@ -273,7 +248,6 @@
 
         function setupAdminUI(u) { isAdmin = true; document.getElementById('guest-nav').classList.add('hidden'); document.getElementById('admin-info').classList.remove('hidden'); document.getElementById('admin-name').innerText = u.nickname; }
         function logoutAdmin() { auth.signOut().then(() => { isAdmin = false; document.getElementById('admin-info').classList.add('hidden'); document.getElementById('guest-nav').classList.remove('hidden'); zatvoriSvePanele(); osveziTereneUCentru(); }); }
-
         function toggleModal(id, s) { document.getElementById(id).classList.toggle('hidden', !s); }
 
         function registerAdmin() {
@@ -294,8 +268,7 @@
         }
 
         map.on('click', e => { 
-            if (!isAdmin) return; 
-            if (e.originalEvent._stopped) return; 
+            if (!isAdmin || e.originalEvent._stopped) return; 
             tempCoords = e.latlng; if (tempMarker) map.removeLayer(tempMarker); 
             tempMarker = L.marker(e.latlng, { icon: L.divIcon({ html: '📍', iconSize:[30,30], iconAnchor:[15,30] }) }).addTo(map); 
             document.getElementById('match-panel').classList.remove('active');
@@ -422,13 +395,29 @@
         function osveziTereneUCentru() {
             const centar = map.getCenter(); db.ref('tereni').off();
             db.ref('tereni').on('value', snap => { 
-                courtMarkers.clearLayers(); const data = snap.val(); let usedCoords = [];
+                courtMarkers.clearLayers(); const data = snap.val(); 
+                let usedCoords = []; 
+                const zoom = map.getZoom();
+                // Dinamički offset koji se povećava kako se udaljavamo (zoom opada)
+                const offsetFactor = (21 - zoom) * 0.00008;
+
                 for (let id in data) { 
                     const c = data[id]; 
-                    if (centar.distanceTo(L.latLng(c.lat, c.lng)) <= 20000) {
-                        let lat = c.lat, lng = c.lng, key = lat.toFixed(4) + "," + lng.toFixed(4);
-                        while(usedCoords.includes(key)) { lat += 0.00018; lng += 0.00018; key = lat.toFixed(4) + "," + lng.toFixed(4); }
-                        usedCoords.push(key); renderujMarker(id, c, lat, lng); 
+                    if (centar.distanceTo(L.latLng(c.lat, c.lng)) <= 25000) {
+                        let lat = c.lat, lng = c.lng;
+                        let key = lat.toFixed(4) + "," + lng.toFixed(4);
+                        
+                        // SPIRALNI RASPORED ZA SPREČAVANJE PREKLAPANJA
+                        let angle = 0, count = 0;
+                        while(usedCoords.includes(key)) {
+                            angle += 0.8; 
+                            lat += Math.cos(angle) * offsetFactor;
+                            lng += Math.sin(angle) * offsetFactor;
+                            key = lat.toFixed(4) + "," + lng.toFixed(4);
+                            if(count++ > 50) break;
+                        }
+                        usedCoords.push(key);
+                        renderujMarker(id, c, lat, lng); 
                     }
                 } 
             });
@@ -436,11 +425,11 @@
 
         function renderujMarker(id, c, visualLat, visualLng) {
             const isS = (c.sport === 'tenis' || c.sport === 'odbojka'); 
-            let dS = isS ? `[${c.scoreA}:${c.scoreB}]` : "";
             let sDot = "dot-free", sTxt = "FREE", sA = c.scoreA||0, sB = c.scoreB||0;
+            let sub = c.arhiva || "";
             
-            if(c.status === 'najava') { sDot = "dot-najava"; sTxt = "SOON"; }
-            else if(c.status === 'live') { sDot = "dot-live"; sTxt = "LIVE"; }
+            if(c.status === 'najava') { sDot = "dot-najava"; sTxt = "SOON"; sub = c.datum || ""; }
+            else if(c.status === 'live') { sDot = "dot-live"; sTxt = "LIVE"; if(isS) sTxt += ` [${c.scoreA}:${c.scoreB}]`; }
             else if(c.status === 'zavrseno') { sDot = "dot-ft"; sTxt = "FT"; }
 
             const user = auth.currentUser;
@@ -454,17 +443,18 @@
                         <div class="score-body">
                             <div class="team-row">
                                 <span class="team-name">${c.timA || 'TIM A'}</span>
-                                <span class="team-score">${c.status === 'slobodno' ? '-' : sA}</span>
+                                <span class="team-score">${c.status === 'slobodno' ? '-' : (isS ? c.setA||0 : sA)}</span>
                             </div>
                             <div class="team-row">
                                 <span class="team-name">${c.timB || 'TIM B'}</span>
-                                <span class="team-score">${c.status === 'slobodno' ? '-' : sB}</span>
+                                <span class="team-score">${c.status === 'slobodno' ? '-' : (isS ? c.setB||0 : sB)}</span>
                             </div>
                         </div>
-                        <div class="status-footer">
+                        <div class="status-line">
                             <div class="status-dot ${sDot}"></div>
-                            <span class="status-text">${sTxt} ${c.status === 'live' ? dS : ''}</span>
+                            <span class="status-text">${sTxt}</span>
                         </div>
+                        ${sub ? `<div class="arhiva-row">${sub}</div>` : ''}
                     </div>
                     ${c.emoji}
                 </div>`;
