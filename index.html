@@ -78,7 +78,7 @@
 
         .live-controls { display: flex; justify-content: space-around; align-items: center; background: #1a1a1a; padding: 15px; border-radius: 15px; margin-top: 10px; border: 1px solid #333; }
         .score-display { font-size: 36px; font-weight: 900; color: var(--accent); margin: 5px 0; }
-        .score-btn { background: #333; border: 1px solid #444; color: white; padding: 8px 4px; border-radius: 6px; font-weight: 900; font-size: 12px; margin: 2px; min-width: 38px; }
+        .score-btn { background: #333; border: 1px solid #444; color: white; padding: 8px 4px; border-radius: 6px; font-weight: 900; font-size: 12px; margin: 2px; min-width: 35px; }
         .btn-minus { background: #c0392b !important; }
         .btn-period { width: 100%; background: var(--blue); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: 900; margin-top: 10px; text-transform: uppercase; font-size: 11px; }
 
@@ -143,7 +143,6 @@
             <h4 style="font-weight:900;">Registracija Admina</h4>
             <input type="text" id="reg-nick" placeholder="Nickname">
             <input type="email" id="reg-email" placeholder="Email">
-            <input type="password" id="reg-pass" placeholder="Lozinka">
             <button class="btn-action" onclick="registerAdmin()">Registruj me</button>
             <button onclick="toggleModal('register-screen', false)" style="background:none; border:none; margin-top:12px; color:#999; font-weight:900;">Zatvori</button>
         </div>
@@ -153,7 +152,6 @@
         <div class="modal">
             <h4 style="font-weight:900;">Admin Login</h4>
             <input type="email" id="login-email" placeholder="Unesite email">
-            <input type="password" id="login-pass" placeholder="Unesite lozinku">
             <button class="btn-action" onclick="loginAdmin()">Prijavi se</button>
             <button onclick="toggleModal('login-screen', false)" style="background:none; border:none; margin-top:12px; color:#999; font-weight:900;">Zatvori</button>
         </div>
@@ -237,16 +235,12 @@
 
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script>
-        const firebaseConfig = { 
-            databaseURL: "https://allsportslocal-ea1d4-default-rtdb.europe-west1.firebasedatabase.app"
-        };
+        const firebaseConfig = { databaseURL: "https://allsportslocal-ea1d4-default-rtdb.europe-west1.firebasedatabase.app" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        const auth = firebase.auth();
 
         var map = L.map('map', { zoomControl: false, tap: false, attributionControl: false }).setView([localStorage.getItem('lastLat')||44.81, localStorage.getItem('lastLng')||20.44], localStorage.getItem('lastZoom')||13);
         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
@@ -269,69 +263,24 @@
         function toggleSearch() { const inp = document.getElementById('city-search'); if(inp.classList.contains('expanded')) { if(inp.value) searchCity(); else inp.classList.remove('expanded'); } else { inp.classList.add('expanded'); inp.focus(); } }
         function searchCity() { fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${document.getElementById('city-search').value}`).then(res => res.json()).then(data => { if(data.length > 0) { map.setView([data[0].lat, data[0].lon], 13); document.getElementById('city-search').classList.remove('expanded'); } else alert("Grad nije pronađen."); }); }
 
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                db.ref('admins/' + user.uid).once('value', snap => {
-                    const ud = snap.val();
-                    if (ud) { setupAdminUI(ud); startExplore(); }
-                });
-            } else {
-                logoutAdminUI();
-            }
-        });
-
-        function registerAdmin() {
-            const email = document.getElementById('reg-email').value;
-            const pass = document.getElementById('reg-pass').value;
-            const nick = document.getElementById('reg-nick').value;
-            if(!email || !pass || !nick) return alert("Popunite sve.");
-
-            auth.createUserWithEmailAndPassword(email, pass).then(cred => {
-                const userData = { nickname: nick, email: email, uid: cred.user.uid };
-                return db.ref('admins/' + cred.user.uid).set(userData);
-            }).then(() => {
-                toggleModal('register-screen', false);
-            }).catch(e => alert(e.message));
-        }
+        window.onload = () => { const saved = localStorage.getItem('loggedAdmin'); if (saved) { setupAdminUI(JSON.parse(saved)); startExplore(); } };
+        function toggleModal(id, s) { document.getElementById(id).classList.toggle('hidden', !s); }
 
         function loginAdmin() {
-            const email = document.getElementById('login-email').value;
-            const pass = document.getElementById('login-pass').value;
-            auth.signInWithEmailAndPassword(email, pass)
-                .then(() => toggleModal('login-screen', false))
-                .catch(e => alert("Greška pri prijavi."));
+            db.ref('admins').orderByChild('email').equalTo(document.getElementById('login-email').value.toLowerCase().trim()).once('value', snap => {
+                if (snap.exists()) { const ud = Object.values(snap.val())[0]; localStorage.setItem('loggedAdmin', JSON.stringify(ud)); setupAdminUI(ud); toggleModal('login-screen', false); osveziTereneUCentru(); } else alert("Niste admin.");
+            });
         }
-
-        function setupAdminUI(u) { 
-            isAdmin = true; 
-            document.getElementById('guest-nav').classList.add('hidden'); 
-            document.getElementById('admin-info').classList.remove('hidden'); 
-            document.getElementById('admin-name').innerText = u.nickname; 
-        }
-
-        function logoutAdminUI() {
-            isAdmin = false;
-            document.getElementById('admin-info').classList.add('hidden');
-            document.getElementById('guest-nav').classList.remove('hidden');
-            zatvoriSvePanele();
-            osveziTereneUCentru();
-        }
-
-        function logoutAdmin() { auth.signOut(); }
+        function setupAdminUI(u) { isAdmin = true; document.getElementById('guest-nav').classList.add('hidden'); document.getElementById('admin-info').classList.remove('hidden'); document.getElementById('admin-name').innerText = u.nickname; }
+        function logoutAdmin() { isAdmin = false; localStorage.removeItem('loggedAdmin'); document.getElementById('admin-info').classList.add('hidden'); document.getElementById('guest-nav').classList.remove('hidden'); zatvoriSvePanele(); osveziTereneUCentru(); }
 
         map.on('click', e => { if (!isAdmin) return; tempCoords = e.latlng; if (tempMarker) map.removeLayer(tempMarker); tempMarker = L.marker(e.latlng, { icon: L.divIcon({ html: '📍', iconSize:[30,30], iconAnchor:[15,30] }) }).addTo(map); document.getElementById('admin-panel').classList.add('active'); });
         function selectSport(emoji, slug, el) { selectedSport = { emoji, slug }; document.querySelectorAll('.sport-item').forEach(i => i.classList.remove('selected')); el.classList.add('selected'); }
 
         function saveCourt() {
-            const n = document.getElementById('court-name').value;
-            const user = auth.currentUser;
-            if(!n || !user || !tempCoords) return;
-            db.ref('tereni').push({ 
-                ime: n, sport: selectedSport.slug, emoji: selectedSport.emoji, 
-                lat: tempCoords.lat, lng: tempCoords.lng, status: 'slobodno', 
-                scoreA: 0, scoreB: 0, timA: '', timB: '', datum: '', 
-                arhiva: '', setA: 0, setB: 0, vlasnik: user.email, penA: 0, penB: 0 
-            }).then(() => { zatvoriSvePanele(); osveziTereneUCentru(); });
+            const n = document.getElementById('court-name').value, u = JSON.parse(localStorage.getItem('loggedAdmin'));
+            if(!n || !u || !tempCoords) return;
+            db.ref('tereni').push({ ime: n, sport: selectedSport.slug, emoji: selectedSport.emoji, lat: tempCoords.lat, lng: tempCoords.lng, status: 'slobodno', scoreA: 0, scoreB: 0, timA: '', timB: '', datum: '', arhiva: '', setA: 0, setB: 0, vlasnik: u.email, penA: 0, penB: 0 }).then(() => { zatvoriSvePanele(); osveziTereneUCentru(); });
         }
 
         function otvoriUredi(id) {
@@ -389,18 +338,11 @@
 
         function renderujPoeneAdmin(c) {
             const bA = document.getElementById('btns-a'), bB = document.getElementById('btns-b');
-            bA.innerHTML = bB.innerHTML = ''; 
-            if(c.status === 'zavrseno') return;
-            
+            bA.innerHTML = bB.innerHTML = ''; if(c.status === 'zavrseno') return;
             let pts = (c.sport === 'kosarka') ? [1, 2, 3] : [1];
-            
             [ {id: 'scoreA', el: bA}, {id: 'scoreB', el: bB} ].forEach(side => {
-                pts.forEach(p => { 
-                    let btn = document.createElement('button'); btn.className='score-btn'; btn.innerText='+'+p; 
-                    btn.onclick = () => db.ref('tereni/'+currentCourtId+'/'+side.id).transaction(v => (v||0)+p); side.el.appendChild(btn); 
-                });
-                let min = document.createElement('button'); min.className='score-btn btn-minus'; min.innerText='-1'; 
-                min.onclick = () => db.ref('tereni/'+currentCourtId+'/'+side.id).transaction(v => Math.max(0, (v||0)-1)); side.el.appendChild(min);
+                pts.forEach(p => { let btn = document.createElement('button'); btn.className='score-btn'; btn.innerText='+'+p; btn.onclick = () => db.ref('tereni/'+currentCourtId+'/'+side.id).transaction(v => (v||0)+p); side.el.appendChild(btn); });
+                let min = document.createElement('button'); min.className='score-btn btn-minus'; min.innerText='-1'; min.onclick = () => db.ref('tereni/'+currentCourtId+'/'+side.id).transaction(v => Math.max(0, (v||0)-1)); side.el.appendChild(min);
             });
         }
 
@@ -429,7 +371,7 @@
 
         function updateStatus(s) {
             const ud = { status: s, timA: document.getElementById('team-a').value, timB: document.getElementById('team-b').value, datum: document.getElementById('match-date').value };
-            db.ref('tereni/'+currentCourtId).update(ud).then(() => { setupControlView(s); });
+            db.ref('tereni/'+currentCourtId).update(ud).then(() => { setupControlView(s); if (s === 'live') setupLivePanel(ud); });
         }
 
         function resetMatch() { if(confirm("Reset meča?")) { db.ref('tereni/'+currentCourtId).update({ status:'slobodno', scoreA:0, scoreB:0, setA:0, setB:0, timA:'', timB:'', datum:'', arhiva:'', penA:0, penB:0 }); zatvoriSvePanele(); } }
@@ -449,8 +391,8 @@
             else if(c.status === 'live') { sL = "LIVE"; sC = "bg-live"; mT = `${c.timA} ${dS} ${c.timB}${isS?` <span style='color:var(--accent)'>[${c.scoreA}:${c.scoreB}]</span>`:""}`; bR = c.arhiva ? `<div class="score-sub-row">${c.arhiva}</div>` : ''; }
             else if(c.status === 'zavrseno') { sL = "FT"; sC = "bg-ft"; mT = `${c.timA} ${dS} ${c.timB}`; bR = c.arhiva ? `<div class="score-sub-row">${c.arhiva}</div>` : ''; }
             const html = `<div class="icon-container ${c.status === 'live' ? 'marker-live' : ''}" style="position:relative; font-size:32px;"><div class="map-scoreboard"><div class="score-name-row">${c.ime}</div><div class="score-main-row"><div class="status-tag ${sC}">${sL}</div><div class="match-info">${mT}</div></div>${bR}</div>${c.emoji}</div>`;
-            const user = auth.currentUser;
-            L.marker([c.lat, c.lng], { icon: L.divIcon({ html: html, iconAnchor:[16,16], className:'' }) }).bindPopup(`<div style="text-align:center;"><b style="font-weight:900;">${c.ime}</b>${isAdmin && user && c.vlasnik === user.email ? `<br><button onclick="otvoriUredi('${id}')" style="width:100%; margin-top:10px; padding:10px; background:#000; color:white; border:2px solid white; border-radius:8px; font-weight:900;">UREDI</button>` : ''}</div>`).addTo(courtMarkers);
+            const u = JSON.parse(localStorage.getItem('loggedAdmin') || 'null');
+            L.marker([c.lat, c.lng], { icon: L.divIcon({ html: html, iconAnchor:[16,16], className:'' }) }).bindPopup(`<div style="text-align:center;"><b style="font-weight:900;">${c.ime}</b>${isAdmin && u && c.vlasnik === u.email ? `<br><button onclick="otvoriUredi('${id}')" style="width:100%; margin-top:10px; padding:10px; background:#000; color:white; border:2px solid white; border-radius:8px; font-weight:900;">UREDI</button>` : ''}</div>`).addTo(courtMarkers);
         }
 
         function locirajMe() { map.locate({setView: true, maxZoom: 16}); map.on('locationfound', e => { if (userMarker) userMarker.setLatLng(e.latlng); else userMarker = L.marker(e.latlng, {icon: L.divIcon({className:'', html:"<div class='pulse-marker'></div>"})}).addTo(map); }); }
