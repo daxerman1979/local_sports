@@ -17,9 +17,11 @@
             touch-action: none; 
         }
 
+        /* MAPA I BLUR */
         #map { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1; transition: filter 0.8s ease; }
         .map-blur { filter: blur(15px) brightness(0.3); pointer-events: none; }
 
+        /* STARTUP SCREEN */
         #startup-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 10001; display: flex; justify-content: center; align-items: center;
@@ -32,6 +34,7 @@
         }
         .startup-card h1 { font-size: 30px; font-weight: 900; color: var(--primary); margin: 0 0 10px 0; }
 
+        /* HEADER */
         header {
             position: fixed; top: 0; left: 0; width: 100%; z-index: 2000;
             display: flex; justify-content: space-between; align-items: center;
@@ -43,11 +46,13 @@
         .logo { font-size: 22px; font-weight: 900; color: var(--primary); text-shadow: 0 0 10px rgba(0,0,0,1); letter-spacing: 1px; }
         .nav-btn { background: rgba(0,0,0,0.8); border: 2px solid rgba(255,255,255,0.5); color: white; padding: 6px 12px; border-radius: 15px; font-size: 11px; font-weight: 900; margin-left: 5px; }
 
+        /* SEARCH */
         .search-wrapper { position: fixed; top: 70px; right: 15px; z-index: 2000; display: flex; align-items: center; }
         .search-input { width: 0; opacity: 0; padding: 8px 0; border-radius: 20px; background: rgba(0,0,0,0.9); color: white; font-weight: 900; transition: 0.4s; outline: none; border: 2px solid transparent; }
         .search-input.expanded { width: 180px; opacity: 1; padding: 8px 15px; border: 2px solid #fff; margin-right: 5px; }
         .search-toggle-btn { width: 38px; height: 38px; background: rgba(0,0,0,0.8); border: 2px solid #fff; color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; }
 
+        /* SCOREBOARD KARTICA NA MAPI */
         .map-scoreboard {
             position: absolute; bottom: 45px; left: 50%; transform: translateX(-50%);
             display: flex; flex-direction: column; 
@@ -55,12 +60,13 @@
             background: #000; border-radius: 12px; border: 2px solid #ffffff;
             box-shadow: 0 12px 30px rgba(0,0,0,1); overflow: hidden; z-index: 1000;
         }
-        .score-name-row { background: #ffffff; color: #000; font-size: 10px; font-weight: 900; padding: 6px 12px; text-align: center; border-bottom: 2px solid #000; text-transform: uppercase; }
+        .score-name-row { background: #fff; color: #000; font-size: 10px; font-weight: 900; padding: 6px 12px; text-align: center; border-bottom: 2px solid #000; text-transform: uppercase; }
         .score-main-row { display: flex; background: #000; }
         .status-tag { font-size: 9px; font-weight: 900; padding: 10px 6px; color: #fff; text-transform: uppercase; writing-mode: vertical-lr; transform: rotate(180deg); text-align: center; border-left: 2px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; }
-        .match-info { flex-grow: 1; padding: 10px 14px; text-align: center; color: #ffffff; font-weight: 900; font-size: 13px; white-space: nowrap; }
-        .score-sub-row { background: #111; color: #ffffff; font-size: 9px; padding: 5px 10px; text-align: center; border-top: 1px solid rgba(255,255,255,0.3); font-weight: 900; }
+        .match-info { flex-grow: 1; padding: 10px 14px; text-align: center; color: #fff; font-weight: 900; font-size: 13px; white-space: nowrap; }
+        .score-sub-row { background: #111; color: #fff; font-size: 9px; padding: 5px 10px; text-align: center; border-top: 1px solid rgba(255,255,255,0.3); font-weight: 900; }
 
+        /* PANELI */
         #admin-panel, #match-panel {
             position: fixed; bottom: 0; left: 0; width: 100%; z-index: 9999;
             background: var(--dark); color: white; padding: 15px 15px calc(25px + env(safe-area-inset-bottom));
@@ -79,6 +85,7 @@
 
         .bg-live { background: var(--primary) !important; animation: blink 0.8s infinite; }
         .bg-ft { background: #777 !important; }
+        .bg-upcoming { background: var(--accent) !important; }
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
         
         .circle-btn { width: 48px; height: 48px; background: white; border: 3px solid #000; border-radius: 50%; position: fixed; right: 12px; bottom: 95px; z-index: 2000; display: flex; justify-content: center; align-items: center; font-size: 22px; }
@@ -216,10 +223,10 @@
         }
 
         function registerAdmin() {
-            const nick = document.getElementById('reg-nick').value.trim();
-            const email = document.getElementById('reg-email').value.toLowerCase().trim();
-            if(!nick || !email) return;
-            db.ref('admins').push({ nickname: nick, email: email }).then(() => { alert("Registrovan!"); toggleModal('register-screen', false); });
+            const n = document.getElementById('reg-nick').value.trim();
+            const e = document.getElementById('reg-email').value.toLowerCase().trim();
+            if(!n || !e) return;
+            db.ref('admins').push({ nickname: n, email: e }).then(() => { alert("Registrovan!"); toggleModal('register-screen', false); });
         }
 
         function loginAdmin() {
@@ -334,7 +341,7 @@
                 <div class="map-scoreboard">
                     <div class="score-name-row">${c.ime}</div>
                     <div class="score-main-row">
-                        <div class="status-tag ${c.status === 'live' ? 'bg-live' : (c.status === 'zavrseno' ? 'bg-ft' : 'bg-free')}">${c.status.toUpperCase()}</div>
+                        <div class="status-tag ${c.status === 'live' ? 'bg-live' : (c.status === 'zavrseno' ? 'bg-ft' : (c.status === 'najava' ? 'bg-upcoming' : 'bg-free'))}">${c.status.toUpperCase()}</div>
                         <div class="match-info">${c.timA || 'FREE'} ${dS} ${c.timB || ''}</div>
                     </div>
                     ${c.arhiva ? `<div class="score-sub-row">${c.arhiva}</div>` : ''}
