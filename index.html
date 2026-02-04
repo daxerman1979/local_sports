@@ -17,11 +17,9 @@
             touch-action: none; 
         }
 
-        /* MAPA I BLUR FIX */
         #map { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1; transition: filter 0.8s ease; }
         .map-blur { filter: blur(15px) brightness(0.3); pointer-events: none; }
 
-        /* STARTUP SCREEN */
         #startup-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 10001; display: flex; justify-content: center; align-items: center;
@@ -34,7 +32,6 @@
         }
         .startup-card h1 { font-size: 30px; font-weight: 900; color: var(--primary); margin: 0 0 10px 0; }
 
-        /* UI HEADER */
         header {
             position: fixed; top: 0; left: 0; width: 100%; z-index: 2000;
             display: flex; justify-content: space-between; align-items: center;
@@ -46,28 +43,24 @@
         .logo { font-size: 22px; font-weight: 900; color: var(--primary); text-shadow: 0 0 10px rgba(0,0,0,1); letter-spacing: 1px; }
         .nav-btn { background: rgba(0,0,0,0.8); border: 2px solid rgba(255,255,255,0.5); color: white; padding: 6px 12px; border-radius: 15px; font-size: 11px; font-weight: 900; margin-left: 5px; }
 
-        /* DISKRETNI SEARCH */
         .search-wrapper { position: fixed; top: 70px; right: 15px; z-index: 2000; display: flex; align-items: center; }
         .search-input { width: 0; opacity: 0; padding: 8px 0; border-radius: 20px; background: rgba(0,0,0,0.9); color: white; font-weight: 900; transition: 0.4s; outline: none; border: 2px solid transparent; }
         .search-input.expanded { width: 180px; opacity: 1; padding: 8px 15px; border: 2px solid #fff; margin-right: 5px; }
         .search-toggle-btn { width: 38px; height: 38px; background: rgba(0,0,0,0.8); border: 2px solid #fff; color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; }
 
-        /* 3D FLIP SCOREBOARD */
-        .flip-container { perspective: 1000px; position: absolute; bottom: 45px; left: 50%; transform: translateX(-50%); z-index: 1000; }
-        .flipper { position: relative; width: max-content; min-width: 140px; max-width: 280px; transition: 0.8s; transform-style: preserve-3d; }
-        .flip-active .flipper { transform: rotateY(180deg); }
-        .score-front, .score-back { backface-visibility: hidden; border-radius: 12px; border: 2px solid #fff; box-shadow: 0 12px 30px rgba(0,0,0,1); overflow: hidden; }
-        .score-back { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transform: rotateY(180deg); background: #000; display: flex; justify-content: center; align-items: center; }
-        .score-back img { width: 100%; height: 100%; object-fit: cover; }
-
-        /* DIZAJN KARTICE */
-        .score-name-row { background: #fff; color: #000; font-size: 10px; font-weight: 900; padding: 6px 12px; text-align: center; border-bottom: 2px solid #000; text-transform: uppercase; }
+        .map-scoreboard {
+            position: absolute; bottom: 45px; left: 50%; transform: translateX(-50%);
+            display: flex; flex-direction: column; 
+            width: max-content; min-width: 130px; max-width: 280px;
+            background: #000; border-radius: 12px; border: 2px solid #ffffff;
+            box-shadow: 0 12px 30px rgba(0,0,0,1); overflow: hidden; z-index: 1000;
+        }
+        .score-name-row { background: #ffffff; color: #000; font-size: 10px; font-weight: 900; padding: 6px 12px; text-align: center; border-bottom: 2px solid #000; text-transform: uppercase; }
         .score-main-row { display: flex; background: #000; }
         .status-tag { font-size: 9px; font-weight: 900; padding: 10px 6px; color: #fff; text-transform: uppercase; writing-mode: vertical-lr; transform: rotate(180deg); text-align: center; border-left: 2px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; }
-        .match-info { flex-grow: 1; padding: 10px 14px; text-align: center; color: #fff; font-weight: 900; font-size: 13px; white-space: nowrap; }
-        .score-sub-row { background: #111; color: #fff; font-size: 9px; padding: 5px 10px; text-align: center; border-top: 1px solid rgba(255,255,255,0.3); font-weight: 900; }
+        .match-info { flex-grow: 1; padding: 10px 14px; text-align: center; color: #ffffff; font-weight: 900; font-size: 13px; white-space: nowrap; }
+        .score-sub-row { background: #111; color: #ffffff; font-size: 9px; padding: 5px 10px; text-align: center; border-top: 1px solid rgba(255,255,255,0.3); font-weight: 900; }
 
-        /* PANELI */
         #admin-panel, #match-panel {
             position: fixed; bottom: 0; left: 0; width: 100%; z-index: 9999;
             background: var(--dark); color: white; padding: 15px 15px calc(25px + env(safe-area-inset-bottom));
@@ -146,7 +139,6 @@
             <button onclick="zatvoriSvePanele()" style="color:white; background:#333; border:none; width:30px; height:30px; border-radius:50%; font-weight:900;">×</button>
         </div>
         <input type="text" id="court-name" placeholder="Ime stadiona / hale">
-        <input type="text" id="ad-url" placeholder="URL Slike Reklame (opciono)">
         <div class="sport-grid">
             <div class="sport-item selected" onclick="selectSport('⚽', 'fudbal', this)">⚽<span>Fudbal</span></div>
             <div class="sport-item" onclick="selectSport('🏀', 'kosarka', this)">🏀<span>Basket</span></div>
@@ -166,7 +158,6 @@
             </div>
             <input type="text" id="team-a" placeholder="Tim 1">
             <input type="text" id="team-b" placeholder="Tim 2">
-            <input type="text" id="ad-url-edit" placeholder="URL reklame">
             <button class="btn-action" style="background:var(--accent)" onclick="updateStatus('live')">GO LIVE 🔴</button>
             <button class="btn-action" style="background:#c0392b; margin-top:8px;" onclick="obrisiTeren()">OBRIŠI TEREN</button>
         </div>
@@ -213,6 +204,8 @@
         var userMarker, tempMarker, currentCourtId = null, isAdmin = false, selectedSport = { emoji: '⚽', slug: 'fudbal' }, tempCoords = null;
         var courtMarkers = L.layerGroup().addTo(map);
 
+        map.on('moveend', () => { const c = map.getCenter(); localStorage.setItem('lastLat', c.lat); localStorage.setItem('lastLng', c.lng); localStorage.setItem('lastZoom', map.getZoom()); osveziTereneUCentru(); });
+
         function startExplore() {
             document.getElementById('startup-screen').classList.add('hidden'); 
             document.getElementById('map').classList.remove('map-blur');
@@ -246,9 +239,9 @@
         function searchCity() { fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${document.getElementById('city-search').value}`).then(res => res.json()).then(data => { if(data.length > 0) { map.setView([data[0].lat, data[0].lon], 13); document.getElementById('city-search').classList.remove('expanded'); } }); }
 
         function saveCourt() {
-            const n = document.getElementById('court-name').value, ad = document.getElementById('ad-url').value, u = JSON.parse(localStorage.getItem('loggedAdmin'));
+            const n = document.getElementById('court-name').value, u = JSON.parse(localStorage.getItem('loggedAdmin'));
             if(!n || !u || !tempCoords) return;
-            db.ref('tereni').push({ ime: n, sport: selectedSport.slug, emoji: selectedSport.emoji, lat: tempCoords.lat, lng: tempCoords.lng, status: 'slobodno', scoreA: 0, scoreB: 0, timA: '', timB: '', arhiva: '', vlasnik: u.email, reklama: ad, penA: 0, penB: 0 }).then(() => zatvoriSvePanele());
+            db.ref('tereni').push({ ime: n, sport: selectedSport.slug, emoji: selectedSport.emoji, lat: tempCoords.lat, lng: tempCoords.lng, status: 'slobodno', scoreA: 0, scoreB: 0, timA: '', timB: '', arhiva: '', vlasnik: u.email, penA: 0, penB: 0 }).then(() => zatvoriSvePanele());
         }
 
         function otvoriUredi(id) {
@@ -256,8 +249,7 @@
             db.ref('tereni/' + id).once('value', snap => {
                 const c = snap.val(); if(!c) return;
                 document.getElementById('target-court-name').innerText = c.ime;
-                document.getElementById('team-a').value = c.timA; document.getElementById('team-b').value = c.timB;
-                document.getElementById('ad-url-edit').value = c.reklama || '';
+                document.getElementById('team-a').value = c.timA || ''; document.getElementById('team-b').value = c.timB || '';
                 setupControlView(c.status); setupLivePanel(c); document.getElementById('match-panel').classList.add('active');
             });
         }
@@ -324,7 +316,7 @@
         }
 
         function updateStatus(s) {
-            db.ref('tereni/'+currentCourtId).update({ status: s, timA: document.getElementById('team-a').value, timB: document.getElementById('team-b').value, reklama: document.getElementById('ad-url-edit').value }).then(() => setupControlView(s));
+            db.ref('tereni/'+currentCourtId).update({ status: s, timA: document.getElementById('team-a').value, timB: document.getElementById('team-b').value }).then(() => setupControlView(s));
         }
 
         function osveziTereneUCentru() {
@@ -336,31 +328,20 @@
         }
 
         function renderujMarker(id, c) {
-            const hasAd = c.reklama && c.reklama.length > 5;
-            const markerId = `marker-${id}`;
             let dS = `${c.scoreA}-${c.scoreB}`;
             if (c.penA > 0 || c.penB > 0) dS += ` (pen. ${c.penA}:${c.penB})`;
-
             const html = `
-                <div id="${markerId}" class="flip-container">
-                    <div class="flipper">
-                        <div class="score-front">
-                            <div class="score-name-row">${c.ime}</div>
-                            <div class="score-main-row">
-                                <div class="status-tag ${c.status === 'live' ? 'bg-live' : (c.status === 'zavrseno' ? 'bg-ft' : 'bg-free')}">${c.status.toUpperCase()}</div>
-                                <div class="match-info">${c.timA || 'FREE'} ${dS} ${c.timB || ''}</div>
-                            </div>
-                            ${c.arhiva ? `<div class="score-sub-row">${c.arhiva}</div>` : ''}
-                        </div>
-                        <div class="score-back">
-                            ${hasAd ? `<img src="${c.reklama}" />` : `<div style="color:white; font-size:10px; font-weight:900;">LOCALIVE AD</div>`}
-                        </div>
+                <div class="map-scoreboard">
+                    <div class="score-name-row">${c.ime}</div>
+                    <div class="score-main-row">
+                        <div class="status-tag ${c.status === 'live' ? 'bg-live' : (c.status === 'zavrseno' ? 'bg-ft' : 'bg-free')}">${c.status.toUpperCase()}</div>
+                        <div class="match-info">${c.timA || 'FREE'} ${dS} ${c.timB || ''}</div>
                     </div>
-                    <div style="text-align:center; font-size:32px; margin-top:5px;">${c.emoji}</div>
+                    ${c.arhiva ? `<div class="score-sub-row">${c.arhiva}</div>` : ''}
+                    <div style="text-align:center; font-size:32px; padding:5px; background:transparent;">${c.emoji}</div>
                 </div>
             `;
             L.marker([c.lat, c.lng], { icon: L.divIcon({ html: html, iconAnchor:[16,16], className:'' }) }).bindPopup(`<div style="text-align:center;"><b>${c.ime}</b><br><button onclick="otvoriUredi('${id}')" style="width:100%; margin-top:10px; padding:8px; background:#000; color:#fff; border-radius:8px; font-weight:900;">UREDI</button></div>`).addTo(courtMarkers);
-            if (hasAd) { setInterval(() => { const el = document.getElementById(markerId); if (el) { el.classList.add('flip-active'); setTimeout(() => el.classList.remove('flip-active'), 5000); } }, 60000); }
         }
 
         function obrisiTeren() { if(confirm("Obriši?")) db.ref('tereni/'+currentCourtId).remove().then(() => zatvoriSvePanele()); }
