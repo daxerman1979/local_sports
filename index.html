@@ -6,8 +6,6 @@
     <title>LOCALIVE - Smart Sports Map</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
     
     <style>
         :root { --primary: #e74c3c; --dark: #121212; --accent: #2ecc71; --blue: #3498db; --grey: #7f8c8d; }
@@ -126,12 +124,6 @@
         .modal { background: white; padding: 20px; border-radius: 20px; width: 85%; max-width: 320px; text-align: center; }
         .pulse-marker { width: 14px; height: 14px; background: #3498db; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 15px #3498db; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.6); opacity: 0.5; } 100% { transform: scale(1); opacity: 1; } }
-        
-        /* Nežna bela linija paukove mreže */
-        .leaflet-cluster-spider-leg { 
-            stroke: rgba(255, 255, 255, 0.4) !important; 
-            stroke-width: 1px !important; 
-        }
     </style>
 </head>
 <body>
@@ -247,7 +239,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
 
     <script>
         const firebaseConfig = { 
@@ -266,16 +257,7 @@
             .then(res => res.json()).then(data => { L.geoJson(data, { style: { color: "#ffffff", weight: 1.5, fillOpacity: 0, dashArray: '5, 5' }, interactive: false }).addTo(map); });
 
         var userMarker, tempMarker, currentCourtId = null, isAdmin = false, selectedSport = { emoji: '⚽', slug: 'fudbal' }, tempCoords = null;
-        
-        // PODEŠAVANJE ZA PERMANENTNO RAZDVAKANJE SA PRECIZNIM LINIJAMA
-        var courtMarkers = L.markerClusterGroup({
-            showCoverageOnHover: false,
-            zoomToBoundsOnClick: false,
-            spiderfyOnMaxZoom: false, 
-            disableClusteringAtZoom: 1, 
-            spiderfyDistanceMultiplier: 4, 
-            maxClusterRadius: 80 
-        }).addTo(map);
+        var courtMarkers = L.layerGroup().addTo(map);
 
         map.on('moveend', () => { const center = map.getCenter(); localStorage.setItem('lastLat', center.lat); localStorage.setItem('lastLng', center.lng); localStorage.setItem('lastZoom', map.getZoom()); osveziTereneUCentru(); });
 
@@ -338,9 +320,11 @@
         map.on('click', e => { 
             if (!isAdmin) return; 
             if (e.originalEvent._stopped) return; 
+
             tempCoords = e.latlng; 
             if (tempMarker) map.removeLayer(tempMarker); 
             tempMarker = L.marker(e.latlng, { icon: L.divIcon({ html: '📍', iconSize:[30,30], iconAnchor:[15,30] }) }).addTo(map); 
+            
             document.getElementById('match-panel').classList.remove('active');
             document.getElementById('admin-panel').classList.add('active'); 
         });
@@ -393,6 +377,7 @@
                 pc.innerHTML = '';
                 let arhivaStr = data.arhiva || "", countPeriods = arhivaStr ? arhivaStr.split(', ').length : 0;
                 let nextLabel = "", namePrefix = "", isPenalMode = false;
+
                 if (data.sport === "fudbal" || data.sport === "rukomet") {
                     if (countPeriods === 0) { nextLabel = "KRAJ 1.P"; namePrefix = "1P "; }
                     else if (countPeriods === 1) { nextLabel = "KRAJ 2.P (FT)"; namePrefix = "2P "; }
@@ -406,6 +391,7 @@
                     if (countPeriods < 4) { nextLabel = `KRAJ ${countPeriods+1}. ČETVRTINE`; namePrefix = `${countPeriods+1}Q `; }
                     else { nextLabel = "KRAJ PRODUŽETKA"; namePrefix = "ET "; }
                 }
+
                 if (nextLabel && data.status === 'live') {
                     let b = document.createElement('button'); b.className = 'btn-period'; b.innerText = nextLabel;
                     b.onclick = () => arhivirajPeriod(namePrefix, isPenalMode); pc.appendChild(b);
@@ -461,23 +447,29 @@
             db.ref('tereni').on('value', snap => { 
                 courtMarkers.clearLayers(); 
                 const data = snap.val(); 
+                // Logika za sprečavanje preklapanja bez Cluster grupe
+                let usedCoords = [];
                 for (let id in data) { 
                     const c = data[id]; 
-                    if (centar.distanceTo(L.latLng(c.lat, c.lng)) <= 20000) renderujMarker(id, c); 
-                } 
-                
-                // AUTOMATSKO RAZDVAKANJE KLIKOM NA KLASTER RADI PRECIZNIH LINIJA
-                setTimeout(() => {
-                    courtMarkers.eachLayer(function(layer) {
-                        if (layer.__parent) {
-                            layer.__parent.spiderfy();
+                    if (centar.distanceTo(L.latLng(c.lat, c.lng)) <= 20000) {
+                        // Offset sistem: ako je lokacija zauzeta, pomeri marker malo
+                        let lat = c.lat;
+                        let lng = c.lng;
+                        let key = lat.toFixed(4) + "," + lng.toFixed(4);
+                        
+                        while(usedCoords.includes(key)) {
+                            lat += 0.0001; // Blagi pomak na gore
+                            lng += 0.0001; // Blagi pomak u desno
+                            key = lat.toFixed(4) + "," + lng.toFixed(4);
                         }
-                    });
-                }, 300);
+                        usedCoords.push(key);
+                        renderujMarker(id, c, lat, lng); 
+                    }
+                } 
             });
         }
 
-        function renderujMarker(id, c) {
+        function renderujMarker(id, c, visualLat, visualLng) {
             const isS = (c.sport === 'tenis' || c.sport === 'odbojka'); let dS = isS ? `${c.setA||0}-${c.setB||0}` : `${c.scoreA||0}-${c.scoreB||0}`;
             if (c.penA > 0 || c.penB > 0) dS += ` (pen. ${c.penA}:${c.penB})`;
             let sL = "FREE", sC = "bg-free", mT = "SLOBODAN TEREN", bR = "";
@@ -502,8 +494,10 @@
                     ${c.emoji}
                 </div>`;
             
-            const marker = L.marker([c.lat, c.lng], { icon: L.divIcon({ html: html, iconAnchor:[16,16], className:'' }) });
-            courtMarkers.addLayer(marker);
+            // Koristimo visualLat i visualLng za prikaz, originalne koordinate ostaju u bazi
+            L.marker([visualLat, visualLng], { 
+                icon: L.divIcon({ html: html, iconAnchor:[16,16], className:'' }) 
+            }).addTo(courtMarkers);
         }
 
         function locirajMe() { map.locate({setView: true, maxZoom: 16}); map.on('locationfound', e => { if (userMarker) userMarker.setLatLng(e.latlng); else userMarker = L.marker(e.latlng, {icon: L.divIcon({className:'', html:"<div class='pulse-marker'></div>"})}).addTo(map); }); }
