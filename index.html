@@ -20,6 +20,7 @@
         #map { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1; transition: filter 0.8s ease; }
         .map-blur { filter: blur(15px) brightness(0.5); }
 
+        /* STARTUP SCREEN */
         #startup-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 10001; display: flex; justify-content: center; align-items: center;
@@ -43,6 +44,7 @@
         .logo { font-size: 22px; font-weight: 900; color: var(--primary); text-shadow: 0 0 10px rgba(0,0,0,1); letter-spacing: 1px; }
         .nav-btn { background: rgba(0,0,0,0.8); border: 2px solid rgba(255,255,255,0.5); color: white; padding: 6px 12px; border-radius: 15px; font-size: 11px; font-weight: 900; margin-left: 5px; }
 
+        /* SEARCH BAR */
         .search-wrapper {
             position: fixed; top: 70px; right: 15px; z-index: 2000;
             display: flex; align-items: center; justify-content: flex-end;
@@ -62,6 +64,7 @@
             align-items: center; cursor: pointer; font-size: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
         }
 
+        /* PANELS */
         #admin-panel, #match-panel {
             position: fixed; bottom: 0; left: 0; width: 100%; z-index: 9999;
             background: var(--dark); color: white;
@@ -82,30 +85,31 @@
         .btn-minus { background: #c0392b !important; }
         .btn-period { width: 100%; background: var(--blue); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: 900; margin-top: 10px; text-transform: uppercase; font-size: 11px; }
 
+        /* PROFI MAP SCOREBOARD - COMPACT DESIGN */
         .map-scoreboard {
-            position: absolute; bottom: 45px; left: 50%; transform: translateX(-50%);
+            position: absolute; bottom: 42px; left: 50%; transform: translateX(-50%);
             display: flex; flex-direction: column; 
-            width: max-content; min-width: 130px; max-width: 280px;
-            background: #000; border-radius: 12px; border: 2px solid #ffffff;
-            box-shadow: 0 12px 30px rgba(0,0,0,1); overflow: hidden; z-index: 1000;
+            width: 140px; 
+            background: rgba(0,0,0,0.95); border-radius: 10px; border: 1px solid #fff;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.8); overflow: hidden; z-index: 1000;
         }
         .score-name-row {
-            background: #ffffff; color: #000; font-size: 10px; font-weight: 900;
-            padding: 6px 12px; text-align: center; border-bottom: 2px solid #000;
-            text-transform: uppercase; line-height: 1.1; letter-spacing: 0.5px;
+            background: #fff; color: #000; font-size: 8px; font-weight: 900;
+            padding: 3px 6px; text-align: center; border-bottom: 1px solid #000;
+            text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
-        .score-main-row { display: flex; flex-direction: row; align-items: stretch; background: #000; }
-        .status-tag {
-            font-size: 9px; font-weight: 900; padding: 10px 6px; color: #fff;
-            text-transform: uppercase; writing-mode: vertical-lr; transform: rotate(180deg);
-            text-align: center; border-left: 2px solid rgba(255,255,255,0.2);
-            display: flex; align-items: center; justify-content: center;
+        .score-main-row { display: flex; align-items: center; padding: 6px 8px; background: #000; justify-content: center; }
+        
+        .status-dot {
+            width: 6px; height: 6px; border-radius: 50%; margin-right: 6px; flex-shrink: 0;
         }
-        .match-info { flex-grow: 1; padding: 10px 14px; text-align: center; color: #ffffff; font-weight: 900; font-size: 13px; white-space: nowrap; letter-spacing: 0.3px; }
+        .match-info { 
+            color: #ffffff; font-weight: 900; font-size: 11px; text-align: center;
+            letter-spacing: 0.2px; line-height: 1;
+        }
         .score-sub-row {
-            background: #111; color: #ffffff; font-size: 9px; padding: 5px 10px;
-            text-align: center; border-top: 1px solid rgba(255,255,255,0.3); white-space: normal;
-            word-wrap: break-word; line-height: 1.3; font-weight: 900;
+            background: rgba(255,255,255,0.05); color: #aaa; font-size: 7px; padding: 3px;
+            text-align: center; border-top: 1px solid rgba(255,255,255,0.1); font-weight: 700;
         }
 
         .bg-upcoming { background: var(--accent) !important; }
@@ -114,7 +118,7 @@
         .bg-free { background: var(--blue) !important; }
 
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
-        .marker-live { filter: drop-shadow(0 0 18px #fff) !important; }
+        .marker-live { filter: drop-shadow(0 0 10px #fff) !important; }
         
         input { width: 100%; padding: 14px; margin: 8px 0; border: 2px solid #ddd; border-radius: 12px; font-size: 16px; box-sizing: border-box; background: #fff; font-weight: 900; }
         .btn-action { width: 100%; background: var(--primary); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 900; font-size: 16px; margin-top: 5px; }
@@ -273,10 +277,7 @@
         auth.onAuthStateChanged(user => {
             if (user) {
                 db.ref('admins/' + user.uid).once('value', snap => {
-                    if(snap.exists()){
-                        setupAdminUI(snap.val());
-                        if(document.getElementById('startup-screen').classList.contains('hidden') === false) startExplore();
-                    }
+                    if(snap.exists()){ setupAdminUI(snap.val()); if(document.getElementById('startup-screen').classList.contains('hidden') === false) startExplore(); }
                 });
             }
         });
@@ -301,30 +302,24 @@
         }
 
         function setupAdminUI(u) { 
-            isAdmin = true; 
-            document.getElementById('guest-nav').classList.add('hidden'); 
+            isAdmin = true; document.getElementById('guest-nav').classList.add('hidden'); 
             document.getElementById('admin-info').classList.remove('hidden'); 
             document.getElementById('admin-name').innerText = u.nickname; 
         }
 
         function logoutAdmin() { 
             auth.signOut().then(() => {
-                isAdmin = false; 
-                document.getElementById('admin-info').classList.add('hidden'); 
+                isAdmin = false; document.getElementById('admin-info').classList.add('hidden'); 
                 document.getElementById('guest-nav').classList.remove('hidden'); 
-                zatvoriSvePanele(); 
-                osveziTereneUCentru(); 
+                zatvoriSvePanele(); osveziTereneUCentru(); 
             });
         }
 
         map.on('click', e => { 
             if (!isAdmin) return; 
             if (e.originalEvent._stopped) return; 
-
-            tempCoords = e.latlng; 
-            if (tempMarker) map.removeLayer(tempMarker); 
+            tempCoords = e.latlng; if (tempMarker) map.removeLayer(tempMarker); 
             tempMarker = L.marker(e.latlng, { icon: L.divIcon({ html: '📍', iconSize:[30,30], iconAnchor:[15,30] }) }).addTo(map); 
-            
             document.getElementById('match-panel').classList.remove('active');
             document.getElementById('admin-panel').classList.add('active'); 
         });
@@ -376,25 +371,14 @@
                 document.getElementById('label-team-b').innerText = data.timB || 'TIM 2';
                 pc.innerHTML = '';
                 let arhivaStr = data.arhiva || "", countPeriods = arhivaStr ? arhivaStr.split(', ').length : 0;
-                let nextLabel = "", namePrefix = "", isPenalMode = false;
-
+                let nextLabel = "", namePrefix = "";
                 if (data.sport === "fudbal" || data.sport === "rukomet") {
                     if (countPeriods === 0) { nextLabel = "KRAJ 1.P"; namePrefix = "1P "; }
                     else if (countPeriods === 1) { nextLabel = "KRAJ 2.P (FT)"; namePrefix = "2P "; }
-                    else if (countPeriods === 2) { nextLabel = "KRAJ PRODUŽETKA"; namePrefix = "ET "; }
-                    else if (countPeriods === 3) { nextLabel = "KRAJ PENALA"; namePrefix = "PEN "; isPenalMode = true; }
-                } else if (data.sport === "hokej") {
-                    if (countPeriods < 3) { nextLabel = `KRAJ ${countPeriods+1}. TREĆINE`; namePrefix = `${countPeriods+1}T `; }
-                    else if (countPeriods === 3) { nextLabel = "KRAJ PRODUŽETKA"; namePrefix = "ET "; }
-                    else if (countPeriods === 4) { nextLabel = "KRAJ PENALA"; namePrefix = "PEN "; isPenalMode = true; }
-                } else if (data.sport === "kosarka") {
-                    if (countPeriods < 4) { nextLabel = `KRAJ ${countPeriods+1}. ČETVRTINE`; namePrefix = `${countPeriods+1}Q `; }
-                    else { nextLabel = "KRAJ PRODUŽETKA"; namePrefix = "ET "; }
-                }
-
+                } 
                 if (nextLabel && data.status === 'live') {
                     let b = document.createElement('button'); b.className = 'btn-period'; b.innerText = nextLabel;
-                    b.onclick = () => arhivirajPeriod(namePrefix, isPenalMode); pc.appendChild(b);
+                    b.onclick = () => arhivirajPeriod(namePrefix); pc.appendChild(b);
                 }
                 renderujPoeneAdmin(data);
             });
@@ -410,13 +394,13 @@
             });
         }
 
-        function arhivirajPeriod(namePrefix, isPenal) {
+        function arhivirajPeriod(namePrefix) {
             db.ref('tereni/' + currentCourtId).once('value', snap => {
                 const c = snap.val(); let arhivaArr = c.arhiva ? c.arhiva.split(', ') : [], sumA = 0, sumB = 0;
-                arhivaArr.forEach(par => { let cisto = par.split(' ')[1] || par, parts = cisto.split(':'); if (parts.length === 2) { sumA += parseInt(parts[0]); sumB += parseInt(parts[1]); } });
+                arhivaArr.forEach(par => { let parts = (par.split(' ')[1] || par).split(':'); if (parts.length === 2) { sumA += parseInt(parts[0]); sumB += parseInt(parts[1]); } });
                 let diffA = c.scoreA - sumA, diffB = c.scoreB - sumB;
-                if (isPenal) { db.ref('tereni/' + currentCourtId).update({ arhiva: (c.arhiva ? c.arhiva + ", " : "") + namePrefix + c.scoreA + ":" + c.scoreB, penA: c.scoreA, penB: c.scoreB, scoreA: sumA, scoreB: sumB }); }
-                else { let rez = `${diffA}:${diffB}`, nova = c.arhiva ? c.arhiva + ", " + namePrefix + rez : namePrefix + rez; db.ref('tereni/' + currentCourtId).update({ arhiva: nova }); }
+                let rez = `${diffA}:${diffB}`, nova = c.arhiva ? c.arhiva + ", " + namePrefix + rez : namePrefix + rez; 
+                db.ref('tereni/' + currentCourtId).update({ arhiva: nova });
             });
         }
 
@@ -447,21 +431,12 @@
             db.ref('tereni').on('value', snap => { 
                 courtMarkers.clearLayers(); 
                 const data = snap.val(); 
-                // Logika za sprečavanje preklapanja bez Cluster grupe
                 let usedCoords = [];
                 for (let id in data) { 
                     const c = data[id]; 
                     if (centar.distanceTo(L.latLng(c.lat, c.lng)) <= 20000) {
-                        // Offset sistem: ako je lokacija zauzeta, pomeri marker malo
-                        let lat = c.lat;
-                        let lng = c.lng;
-                        let key = lat.toFixed(4) + "," + lng.toFixed(4);
-                        
-                        while(usedCoords.includes(key)) {
-                            lat += 0.0001; // Blagi pomak na gore
-                            lng += 0.0001; // Blagi pomak u desno
-                            key = lat.toFixed(4) + "," + lng.toFixed(4);
-                        }
+                        let lat = c.lat, lng = c.lng, key = lat.toFixed(4) + "," + lng.toFixed(4);
+                        while(usedCoords.includes(key)) { lat += 0.00015; lng += 0.00015; key = lat.toFixed(4) + "," + lng.toFixed(4); }
                         usedCoords.push(key);
                         renderujMarker(id, c, lat, lng); 
                     }
@@ -470,23 +445,24 @@
         }
 
         function renderujMarker(id, c, visualLat, visualLng) {
-            const isS = (c.sport === 'tenis' || c.sport === 'odbojka'); let dS = isS ? `${c.setA||0}-${c.setB||0}` : `${c.scoreA||0}-${c.scoreB||0}`;
-            if (c.penA > 0 || c.penB > 0) dS += ` (pen. ${c.penA}:${c.penB})`;
-            let sL = "FREE", sC = "bg-free", mT = "SLOBODAN TEREN", bR = "";
-            if(c.status === 'najava') { sL = "NAJAVA"; sC = "bg-upcoming"; mT = `${c.timA} vs ${c.timB}`; bR = `<div class="score-sub-row">${c.datum}</div>`; }
-            else if(c.status === 'live') { sL = "LIVE"; sC = "bg-live"; mT = `${c.timA} ${dS} ${c.timB}${isS?` <span style='color:var(--accent)'>[${c.scoreA}:${c.scoreB}]</span>`:""}`; bR = c.arhiva ? `<div class="score-sub-row">${c.arhiva}</div>` : ''; }
-            else if(c.status === 'zavrseno') { sL = "FT"; sC = "bg-ft"; mT = `${c.timA} ${dS} ${c.timB}`; bR = c.arhiva ? `<div class="score-sub-row">${c.arhiva}</div>` : ''; }
+            const isS = (c.sport === 'tenis' || c.sport === 'odbojka'); 
+            let dS = isS ? `${c.setA||0}-${c.setB||0}` : `${c.scoreA||0}-${c.scoreB||0}`;
+            
+            let sL = "", sC = "bg-free", mT = "FREE", bR = "";
+            if(c.status === 'najava') { sC = "bg-upcoming"; mT = `${c.timA} - ${c.timB}`; bR = `<div class="score-sub-row">${c.datum}</div>`; }
+            else if(c.status === 'live') { sC = "bg-live"; mT = `${c.timA} ${dS} ${c.timB}`; bR = c.arhiva ? `<div class="score-sub-row">${c.arhiva}</div>` : ''; }
+            else if(c.status === 'zavrseno') { sC = "bg-ft"; mT = `${c.timA} ${dS} ${c.timB}`; bR = c.arhiva ? `<div class="score-sub-row">${c.arhiva}</div>` : ''; }
 
             const user = auth.currentUser;
             const isOwner = isAdmin && user && c.vlasnik === user.email;
             const clickAction = isOwner ? `onclick="L.DomEvent.stopPropagation(event); otvoriUredi('${id}')"` : "";
 
             const html = `
-                <div class="icon-container ${c.status === 'live' ? 'marker-live' : ''}" style="position:relative; font-size:32px;">
+                <div class="icon-container ${c.status === 'live' ? 'marker-live' : ''}" style="position:relative; font-size:24px;">
                     <div class="map-scoreboard" ${clickAction} style="${isOwner ? 'cursor:pointer;' : ''}">
                         <div class="score-name-row">${c.ime}</div>
                         <div class="score-main-row">
-                            <div class="status-tag ${sC}">${sL}</div>
+                            <div class="status-dot ${sC}"></div>
                             <div class="match-info">${mT}</div>
                         </div>
                         ${bR}
@@ -494,10 +470,7 @@
                     ${c.emoji}
                 </div>`;
             
-            // Koristimo visualLat i visualLng za prikaz, originalne koordinate ostaju u bazi
-            L.marker([visualLat, visualLng], { 
-                icon: L.divIcon({ html: html, iconAnchor:[16,16], className:'' }) 
-            }).addTo(courtMarkers);
+            L.marker([visualLat, visualLng], { icon: L.divIcon({ html: html, iconAnchor:[12,12], className:'' }) }).addTo(courtMarkers);
         }
 
         function locirajMe() { map.locate({setView: true, maxZoom: 16}); map.on('locationfound', e => { if (userMarker) userMarker.setLatLng(e.latlng); else userMarker = L.marker(e.latlng, {icon: L.divIcon({className:'', html:"<div class='pulse-marker'></div>"})}).addTo(map); }); }
