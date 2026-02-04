@@ -143,6 +143,7 @@
             <h4 style="font-weight:900;">Registracija Admina</h4>
             <input type="text" id="reg-nick" placeholder="Nickname">
             <input type="email" id="reg-email" placeholder="Email">
+            <input type="password" id="reg-pass" placeholder="Lozinka (min. 6 karaktera)">
             <button class="btn-action" onclick="registerAdmin()">Registruj me</button>
             <button onclick="toggleModal('register-screen', false)" style="background:none; border:none; margin-top:12px; color:#999; font-weight:900;">Zatvori</button>
         </div>
@@ -151,7 +152,8 @@
     <div id="login-screen" class="overlay hidden">
         <div class="modal">
             <h4 style="font-weight:900;">Admin Login</h4>
-            <input type="email" id="login-email" placeholder="Unesite email">
+            <input type="email" id="login-email" placeholder="Email">
+            <input type="password" id="login-pass" placeholder="Lozinka">
             <button class="btn-action" onclick="loginAdmin()">Prijavi se</button>
             <button onclick="toggleModal('login-screen', false)" style="background:none; border:none; margin-top:12px; color:#999; font-weight:900;">Zatvori</button>
         </div>
@@ -235,62 +237,165 @@
 
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script>
-        const firebaseConfig = { databaseURL: "https://allsportslocal-ea1d4-default-rtdb.europe-west1.firebasedatabase.app" };
+        // FIREBASE KONFIGURACIJA
+        const firebaseConfig = { 
+            databaseURL: "https://allsportslocal-ea1d4-default-rtdb.europe-west1.firebasedatabase.app" 
+        };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
+        const auth = firebase.auth();
 
+        // LEAFLET MAPA
         var map = L.map('map', { zoomControl: false, tap: false, attributionControl: false }).setView([localStorage.getItem('lastLat')||44.81, localStorage.getItem('lastLng')||20.44], localStorage.getItem('lastZoom')||13);
         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', { zIndex: 1000 }).addTo(map);
 
+        // GRANICE DRŽAVA
         fetch('https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson')
             .then(res => res.json()).then(data => { L.geoJson(data, { style: { color: "#ffffff", weight: 1.5, fillOpacity: 0, dashArray: '5, 5' }, interactive: false }).addTo(map); });
 
         var userMarker, tempMarker, currentCourtId = null, isAdmin = false, selectedSport = { emoji: '⚽', slug: 'fudbal' }, tempCoords = null;
         var courtMarkers = L.layerGroup().addTo(map);
 
-        map.on('moveend', () => { const center = map.getCenter(); localStorage.setItem('lastLat', center.lat); localStorage.setItem('lastLng', center.lng); localStorage.setItem('lastZoom', map.getZoom()); osveziTereneUCentru(); });
+        // PRAĆENJE STANJA PRIJAVE
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                db.ref('admins/' + user.uid).once('value', snap => {
+                    const data = snap.val();
+                    if(data) setupAdminUI(data);
+                });
+            } else {
+                logoutUI();
+            }
+        });
+
+        map.on('moveend', () => { 
+            const center = map.getCenter(); 
+            localStorage.setItem('lastLat', center.lat); 
+            localStorage.setItem('lastLng', center.lng); 
+            localStorage.setItem('lastZoom', map.getZoom()); 
+            osveziTereneUCentru(); 
+        });
 
         function startExplore() {
-            document.getElementById('startup-screen').classList.add('hidden'); document.getElementById('map').classList.remove('map-blur');
-            document.getElementById('main-header').classList.remove('hidden'); document.getElementById('search-bar').classList.remove('hidden');
-            document.getElementById('recenter-btn').classList.remove('hidden'); map.invalidateSize(); osveziTereneUCentru();
+            document.getElementById('startup-screen').classList.add('hidden'); 
+            document.getElementById('map').classList.remove('map-blur');
+            document.getElementById('main-header').classList.remove('hidden'); 
+            document.getElementById('search-bar').classList.remove('hidden');
+            document.getElementById('recenter-btn').classList.remove('hidden'); 
+            map.invalidateSize(); 
+            osveziTereneUCentru();
         }
 
-        function toggleSearch() { const inp = document.getElementById('city-search'); if(inp.classList.contains('expanded')) { if(inp.value) searchCity(); else inp.classList.remove('expanded'); } else { inp.classList.add('expanded'); inp.focus(); } }
-        function searchCity() { fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${document.getElementById('city-search').value}`).then(res => res.json()).then(data => { if(data.length > 0) { map.setView([data[0].lat, data[0].lon], 13); document.getElementById('city-search').classList.remove('expanded'); } else alert("Grad nije pronađen."); }); }
+        // PRETRAGA
+        function toggleSearch() { 
+            const inp = document.getElementById('city-search'); 
+            if(inp.classList.contains('expanded')) { 
+                if(inp.value) searchCity(); else inp.classList.remove('expanded'); 
+            } else { 
+                inp.classList.add('expanded'); inp.focus(); 
+            } 
+        }
+        function searchCity() { 
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${document.getElementById('city-search').value}`)
+            .then(res => res.json()).then(data => { 
+                if(data.length > 0) { 
+                    map.setView([data[0].lat, data[0].lon], 13); 
+                    document.getElementById('city-search').classList.remove('expanded'); 
+                    setTimeout(osveziTereneUCentru, 500);
+                } else alert("Grad nije pronađen."); 
+            }); 
+        }
 
-        window.onload = () => { const saved = localStorage.getItem('loggedAdmin'); if (saved) { setupAdminUI(JSON.parse(saved)); startExplore(); } };
-        function toggleModal(id, s) { document.getElementById(id).classList.toggle('hidden', !s); }
+        // ADMIN LOGIKA (AUTH)
+        function registerAdmin() {
+            const email = document.getElementById('reg-email').value.trim();
+            const pass = document.getElementById('reg-pass').value;
+            const nick = document.getElementById('reg-nick').value.trim();
+
+            if(!email || !pass || !nick) return alert("Popunite sva polja.");
+            if(pass.length < 6) return alert("Lozinka mora imati bar 6 karaktera.");
+
+            auth.createUserWithEmailAndPassword(email, pass).then(cred => {
+                return db.ref('admins/' + cred.user.uid).set({ nickname: nick, email: email, uid: cred.user.uid });
+            }).then(() => {
+                alert("Uspešna registracija!");
+                toggleModal('register-screen', false);
+            }).catch(err => alert(err.message));
+        }
 
         function loginAdmin() {
-            db.ref('admins').orderByChild('email').equalTo(document.getElementById('login-email').value.toLowerCase().trim()).once('value', snap => {
-                if (snap.exists()) { const ud = Object.values(snap.val())[0]; localStorage.setItem('loggedAdmin', JSON.stringify(ud)); setupAdminUI(ud); toggleModal('login-screen', false); osveziTereneUCentru(); } else alert("Niste admin.");
-            });
+            const email = document.getElementById('login-email').value.trim();
+            const pass = document.getElementById('login-pass').value;
+            auth.signInWithEmailAndPassword(email, pass)
+                .then(() => toggleModal('login-screen', false))
+                .catch(err => alert("Greška pri prijavi: " + err.message));
         }
-        function setupAdminUI(u) { isAdmin = true; document.getElementById('guest-nav').classList.add('hidden'); document.getElementById('admin-info').classList.remove('hidden'); document.getElementById('admin-name').innerText = u.nickname; }
-        function logoutAdmin() { isAdmin = false; localStorage.removeItem('loggedAdmin'); document.getElementById('admin-info').classList.add('hidden'); document.getElementById('guest-nav').classList.remove('hidden'); zatvoriSvePanele(); osveziTereneUCentru(); }
 
-        map.on('click', e => { if (!isAdmin) return; tempCoords = e.latlng; if (tempMarker) map.removeLayer(tempMarker); tempMarker = L.marker(e.latlng, { icon: L.divIcon({ html: '📍', iconSize:[30,30], iconAnchor:[15,30] }) }).addTo(map); document.getElementById('admin-panel').classList.add('active'); });
-        function selectSport(emoji, slug, el) { selectedSport = { emoji, slug }; document.querySelectorAll('.sport-item').forEach(i => i.classList.remove('selected')); el.classList.add('selected'); }
+        function setupAdminUI(u) {
+            isAdmin = true;
+            document.getElementById('guest-nav').classList.add('hidden');
+            document.getElementById('admin-info').classList.remove('hidden');
+            document.getElementById('admin-name').innerText = u.nickname;
+            osveziTereneUCentru();
+        }
+
+        function logoutAdmin() { auth.signOut(); }
+        
+        function logoutUI() {
+            isAdmin = false;
+            document.getElementById('admin-info').classList.add('hidden');
+            document.getElementById('guest-nav').classList.remove('hidden');
+            zatvoriSvePanele();
+            osveziTereneUCentru();
+        }
+
+        // MAPA CLICK & SAVE
+        map.on('click', e => { 
+            if (!isAdmin) return; 
+            tempCoords = e.latlng; 
+            if (tempMarker) map.removeLayer(tempMarker); 
+            tempMarker = L.marker(e.latlng, { icon: L.divIcon({ html: '📍', iconSize:[30,30], iconAnchor:[15,30] }) }).addTo(map); 
+            document.getElementById('admin-panel').classList.add('active'); 
+        });
+
+        function selectSport(emoji, slug, el) { 
+            selectedSport = { emoji, slug }; 
+            document.querySelectorAll('.sport-item').forEach(i => i.classList.remove('selected')); 
+            el.classList.add('selected'); 
+        }
 
         function saveCourt() {
-            const n = document.getElementById('court-name').value, u = JSON.parse(localStorage.getItem('loggedAdmin'));
-            if(!n || !u || !tempCoords) return;
-            db.ref('tereni').push({ ime: n, sport: selectedSport.slug, emoji: selectedSport.emoji, lat: tempCoords.lat, lng: tempCoords.lng, status: 'slobodno', scoreA: 0, scoreB: 0, timA: '', timB: '', datum: '', arhiva: '', setA: 0, setB: 0, vlasnik: u.email, penA: 0, penB: 0 }).then(() => { zatvoriSvePanele(); osveziTereneUCentru(); });
+            const n = document.getElementById('court-name').value;
+            const user = auth.currentUser;
+            if(!n || !user || !tempCoords) return alert("Unesite ime i označite lokaciju.");
+            
+            db.ref('tereni').push({ 
+                ime: n, sport: selectedSport.slug, emoji: selectedSport.emoji, 
+                lat: tempCoords.lat, lng: tempCoords.lng, status: 'slobodno', 
+                scoreA: 0, scoreB: 0, timA: '', timB: '', datum: '', 
+                arhiva: '', setA: 0, setB: 0, vlasnik: user.email, penA: 0, penB: 0 
+            }).then(() => { 
+                zatvoriSvePanele(); 
+                osveziTereneUCentru(); 
+            });
         }
 
+        // PANEL ZA UREĐIVANJE
         function otvoriUredi(id) {
             currentCourtId = id;
             db.ref('tereni/' + id).once('value', snap => {
                 const c = snap.val(); if(!c) return;
                 document.getElementById('target-court-name').innerText = c.ime;
-                document.getElementById('team-a').value = c.timA || ''; document.getElementById('team-b').value = c.timB || '';
+                document.getElementById('team-a').value = c.timA || ''; 
+                document.getElementById('team-b').value = c.timB || '';
                 document.getElementById('match-date').value = c.datum || '';
-                setupControlView(c.status); setupLivePanel(c);
+                setupControlView(c.status); 
+                setupLivePanel(c);
                 document.getElementById('match-panel').classList.add('active');
             });
         }
@@ -311,6 +416,7 @@
                 document.getElementById('label-team-a').innerText = data.timA || 'TIM 1';
                 document.getElementById('label-team-b').innerText = data.timB || 'TIM 2';
                 pc.innerHTML = '';
+                
                 let arhivaStr = data.arhiva || "", countPeriods = arhivaStr ? arhivaStr.split(', ').length : 0;
                 let nextLabel = "", namePrefix = "", isPenalMode = false;
 
@@ -341,7 +447,6 @@
             bA.innerHTML = bB.innerHTML = ''; 
             if(c.status === 'zavrseno') return;
             
-            // Definišemo poene: košarka ima 1,2,3 - svi ostali (fudbal, rukomet, hokej, tenis, odbojka) imaju +1
             let pts = (c.sport === 'kosarka') ? [1, 2, 3] : [1];
             
             [ {id: 'scoreA', el: bA}, {id: 'scoreB', el: bB} ].forEach(side => {
@@ -356,55 +461,119 @@
 
         function arhivirajPeriod(namePrefix, isPenal) {
             db.ref('tereni/' + currentCourtId).once('value', snap => {
-                const c = snap.val(); let arhivaArr = c.arhiva ? c.arhiva.split(', ') : [], sumA = 0, sumB = 0;
-                arhivaArr.forEach(par => { let cisto = par.split(' ')[1] || par, parts = cisto.split(':'); if (parts.length === 2) { sumA += parseInt(parts[0]); sumB += parseInt(parts[1]); } });
+                const c = snap.val(); 
+                let arhivaArr = c.arhiva ? c.arhiva.split(', ') : [], sumA = 0, sumB = 0;
+                arhivaArr.forEach(par => { 
+                    let cisto = par.split(' ')[1] || par, parts = cisto.split(':'); 
+                    if (parts.length === 2) { sumA += parseInt(parts[0]); sumB += parseInt(parts[1]); } 
+                });
                 let diffA = c.scoreA - sumA, diffB = c.scoreB - sumB;
-                if (isPenal) { db.ref('tereni/' + currentCourtId).update({ arhiva: (c.arhiva ? c.arhiva + ", " : "") + namePrefix + c.scoreA + ":" + c.scoreB, penA: c.scoreA, penB: c.scoreB, scoreA: sumA, scoreB: sumB }); }
-                else { let rez = `${diffA}:${diffB}`, nova = c.arhiva ? c.arhiva + ", " + namePrefix + rez : namePrefix + rez; db.ref('tereni/' + currentCourtId).update({ arhiva: nova }); }
+                if (isPenal) { 
+                    db.ref('tereni/' + currentCourtId).update({ arhiva: (c.arhiva ? c.arhiva + ", " : "") + namePrefix + c.scoreA + ":" + c.scoreB, penA: c.scoreA, penB: c.scoreB, scoreA: sumA, scoreB: sumB }); 
+                } else { 
+                    let rez = `${diffA}:${diffB}`, nova = c.arhiva ? c.arhiva + ", " + namePrefix + rez : namePrefix + rez; 
+                    db.ref('tereni/' + currentCourtId).update({ arhiva: nova }); 
+                }
             });
         }
 
         function proveriPravila(c) {
             let sA = c.scoreA||0, sB = c.scoreB||0, setA = c.setA||0, setB = c.setB||0;
-            if (c.sport === 'odbojka') { let lim = (setA + setB === 4) ? 15 : 25; if ((sA >= lim || sB >= lim) && Math.abs(sA - sB) >= 2) arhivirajAutomatski(sA > sB ? 'setA' : 'setB'); if (setA >= 3 || setB >= 3) updateStatus('zavrseno'); }
-            else if (c.sport === 'tenis') { if (((sA >= 6 || sB >= 6) && Math.abs(sA - sB) >= 2) || sA === 7 || sB === 7) arhivirajAutomatski(sA > sB ? 'setA' : 'setB'); if (setA >= 2 || setB >= 2) updateStatus('zavrseno'); }
+            if (c.sport === 'odbojka') { 
+                let lim = (setA + setB === 4) ? 15 : 25; 
+                if ((sA >= lim || sB >= lim) && Math.abs(sA - sB) >= 2) arhivirajAutomatski(sA > sB ? 'setA' : 'setB'); 
+                if (setA >= 3 || setB >= 3) updateStatus('zavrseno'); 
+            } else if (c.sport === 'tenis') { 
+                if (((sA >= 6 || sB >= 6) && Math.abs(sA - sB) >= 2) || sA === 7 || sB === 7) arhivirajAutomatski(sA > sB ? 'setA' : 'setB'); 
+                if (setA >= 2 || setB >= 2) updateStatus('zavrseno'); 
+            }
         }
 
         function arhivirajAutomatski(w) {
             db.ref('tereni/' + currentCourtId).once('value', snap => {
-                const c = snap.val(); let arh = c.arhiva ? c.arhiva.split(', ') : [], sN = arh.length + 1, rez = `S${sN} ${c.scoreA}:${c.scoreB}`, nova = c.arhiva ? c.arhiva + ", " + rez : rez;
-                let ud = { arhiva: nova, scoreA: 0, scoreB: 0 }; ud[w] = (c[w] || 0) + 1; db.ref('tereni/' + currentCourtId).update(ud);
+                const c = snap.val(); 
+                let arh = c.arhiva ? c.arhiva.split(', ') : [], sN = arh.length + 1, rez = `S${sN} ${c.scoreA}:${c.scoreB}`, nova = c.arhiva ? c.arhiva + ", " + rez : rez;
+                let ud = { arhiva: nova, scoreA: 0, scoreB: 0 }; 
+                ud[w] = (c[w] || 0) + 1; 
+                db.ref('tereni/' + currentCourtId).update(ud);
             });
         }
 
         function updateStatus(s) {
-            const ud = { status: s, timA: document.getElementById('team-a').value, timB: document.getElementById('team-b').value, datum: document.getElementById('match-date').value };
+            const ud = { 
+                status: s, 
+                timA: document.getElementById('team-a').value, 
+                timB: document.getElementById('team-b').value, 
+                datum: document.getElementById('match-date').value 
+            };
             db.ref('tereni/'+currentCourtId).update(ud).then(() => { setupControlView(s); });
         }
 
-        function resetMatch() { if(confirm("Reset meča?")) { db.ref('tereni/'+currentCourtId).update({ status:'slobodno', scoreA:0, scoreB:0, setA:0, setB:0, timA:'', timB:'', datum:'', arhiva:'', penA:0, penB:0 }); zatvoriSvePanele(); } }
-        function obrisiTeren() { if(confirm("Trajno obrisati teren sa mape?")) db.ref('tereni/'+currentCourtId).remove().then(() => zatvoriSvePanele()); }
-        function zatvoriSvePanele() { if (currentCourtId) db.ref('tereni/' + currentCourtId).off('value'); document.getElementById('admin-panel').classList.remove('active'); document.getElementById('match-panel').classList.remove('active'); if(tempMarker) map.removeLayer(tempMarker); }
+        function resetMatch() { 
+            if(confirm("Reset meča?")) { 
+                db.ref('tereni/'+currentCourtId).update({ status:'slobodno', scoreA:0, scoreB:0, setA:0, setB:0, timA:'', timB:'', datum:'', arhiva:'', penA:0, penB:0 }); 
+                zatvoriSvePanele(); 
+            } 
+        }
+        
+        function obrisiTeren() { 
+            if(confirm("Trajno obrisati teren sa mape?")) db.ref('tereni/'+currentCourtId).remove().then(() => zatvoriSvePanele()); 
+        }
 
+        function zatvoriSvePanele() { 
+            if (currentCourtId) db.ref('tereni/' + currentCourtId).off('value'); 
+            document.getElementById('admin-panel').classList.remove('active'); 
+            document.getElementById('match-panel').classList.remove('active'); 
+            if(tempMarker) map.removeLayer(tempMarker); 
+        }
+
+        // RENDER MARKKERA
         function osveziTereneUCentru() {
-            const centar = map.getCenter(); db.ref('tereni').off();
-            db.ref('tereni').on('value', snap => { courtMarkers.clearLayers(); const data = snap.val(); for (let id in data) { const c = data[id]; if (centar.distanceTo(L.latLng(c.lat, c.lng)) <= 20000) renderujMarker(id, c); } });
+            const centar = map.getCenter(); 
+            db.ref('tereni').off();
+            db.ref('tereni').on('value', snap => { 
+                courtMarkers.clearLayers(); 
+                const data = snap.val(); 
+                for (let id in data) { 
+                    const c = data[id]; 
+                    if (centar.distanceTo(L.latLng(c.lat, c.lng)) <= 20000) renderujMarker(id, c); 
+                } 
+            });
         }
 
         function renderujMarker(id, c) {
-            const isS = (c.sport === 'tenis' || c.sport === 'odbojka'); let dS = isS ? `${c.setA||0}-${c.setB||0}` : `${c.scoreA||0}-${c.scoreB||0}`;
+            const isS = (c.sport === 'tenis' || c.sport === 'odbojka'); 
+            let dS = isS ? `${c.setA||0}-${c.setB||0}` : `${c.scoreA||0}-${c.scoreB||0}`;
             if (c.penA > 0 || c.penB > 0) dS += ` (pen. ${c.penA}:${c.penB})`;
+            
             let sL = "FREE", sC = "bg-free", mT = "SLOBODAN TEREN", bR = "";
-            if(c.status === 'najava') { sL = "NAJAVA"; sC = "bg-upcoming"; mT = `${c.timA} vs ${c.timB}`; bR = `<div class="score-sub-row">${c.datum}</div>`; }
-            else if(c.status === 'live') { sL = "LIVE"; sC = "bg-live"; mT = `${c.timA} ${dS} ${c.timB}${isS?` <span style='color:var(--accent)'>[${c.scoreA}:${c.scoreB}]</span>`:""}`; bR = c.arhiva ? `<div class="score-sub-row">${c.arhiva}</div>` : ''; }
-            else if(c.status === 'zavrseno') { sL = "FT"; sC = "bg-ft"; mT = `${c.timA} ${dS} ${c.timB}`; bR = c.arhiva ? `<div class="score-sub-row">${c.arhiva}</div>` : ''; }
+            if(c.status === 'najava') { 
+                sL = "NAJAVA"; sC = "bg-upcoming"; mT = `${c.timA} vs ${c.timB}`; bR = `<div class="score-sub-row">${c.datum}</div>`; 
+            } else if(c.status === 'live') { 
+                sL = "LIVE"; sC = "bg-live"; mT = `${c.timA} ${dS} ${c.timB}${isS?` <span style='color:var(--accent)'>[${c.scoreA}:${c.scoreB}]</span>`:""}`; bR = c.arhiva ? `<div class="score-sub-row">${c.arhiva}</div>` : ''; 
+            } else if(c.status === 'zavrseno') { 
+                sL = "FT"; sC = "bg-ft"; mT = `${c.timA} ${dS} ${c.timB}`; bR = c.arhiva ? `<div class="score-sub-row">${c.arhiva}</div>` : ''; 
+            }
+            
             const html = `<div class="icon-container ${c.status === 'live' ? 'marker-live' : ''}" style="position:relative; font-size:32px;"><div class="map-scoreboard"><div class="score-name-row">${c.ime}</div><div class="score-main-row"><div class="status-tag ${sC}">${sL}</div><div class="match-info">${mT}</div></div>${bR}</div>${c.emoji}</div>`;
-            const uStr = localStorage.getItem('loggedAdmin');
-            const u = uStr ? JSON.parse(uStr) : null;
-            L.marker([c.lat, c.lng], { icon: L.divIcon({ html: html, iconAnchor:[16,16], className:'' }) }).bindPopup(`<div style="text-align:center;"><b style="font-weight:900;">${c.ime}</b>${isAdmin && u && c.vlasnik === u.email ? `<br><button onclick="otvoriUredi('${id}')" style="width:100%; margin-top:10px; padding:10px; background:#000; color:white; border:2px solid white; border-radius:8px; font-weight:900;">UREDI</button>` : ''}</div>`).addTo(courtMarkers);
+            
+            const user = auth.currentUser;
+            const isOwner = user && c.vlasnik === user.email;
+
+            L.marker([c.lat, c.lng], { icon: L.divIcon({ html: html, iconAnchor:[16,16], className:'' }) })
+             .bindPopup(`<div style="text-align:center;"><b style="font-weight:900;">${c.ime}</b>${isAdmin && isOwner ? `<br><button onclick="otvoriUredi('${id}')" style="width:100%; margin-top:10px; padding:10px; background:#000; color:white; border:2px solid white; border-radius:8px; font-weight:900;">UREDI</button>` : ''}</div>`)
+             .addTo(courtMarkers);
         }
 
-        function locirajMe() { map.locate({setView: true, maxZoom: 16}); map.on('locationfound', e => { if (userMarker) userMarker.setLatLng(e.latlng); else userMarker = L.marker(e.latlng, {icon: L.divIcon({className:'', html:"<div class='pulse-marker'></div>"})}).addTo(map); }); }
+        function locirajMe() { 
+            map.locate({setView: true, maxZoom: 16}); 
+            map.on('locationfound', e => { 
+                if (userMarker) userMarker.setLatLng(e.latlng); 
+                else userMarker = L.marker(e.latlng, {icon: L.divIcon({className:'', html:"<div class='pulse-marker'></div>"})}).addTo(map); 
+            }); 
+        }
+
+        function toggleModal(id, s) { document.getElementById(id).classList.toggle('hidden', !s); }
     </script>
 </body>
 </html>
