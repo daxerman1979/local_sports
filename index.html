@@ -64,7 +64,7 @@
         .score-btn { background: #333; border: 1px solid #444; color: white; padding: 8px 4px; border-radius: 6px; font-weight: 900; font-size: 12px; margin: 2px; min-width: 35px; }
         .btn-period { width: 100%; background: var(--blue); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: 900; margin-top: 10px; text-transform: uppercase; font-size: 11px; }
 
-        /* SCOREBOARD KARTICA */
+        /* KARTICA NA MAPI */
         .map-scoreboard {
             position: absolute; bottom: 45px; left: 50%; transform: translateX(-50%);
             width: 105px; background: #000; border: 1.5px solid #fff; border-radius: 8px;
@@ -84,13 +84,13 @@
 
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
 
-        /* INFO MODAL ZA GOSTE */
+        /* MODALI */
         .info-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10005; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
         .info-card { background: #111; border: 2px solid var(--blue); width: 85%; max-width: 300px; border-radius: 20px; padding: 20px; text-align: center; color: white; }
         .info-arhiva { margin-top: 15px; padding: 10px; background: #000; border-radius: 10px; font-size: 13px; color: #ccc; font-weight: 700; }
 
         input { width: 100%; padding: 14px; margin: 8px 0; border: 2px solid #ddd; border-radius: 12px; font-size: 16px; box-sizing: border-box; background: #fff; font-weight: 900; }
-        .btn-action { width: 100%; background: var(--primary); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 900; font-size: 16px; margin-top: 5px; }
+        .btn-action { width: 100%; background: var(--primary); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 900; font-size: 16px; margin-top: 5px; cursor: pointer; }
         .circle-btn { width: 48px; height: 48px; background: white; border: 3px solid #000; border-radius: 50%; position: fixed; right: 12px; bottom: 95px; z-index: 2000; display: flex; justify-content: center; align-items: center; font-size: 22px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
         .hidden { display: none !important; }
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10002; display: flex; justify-content: center; align-items: center; background: rgba(0,0,0,0.9); backdrop-filter: blur(5px); }
@@ -109,16 +109,6 @@
         </div>
     </div>
 
-    <div id="guest-info-modal" class="info-overlay hidden" onclick="this.classList.add('hidden')">
-        <div class="info-card" onclick="event.stopPropagation()">
-            <h2 id="guest-court-name" style="color:var(--blue); margin-bottom:5px;">IME TERENA</h2>
-            <div id="guest-match-teams" style="font-size:18px; font-weight:900;">TIM A vs TIM B</div>
-            <div id="guest-match-score" style="font-size:32px; color:var(--accent); margin:10px 0;">0 : 0</div>
-            <div class="info-arhiva" id="guest-match-arhiva">Nema detalja</div>
-            <button class="btn-action" style="margin-top:15px;" onclick="document.getElementById('guest-info-modal').classList.add('hidden')">ZATVORI</button>
-        </div>
-    </div>
-
     <div id="register-screen" class="overlay hidden">
         <div class="modal">
             <h4 style="font-weight:900;">Registracija Admina</h4>
@@ -133,10 +123,20 @@
     <div id="login-screen" class="overlay hidden">
         <div class="modal">
             <h4 style="font-weight:900;">Admin Login</h4>
-            <input type="email" id="login-email" placeholder="Unesite email">
+            <input type="email" id="login-email" placeholder="Email">
             <input type="password" id="login-pass" placeholder="Lozinka">
             <button class="btn-action" onclick="loginAdmin()">Prijavi se</button>
             <button onclick="toggleModal('login-screen', false)" style="background:none; border:none; margin-top:12px; color:#999; font-weight:900;">Zatvori</button>
+        </div>
+    </div>
+
+    <div id="guest-info-modal" class="info-overlay hidden" onclick="this.classList.add('hidden')">
+        <div class="info-card" onclick="event.stopPropagation()">
+            <h2 id="guest-court-name" style="color:var(--blue); margin-bottom:5px;">IME TERENA</h2>
+            <div id="guest-match-teams" style="font-size:18px; font-weight:900;">TIM A vs TIM B</div>
+            <div id="guest-match-score" style="font-size:32px; color:var(--accent); margin:10px 0;">0 : 0</div>
+            <div class="info-arhiva" id="guest-match-arhiva">Nema detalja</div>
+            <button class="btn-action" style="margin-top:15px;" onclick="document.getElementById('guest-info-modal').classList.add('hidden')">ZATVORI</button>
         </div>
     </div>
 
@@ -152,37 +152,30 @@
     </header>
 
     <div id="admin-panel">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
             <strong style="color:var(--primary); font-weight:900;">DODAJ TEREN</strong>
             <button onclick="zatvoriSvePanele()" style="color:white; background:#333; border:none; width:30px; height:30px; border-radius:50%; font-weight:900;">×</button>
         </div>
-        <input type="text" id="court-name" placeholder="Ime stadiona / hale">
+        <input type="text" id="court-name" placeholder="Ime stadiona">
         <div class="sport-grid">
             <div class="sport-item selected" onclick="selectSport('⚽', 'fudbal', this)">⚽<span>Fudbal</span></div>
             <div class="sport-item" onclick="selectSport('🏀', 'kosarka', this)">🏀<span>Basket</span></div>
             <div class="sport-item" onclick="selectSport('🎾', 'tenis', this)">🎾<span>Tenis</span></div>
-            <div class="sport-item" onclick="selectSport('🏐', 'odbojka', this)">🏐<span>Odbojka</span></div>
         </div>
-        <button class="btn-action" style="background:var(--accent)" onclick="saveCourt()">SAČUVAJ LOKACIJU</button>
+        <button class="btn-action" style="background:var(--accent)" onclick="saveCourt()">SAČUVAJ</button>
     </div>
 
     <div id="match-panel">
         <div id="match-setup">
-            <strong id="target-court-name" style="color:var(--blue); font-weight:900;">UREDI MEČ</strong>
+            <strong id="target-court-name" style="color:var(--blue); font-weight:900;">UREDI</strong>
             <input type="text" id="team-a" placeholder="Tim 1">
             <input type="text" id="team-b" placeholder="Tim 2">
-            <input type="text" id="match-date" placeholder="Datum (npr. 12.05. 20h)">
-            <button class="btn-action" onclick="updateStatus('najava')">NAJAVI MEČ</button>
-            <button class="btn-action" style="background:var(--accent); margin-top:8px;" onclick="updateStatus('live')">GO LIVE 🔴</button>
-            <button class="btn-action" style="background:#555; margin-top:8px;" onclick="resetMatch()">RESET MEČA</button>
-            <button class="btn-action" style="background:#c0392b; margin-top:8px;" onclick="obrisiTeren()">OBRIŠI TEREN</button>
+            <input type="text" id="match-date" placeholder="Datum/Vreme">
+            <button class="btn-action" onclick="updateStatus('najava')">NAJAVI</button>
+            <button class="btn-action" style="background:var(--accent); margin-top:8px;" onclick="updateStatus('live')">LIVE 🔴</button>
+            <button class="btn-action" style="background:#c0392b; margin-top:8px;" onclick="obrisiTeren()">OBRIŠI</button>
         </div>
-
         <div id="match-live" class="hidden">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <span id="live-status-label" style="color:var(--accent); font-weight:900;">LIVE</span>
-                <button onclick="zatvoriSvePanele()" style="color:white; background:#333; border:none; width:30px; height:30px; border-radius:50%; font-weight:900;">×</button>
-            </div>
             <div class="live-controls">
                 <div style="text-align:center; width:45%;">
                     <div id="label-team-a" style="font-size:11px; font-weight:900;">TIM 1</div>
@@ -221,16 +214,8 @@
         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', { zIndex: 1000 }).addTo(map);
 
-        var userMarker, tempMarker, currentCourtId = null, isAdmin = false, selectedSport = { emoji: '⚽', slug: 'fudbal' }, tempCoords = null;
+        var userMarker, tempMarker, currentCourtId = null, isAdmin = false, selectedSport = { emoji: '⚽', slug: 'fudbal' };
         var courtMarkers = L.layerGroup().addTo(map);
-
-        map.on('moveend', () => { const center = map.getCenter(); localStorage.setItem('lastLat', center.lat); localStorage.setItem('lastLng', center.lng); localStorage.setItem('lastZoom', map.getZoom()); osveziTereneUCentru(); });
-
-        function startExplore() {
-            document.getElementById('startup-screen').classList.add('hidden'); document.getElementById('map').classList.remove('map-blur');
-            document.getElementById('main-header').classList.remove('hidden'); document.getElementById('recenter-btn').classList.remove('hidden'); 
-            map.invalidateSize(); osveziTereneUCentru();
-        }
 
         auth.onAuthStateChanged(user => {
             if (user) {
@@ -249,7 +234,7 @@
             const email = document.getElementById('reg-email').value.trim();
             const pass = document.getElementById('reg-pass').value;
             const nick = document.getElementById('reg-nick').value.trim();
-            if(!email || !pass || !nick) return alert("Popuni sva polja");
+            if(!email || !pass || !nick) return alert("Popuni sve!");
             auth.createUserWithEmailAndPassword(email, pass).then(cred => {
                 db.ref('admins/' + cred.user.uid).set({ nickname: nick, email: email, uid: cred.user.uid });
                 toggleModal('register-screen', false);
@@ -263,6 +248,14 @@
         }
 
         function logoutAdmin() { auth.signOut().then(() => location.reload()); }
+        function startExplore() {
+            document.getElementById('startup-screen').classList.add('hidden');
+            document.getElementById('map').classList.remove('map-blur');
+            document.getElementById('main-header').classList.remove('hidden');
+            document.getElementById('recenter-btn').classList.remove('hidden');
+            osveziTereneUCentru();
+        }
+
         function toggleModal(id, s) { document.getElementById(id).classList.toggle('hidden', !s); }
         function selectSport(emoji, slug, el) { selectedSport = { emoji, slug }; document.querySelectorAll('.sport-item').forEach(i => i.classList.remove('selected')); el.classList.add('selected'); }
 
@@ -312,31 +305,24 @@
             document.getElementById('match-live').classList.toggle('hidden', !isLive);
         }
 
-        function setupLivePanel(c) {
+        function setupLivePanel(d) {
             const pc = document.getElementById('period-controls'), bA = document.getElementById('btns-a'), bB = document.getElementById('btns-b');
             db.ref('tereni/' + currentCourtId).on('value', snap => {
-                const d = snap.val(); if(!d) return;
-                document.getElementById('score-a').innerText = d.scoreA || 0; document.getElementById('score-b').innerText = d.scoreB || 0;
+                const data = snap.val(); if(!data) return;
+                document.getElementById('score-a').innerText = data.scoreA || 0; document.getElementById('score-b').innerText = data.scoreB || 0;
                 bA.innerHTML = bB.innerHTML = pc.innerHTML = '';
-                let pts = (d.sport === 'kosarka') ? [1, 2, 3] : [1];
+                let pts = (data.sport === 'kosarka') ? [1, 2, 3] : [1];
                 pts.forEach(p => {
-                    let btnA = document.createElement('button'); btnA.className='score-btn'; btnA.innerText='+'+p; btnA.onclick=()=>db.ref('tereni/'+currentCourtId+'/scoreA').transaction(v=>(v||0)+p); bA.appendChild(btnA);
-                    let btnB = document.createElement('button'); btnB.className='score-btn'; btnB.innerText='+'+p; btnB.onclick=()=>db.ref('tereni/'+currentCourtId+'/scoreB').transaction(v=>(v||0)+p); bB.appendChild(btnB);
+                    let b1 = document.createElement('button'); b1.className='score-btn'; b1.innerText='+'+p; b1.onclick=()=>db.ref('tereni/'+currentCourtId+'/scoreA').transaction(v=>(v||0)+p); bA.appendChild(b1);
+                    let b2 = document.createElement('button'); b2.className='score-btn'; b2.innerText='+'+p; b2.onclick=()=>db.ref('tereni/'+currentCourtId+'/scoreB').transaction(v=>(v||0)+p); bB.appendChild(b2);
                 });
-                
-                let arhivaStr = d.arhiva || "", countPeriods = arhivaStr ? arhivaStr.split('|').length : 0;
-                let nextLabel = "", namePrefix = "";
-                if (d.sport === "fudbal") { if(countPeriods === 0) { nextLabel="KRAJ 1.P"; namePrefix="1P "; } else { nextLabel="KRAJ MEČA"; namePrefix="FT "; } }
-                else if (d.sport === "kosarka") { nextLabel=`KRAJ ${countPeriods+1}.Q`; namePrefix=`Q${countPeriods+1} `; }
-
-                if (nextLabel) {
-                    let bP = document.createElement('button'); bP.className='btn-period'; bP.innerText=nextLabel;
-                    bP.onclick = () => {
-                        let arh = d.arhiva ? d.arhiva + " | " + namePrefix + d.scoreA + ":" + d.scoreB : namePrefix + d.scoreA + ":" + d.scoreB;
-                        db.ref('tereni/' + currentCourtId).update({ arhiva: arh });
-                    };
-                    pc.appendChild(bP);
-                }
+                let bp = document.createElement('button'); bp.className='btn-period'; bp.innerText='ARHIVIRAJ PERIOD';
+                bp.onclick = () => {
+                    let rez = data.scoreA + ":" + data.scoreB;
+                    let arh = data.arhiva ? data.arhiva + " | " + rez : rez;
+                    db.ref('tereni/' + currentCourtId).update({ arhiva: arh });
+                };
+                pc.appendChild(bp);
             });
         }
 
@@ -364,7 +350,7 @@
         }
 
         function renderujMarker(id, c, vLat, vLng) {
-            let sDot = "dot-free", sTxt = "FREE", sA = c.scoreA||0, sB = c.scoreB||0;
+            let sDot = "dot-free", sA = c.scoreA||0, sB = c.scoreB||0;
             if(c.status === 'najava') sDot = "dot-najava";
             else if(c.status === 'live') sDot = "dot-live";
             else if(c.status === 'zavrseno') sDot = "dot-ft";
