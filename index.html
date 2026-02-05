@@ -2,123 +2,187 @@
 <html lang="sr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LOCALIVE - Login & Registracija</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>LOCALIVE - Satelitska Mapa</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
     <style>
-        :root { --primary: #e74c3c; --dark: #1a1a1a; --accent: #2ecc71; --white: #ffffff; }
+        :root { --primary: #e74c3c; --dark: #111; --accent: #2ecc71; }
         
-        body { 
-            margin: 0; font-family: -apple-system, sans-serif; 
-            background: #000; color: white; 
-            display: flex; justify-content: center; align-items: center; height: 100vh;
-        }
+        body, html { margin: 0; padding: 0; height: 100%; width: 100%; font-family: -apple-system, sans-serif; background: #000; overflow: hidden; }
+        #map { width: 100%; height: 100%; position: absolute; visibility: hidden; background: #000; }
+        .visible { visibility: visible !important; }
 
-        .auth-container {
-            background: #fff; padding: 30px; border-radius: 20px;
-            width: 90%; max-width: 350px; text-align: center; color: #333;
+        /* AUTH OVERLAY */
+        .overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.95);
+            display: flex; justify-content: center; align-items: center; z-index: 10000;
         }
-
-        h2 { color: var(--primary); margin-bottom: 20px; }
-        input { 
-            width: 100%; padding: 12px; margin: 10px 0; 
-            border: 2px solid #ddd; border-radius: 10px; box-sizing: border-box;
-            font-size: 16px;
-        }
-
-        .btn {
-            width: 100%; padding: 14px; border: none; border-radius: 12px;
-            font-weight: 900; cursor: pointer; margin-top: 10px; transition: 0.3s;
-        }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-secondary { background: #555; color: white; }
+        .modal { background: #fff; padding: 30px; border-radius: 25px; width: 85%; max-width: 350px; text-align: center; color: #333; }
+        input { width: 100%; padding: 14px; margin: 8px 0; border: 2px solid #eee; border-radius: 12px; box-sizing: border-box; font-size: 16px; }
         
-        .toggle-link { margin-top: 15px; font-size: 14px; color: #666; cursor: pointer; text-decoration: underline; }
-        .hidden { display: none; }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 12px; font-weight: 900; cursor: pointer; margin-top: 10px; transition: 0.2s; }
+        .btn-main { background: var(--primary); color: white; }
+        .btn-explore { background: var(--accent); color: white; }
+        .btn-alt { background: #eee; color: #555; font-size: 12px; }
+
+        /* UI KONTROLE */
+        .ui-element { position: fixed; z-index: 1000; pointer-events: auto; }
+        
+        .top-bar { top: env(safe-area-inset-top, 20px); left: 15px; right: 15px; display: flex; justify-content: space-between; align-items: center; pointer-events: none; }
+        .tag { background: rgba(0,0,0,0.85); color: white; padding: 8px 15px; border-radius: 20px; font-size: 13px; font-weight: bold; border: 1px solid rgba(255,255,255,0.2); pointer-events: auto; }
+
+        .search-box { top: 80px; left: 15px; right: 15px; display: flex; gap: 8px; }
+        #city-input { flex: 1; padding: 12px; border-radius: 15px; border: none; background: rgba(255,255,255,0.9); box-shadow: 0 4px 15px rgba(0,0,0,0.3); font-weight: bold; }
+        .btn-search { width: 45px; height: 45px; border-radius: 15px; background: var(--primary); color: white; border: none; font-size: 18px; }
+
+        .fab { bottom: 30px; right: 20px; width: 55px; height: 55px; border-radius: 50%; background: white; border: none; font-size: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.4); display: flex; justify-content: center; align-items: center; }
+
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <div id="start-screen" class="auth-container">
-        <h1 style="color:var(--primary)">LOCALIVE</h1>
-        <p>Admin Panel Pristup</p>
-        <button class="btn btn-primary" onclick="showForm('login')">PRIJAVI SE</button>
-        <button class="btn btn-secondary" onclick="showForm('register')">REGISTRACIJA</button>
+    <div id="auth-screen" class="overlay">
+        <div class="modal">
+            <h1 style="color:var(--primary); margin-bottom: 5px;">LOCALIVE</h1>
+            <p id="auth-status" style="margin-top:0; font-weight: bold; color: #777;">Admin Panel</p>
+            
+            <div id="auth-fields">
+                <input type="text" id="reg-nick" class="hidden" placeholder="Vaš Nickname">
+                <input type="email" id="auth-email" placeholder="Email">
+                <input type="password" id="auth-pass" placeholder="Lozinka">
+            </div>
+
+            <button class="btn btn-main" id="btn-primary" onclick="handleAuth()">PRIJAVI SE</button>
+            <button class="btn btn-alt" id="btn-toggle" onclick="toggleAuthMode()">NEMAŠ NALOG? REGISTRACIJA</button>
+            <div style="margin: 15px 0; color: #ccc;">ili</div>
+            <button class="btn btn-explore" onclick="startExplore()">ISTRAŽI MAPU 🌍</button>
+        </div>
     </div>
 
-    <div id="register-form" class="auth-container hidden">
-        <h2>Registracija</h2>
-        <input type="text" id="reg-nick" placeholder="Nickname (Ime)">
-        <input type="email" id="reg-email" placeholder="Email">
-        <input type="password" id="reg-pass" placeholder="Lozinka">
-        <button class="btn btn-primary" onclick="handleRegister()">KREIRAJ NALOG</button>
-        <div class="toggle-link" onclick="showForm('login')">Već imaš nalog? Prijavi se</div>
-    </div>
+    <div id="map"></div>
 
-    <div id="login-form" class="auth-container hidden">
-        <h2>Admin Login</h2>
-        <input type="email" id="login-email" placeholder="Email">
-        <input type="password" id="login-pass" placeholder="Lozinka">
-        <button class="btn btn-primary" onclick="handleLogin()">PRISTUPI</button>
-        <div class="toggle-link" onclick="showForm('register')">Nemaš nalog? Registruj se</div>
+    <div id="main-ui" class="hidden">
+        <div class="ui-element top-bar">
+            <div id="user-display" class="tag">Gost</div>
+            <button class="tag" style="background:var(--primary)" onclick="location.reload()">Logout</button>
+        </div>
+
+        <div class="ui-element search-box">
+            <input type="text" id="city-input" placeholder="Pretraži grad ili državu...">
+            <button class="btn-search" onclick="searchLocation()">🔍</button>
+        </div>
+
+        <button class="ui-element fab" onclick="locateMe()">🎯</button>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script>
-        // Tvoja konfiguracija
+        // FIREBASE KONFIGURACIJA
         const firebaseConfig = { 
             apiKey: "AIzaSyCyyqnqeS-9jurBX-6VIRp8CiPTMbXkXgw", 
             databaseURL: "https://allsportslocal-ea1d4-default-rtdb.europe-west1.firebasedatabase.app" 
         };
         firebase.initializeApp(firebaseConfig);
-        
         const auth = firebase.auth();
         const db = firebase.database();
 
-        // Navigacija kroz forme
-        function showForm(type) {
-            document.getElementById('start-screen').classList.add('hidden');
-            document.getElementById('register-form').classList.toggle('hidden', type !== 'register');
-            document.getElementById('login-form').classList.toggle('hidden', type !== 'login');
+        let map, isRegister = false;
+
+        // AUTH LOGIKA
+        function toggleAuthMode() {
+            isRegister = !isRegister;
+            document.getElementById('reg-nick').classList.toggle('hidden', !isRegister);
+            document.getElementById('auth-status').innerText = isRegister ? "Novi Admin" : "Admin Panel";
+            document.getElementById('btn-primary').innerText = isRegister ? "KREIRAJ NALOG" : "PRIJAVI SE";
+            document.getElementById('btn-toggle').innerText = isRegister ? "NAZAD NA LOGIN" : "NEMAŠ NALOG? REGISTRACIJA";
         }
 
-        // Funkcija za REGISTRACIJU
-        function handleRegister() {
-            const email = document.getElementById('reg-email').value;
-            const pass = document.getElementById('reg-pass').value;
+        async function handleAuth() {
+            const email = document.getElementById('auth-email').value;
+            const pass = document.getElementById('auth-pass').value;
             const nick = document.getElementById('reg-nick').value;
 
-            if(!email || !pass || !nick) return alert("Popuni sva polja!");
-
-            auth.createUserWithEmailAndPassword(email, pass)
-                .then((userCredential) => {
-                    // Čuvanje dodatnih podataka o adminu u bazu
-                    return db.ref('admins/' + userCredential.user.uid).set({
-                        nickname: nick,
-                        email: email,
-                        role: 'admin'
-                    });
-                })
-                .then(() => {
-                    alert("Uspešna registracija!");
-                    location.reload(); // Ili preusmeri na mapu
-                })
-                .catch(error => alert(error.message));
+            try {
+                if (isRegister) {
+                    const res = await auth.createUserWithEmailAndPassword(email, pass);
+                    await db.ref('admins/' + res.user.uid).set({ nickname: nick, email: email });
+                } else {
+                    await auth.signInWithEmailAndPassword(email, pass);
+                }
+                startApp();
+            } catch (e) { alert("Greška: " + e.message); }
         }
 
-        // Funkcija za LOGIN
-        function handleLogin() {
-            const email = document.getElementById('login-email').value;
-            const pass = document.getElementById('login-pass').value;
+        function startExplore() {
+            document.getElementById('user-display').innerText = "Režim: Istraživanje";
+            startApp();
+        }
 
-            auth.signInWithEmailAndPassword(email, pass)
-                .then(() => {
-                    alert("Dobrodošli nazad!");
-                    // Ovde ide kod za otvaranje mape
-                })
-                .catch(error => alert("Greška: " + error.message));
+        // INICIJALIZACIJA APLIKACIJE
+        function startApp() {
+            document.getElementById('auth-screen').classList.add('hidden');
+            document.getElementById('main-ui').classList.remove('hidden');
+            initMap();
+            
+            // Provera nick-a ako je logovan
+            auth.onAuthStateChanged(user => {
+                if(user) {
+                    db.ref('admins/' + user.uid).once('value', snap => {
+                        if(snap.exists()) document.getElementById('user-display').innerText = "Admin: " + snap.val().nickname;
+                    });
+                }
+            });
+        }
+
+        function initMap() {
+            // Pamćenje lokacije iz LocalStorage-a
+            const lastLat = localStorage.getItem('localive_lat') || 44.81;
+            const lastLng = localStorage.getItem('localive_lng') || 20.44;
+            const lastZoom = localStorage.getItem('localive_zoom') || 13;
+
+            map = L.map('map', { zoomControl: false }).setView([lastLat, lastLng], lastZoom);
+
+            // 1. SATELITSKI SLOJ (Esri)
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
+
+            // 2. HIBRIDNI SLOJ (Ulice, granice i imena gradova - CartoDB)
+            // Koristimo CartoDB jer je čistiji i uvek besplatan za open-source projekte
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', {
+                pane: 'shadowPane' // Postavlja tekst iznad satelita
+            }).addTo(map);
+
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_road_any/{z}/{x}/{y}{r}.png', {
+                opacity: 0.4
+            }).addTo(map);
+
+            map.on('moveend', () => {
+                const c = map.getCenter();
+                localStorage.setItem('localive_lat', c.lat);
+                localStorage.setItem('localive_lng', c.lng);
+                localStorage.setItem('localive_zoom', map.getZoom());
+            });
+
+            document.getElementById('map').classList.add('visible');
+        }
+
+        // FUNKCIJE KONTROLA
+        async function searchLocation() {
+            const query = document.getElementById('city-input').value;
+            if(!query) return;
+            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}`);
+            const data = await res.json();
+            if(data.length > 0) map.setView([data[0].lat, data[0].lon], 13);
+        }
+
+        function locateMe() {
+            map.locate({setView: true, maxZoom: 16});
         }
     </script>
 </body>
