@@ -2,152 +2,60 @@
 <html lang="sr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Sportska Mapa</title>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mobilna OpenStreetMap</title>
+
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    
+
     <style>
-        body { margin: 0; font-family: sans-serif; display: flex; height: 100vh; }
-        #map { flex-grow: 1; height: 100%; }
-        
-        #admin-panel {
-            width: 300px;
-            background: #f4f4f4;
-            padding: 20px;
-            box-shadow: -2px 0 5px rgba(0,0,0,0.1);
-            overflow-y: auto;
-            z-index: 1000;
+        /* Postavljanje mape da zauzme ceo ekran */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
         }
 
-        .court-card {
-            background: white;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            border-left: 5px solid #333;
+        #map {
+            height: 100vh; /* 100% visine ekrana */
+            width: 100vw;  /* 100% širine ekrana */
         }
 
-        .score-controls {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-top: 10px;
+        /* Prilagođavanje kontrola za lakše korišćenje na dodir */
+        .leaflet-bar a {
+            width: 44px !important;
+            height: 44px !important;
+            line-height: 44px !important;
         }
-
-        button {
-            cursor: pointer;
-            padding: 5px 10px;
-            background: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-        }
-
-        button.delete { background: #dc3545; }
-        .type-badge { font-size: 0.8em; font-weight: bold; text-transform: uppercase; }
-        .football { border-left-color: #28a745; }
-        .basketball { border-left-color: #ff8c00; }
     </style>
 </head>
 <body>
 
     <div id="map"></div>
 
-    <div id="admin-panel">
-        <h2>Admin Panel</h2>
-        <p><small>Klikni na mapu da dodaš teren</small></p>
-        <hr>
-        <div id="courts-list">
-            </div>
-    </div>
-
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script>
-        // 1. Inicijalizacija mape (centrirano na Balkan/Srbiju)
-        const map = L.map('map').setView([44.7866, 20.4489], 13);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        // Inicijalizacija mape (koordinate su postavljene na Balkan kao primer)
+        var map = L.map('map').setView([44.8176, 20.4633], 6);
 
-        let courts = JSON.parse(localStorage.getItem('sports_courts')) || [];
-        const markers = {};
+        // Dodavanje OpenStreetMap sloja (sadrži ulice, gradove i granice)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap doprinosi'
+        }).addTo(map);
 
-        // 2. Funkcija za ispis terena u admin panelu i na mapi
-        function renderCourts() {
-            document.getElementById('courts-list').innerHTML = '';
-            
-            courts.forEach((court, index) => {
-                // Dodavanje markera na mapu ako ne postoji
-                if (!markers[index]) {
-                    const marker = L.marker([court.lat, court.lng]).addTo(map);
-                    marker.bindPopup(`<b>${court.name}</b><br>Rezultat: ${court.scoreA}:${court.scoreB}`);
-                    markers[index] = marker;
-                } else {
-                    markers[index].setPopupContent(`<b>${court.name}</b><br>Rezultat: ${court.scoreA}:${court.scoreB}`);
-                }
+        // Opciono: Dodavanje markera za trenutnu lokaciju korisnika
+        map.locate({setView: true, maxZoom: 16});
 
-                // Dodavanje u listu sa strane
-                const div = document.createElement('div');
-                div.className = `court-card ${court.type}`;
-                div.innerHTML = `
-                    <span class="type-badge">${court.type === 'football' ? '⚽ Fudbal' : '🏀 Košarka'}</span>
-                    <strong>${court.name}</strong>
-                    <div class="score-controls">
-                        <span>Rezultat: <b>${court.scoreA} : ${court.scoreB}</b></span>
-                        <div>
-                            <button onclick="updateScore(${index}, 'A', 1)">+ A</button>
-                            <button onclick="updateScore(${index}, 'B', 1)">+ B</button>
-                        </div>
-                    </div>
-                    <button class="delete" style="margin-top:10px; width:100%" onclick="deleteCourt(${index})">Ukloni teren</button>
-                `;
-                document.getElementById('courts-list').appendChild(div);
-            });
-            
-            localStorage.setItem('sports_courts', JSON.stringify(courts));
+        function onLocationFound(e) {
+            var radius = e.accuracy / 2;
+            L.marker(e.latlng).addTo(map)
+                .bindPopup("Vi ste u krugu od " + radius + " metara od ove tačke").openPopup();
+            L.circle(e.latlng, radius).addTo(map);
         }
 
-        // 3. Klik na mapu za dodavanje novog terena
-        map.on('click', function(e) {
-            const name = prompt("Unesite naziv terena:");
-            if (!name) return;
-            
-            const type = confirm("Kliknite OK za FUDBAL ili CANCEL za KOŠARKU");
-            const courtType = type ? 'football' : 'basketball';
-
-            const newCourt = {
-                lat: e.latlng.lat,
-                lng: e.latlng.lng,
-                name: name,
-                type: courtType,
-                scoreA: 0,
-                scoreB: 0
-            };
-
-            courts.push(newCourt);
-            renderCourts();
-        });
-
-        // 4. Ažuriranje rezultata (Live)
-        window.updateScore = function(index, team, points) {
-            if (team === 'A') courts[index].scoreA += points;
-            else courts[index].scoreB += points;
-            renderCourts();
-        };
-
-        // 5. Brisanje terena
-        window.deleteCourt = function(index) {
-            map.removeLayer(markers[index]);
-            delete markers[index];
-            courts.splice(index, 1);
-            // Moramo očistiti sve markere i ponovo ih mapirati jer se indexi menjaju
-            Object.values(markers).forEach(m => map.removeLayer(m));
-            for (let key in markers) delete markers[key];
-            renderCourts();
-        };
-
-        // Inicijalno učitavanje
-        renderCourts();
+        map.on('locationfound', onLocationFound);
     </script>
 </body>
 </html>
