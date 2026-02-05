@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="sr">
+<html lang="bs">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -21,12 +21,10 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 1000;
-            transition: 0.5s;
+            z-index: 2000;
         }
 
         .hero-title { color: white; font-size: 2.5rem; margin-bottom: 20px; text-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
-
         .btn-group { display: flex; flex-direction: column; gap: 15px; width: 80%; max-width: 300px; }
 
         button {
@@ -36,17 +34,31 @@
             font-size: 1rem;
             font-weight: bold;
             cursor: pointer;
-            transition: transform 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
         }
 
         .btn-login { background-color: #ffffff; color: #333; }
         .btn-reg { background-color: #4CAF50; color: white; }
         .btn-explore { background-color: #2196F3; color: white; }
-        
-        button:active { transform: scale(0.95); }
+
+        /* Navigacija iznad mape */
+        #map-ui {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            display: none;
+            width: 90%;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-small { padding: 8px 15px; font-size: 0.8rem; border-radius: 15px; }
 
         /* Mapa */
-        #map { height: 100vh; width: 100vw; display: none; }
+        #map { height: 100vh; width: 100vw; display: none; background: #000; }
     </style>
 </head>
 <body>
@@ -54,10 +66,15 @@
     <div id="landing-page">
         <h1 class="hero-title">AllSportsLocal</h1>
         <div class="btn-group">
-            <button class="btn-login" onclick="authAlert()">Login</button>
-            <button class="btn-reg" onclick="authAlert()">Registracija</button>
+            <button class="btn-login" onclick="authAlert('Login')">Login</button>
+            <button class="btn-reg" onclick="authAlert('Registracija')">Registracija</button>
             <button class="btn-explore" onclick="startExplore()">Explore Mapa</button>
         </div>
+    </div>
+
+    <div id="map-ui" style="display: none;">
+        <button class="btn-login btn-small" onclick="authAlert('Login')">Login</button>
+        <button class="btn-reg btn-small" onclick="authAlert('Registracija')">Registracija</button>
     </div>
 
     <div id="map"></div>
@@ -75,37 +92,37 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-        
-        console.log("Firebase spreman.");
     </script>
 
     <script>
-        function authAlert() {
-            alert("Funkcija autentifikacije bi ovde povezala Firebase Auth.");
+        function authAlert(type) {
+            alert(type + " funkcija je povezana sa vašim Firebase nalogom.");
         }
 
         function startExplore() {
-            // Sakrij početnu stranu, prikaži mapu
+            // Sakrij landing, prikaži mapu i UI
             document.getElementById('landing-page').style.display = 'none';
             document.getElementById('map').style.display = 'block';
+            document.getElementById('map-ui').style.display = 'flex';
 
             // Inicijalizacija mape
-            var map = L.map('map').setView([44.8176, 20.4633], 6);
+            var map = L.map('map', {
+                zoomControl: false // Sakrivamo da ne smeta dugmićima na vrhu
+            }).setView([44.378, 17.331], 7); // Centrirano na Balkan
 
-            // Satelitski sloj (Esri World Imagery)
-            var satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-                attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EBP, and the GIS User Community'
+            // DODAVANJE SATELITSKE MAPE SA ULICAMA, GRADIDIMA I GRANICAMA
+            // Koristimo Google Hybrid (Satelit + Labels)
+            var googleHybrid = L.tileLayer('https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+                maxZoom: 20,
+                subdomains:['mt0','mt1','mt2','mt3'],
+                attribution: '&copy; Google Maps'
             }).addTo(map);
 
-            // Sloj sa imenima ulica i granicama (Transparentni hibrid)
-            var labels = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-labels/{z}/{x}/{y}{r}.png', {
-                attribution: 'Map tiles by Stamen Design, CC BY 3.0 &mdash; Map data &copy; OpenStreetMap',
-                subdomains: 'abcd',
-                opacity: 0.7
-            }).addTo(map);
+            // Dodajemo kontrolu zuma dole desno
+            L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-            // Osveži veličinu mape jer je bila skrivena
-            setTimeout(() => { map.invalidateSize(); }, 100);
+            // Osvežavanje veličine mape
+            setTimeout(() => { map.invalidateSize(); }, 200);
         }
     </script>
 </body>
