@@ -20,7 +20,20 @@
         #map { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1; transition: filter 0.8s ease; }
         .map-blur { filter: blur(15px) brightness(0.5); }
 
-        /* HEADER */
+        /* STARTUP SCREEN */
+        #startup-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 10001; display: flex; justify-content: center; align-items: center;
+            background: rgba(0,0,0,0.85);
+        }
+        .startup-card {
+            background: white; padding: 35px 25px; border-radius: 30px;
+            width: 85%; max-width: 330px; text-align: center;
+            box-shadow: 0 15px 45px rgba(0,0,0,0.6);
+        }
+        .startup-card h1 { font-size: 30px; font-weight: 900; color: var(--primary); margin: 0 0 10px 0; }
+
+        /* HEADER & SEARCH */
         header {
             position: fixed; top: 0; left: 0; width: 100%; z-index: 2000;
             display: flex; justify-content: space-between; align-items: center;
@@ -32,51 +45,51 @@
         .logo { font-size: 22px; font-weight: 900; color: var(--primary); text-shadow: 0 0 10px rgba(0,0,0,1); letter-spacing: 1px; }
         .nav-btn { background: rgba(0,0,0,0.8); border: 2px solid rgba(255,255,255,0.5); color: white; padding: 6px 12px; border-radius: 15px; font-size: 11px; font-weight: 900; margin-left: 5px; cursor: pointer; }
 
-        /* LINEARNA KARTICA KOJA POČINJE OD LOPTE */
-        .map-scoreboard-linear {
-            display: flex; align-items: center; background: rgba(0,0,0,0.9);
-            border: 1px solid rgba(255,255,255,0.8); padding: 3px 10px 3px 3px; border-radius: 20px;
-            white-space: nowrap; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        .search-wrapper { position: fixed; top: 70px; right: 15px; z-index: 2000; display: flex; align-items: center; }
+        .search-input { width: 0; opacity: 0; padding: 8px 0; border-radius: 20px; background: rgba(0,0,0,0.9); color: white; font-weight: 900; transition: all 0.4s ease; outline: none; border: 2px solid #fff; }
+        .search-input.expanded { width: 180px; opacity: 1; padding: 8px 15px; margin-right: 5px; }
+        .search-toggle-btn { width: 38px; height: 38px; background: rgba(0,0,0,0.8); border: 2px solid #fff; color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; }
+
+        /* KARTICA NA MAPI */
+        .map-scoreboard {
+            position: absolute; bottom: 45px; left: 50%; transform: translateX(-50%);
+            width: 105px; background: #000; border: 1.5px solid #fff; border-radius: 8px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.8); overflow: hidden; z-index: 1000;
         }
-        .sport-icon-wrap { 
-            font-size: 14px; display: flex; align-items: center; justify-content: center; 
-            border-radius: 50%; width: 24px; height: 24px; background: #000;
-        }
-        .team-text { color: #fff; font-size: 10px; font-weight: 900; text-transform: uppercase; margin-left: 8px; }
-        .score-box { background: #fff; color: #000; padding: 1px 6px; border-radius: 4px; font-size: 11px; font-weight: 900; margin: 0 6px; }
+        .score-body { padding: 5px; background: #000; }
+        .team-row { display: flex; justify-content: space-between; align-items: center; margin: 1px 0; }
+        .team-name { color: #fff; font-size: 10px; font-weight: 900; text-transform: uppercase; max-width: 70px; overflow: hidden; white-space: nowrap; }
+        .team-score { color: var(--accent); font-size: 12px; font-weight: 900; min-width: 15px; text-align: right; }
+        .status-strip { display: flex; align-items: center; justify-content: center; background: #111; padding: 2px; border-top: 1px solid #222; }
+        .status-dot { width: 5px; height: 5px; border-radius: 50%; }
 
-        /* OREOLI */
-        .glow-live { box-shadow: 0 0 12px #ff3e3e; border: 1.5px solid #ff3e3e; animation: blink 1s infinite; }
-        .glow-upcoming { box-shadow: 0 0 12px #2ecc71; border: 1.5px solid #2ecc71; }
-        .glow-free { border: 1px solid #3498db; }
-        .glow-ft { border: 1px solid #777; }
+        .dot-live { background: #ff3e3e; box-shadow: 0 0 6px #ff3e3e; animation: blink 0.8s infinite; }
+        .dot-najava { background: #2ecc71; box-shadow: 0 0 6px #2ecc71; animation: blink 1.2s infinite; }
+        .dot-ft { background: #777; }
+        .dot-free { background: var(--blue); }
 
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
 
-        /* MODALI I PANELI */
-        .info-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10005; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
-        .info-card { background: #111; border: 2px solid var(--blue); width: 85%; max-width: 300px; border-radius: 20px; padding: 20px; text-align: center; color: white; }
-        .info-arhiva { margin-top: 15px; padding: 10px; background: #000; border-radius: 10px; font-size: 13px; color: #ccc; font-weight: 700; border: 1px dashed #333; }
-        
-        #startup-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10001; display: flex; justify-content: center; align-items: center; background: rgba(0,0,0,0.85); }
-        .startup-card { background: white; padding: 35px 25px; border-radius: 30px; width: 85%; max-width: 330px; text-align: center; }
-        
+        /* LOKACIJA PULS */
+        .pulse-marker { width: 14px; height: 14px; background: #3498db; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 15px #3498db; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.6); opacity: 0.5; } 100% { transform: scale(1); opacity: 1; } }
+
+        /* MODALI & PANELI */
         #admin-panel, #match-panel { position: fixed; bottom: 0; left: 0; width: 100%; z-index: 9999; background: var(--dark); color: white; padding: 15px 15px calc(25px + env(safe-area-inset-bottom)); border-radius: 25px 25px 0 0; border-top: 4px solid var(--primary); transform: translateY(105%); transition: 0.3s ease; }
         .active { transform: translateY(0) !important; }
-        
-        .score-btn { background: #333; border: 1px solid #444; color: white; padding: 10px; border-radius: 8px; font-weight: 900; margin: 3px; min-width: 40px; }
-        .btn-period { width: 100%; background: var(--blue); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: 900; margin-top: 10px; text-transform: uppercase; }
-        .btn-action { width: 100%; background: var(--primary); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 900; margin-top: 8px; cursor: pointer; }
+        input { width: 100%; padding: 14px; margin: 8px 0; border: 2px solid #ddd; border-radius: 12px; font-size: 16px; box-sizing: border-box; font-weight: 900; color: #000; }
+        .btn-action { width: 100%; background: var(--primary); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 900; font-size: 16px; margin-top: 5px; cursor: pointer; }
+        .circle-btn { width: 48px; height: 48px; background: white; border: 3px solid #000; border-radius: 50%; position: fixed; right: 12px; bottom: 95px; z-index: 2000; display: flex; justify-content: center; align-items: center; font-size: 22px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); cursor: pointer; }
         .hidden { display: none !important; }
-        .sport-item { background: #1a1a1a; border: 2px solid #333; border-radius: 12px; padding: 10px; text-align: center; }
-        .sport-item.selected { border-color: var(--primary); }
+        .info-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10005; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
+        .info-card { background: #111; border: 2px solid var(--blue); width: 85%; max-width: 300px; border-radius: 20px; padding: 20px; text-align: center; color: white; }
     </style>
 </head>
 <body>
 
     <div id="startup-screen">
         <div class="startup-card">
-            <h1 style="color:var(--primary); font-weight:900;">LOCALIVE</h1>
+            <h1>LOCALIVE</h1>
             <p style="font-weight:900; color:#333;">Pronađi igru u svom gradu.</p>
             <button class="btn-action" onclick="toggleModal('login-screen', true)">LOG IN ADMIN</button>
             <button class="btn-action" style="background:#555;" onclick="toggleModal('register-screen', true)">REGISTRACIJA</button>
@@ -84,34 +97,42 @@
         </div>
     </div>
 
+    <div id="search-bar" class="search-wrapper hidden">
+        <input type="text" id="city-search" class="search-input" placeholder="Grad...">
+        <div class="search-toggle-btn" onclick="toggleSearch()">🔍</div>
+    </div>
+
     <div id="register-screen" class="overlay hidden">
-        <div style="background:white; padding:20px; border-radius:20px; width:80%; max-width:320px; text-align:center;">
-            <h4 style="font-weight:900; color:#000;">Registracija Admina</h4>
-            <input type="text" id="reg-nick" placeholder="Nickname" style="width:100%; padding:12px; margin:8px 0; border:1px solid #ddd; border-radius:10px;">
-            <input type="email" id="reg-email" placeholder="Email" style="width:100%; padding:12px; margin:8px 0; border:1px solid #ddd; border-radius:10px;">
-            <input type="password" id="reg-pass" placeholder="Lozinka" style="width:100%; padding:12px; margin:8px 0; border:1px solid #ddd; border-radius:10px;">
-            <button class="btn-action" onclick="registerAdmin()">Registruj me</button>
-            <button onclick="toggleModal('register-screen', false)" style="background:none; border:none; margin-top:10px; color:grey;">Zatvori</button>
+        <div style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); display:flex; justify-content:center; align-items:center; z-index:11000;">
+            <div style="background:white; padding:20px; border-radius:20px; width:85%; max-width:320px; text-align:center;">
+                <h4 style="font-weight:900; color:#000;">Registracija</h4>
+                <input type="text" id="reg-nick" placeholder="Nickname">
+                <input type="email" id="reg-email" placeholder="Email">
+                <input type="password" id="reg-pass" placeholder="Lozinka">
+                <button class="btn-action" onclick="registerAdmin()">Registruj me</button>
+                <button onclick="toggleModal('register-screen', false)" style="border:none; background:none; margin-top:10px; color:#666;">Zatvori</button>
+            </div>
         </div>
     </div>
 
     <div id="login-screen" class="overlay hidden">
-        <div style="background:white; padding:20px; border-radius:20px; width:80%; max-width:320px; text-align:center;">
-            <h4 style="font-weight:900; color:#000;">Admin Login</h4>
-            <input type="email" id="login-email" placeholder="Email" style="width:100%; padding:12px; margin:8px 0; border:1px solid #ddd; border-radius:10px;">
-            <input type="password" id="login-pass" placeholder="Lozinka" style="width:100%; padding:12px; margin:8px 0; border:1px solid #ddd; border-radius:10px;">
-            <button class="btn-action" onclick="loginAdmin()">Prijavi se</button>
-            <button onclick="toggleModal('login-screen', false)" style="background:none; border:none; margin-top:10px; color:grey;">Zatvori</button>
+        <div style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); display:flex; justify-content:center; align-items:center; z-index:11000;">
+            <div style="background:white; padding:20px; border-radius:20px; width:85%; max-width:320px; text-align:center;">
+                <h4 style="font-weight:900; color:#000;">Admin Login</h4>
+                <input type="email" id="login-email" placeholder="Email">
+                <input type="password" id="login-pass" placeholder="Lozinka">
+                <button class="btn-action" onclick="loginAdmin()">Prijavi se</button>
+                <button onclick="toggleModal('login-screen', false)" style="border:none; background:none; margin-top:10px; color:#666;">Zatvori</button>
+            </div>
         </div>
     </div>
 
     <div id="guest-info-modal" class="info-overlay hidden" onclick="this.classList.add('hidden')">
         <div class="info-card" onclick="event.stopPropagation()">
-            <h2 id="guest-court-name" style="color:var(--blue); font-size:18px;">IME TERENA</h2>
-            <div id="guest-match-teams" style="font-size:16px; font-weight:900;">TIM A vs TIM B</div>
-            <div id="guest-match-score" style="font-size:40px; color:var(--accent); margin:10px 0;">0 : 0</div>
-            <div class="info-arhiva" id="guest-match-arhiva">Nema detalja.</div>
-            <button class="btn-action" onclick="document.getElementById('guest-info-modal').classList.add('hidden')">ZATVORI</button>
+            <h2 id="guest-court-name" style="color:var(--blue);">IME TERENA</h2>
+            <div id="guest-match-teams" style="font-size:18px; font-weight:900;">TIM A vs TIM B</div>
+            <div id="guest-match-score" style="font-size:32px; color:var(--accent); margin:10px 0;">0 : 0</div>
+            <div id="guest-match-arhiva" style="font-size:14px; color:#ccc;">Nema detalja</div>
         </div>
     </div>
 
@@ -122,46 +143,44 @@
             <button class="nav-btn" onclick="toggleModal('login-screen', true)">Login</button>
         </div>
         <div id="admin-info" class="nav-links hidden">
-            <span id="admin-name" style="color:white; font-size:11px; margin-right:8px; font-weight:900;"></span>
+            <span id="admin-name" style="color:white; font-size:11px; font-weight:900;"></span>
             <button class="nav-btn" onclick="logoutAdmin()">Logout</button>
         </div>
     </header>
 
     <div id="admin-panel">
-        <strong style="color:var(--primary);">DODAJ TEREN</strong>
-        <input type="text" id="court-name" placeholder="Ime stadiona" style="width:100%; padding:12px; margin-top:10px; border-radius:10px; border:none;">
-        <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin:15px 0;">
-            <div class="sport-item selected" onclick="selectSport('⚽', 'fudbal', this)">⚽</div>
-            <div class="sport-item" onclick="selectSport('🏀', 'kosarka', this)">🏀</div>
-            <div class="sport-item" onclick="selectSport('🎾', 'tenis', this)">🎾</div>
+        <strong>DODAJ TEREN</strong>
+        <input type="text" id="court-name" placeholder="Ime stadiona">
+        <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin:10px 0;">
+            <div class="sport-item selected" style="padding:10px; border:2px solid #333; border-radius:10px; text-align:center;" onclick="selectSport('⚽', 'fudbal', this)">⚽</div>
+            <div class="sport-item" style="padding:10px; border:2px solid #333; border-radius:10px; text-align:center;" onclick="selectSport('🏀', 'kosarka', this)">🏀</div>
+            <div class="sport-item" style="padding:10px; border:2px solid #333; border-radius:10px; text-align:center;" onclick="selectSport('🎾', 'tenis', this)">🎾</div>
         </div>
         <button class="btn-action" style="background:var(--accent)" onclick="saveCourt()">SAČUVAJ</button>
-        <button class="btn-action" style="background:#444" onclick="zatvoriSvePanele()">OTKAŽI</button>
+        <button class="btn-action" style="background:#333" onclick="zatvoriSvePanele()">ZATVORI</button>
     </div>
 
     <div id="match-panel">
         <div id="match-setup">
             <strong id="target-court-name" style="color:var(--blue);">UREDI</strong>
-            <input type="text" id="team-a" placeholder="Tim 1" style="width:100%; padding:12px; margin-top:8px; border-radius:10px;">
-            <input type="text" id="team-b" placeholder="Tim 2" style="width:100%; padding:12px; margin-top:8px; border-radius:10px;">
-            <input type="text" id="match-date" placeholder="Vreme/Datum" style="width:100%; padding:12px; margin-top:8px; border-radius:10px;">
+            <input type="text" id="team-a" placeholder="Tim 1">
+            <input type="text" id="team-b" placeholder="Tim 2">
+            <input type="text" id="match-date" placeholder="Datum">
             <button class="btn-action" onclick="updateStatus('najava')">NAJAVI</button>
             <button class="btn-action" style="background:var(--accent);" onclick="updateStatus('live')">LIVE 🔴</button>
-            <button class="btn-action" style="background:#c0392b;" onclick="obrisiTeren()">OBRIŠI TEREN</button>
+            <button class="btn-action" style="background:#c0392b;" onclick="obrisiTeren()">OBRIŠI</button>
         </div>
         <div id="match-live" class="hidden">
             <div style="display:flex; justify-content:space-around; align-items:center;">
-                <div style="text-align:center;"><div id="score-a" style="font-size:40px; font-weight:900; color:var(--accent);">0</div><div id="btns-a"></div></div>
-                <div style="font-weight:900;">VS</div>
-                <div style="text-align:center;"><div id="score-b" style="font-size:40px; font-weight:900; color:var(--accent);">0</div><div id="btns-b"></div></div>
+                <div style="text-align:center;"><div id="score-a" style="font-size:36px; font-weight:900; color:var(--accent);">0</div><div id="btns-a"></div></div>
+                <div style="text-align:center;"><div id="score-b" style="font-size:36px; font-weight:900; color:var(--accent);">0</div><div id="btns-b"></div></div>
             </div>
             <div id="period-controls"></div>
             <button class="btn-action" style="background:orange;" onclick="updateStatus('zavrseno')">ZAVRŠI (FT)</button>
-            <button class="btn-action" style="background:#555;" onclick="zatvoriSvePanele()">ZATVORI</button>
         </div>
     </div>
 
-    <button id="recenter-btn" class="circle-btn hidden" onclick="locirajMe()" style="bottom:20px;">🎯</button>
+    <button id="recenter-btn" class="circle-btn hidden" onclick="locirajMe()">🎯</button>
     <div id="map" class="map-blur"></div>
 
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
@@ -181,7 +200,7 @@
         L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', { zIndex: 1000 }).addTo(map);
 
-        var currentCourtId = null, isAdmin = false, selectedSport = { emoji: '⚽', slug: 'fudbal' }, tempCoords = null;
+        var userMarker, currentCourtId = null, isAdmin = false, selectedSport = { emoji: '⚽', slug: 'fudbal' }, tempCoords = null;
         var courtMarkers = L.layerGroup().addTo(map);
 
         auth.onAuthStateChanged(user => {
@@ -199,7 +218,7 @@
 
         function registerAdmin() {
             const email = document.getElementById('reg-email').value.trim(), pass = document.getElementById('reg-pass').value, nick = document.getElementById('reg-nick').value.trim();
-            if(!email || !pass || !nick) return alert("Popuni sve!");
+            if(!email || !pass || !nick) return alert("Popuni!");
             auth.createUserWithEmailAndPassword(email, pass).then(cred => {
                 db.ref('admins/' + cred.user.uid).set({ nickname: nick, email: email, uid: cred.user.uid });
                 toggleModal('register-screen', false);
@@ -217,20 +236,32 @@
             document.getElementById('startup-screen').classList.add('hidden');
             document.getElementById('map').classList.remove('map-blur');
             document.getElementById('main-header').classList.remove('hidden');
+            document.getElementById('search-bar').classList.remove('hidden');
             document.getElementById('recenter-btn').classList.remove('hidden');
-            osveziTereneUCentru();
+            locirajMe(); osveziTereneUCentru();
         }
 
         function toggleModal(id, s) { document.getElementById(id).classList.toggle('hidden', !s); }
-        function selectSport(emoji, slug, el) { selectedSport = { emoji, slug }; document.querySelectorAll('.sport-item').forEach(i => i.classList.remove('selected')); el.classList.add('selected'); }
+        function selectSport(emoji, slug, el) { selectedSport = { emoji, slug }; document.querySelectorAll('.sport-item').forEach(i => i.classList.remove('selected')); el.style.borderColor = "var(--primary)"; }
+
+        function toggleSearch() { 
+            const inp = document.getElementById('city-search'); 
+            if(inp.classList.contains('expanded')) {
+                if(inp.value) searchCity(inp.value);
+                else inp.classList.remove('expanded');
+            } else inp.classList.add('expanded');
+        }
+
+        function searchCity(q) {
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${q}`)
+                .then(res => res.json()).then(data => { if(data[0]) map.setView([data[0].lat, data[0].lon], 13); });
+        }
 
         map.on('moveend', () => { osveziTereneUCentru(); });
 
         map.on('click', e => { 
             if (!isAdmin || e.originalEvent._stopped) return; 
-            tempCoords = e.latlng; if (tempMarker) map.removeLayer(tempMarker); 
-            tempMarker = L.marker(e.latlng, { icon: L.divIcon({ html: '📍', iconSize:[30,30], iconAnchor:[15,30] }) }).addTo(map); 
-            document.getElementById('admin-panel').classList.add('active'); 
+            tempCoords = e.latlng; document.getElementById('admin-panel').classList.add('active'); 
         });
 
         function saveCourt() {
@@ -238,7 +269,41 @@
             if(!n || !tempCoords) return;
             db.ref('tereni').push({ 
                 ime: n, sport: selectedSport.slug, emoji: selectedSport.emoji, lat: tempCoords.lat, lng: tempCoords.lng, status: 'slobodno', scoreA: 0, scoreB: 0, timA: '', timB: '', datum: '', arhiva: '', vlasnik: auth.currentUser.email 
-            }).then(() => { zatvoriSvePanele(); osveziTereneUCentru(); });
+            }).then(() => { zatvoriSvePanele(); });
+        }
+
+        function osveziTereneUCentru() {
+            const centar = map.getCenter(), zoom = map.getZoom(); db.ref('tereni').off();
+            db.ref('tereni').on('value', snap => { 
+                courtMarkers.clearLayers(); const data = snap.val(); let usedCoords = [];
+                const offsetFactor = (21 - zoom) * 0.00008;
+                for (let id in data) { 
+                    const c = data[id]; if (centar.distanceTo(L.latLng(c.lat, c.lng)) <= 20000) {
+                        let lat = c.lat, lng = c.lng, angle = 0;
+                        while(usedCoords.includes(lat.toFixed(4)+","+lng.toFixed(4))) { angle += 0.8; lat += Math.cos(angle)*offsetFactor; lng += Math.sin(angle)*offsetFactor; }
+                        usedCoords.push(lat.toFixed(4)+","+lng.toFixed(4));
+                        renderujMarker(id, c, lat, lng); 
+                    }
+                } 
+            });
+        }
+
+        function renderujMarker(id, c, vLat, vLng) {
+            let sDot = "dot-free", sA = c.scoreA||0, sB = c.scoreB||0;
+            if(c.status === 'najava') sDot = "dot-najava";
+            else if(c.status === 'live') sDot = "dot-live";
+            else if(c.status === 'zavrseno') sDot = "dot-ft";
+
+            const clickAction = (isAdmin && c.vlasnik === auth.currentUser?.email) ? `otvoriUredi('${id}')` : `otvoriDetaljeGost('${id}')`;
+
+            const html = `<div onclick="${clickAction}"><div class="map-scoreboard">
+                <div class="score-body">
+                    <div class="team-row"><span class="team-name">${c.timA || 'TIM A'}</span><span class="team-score">${c.status==='slobodno'?'-':sA}</span></div>
+                    <div class="team-row"><span class="team-name">${c.timB || 'TIM B'}</span><span class="team-score">${c.status==='slobodno'?'-':sB}</span></div>
+                </div>
+                <div class="status-strip"><div class="status-dot ${sDot}"></div></div>
+            </div>${c.emoji}</div>`;
+            L.marker([vLat, vLng], { icon: L.divIcon({ html: html, iconAnchor:[16,16], className:'' }) }).addTo(courtMarkers);
         }
 
         function otvoriUredi(id) {
@@ -248,7 +313,6 @@
                 document.getElementById('target-court-name').innerText = c.ime;
                 document.getElementById('team-a').value = c.timA || '';
                 document.getElementById('team-b').value = c.timB || '';
-                document.getElementById('match-date').value = c.datum || '';
                 setupControlView(c.status); setupLivePanel(c);
                 document.getElementById('match-panel').classList.add('active');
             });
@@ -258,8 +322,8 @@
             db.ref('tereni/' + id).once('value', snap => {
                 const c = snap.val();
                 document.getElementById('guest-court-name').innerText = c.ime;
-                document.getElementById('guest-match-teams').innerText = `${c.timA || 'TIM A'} vs ${c.timB || 'TIM B'}`;
-                document.getElementById('guest-match-score').innerText = `${c.scoreA || 0} : ${c.scoreB || 0}`;
+                document.getElementById('guest-match-teams').innerText = `${c.timA} vs ${c.timB}`;
+                document.getElementById('guest-match-score').innerText = `${c.scoreA} : ${c.scoreB}`;
                 document.getElementById('guest-match-arhiva').innerText = c.arhiva || "Nema detalja.";
                 document.getElementById('guest-info-modal').classList.remove('hidden');
             });
@@ -275,21 +339,14 @@
             const pc = document.getElementById('period-controls'), bA = document.getElementById('btns-a'), bB = document.getElementById('btns-b');
             db.ref('tereni/' + currentCourtId).on('value', snap => {
                 const data = snap.val(); if(!data) return;
-                document.getElementById('score-a').innerText = data.scoreA || 0; document.getElementById('score-b').innerText = data.scoreB || 0;
+                document.getElementById('score-a').innerText = data.scoreA; document.getElementById('score-b').innerText = data.scoreB;
                 bA.innerHTML = bB.innerHTML = pc.innerHTML = '';
-                
                 let pts = (data.sport === 'kosarka') ? [1, 2, 3] : [1];
                 pts.forEach(p => {
-                    let btnA = document.createElement('button'); btnA.className='score-btn'; btnA.innerText='+'+p; btnA.onclick=()=>db.ref('tereni/'+currentCourtId+'/scoreA').transaction(v=>(v||0)+p); bA.appendChild(btnA);
-                    let btnB = document.createElement('button'); btnB.className='score-btn'; btnB.innerText='+'+p; btnB.onclick=()=>db.ref('tereni/'+currentCourtId+'/scoreB').transaction(v=>(v||0)+p); bB.appendChild(btnB);
+                    let b1 = document.createElement('button'); b1.className='score-btn'; b1.innerText='+'+p; b1.onclick=()=>db.ref('tereni/'+currentCourtId+'/scoreA').transaction(v=>(v||0)+p); bA.appendChild(b1);
+                    let b2 = document.createElement('button'); b2.className='score-btn'; b2.innerText='+'+p; b2.onclick=()=>db.ref('tereni/'+currentCourtId+'/scoreB').transaction(v=>(v||0)+p); bB.appendChild(b2);
                 });
-
-                let label = "KRAJ PERIODA";
-                if(data.sport === 'fudbal') label = "KRAJ POLUVREMENA";
-                if(data.sport === 'kosarka') label = "KRAJ ČETVRTINE";
-                if(data.sport === 'tenis') label = "KRAJ SETA";
-
-                let bp = document.createElement('button'); bp.className='btn-period'; bp.innerText=label;
+                let bp = document.createElement('button'); bp.className='btn-action'; bp.innerText='ARHIVIRAJ REZULTAT';
                 bp.onclick = () => {
                     let arh = data.arhiva ? data.arhiva + " | " + data.scoreA + ":" + data.scoreB : data.scoreA + ":" + data.scoreB;
                     db.ref('tereni/' + currentCourtId).update({ arhiva: arh });
@@ -303,44 +360,15 @@
         }
 
         function obrisiTeren() { if(confirm("Obrisati?")) { db.ref('tereni/'+currentCourtId).remove(); zatvoriSvePanele(); } }
-        function zatvoriSvePanele() { document.getElementById('admin-panel').classList.remove('active'); document.getElementById('match-panel').classList.remove('active'); if(tempMarker) map.removeLayer(tempMarker); }
+        function zatvoriSvePanele() { document.getElementById('admin-panel').classList.remove('active'); document.getElementById('match-panel').classList.remove('active'); }
 
-        function osveziTereneUCentru() {
-            const centar = map.getCenter(), zoom = map.getZoom(); db.ref('tereni').off();
-            db.ref('tereni').on('value', snap => { 
-                courtMarkers.clearLayers(); const data = snap.val(); let usedCoords = [];
-                const offsetFactor = (21 - zoom) * 0.00008;
-                for (let id in data) { 
-                    const c = data[id]; if (centar.distanceTo(L.latLng(c.lat, c.lng)) <= 20000) {
-                        let lat = c.lat, lng = c.lng, angle = 0;
-                        while(usedCoords.includes(lat.toFixed(4)+","+lng.toFixed(4))) { angle += 0.8; lat += Math.cos(angle)*offsetFactor; lng += Math.sin(angle)*offsetFactor; }
-                        usedCoords.push(lat.toFixed(4)+","+lng.toFixed(4)); renderujMarker(id, c, lat, lng); 
-                    }
-                } 
+        function locirajMe() {
+            map.locate({setView: true, maxZoom: 16});
+            map.on('locationfound', e => {
+                if (userMarker) userMarker.setLatLng(e.latlng);
+                else userMarker = L.marker(e.latlng, {icon: L.divIcon({className:'', html:"<div class='pulse-marker'></div>"})}).addTo(map);
             });
         }
-
-        function renderujMarker(id, c, vLat, vLng) {
-            let glow = "glow-free", sA = c.scoreA||0, sB = c.scoreB||0;
-            if(c.status === 'najava') glow = "glow-upcoming";
-            else if(c.status === 'live') glow = "glow-live";
-            else if(c.status === 'zavrseno') glow = "glow-ft";
-
-            const clickAction = (isAdmin && c.vlasnik === auth.currentUser?.email) ? `otvoriUredi('${id}')` : `otvoriDetaljeGost('${id}')`;
-
-            const html = `
-                <div class="map-scoreboard-linear" onclick="${clickAction}">
-                    <div class="sport-icon-wrap ${glow}">${c.emoji}</div>
-                    <span class="team-text">${c.timA || 'TIM A'}</span>
-                    <div class="score-box">${c.status==='slobodno'?'-':sA+':'+sB}</div>
-                    <span class="team-text" style="margin-right:5px;">${c.timB || 'TIM B'}</span>
-                </div>`;
-            
-            // Sidro postavljamo na [12, 12] tako da lopta (icon-wrap) bude tačno na kliknutoj tački
-            L.marker([vLat, vLng], { icon: L.divIcon({ html: html, iconAnchor:[12, 12], className:'' }) }).addTo(courtMarkers);
-        }
-
-        function locirajMe() { map.locate({setView: true, maxZoom: 16}); }
     </script>
 </body>
 </html>
