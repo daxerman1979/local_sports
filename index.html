@@ -20,24 +20,48 @@
             display: flex; justify-content: center; align-items: center; z-index: 10000;
         }
         .modal { background: #fff; padding: 30px; border-radius: 25px; width: 85%; max-width: 350px; text-align: center; color: #333; }
-        input { width: 100%; padding: 14px; margin: 8px 0; border: 2px solid #eee; border-radius: 12px; box-sizing: border-box; font-size: 16px; }
+        input { width: 100%; padding: 14px; margin: 8px 0; border: 2px solid #eee; border-radius: 12px; box-sizing: border-box; font-size: 16px; outline: none; }
         
-        .btn { width: 100%; padding: 15px; border: none; border-radius: 12px; font-weight: 900; cursor: pointer; margin-top: 10px; transition: 0.2s; }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 12px; font-weight: 900; cursor: pointer; margin-top: 10px; }
         .btn-main { background: var(--primary); color: white; }
         .btn-explore { background: var(--accent); color: white; }
         .btn-alt { background: #eee; color: #555; font-size: 12px; }
 
-        /* UI KONTROLE */
-        .ui-element { position: fixed; z-index: 1000; pointer-events: auto; }
-        
-        .top-bar { top: env(safe-area-inset-top, 20px); left: 15px; right: 15px; display: flex; justify-content: space-between; align-items: center; pointer-events: none; }
-        .tag { background: rgba(0,0,0,0.85); color: white; padding: 8px 15px; border-radius: 20px; font-size: 13px; font-weight: bold; border: 1px solid rgba(255,255,255,0.2); pointer-events: auto; }
+        /* UI ELEMENTI */
+        .top-info { position: fixed; top: env(safe-area-inset-top, 20px); left: 15px; z-index: 1000; pointer-events: none; }
+        .tag { background: rgba(0,0,0,0.8); color: white; padding: 6px 15px; border-radius: 20px; font-size: 12px; font-weight: bold; border: 1px solid rgba(255,255,255,0.2); }
 
-        .search-box { top: 80px; left: 15px; right: 15px; display: flex; gap: 8px; }
-        #city-input { flex: 1; padding: 12px; border-radius: 15px; border: none; background: rgba(255,255,255,0.9); box-shadow: 0 4px 15px rgba(0,0,0,0.3); font-weight: bold; }
-        .btn-search { width: 45px; height: 45px; border-radius: 15px; background: var(--primary); color: white; border: none; font-size: 18px; }
+        /* DISKRETAN SEARCH I GPS */
+        .controls-container {
+            position: fixed; bottom: 30px; right: 20px; z-index: 1000;
+            display: flex; flex-direction: column; align-items: flex-end; gap: 12px;
+        }
 
-        .fab { bottom: 30px; right: 20px; width: 55px; height: 55px; border-radius: 50%; background: white; border: none; font-size: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.4); display: flex; justify-content: center; align-items: center; }
+        .search-wrapper {
+            display: flex; align-items: center; background: white; 
+            border-radius: 30px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            width: 50px; transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .search-wrapper.active { width: 260px; }
+
+        #city-input { 
+            width: 0; padding: 0; border: none; font-size: 14px; background: transparent; 
+            transition: width 0.4s, padding 0.4s;
+        }
+        .search-wrapper.active #city-input { width: 180px; padding: 0 15px; }
+
+        .circle-btn {
+            width: 50px; height: 50px; min-width: 50px; border-radius: 50%;
+            background: white; border: none; font-size: 20px;
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+        }
+
+        .logout-btn {
+            position: fixed; top: env(safe-area-inset-top, 20px); right: 15px; z-index: 1000;
+            background: var(--primary); color: white; border: none; padding: 6px 15px;
+            border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer;
+        }
 
         .hidden { display: none !important; }
     </style>
@@ -47,7 +71,7 @@
     <div id="auth-screen" class="overlay">
         <div class="modal">
             <h1 style="color:var(--primary); margin-bottom: 5px;">LOCALIVE</h1>
-            <p id="auth-status" style="margin-top:0; font-weight: bold; color: #777;">Admin Panel</p>
+            <p id="auth-status" style="margin-top:0; font-weight: bold; color: #777;">Dobrodošli</p>
             
             <div id="auth-fields">
                 <input type="text" id="reg-nick" class="hidden" placeholder="Vaš Nickname">
@@ -57,7 +81,7 @@
 
             <button class="btn btn-main" id="btn-primary" onclick="handleAuth()">PRIJAVI SE</button>
             <button class="btn btn-alt" id="btn-toggle" onclick="toggleAuthMode()">NEMAŠ NALOG? REGISTRACIJA</button>
-            <div style="margin: 15px 0; color: #ccc;">ili</div>
+            <div style="margin: 10px 0; color: #ccc;">ili</div>
             <button class="btn btn-explore" onclick="startExplore()">ISTRAŽI MAPU 🌍</button>
         </div>
     </div>
@@ -65,17 +89,20 @@
     <div id="map"></div>
 
     <div id="main-ui" class="hidden">
-        <div class="ui-element top-bar">
+        <div class="top-info">
             <div id="user-display" class="tag">Gost</div>
-            <button class="tag" style="background:var(--primary)" onclick="location.reload()">Logout</button>
         </div>
+        
+        <button id="logout-btn" class="logout-btn hidden" onclick="location.reload()">Logout</button>
 
-        <div class="ui-element search-box">
-            <input type="text" id="city-input" placeholder="Pretraži grad ili državu...">
-            <button class="btn-search" onclick="searchLocation()">🔍</button>
+        <div class="controls-container">
+            <div class="search-wrapper" id="search-wrapper">
+                <input type="text" id="city-input" placeholder="Pretraži grad..." onkeypress="if(event.key==='Enter') searchLocation()">
+                <button class="circle-btn" onclick="toggleSearch()" style="box-shadow: none;">🔍</button>
+            </div>
+            
+            <button class="circle-btn" onclick="locateMe()">🎯</button>
         </div>
-
-        <button class="ui-element fab" onclick="locateMe()">🎯</button>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
@@ -84,7 +111,6 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script>
-        // FIREBASE KONFIGURACIJA
         const firebaseConfig = { 
             apiKey: "AIzaSyCyyqnqeS-9jurBX-6VIRp8CiPTMbXkXgw", 
             databaseURL: "https://allsportslocal-ea1d4-default-rtdb.europe-west1.firebasedatabase.app" 
@@ -95,20 +121,17 @@
 
         let map, isRegister = false;
 
-        // AUTH LOGIKA
         function toggleAuthMode() {
             isRegister = !isRegister;
             document.getElementById('reg-nick').classList.toggle('hidden', !isRegister);
-            document.getElementById('auth-status').innerText = isRegister ? "Novi Admin" : "Admin Panel";
             document.getElementById('btn-primary').innerText = isRegister ? "KREIRAJ NALOG" : "PRIJAVI SE";
-            document.getElementById('btn-toggle').innerText = isRegister ? "NAZAD NA LOGIN" : "NEMAŠ NALOG? REGISTRACIJA";
+            document.getElementById('btn-toggle').innerText = isRegister ? "NAZAD" : "NEMAŠ NALOG? REGISTRACIJA";
         }
 
         async function handleAuth() {
             const email = document.getElementById('auth-email').value;
             const pass = document.getElementById('auth-pass').value;
             const nick = document.getElementById('reg-nick').value;
-
             try {
                 if (isRegister) {
                     const res = await auth.createUserWithEmailAndPassword(email, pass);
@@ -116,8 +139,9 @@
                 } else {
                     await auth.signInWithEmailAndPassword(email, pass);
                 }
+                document.getElementById('logout-btn').classList.remove('hidden');
                 startApp();
-            } catch (e) { alert("Greška: " + e.message); }
+            } catch (e) { alert(e.message); }
         }
 
         function startExplore() {
@@ -125,42 +149,32 @@
             startApp();
         }
 
-        // INICIJALIZACIJA APLIKACIJE
         function startApp() {
             document.getElementById('auth-screen').classList.add('hidden');
             document.getElementById('main-ui').classList.remove('hidden');
             initMap();
             
-            // Provera nick-a ako je logovan
             auth.onAuthStateChanged(user => {
                 if(user) {
                     db.ref('admins/' + user.uid).once('value', snap => {
-                        if(snap.exists()) document.getElementById('user-display').innerText = "Admin: " + snap.val().nickname;
+                        if(snap.exists()){
+                            document.getElementById('user-display').innerText = "Admin: " + snap.val().nickname;
+                            document.getElementById('logout-btn').classList.remove('hidden');
+                        }
                     });
                 }
             });
         }
 
         function initMap() {
-            // Pamćenje lokacije iz LocalStorage-a
             const lastLat = localStorage.getItem('localive_lat') || 44.81;
             const lastLng = localStorage.getItem('localive_lng') || 20.44;
             const lastZoom = localStorage.getItem('localive_zoom') || 13;
 
             map = L.map('map', { zoomControl: false }).setView([lastLat, lastLng], lastZoom);
 
-            // 1. SATELITSKI SLOJ (Esri)
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
-
-            // 2. HIBRIDNI SLOJ (Ulice, granice i imena gradova - CartoDB)
-            // Koristimo CartoDB jer je čistiji i uvek besplatan za open-source projekte
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', {
-                pane: 'shadowPane' // Postavlja tekst iznad satelita
-            }).addTo(map);
-
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_road_any/{z}/{x}/{y}{r}.png', {
-                opacity: 0.4
-            }).addTo(map);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png').addTo(map);
 
             map.on('moveend', () => {
                 const c = map.getCenter();
@@ -168,17 +182,26 @@
                 localStorage.setItem('localive_lng', c.lng);
                 localStorage.setItem('localive_zoom', map.getZoom());
             });
-
             document.getElementById('map').classList.add('visible');
         }
 
-        // FUNKCIJE KONTROLA
+        // UI FUNKCIJE
+        function toggleSearch() {
+            const wrapper = document.getElementById('search-wrapper');
+            const input = document.getElementById('city-input');
+            wrapper.classList.toggle('active');
+            if(wrapper.classList.contains('active')) input.focus();
+        }
+
         async function searchLocation() {
             const query = document.getElementById('city-input').value;
             if(!query) return;
             const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}`);
             const data = await res.json();
-            if(data.length > 0) map.setView([data[0].lat, data[0].lon], 13);
+            if(data.length > 0) {
+                map.setView([data[0].lat, data[0].lon], 13);
+                toggleSearch(); // Zatvori search nakon pretrage
+            }
         }
 
         function locateMe() {
