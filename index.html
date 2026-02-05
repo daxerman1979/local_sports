@@ -2,322 +2,123 @@
 <html lang="sr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LOCALIVE</title>
-    
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LOCALIVE - Login & Registracija</title>
     <style>
-        :root { --primary: #e74c3c; --dark: #000000; --accent: #2ecc71; --blue: #3498db; --white: #ffffff; }
-
-        html, body { 
-            margin: 0; padding: 0; width: 100%; height: 100%; 
-            overflow: hidden; position: fixed; background: #000;
-            font-family: -apple-system, system-ui, sans-serif;
-            touch-action: none; 
-        }
-
-        #map { width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1; transition: filter 0.8s ease; }
-        .map-blur { filter: blur(15px) brightness(0.5); }
-
-        /* HEADER */
-        header {
-            position: fixed; top: 0; left: 0; width: 100%; z-index: 2000;
-            display: flex; justify-content: space-between; align-items: center;
-            padding: env(safe-area-inset-top) 12px 8px 12px;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%);
-            pointer-events: none; box-sizing: border-box;
-        }
-        .logo, .nav-links { pointer-events: auto; }
-        .logo { font-size: 22px; font-weight: 900; color: var(--primary); text-shadow: 0 0 10px rgba(0,0,0,1); letter-spacing: 1px; }
-        .nav-btn { background: rgba(0,0,0,0.8); border: 1.5px solid rgba(255,255,255,0.4); color: white; padding: 6px 12px; border-radius: 15px; font-size: 11px; font-weight: 900; margin-left: 5px; }
-
-        /* HORIZONTAL SCOREBOARD ON MAP */
-        .map-scoreboard {
-            position: absolute; bottom: 35px; left: 50%; transform: translateX(-50%);
-            width: 160px; background: rgba(0,0,0,0.9); border: 1.5px solid #fff; border-radius: 6px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5); z-index: 1000; pointer-events: auto;
-        }
-        .score-main { display: flex; align-items: center; justify-content: space-between; padding: 5px 8px; border-bottom: 1px solid #333; }
-        .score-team { color: white; font-size: 11px; font-weight: 900; text-transform: uppercase; flex: 1; }
-        .score-val { color: var(--accent); font-size: 16px; font-weight: 900; padding: 0 5px; }
-        .score-periods { display: flex; justify-content: center; gap: 6px; padding: 2px; background: #111; font-size: 9px; color: #aaa; font-weight: 700; }
+        :root { --primary: #e74c3c; --dark: #1a1a1a; --accent: #2ecc71; --white: #ffffff; }
         
-        /* STATUS DOTS */
-        .status-dot { width: 6px; height: 6px; border-radius: 50%; position: absolute; top: -3px; right: -3px; border: 1px solid white; }
-        .dot-live { background: #ff3e3e; box-shadow: 0 0 5px #ff3e3e; animation: blink 0.8s infinite; }
-
-        /* FLOATING CONTROLS */
-        .controls-container { position: fixed; right: 12px; bottom: 95px; z-index: 2000; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
-        .search-wrapper { display: flex; align-items: center; background: white; border-radius: 25px; height: 48px; border: 2px solid black; overflow: hidden; transition: 0.3s; width: 48px; }
-        .search-wrapper.expanded { width: 220px; }
-        #city-search { border: none; outline: none; width: 0; font-weight: 700; transition: 0.3s; padding: 0; }
-        .search-wrapper.expanded #city-search { width: 140px; padding: 0 10px; }
-        .circle-btn { width: 48px; height: 48px; background: white; border: 2px solid #000; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 22px; }
-
-        /* PANELS */
-        #admin-panel, #match-panel {
-            position: fixed; bottom: 0; left: 0; width: 100%; z-index: 9999;
-            background: var(--dark); color: white; padding: 15px 15px calc(25px + env(safe-area-inset-bottom));
-            border-radius: 25px 25px 0 0; border-top: 4px solid var(--primary);
-            box-sizing: border-box; transform: translateY(105%); transition: 0.3s ease;
+        body { 
+            margin: 0; font-family: -apple-system, sans-serif; 
+            background: #000; color: white; 
+            display: flex; justify-content: center; align-items: center; height: 100vh;
         }
-        .active { transform: translateY(0) !important; }
 
-        .sport-selector { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 15px 0; }
-        .sport-opt { padding: 10px; border: 1px solid #444; border-radius: 10px; text-align: center; filter: grayscale(1); }
-        .sport-opt.selected { filter: grayscale(0); border-color: var(--primary); background: #1a1a1a; }
+        .auth-container {
+            background: #fff; padding: 30px; border-radius: 20px;
+            width: 90%; max-width: 350px; text-align: center; color: #333;
+        }
 
-        .live-controls { display: flex; justify-content: space-around; align-items: center; background: #1a1a1a; padding: 10px; border-radius: 15px; margin: 10px 0; }
-        .btn-score { background: #333; border: 1px solid #555; color: white; padding: 10px; border-radius: 8px; font-weight: 900; min-width: 40px; margin: 2px; }
+        h2 { color: var(--primary); margin-bottom: 20px; }
+        input { 
+            width: 100%; padding: 12px; margin: 10px 0; 
+            border: 2px solid #ddd; border-radius: 10px; box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        .btn {
+            width: 100%; padding: 14px; border: none; border-radius: 12px;
+            font-weight: 900; cursor: pointer; margin-top: 10px; transition: 0.3s;
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-secondary { background: #555; color: white; }
         
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10002; display: flex; justify-content: center; align-items: center; background: rgba(0,0,0,0.9); backdrop-filter: blur(5px); }
-        .modal { background: white; padding: 25px; border-radius: 20px; width: 85%; max-width: 320px; text-align: center; color: #000; }
-        input { width: 100%; padding: 12px; margin: 8px 0; border: 2px solid #ddd; border-radius: 10px; font-weight: 700; }
-        .btn-action { width: 100%; background: var(--primary); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 900; margin-top: 5px; }
-
-        .hidden { display: none !important; }
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+        .toggle-link { margin-top: 15px; font-size: 14px; color: #666; cursor: pointer; text-decoration: underline; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
-    <div id="startup-screen" class="overlay">
-        <div class="modal">
-            <h1 style="color:var(--primary); font-weight: 900;">LOCALIVE</h1>
-            <button class="btn-action" onclick="toggleModal('login-screen', true)">ADMIN LOGIN</button>
-            <button class="btn-action" style="background:#555;" onclick="toggleModal('register-screen', true)">REGISTRACIJA</button>
-            <button class="btn-action" style="background:var(--accent);" onclick="startExplore()">ISTRAŽI MAPU 🌍</button>
-        </div>
+    <div id="start-screen" class="auth-container">
+        <h1 style="color:var(--primary)">LOCALIVE</h1>
+        <p>Admin Panel Pristup</p>
+        <button class="btn btn-primary" onclick="showForm('login')">PRIJAVI SE</button>
+        <button class="btn btn-secondary" onclick="showForm('register')">REGISTRACIJA</button>
     </div>
 
-    <div id="register-screen" class="overlay hidden">
-        <div class="modal">
-            <h3>Registracija</h3>
-            <input type="text" id="reg-nick" placeholder="Nickname">
-            <input type="email" id="reg-email" placeholder="Email">
-            <input type="password" id="reg-pass" placeholder="Lozinka">
-            <button class="btn-action" onclick="registerAdmin()">KREIRAJ</button>
-            <button onclick="toggleModal('register-screen', false)" style="color:#999; border:none; background:none; margin-top:10px;">Zatvori</button>
-        </div>
+    <div id="register-form" class="auth-container hidden">
+        <h2>Registracija</h2>
+        <input type="text" id="reg-nick" placeholder="Nickname (Ime)">
+        <input type="email" id="reg-email" placeholder="Email">
+        <input type="password" id="reg-pass" placeholder="Lozinka">
+        <button class="btn btn-primary" onclick="handleRegister()">KREIRAJ NALOG</button>
+        <div class="toggle-link" onclick="showForm('login')">Već imaš nalog? Prijavi se</div>
     </div>
 
-    <div id="login-screen" class="overlay hidden">
-        <div class="modal">
-            <h3>Admin Login</h3>
-            <input type="email" id="login-email" placeholder="Email">
-            <input type="password" id="login-pass" placeholder="Lozinka">
-            <button class="btn-action" onclick="loginAdmin()">PRIJAVI SE</button>
-            <button onclick="toggleModal('login-screen', false)" style="color:#999; border:none; background:none; margin-top:10px;">Zatvori</button>
-        </div>
+    <div id="login-form" class="auth-container hidden">
+        <h2>Admin Login</h2>
+        <input type="email" id="login-email" placeholder="Email">
+        <input type="password" id="login-pass" placeholder="Lozinka">
+        <button class="btn btn-primary" onclick="handleLogin()">PRISTUPI</button>
+        <div class="toggle-link" onclick="showForm('register')">Nemaš nalog? Registruj se</div>
     </div>
-
-    <header id="main-header" class="hidden">
-        <div class="logo">LOCALIVE</div>
-        <div id="admin-info" class="nav-links hidden">
-            <span id="admin-name" style="color:white; font-size:11px; font-weight:900;"></span>
-            <button class="nav-btn" onclick="logoutAdmin()">Logout</button>
-        </div>
-    </header>
-
-    <div id="map-controls" class="controls-container hidden">
-        <div class="search-wrapper" id="search-box">
-            <button style="background:none; border:none; padding:12px;" onclick="toggleSearch()">🔍</button>
-            <input type="text" id="city-search" placeholder="Grad..." onkeypress="if(event.key==='Enter') searchCity()">
-        </div>
-        <button class="circle-btn" onclick="locirajMe()">🎯</button>
-    </div>
-
-    <div id="admin-panel">
-        <div style="display:flex; justify-content:space-between;">
-            <strong style="color:var(--primary);">DODAJ TEREN</strong>
-            <button onclick="zatvoriSvePanele()">×</button>
-        </div>
-        <input type="text" id="court-name" placeholder="Ime terena">
-        <div class="sport-selector">
-            <div class="sport-opt selected" onclick="selectSport('⚽', 'fudbal', this)">⚽</div>
-            <div class="sport-opt" onclick="selectSport('🏀', 'basket', this)">🏀</div>
-            <div class="sport-opt" onclick="selectSport('🎾', 'tenis', this)">🎾</div>
-        </div>
-        <button class="btn-action" style="background:var(--accent)" onclick="saveCourt()">SAČUVAJ</button>
-    </div>
-
-    <div id="match-panel">
-        <div id="match-setup">
-            <h4 id="m-court-name" style="margin:0 0 10px 0; color:var(--blue);"></h4>
-            <input type="text" id="team-a" placeholder="Domaćin">
-            <input type="text" id="team-b" placeholder="Gost">
-            <button class="btn-action" onclick="updateStatus('live')">POČNI MEČ 🔴</button>
-            <button class="btn-action" style="background:#555; margin-top:8px;" onclick="resetMatch()">RESET</button>
-        </div>
-        <div id="match-live" class="hidden">
-            <div class="live-controls">
-                <div style="text-align:center;">
-                    <div id="live-score-a" style="font-size:30px; font-weight:900; color:var(--accent);">0</div>
-                    <div id="btns-a"></div>
-                </div>
-                <div style="font-size:20px; font-weight:900;">VS</div>
-                <div style="text-align:center;">
-                    <div id="live-score-b" style="font-size:30px; font-weight:900; color:var(--accent);">0</div>
-                    <div id="btns-b"></div>
-                </div>
-            </div>
-            <button class="btn-action" style="background:var(--blue)" onclick="arhivirajPeriod()">KRAJ PERIODA (ČETVRTINA/SET)</button>
-            <button class="btn-action" style="background:orange; margin-top:8px;" onclick="updateStatus('zavrseno')">KRAJ MEČA</button>
-        </div>
-    </div>
-
-    <div id="map" class="map-blur"></div>
 
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script>
+        // Tvoja konfiguracija
         const firebaseConfig = { 
             apiKey: "AIzaSyCyyqnqeS-9jurBX-6VIRp8CiPTMbXkXgw", 
             databaseURL: "https://allsportslocal-ea1d4-default-rtdb.europe-west1.firebasedatabase.app" 
         };
         firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-        const auth = firebase.auth();
-
-        let lastLat = localStorage.getItem('lastLat') || 44.81, lastLng = localStorage.getItem('lastLng') || 20.44, lastZoom = localStorage.getItem('lastZoom') || 13;
-        var map = L.map('map', { zoomControl: false, attributionControl: false }).setView([lastLat, lastLng], lastZoom);
-        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
         
-        var courtMarkers = L.layerGroup().addTo(map);
-        var isAdmin = false, currentCourtId = null, tempCoords = null, selectedSport = { emoji: '⚽', slug: 'fudbal' };
+        const auth = firebase.auth();
+        const db = firebase.database();
 
-        map.on('moveend', () => {
-            const c = map.getCenter();
-            localStorage.setItem('lastLat', c.lat); localStorage.setItem('lastLng', c.lng); localStorage.setItem('lastZoom', map.getZoom());
-        });
-
-        // KLIK ZA DODAVANJE TERENA
-        map.on('click', e => {
-            if(!isAdmin) return;
-            tempCoords = e.latlng;
-            zatvoriSvePanele();
-            document.getElementById('admin-panel').classList.add('active');
-        });
-
-        function startExplore() {
-            document.getElementById('startup-screen').classList.add('hidden');
-            document.getElementById('map').classList.remove('map-blur');
-            document.getElementById('main-header').classList.remove('hidden');
-            document.getElementById('map-controls').classList.remove('hidden');
-            osveziTerene();
+        // Navigacija kroz forme
+        function showForm(type) {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('register-form').classList.toggle('hidden', type !== 'register');
+            document.getElementById('login-form').classList.toggle('hidden', type !== 'login');
         }
 
-        // AUTH
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                db.ref('admins/' + user.uid).once('value', snap => {
-                    if(snap.exists()){ 
-                        isAdmin = true; 
-                        document.getElementById('admin-info').classList.remove('hidden'); 
-                        document.getElementById('admin-name').innerText = snap.val().nickname; 
-                    }
-                });
-            }
-        });
+        // Funkcija za REGISTRACIJU
+        function handleRegister() {
+            const email = document.getElementById('reg-email').value;
+            const pass = document.getElementById('reg-pass').value;
+            const nick = document.getElementById('reg-nick').value;
 
-        function saveCourt() {
-            const name = document.getElementById('court-name').value;
-            if(!name || !tempCoords) return;
-            db.ref('tereni').push({
-                ime: name, lat: tempCoords.lat, lng: tempCoords.lng, emoji: selectedSport.emoji, sport: selectedSport.slug,
-                status: 'slobodno', scoreA: 0, scoreB: 0, arhiva: '', vlasnik: auth.currentUser.email
-            }).then(() => zatvoriSvePanele());
+            if(!email || !pass || !nick) return alert("Popuni sva polja!");
+
+            auth.createUserWithEmailAndPassword(email, pass)
+                .then((userCredential) => {
+                    // Čuvanje dodatnih podataka o adminu u bazu
+                    return db.ref('admins/' + userCredential.user.uid).set({
+                        nickname: nick,
+                        email: email,
+                        role: 'admin'
+                    });
+                })
+                .then(() => {
+                    alert("Uspešna registracija!");
+                    location.reload(); // Ili preusmeri na mapu
+                })
+                .catch(error => alert(error.message));
         }
 
-        function osveziTerene() {
-            db.ref('tereni').on('value', snap => {
-                courtMarkers.clearLayers();
-                snap.forEach(child => {
-                    const c = child.val(), id = child.key;
-                    const html = `
-                        <div style="position:relative;" onclick="otvoriMeč('${id}')">
-                            <div class="map-scoreboard">
-                                <div class="score-main">
-                                    <span class="score-team">${c.timA || 'TIM A'}</span>
-                                    <span class="score-val">${c.scoreA}:${c.scoreB}</span>
-                                    <span class="score-team" style="text-align:right;">${c.timB || 'TIM B'}</span>
-                                </div>
-                                <div class="score-periods">${c.arhiva || '-'}</div>
-                                <div class="status-dot ${c.status==='live'?'dot-live':''}"></div>
-                            </div>
-                            <div style="font-size:24px; text-align:center;">${c.emoji}</div>
-                        </div>`;
-                    L.marker([c.lat, c.lng], { icon: L.divIcon({ html: html, className:'', iconSize:[160,60], iconAnchor:[80,50] }) }).addTo(courtMarkers);
-                });
-            });
-        }
+        // Funkcija za LOGIN
+        function handleLogin() {
+            const email = document.getElementById('login-email').value;
+            const pass = document.getElementById('login-pass').value;
 
-        function otvoriMeč(id) {
-            currentCourtId = id;
-            db.ref('tereni/'+id).once('value', snap => {
-                const c = snap.val();
-                if(isAdmin && auth.currentUser.email === c.vlasnik) {
-                    document.getElementById('m-court-name').innerText = c.ime;
-                    document.getElementById('team-a').value = c.timA || '';
-                    document.getElementById('team-b').value = c.timB || '';
-                    renderujDugmice(c.sport);
-                    document.getElementById('match-live').classList.toggle('hidden', c.status !== 'live');
-                    document.getElementById('match-setup').classList.toggle('hidden', c.status === 'live');
-                    document.getElementById('match-panel').classList.add('active');
-                }
-            });
-        }
-
-        function renderujDugmice(sport) {
-            const bA = document.getElementById('btns-a'), bB = document.getElementById('btns-b');
-            bA.innerHTML = bB.innerHTML = '';
-            let pts = (sport === 'basket') ? [1, 2, 3] : [1];
-            pts.forEach(p => {
-                let btnA = document.createElement('button'); btnA.className='btn-score'; btnA.innerText='+'+p;
-                btnA.onclick = () => db.ref('tereni/'+currentCourtId+'/scoreA').transaction(v => (v||0)+p);
-                bA.appendChild(btnA);
-                let btnB = document.createElement('button'); btnB.className='btn-score'; btnB.innerText='+'+p;
-                btnB.onclick = () => db.ref('tereni/'+currentCourtId+'/scoreB').transaction(v => (v||0)+p);
-                bB.appendChild(btnB);
-            });
-            // Update live numbers
-            db.ref('tereni/'+currentCourtId).on('value', s => {
-                const d = s.val(); if(!d) return;
-                document.getElementById('live-score-a').innerText = d.scoreA;
-                document.getElementById('live-score-b').innerText = d.scoreB;
-            });
-        }
-
-        function arhivirajPeriod() {
-            db.ref('tereni/'+currentCourtId).once('value', snap => {
-                const c = snap.val();
-                let trenutni = `${c.scoreA}:${c.scoreB}`;
-                let novaArhiva = c.arhiva ? c.arhiva + " | " + trenutni : trenutni;
-                db.ref('tereni/'+currentCourtId).update({ arhiva: novaArhiva });
-            });
-        }
-
-        function updateStatus(s) {
-            db.ref('tereni/'+currentCourtId).update({ 
-                status: s, timA: document.getElementById('team-a').value, timB: document.getElementById('team-b').value 
-            }).then(() => { if(s==='zavrseno') zatvoriSvePanele(); else otvoriMeč(currentCourtId); });
-        }
-
-        function resetMatch() { if(confirm("Resetuj?")) db.ref('tereni/'+currentCourtId).update({ status:'slobodno', scoreA:0, scoreB:0, timA:'', timB:'', arhiva:'' }); }
-        function selectSport(e, s, el) { selectedSport = { emoji: e, slug: s }; document.querySelectorAll('.sport-opt').forEach(x => x.classList.remove('selected')); el.classList.add('selected'); }
-        function toggleModal(id, s) { document.getElementById(id).classList.toggle('hidden', !s); }
-        function toggleSearch() { document.getElementById('search-box').classList.toggle('expanded'); }
-        function zatvoriSvePanele() { document.getElementById('admin-panel').classList.remove('active'); document.getElementById('match-panel').classList.remove('active'); }
-        function locirajMe() { map.locate({setView: true, maxZoom: 15}); }
-        async function searchCity() {
-            const city = document.getElementById('city-search').value;
-            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${city}`);
-            const data = await res.json();
-            if(data.length > 0) { map.setView([data[0].lat, data[0].lon], 13); toggleSearch(); }
+            auth.signInWithEmailAndPassword(email, pass)
+                .then(() => {
+                    alert("Dobrodošli nazad!");
+                    // Ovde ide kod za otvaranje mape
+                })
+                .catch(error => alert("Greška: " + error.message));
         }
     </script>
 </body>
