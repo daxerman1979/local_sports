@@ -3,14 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LOCALIVE - Satelitska Mapa</title>
+    <title>LOCALIVE</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
     <style>
         :root { --primary: #e74c3c; --dark: #111; --accent: #2ecc71; }
         
-        body, html { margin: 0; padding: 0; height: 100%; width: 100%; font-family: -apple-system, sans-serif; background: #000; overflow: hidden; }
+        body, html { 
+            margin: 0; padding: 0; height: 100%; width: 100%; 
+            font-family: -apple-system, sans-serif; background: #000; 
+            overflow: hidden; touch-action: manipulation;
+        }
+        
         #map { width: 100%; height: 100%; position: absolute; visibility: hidden; background: #000; }
         .visible { visibility: visible !important; }
 
@@ -20,7 +25,13 @@
             display: flex; justify-content: center; align-items: center; z-index: 10000;
         }
         .modal { background: #fff; padding: 30px; border-radius: 25px; width: 85%; max-width: 350px; text-align: center; color: #333; }
-        input { width: 100%; padding: 14px; margin: 8px 0; border: 2px solid #eee; border-radius: 12px; box-sizing: border-box; font-size: 16px; outline: none; }
+        
+        /* Font-size 16px sprecava auto-zoom na mobilnim telefonima */
+        input { 
+            width: 100%; padding: 14px; margin: 8px 0; 
+            border: 2px solid #eee; border-radius: 12px; 
+            box-sizing: border-box; font-size: 16px; outline: none; 
+        }
         
         .btn { width: 100%; padding: 15px; border: none; border-radius: 12px; font-weight: 900; cursor: pointer; margin-top: 10px; }
         .btn-main { background: var(--primary); color: white; }
@@ -31,7 +42,6 @@
         .top-info { position: fixed; top: env(safe-area-inset-top, 20px); left: 15px; z-index: 1000; pointer-events: none; }
         .tag { background: rgba(0,0,0,0.8); color: white; padding: 6px 15px; border-radius: 20px; font-size: 12px; font-weight: bold; border: 1px solid rgba(255,255,255,0.2); }
 
-        /* DISKRETAN SEARCH I GPS */
         .controls-container {
             position: fixed; bottom: 30px; right: 20px; z-index: 1000;
             display: flex; flex-direction: column; align-items: flex-end; gap: 12px;
@@ -40,13 +50,13 @@
         .search-wrapper {
             display: flex; align-items: center; background: white; 
             border-radius: 30px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-            width: 50px; transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 50px; transition: width 0.3s ease;
         }
         .search-wrapper.active { width: 260px; }
 
         #city-input { 
-            width: 0; padding: 0; border: none; font-size: 14px; background: transparent; 
-            transition: width 0.4s, padding 0.4s;
+            width: 0; padding: 0; border: none; font-size: 16px; background: transparent; 
+            transition: width 0.3s; margin: 0;
         }
         .search-wrapper.active #city-input { width: 180px; padding: 0 15px; }
 
@@ -72,13 +82,11 @@
         <div class="modal">
             <h1 style="color:var(--primary); margin-bottom: 5px;">LOCALIVE</h1>
             <p id="auth-status" style="margin-top:0; font-weight: bold; color: #777;">Dobrodošli</p>
-            
             <div id="auth-fields">
                 <input type="text" id="reg-nick" class="hidden" placeholder="Vaš Nickname">
                 <input type="email" id="auth-email" placeholder="Email">
                 <input type="password" id="auth-pass" placeholder="Lozinka">
             </div>
-
             <button class="btn btn-main" id="btn-primary" onclick="handleAuth()">PRIJAVI SE</button>
             <button class="btn btn-alt" id="btn-toggle" onclick="toggleAuthMode()">NEMAŠ NALOG? REGISTRACIJA</button>
             <div style="margin: 10px 0; color: #ccc;">ili</div>
@@ -89,18 +97,14 @@
     <div id="map"></div>
 
     <div id="main-ui" class="hidden">
-        <div class="top-info">
-            <div id="user-display" class="tag">Gost</div>
-        </div>
-        
+        <div class="top-info"><div id="user-display" class="tag">Gost</div></div>
         <button id="logout-btn" class="logout-btn hidden" onclick="location.reload()">Logout</button>
 
         <div class="controls-container">
             <div class="search-wrapper" id="search-wrapper">
-                <input type="text" id="city-input" placeholder="Pretraži grad..." onkeypress="if(event.key==='Enter') searchLocation()">
+                <input type="text" id="city-input" placeholder="Pretraži..." onkeypress="if(event.key==='Enter') searchLocation()">
                 <button class="circle-btn" onclick="toggleSearch()" style="box-shadow: none;">🔍</button>
             </div>
-            
             <button class="circle-btn" onclick="locateMe()">🎯</button>
         </div>
     </div>
@@ -139,7 +143,6 @@
                 } else {
                     await auth.signInWithEmailAndPassword(email, pass);
                 }
-                document.getElementById('logout-btn').classList.remove('hidden');
                 startApp();
             } catch (e) { alert(e.message); }
         }
@@ -171,7 +174,7 @@
             const lastLng = localStorage.getItem('localive_lng') || 20.44;
             const lastZoom = localStorage.getItem('localive_zoom') || 13;
 
-            map = L.map('map', { zoomControl: false }).setView([lastLat, lastLng], lastZoom);
+            map = L.map('map', { zoomControl: false, tap: false }).setView([lastLat, lastLng], lastZoom);
 
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
             L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png').addTo(map);
@@ -185,26 +188,34 @@
             document.getElementById('map').classList.add('visible');
         }
 
-        // UI FUNKCIJE
         function toggleSearch() {
             const wrapper = document.getElementById('search-wrapper');
             const input = document.getElementById('city-input');
             wrapper.classList.toggle('active');
-            if(wrapper.classList.contains('active')) input.focus();
+            if(wrapper.classList.contains('active')) {
+                input.focus();
+            } else {
+                input.value = "";
+                input.blur();
+            }
         }
 
         async function searchLocation() {
             const query = document.getElementById('city-input').value;
             if(!query) return;
-            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}`);
-            const data = await res.json();
-            if(data.length > 0) {
-                map.setView([data[0].lat, data[0].lon], 13);
-                toggleSearch(); // Zatvori search nakon pretrage
-            }
+            try {
+                const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}`);
+                const data = await res.json();
+                if(data.length > 0) {
+                    // panTo ne menja nivo zooma, samo centar mape
+                    map.panTo([data[0].lat, data[0].lon]);
+                    toggleSearch(); 
+                }
+            } catch (e) { console.error(e); }
         }
 
         function locateMe() {
+            // LocateMe menja zoom samo na 16 radi preciznosti, ali to je korisno
             map.locate({setView: true, maxZoom: 16});
         }
     </script>
