@@ -3,59 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mobilna OpenStreetMap</title>
+    <title>AllSportsLocal - Satelitska Mapa</title>
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-
+    
     <style>
-        /* Postavljanje mape da zauzme ceo ekran */
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
+        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
+        
+        /* Početna strana */
+        #landing-page {
+            position: absolute;
             width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: 0.5s;
         }
 
-        #map {
-            height: 100vh; /* 100% visine ekrana */
-            width: 100vw;  /* 100% širine ekrana */
+        .hero-title { color: white; font-size: 2.5rem; margin-bottom: 20px; text-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
+
+        .btn-group { display: flex; flex-direction: column; gap: 15px; width: 80%; max-width: 300px; }
+
+        button {
+            padding: 15px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
         }
 
-        /* Prilagođavanje kontrola za lakše korišćenje na dodir */
-        .leaflet-bar a {
-            width: 44px !important;
-            height: 44px !important;
-            line-height: 44px !important;
-        }
+        .btn-login { background-color: #ffffff; color: #333; }
+        .btn-reg { background-color: #4CAF50; color: white; }
+        .btn-explore { background-color: #2196F3; color: white; }
+        
+        button:active { transform: scale(0.95); }
+
+        /* Mapa */
+        #map { height: 100vh; width: 100vw; display: none; }
     </style>
 </head>
 <body>
 
+    <div id="landing-page">
+        <h1 class="hero-title">AllSportsLocal</h1>
+        <div class="btn-group">
+            <button class="btn-login" onclick="authAlert()">Login</button>
+            <button class="btn-reg" onclick="authAlert()">Registracija</button>
+            <button class="btn-explore" onclick="startExplore()">Explore Mapa</button>
+        </div>
+    </div>
+
     <div id="map"></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            databaseURL: "https://allsportslocal-ea1d4-default-rtdb.europe-west1.firebasedatabase.app/",
+            appId: "1:161980114353:web:f8deefef0d5d85b1cc8990"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        
+        console.log("Firebase spreman.");
+    </script>
 
     <script>
-        // Inicijalizacija mape (koordinate su postavljene na Balkan kao primer)
-        var map = L.map('map').setView([44.8176, 20.4633], 6);
-
-        // Dodavanje OpenStreetMap sloja (sadrži ulice, gradove i granice)
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '© OpenStreetMap doprinosi'
-        }).addTo(map);
-
-        // Opciono: Dodavanje markera za trenutnu lokaciju korisnika
-        map.locate({setView: true, maxZoom: 16});
-
-        function onLocationFound(e) {
-            var radius = e.accuracy / 2;
-            L.marker(e.latlng).addTo(map)
-                .bindPopup("Vi ste u krugu od " + radius + " metara od ove tačke").openPopup();
-            L.circle(e.latlng, radius).addTo(map);
+        function authAlert() {
+            alert("Funkcija autentifikacije bi ovde povezala Firebase Auth.");
         }
 
-        map.on('locationfound', onLocationFound);
+        function startExplore() {
+            // Sakrij početnu stranu, prikaži mapu
+            document.getElementById('landing-page').style.display = 'none';
+            document.getElementById('map').style.display = 'block';
+
+            // Inicijalizacija mape
+            var map = L.map('map').setView([44.8176, 20.4633], 6);
+
+            // Satelitski sloj (Esri World Imagery)
+            var satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EBP, and the GIS User Community'
+            }).addTo(map);
+
+            // Sloj sa imenima ulica i granicama (Transparentni hibrid)
+            var labels = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-labels/{z}/{x}/{y}{r}.png', {
+                attribution: 'Map tiles by Stamen Design, CC BY 3.0 &mdash; Map data &copy; OpenStreetMap',
+                subdomains: 'abcd',
+                opacity: 0.7
+            }).addTo(map);
+
+            // Osveži veličinu mape jer je bila skrivena
+            setTimeout(() => { map.invalidateSize(); }, 100);
+        }
     </script>
 </body>
 </html>
