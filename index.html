@@ -2,222 +2,152 @@
 <html lang="sr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LOCALIVE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Sportska Mapa</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
     <style>
-        :root { --primary: #e74c3c; --dark: #111; --accent: #2ecc71; }
+        body { margin: 0; font-family: sans-serif; display: flex; height: 100vh; }
+        #map { flex-grow: 1; height: 100%; }
         
-        body, html { 
-            margin: 0; padding: 0; height: 100%; width: 100%; 
-            font-family: -apple-system, sans-serif; background: #000; 
-            overflow: hidden; touch-action: manipulation;
-        }
-        
-        #map { width: 100%; height: 100%; position: absolute; visibility: hidden; background: #000; }
-        .visible { visibility: visible !important; }
-
-        /* AUTH OVERLAY */
-        .overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.95);
-            display: flex; justify-content: center; align-items: center; z-index: 10000;
-        }
-        .modal { background: #fff; padding: 30px; border-radius: 25px; width: 85%; max-width: 350px; text-align: center; color: #333; }
-        
-        /* Font-size 16px sprecava auto-zoom na mobilnim telefonima */
-        input { 
-            width: 100%; padding: 14px; margin: 8px 0; 
-            border: 2px solid #eee; border-radius: 12px; 
-            box-sizing: border-box; font-size: 16px; outline: none; 
-        }
-        
-        .btn { width: 100%; padding: 15px; border: none; border-radius: 12px; font-weight: 900; cursor: pointer; margin-top: 10px; }
-        .btn-main { background: var(--primary); color: white; }
-        .btn-explore { background: var(--accent); color: white; }
-        .btn-alt { background: #eee; color: #555; font-size: 12px; }
-
-        /* UI ELEMENTI */
-        .top-info { position: fixed; top: env(safe-area-inset-top, 20px); left: 15px; z-index: 1000; pointer-events: none; }
-        .tag { background: rgba(0,0,0,0.8); color: white; padding: 6px 15px; border-radius: 20px; font-size: 12px; font-weight: bold; border: 1px solid rgba(255,255,255,0.2); }
-
-        .controls-container {
-            position: fixed; bottom: 30px; right: 20px; z-index: 1000;
-            display: flex; flex-direction: column; align-items: flex-end; gap: 12px;
+        #admin-panel {
+            width: 300px;
+            background: #f4f4f4;
+            padding: 20px;
+            box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+            overflow-y: auto;
+            z-index: 1000;
         }
 
-        .search-wrapper {
-            display: flex; align-items: center; background: white; 
-            border-radius: 30px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-            width: 50px; transition: width 0.3s ease;
-        }
-        .search-wrapper.active { width: 260px; }
-
-        #city-input { 
-            width: 0; padding: 0; border: none; font-size: 16px; background: transparent; 
-            transition: width 0.3s; margin: 0;
-        }
-        .search-wrapper.active #city-input { width: 180px; padding: 0 15px; }
-
-        .circle-btn {
-            width: 50px; height: 50px; min-width: 50px; border-radius: 50%;
-            background: white; border: none; font-size: 20px;
-            display: flex; justify-content: center; align-items: center;
-            cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+        .court-card {
+            background: white;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 5px solid #333;
         }
 
-        .logout-btn {
-            position: fixed; top: env(safe-area-inset-top, 20px); right: 15px; z-index: 1000;
-            background: var(--primary); color: white; border: none; padding: 6px 15px;
-            border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer;
+        .score-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 10px;
         }
 
-        .hidden { display: none !important; }
+        button {
+            cursor: pointer;
+            padding: 5px 10px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+
+        button.delete { background: #dc3545; }
+        .type-badge { font-size: 0.8em; font-weight: bold; text-transform: uppercase; }
+        .football { border-left-color: #28a745; }
+        .basketball { border-left-color: #ff8c00; }
     </style>
 </head>
 <body>
 
-    <div id="auth-screen" class="overlay">
-        <div class="modal">
-            <h1 style="color:var(--primary); margin-bottom: 5px;">LOCALIVE</h1>
-            <p id="auth-status" style="margin-top:0; font-weight: bold; color: #777;">Dobrodošli</p>
-            <div id="auth-fields">
-                <input type="text" id="reg-nick" class="hidden" placeholder="Vaš Nickname">
-                <input type="email" id="auth-email" placeholder="Email">
-                <input type="password" id="auth-pass" placeholder="Lozinka">
-            </div>
-            <button class="btn btn-main" id="btn-primary" onclick="handleAuth()">PRIJAVI SE</button>
-            <button class="btn btn-alt" id="btn-toggle" onclick="toggleAuthMode()">NEMAŠ NALOG? REGISTRACIJA</button>
-            <div style="margin: 10px 0; color: #ccc;">ili</div>
-            <button class="btn btn-explore" onclick="startExplore()">ISTRAŽI MAPU 🌍</button>
-        </div>
-    </div>
-
     <div id="map"></div>
 
-    <div id="main-ui" class="hidden">
-        <div class="top-info"><div id="user-display" class="tag">Gost</div></div>
-        <button id="logout-btn" class="logout-btn hidden" onclick="location.reload()">Logout</button>
-
-        <div class="controls-container">
-            <div class="search-wrapper" id="search-wrapper">
-                <input type="text" id="city-input" placeholder="Pretraži..." onkeypress="if(event.key==='Enter') searchLocation()">
-                <button class="circle-btn" onclick="toggleSearch()" style="box-shadow: none;">🔍</button>
+    <div id="admin-panel">
+        <h2>Admin Panel</h2>
+        <p><small>Klikni na mapu da dodaš teren</small></p>
+        <hr>
+        <div id="courts-list">
             </div>
-            <button class="circle-btn" onclick="locateMe()">🎯</button>
-        </div>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script>
-        const firebaseConfig = { 
-            apiKey: "AIzaSyCyyqnqeS-9jurBX-6VIRp8CiPTMbXkXgw", 
-            databaseURL: "https://allsportslocal-ea1d4-default-rtdb.europe-west1.firebasedatabase.app" 
-        };
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.database();
+        // 1. Inicijalizacija mape (centrirano na Balkan/Srbiju)
+        const map = L.map('map').setView([44.7866, 20.4489], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-        let map, isRegister = false;
+        let courts = JSON.parse(localStorage.getItem('sports_courts')) || [];
+        const markers = {};
 
-        function toggleAuthMode() {
-            isRegister = !isRegister;
-            document.getElementById('reg-nick').classList.toggle('hidden', !isRegister);
-            document.getElementById('btn-primary').innerText = isRegister ? "KREIRAJ NALOG" : "PRIJAVI SE";
-            document.getElementById('btn-toggle').innerText = isRegister ? "NAZAD" : "NEMAŠ NALOG? REGISTRACIJA";
-        }
-
-        async function handleAuth() {
-            const email = document.getElementById('auth-email').value;
-            const pass = document.getElementById('auth-pass').value;
-            const nick = document.getElementById('reg-nick').value;
-            try {
-                if (isRegister) {
-                    const res = await auth.createUserWithEmailAndPassword(email, pass);
-                    await db.ref('admins/' + res.user.uid).set({ nickname: nick, email: email });
-                } else {
-                    await auth.signInWithEmailAndPassword(email, pass);
-                }
-                startApp();
-            } catch (e) { alert(e.message); }
-        }
-
-        function startExplore() {
-            document.getElementById('user-display').innerText = "Režim: Istraživanje";
-            startApp();
-        }
-
-        function startApp() {
-            document.getElementById('auth-screen').classList.add('hidden');
-            document.getElementById('main-ui').classList.remove('hidden');
-            initMap();
+        // 2. Funkcija za ispis terena u admin panelu i na mapi
+        function renderCourts() {
+            document.getElementById('courts-list').innerHTML = '';
             
-            auth.onAuthStateChanged(user => {
-                if(user) {
-                    db.ref('admins/' + user.uid).once('value', snap => {
-                        if(snap.exists()){
-                            document.getElementById('user-display').innerText = "Admin: " + snap.val().nickname;
-                            document.getElementById('logout-btn').classList.remove('hidden');
-                        }
-                    });
+            courts.forEach((court, index) => {
+                // Dodavanje markera na mapu ako ne postoji
+                if (!markers[index]) {
+                    const marker = L.marker([court.lat, court.lng]).addTo(map);
+                    marker.bindPopup(`<b>${court.name}</b><br>Rezultat: ${court.scoreA}:${court.scoreB}`);
+                    markers[index] = marker;
+                } else {
+                    markers[index].setPopupContent(`<b>${court.name}</b><br>Rezultat: ${court.scoreA}:${court.scoreB}`);
                 }
+
+                // Dodavanje u listu sa strane
+                const div = document.createElement('div');
+                div.className = `court-card ${court.type}`;
+                div.innerHTML = `
+                    <span class="type-badge">${court.type === 'football' ? '⚽ Fudbal' : '🏀 Košarka'}</span>
+                    <strong>${court.name}</strong>
+                    <div class="score-controls">
+                        <span>Rezultat: <b>${court.scoreA} : ${court.scoreB}</b></span>
+                        <div>
+                            <button onclick="updateScore(${index}, 'A', 1)">+ A</button>
+                            <button onclick="updateScore(${index}, 'B', 1)">+ B</button>
+                        </div>
+                    </div>
+                    <button class="delete" style="margin-top:10px; width:100%" onclick="deleteCourt(${index})">Ukloni teren</button>
+                `;
+                document.getElementById('courts-list').appendChild(div);
             });
+            
+            localStorage.setItem('sports_courts', JSON.stringify(courts));
         }
 
-        function initMap() {
-            const lastLat = localStorage.getItem('localive_lat') || 44.81;
-            const lastLng = localStorage.getItem('localive_lng') || 20.44;
-            const lastZoom = localStorage.getItem('localive_zoom') || 13;
+        // 3. Klik na mapu za dodavanje novog terena
+        map.on('click', function(e) {
+            const name = prompt("Unesite naziv terena:");
+            if (!name) return;
+            
+            const type = confirm("Kliknite OK za FUDBAL ili CANCEL za KOŠARKU");
+            const courtType = type ? 'football' : 'basketball';
 
-            map = L.map('map', { zoomControl: false, tap: false }).setView([lastLat, lastLng], lastZoom);
+            const newCourt = {
+                lat: e.latlng.lat,
+                lng: e.latlng.lng,
+                name: name,
+                type: courtType,
+                scoreA: 0,
+                scoreB: 0
+            };
 
-            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png').addTo(map);
+            courts.push(newCourt);
+            renderCourts();
+        });
 
-            map.on('moveend', () => {
-                const c = map.getCenter();
-                localStorage.setItem('localive_lat', c.lat);
-                localStorage.setItem('localive_lng', c.lng);
-                localStorage.setItem('localive_zoom', map.getZoom());
-            });
-            document.getElementById('map').classList.add('visible');
-        }
+        // 4. Ažuriranje rezultata (Live)
+        window.updateScore = function(index, team, points) {
+            if (team === 'A') courts[index].scoreA += points;
+            else courts[index].scoreB += points;
+            renderCourts();
+        };
 
-        function toggleSearch() {
-            const wrapper = document.getElementById('search-wrapper');
-            const input = document.getElementById('city-input');
-            wrapper.classList.toggle('active');
-            if(wrapper.classList.contains('active')) {
-                input.focus();
-            } else {
-                input.value = "";
-                input.blur();
-            }
-        }
+        // 5. Brisanje terena
+        window.deleteCourt = function(index) {
+            map.removeLayer(markers[index]);
+            delete markers[index];
+            courts.splice(index, 1);
+            // Moramo očistiti sve markere i ponovo ih mapirati jer se indexi menjaju
+            Object.values(markers).forEach(m => map.removeLayer(m));
+            for (let key in markers) delete markers[key];
+            renderCourts();
+        };
 
-        async function searchLocation() {
-            const query = document.getElementById('city-input').value;
-            if(!query) return;
-            try {
-                const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}`);
-                const data = await res.json();
-                if(data.length > 0) {
-                    // panTo ne menja nivo zooma, samo centar mape
-                    map.panTo([data[0].lat, data[0].lon]);
-                    toggleSearch(); 
-                }
-            } catch (e) { console.error(e); }
-        }
-
-        function locateMe() {
-            // LocateMe menja zoom samo na 16 radi preciznosti, ali to je korisno
-            map.locate({setView: true, maxZoom: 16});
-        }
+        // Inicijalno učitavanje
+        renderCourts();
     </script>
 </body>
 </html>
