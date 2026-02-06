@@ -3,58 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AllSportsLocal Pro</title>
+    <title>AllSportsLocal - Clean Map</title>
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     
     <style>
-        :root { --primary: #00d2ff; --secondary: #3a7bd5; --dark: #121212; }
+        :root { --primary: #00d2ff; --dark: #121212; }
         body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', sans-serif; background: #000; overflow: hidden; }
         #map { height: 100vh; width: 100vw; }
 
-        /* Header */
         .map-header {
             position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
-            z-index: 1000; background: rgba(18, 18, 18, 0.85); color: white;
-            padding: 15px 25px; border-radius: 20px; font-size: 0.9rem;
-            text-align: center; width: 80%; max-width: 400px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.8);
-            backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1);
+            z-index: 1000; background: rgba(18, 18, 18, 0.9); color: white;
+            padding: 12px 20px; border-radius: 20px; font-size: 0.8rem;
+            text-align: center; width: 85%; max-width: 350px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1); pointer-events: none;
         }
 
-        /* Moja Lokacija dugme */
-        .locate-btn {
-            position: absolute; bottom: 100px; right: 12px;
-            z-index: 1000; background: white; width: 44px; height: 44px;
-            border-radius: 12px; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3); cursor: pointer; color: #333;
-        }
-
-        /* Profi Marker */
         .marker-pin {
-            width: 20px; height: 20px; border-radius: 50% 50% 50% 0;
+            width: 24px; height: 24px; border-radius: 50% 50% 50% 0;
             background: var(--primary); position: absolute;
-            transform: rotate(-45deg); left: 50%; top: 50%; margin: -10px 0 0 -10px;
-            box-shadow: 0 0 10px var(--primary); border: 2px solid white;
+            transform: rotate(-45deg); left: 50%; top: 50%; margin: -12px 0 0 -12px;
+            border: 2px solid white; box-shadow: 0 0 10px var(--primary);
         }
 
-        /* Popup */
-        .leaflet-popup-content-wrapper { background: #1e1e1e; color: white; border-radius: 15px; }
-        .popup-info { padding: 10px; text-align: center; }
-        .popup-info h4 { margin: 5px 0; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; }
-        .popup-info small { color: #888; }
+        .popup-info { padding: 10px; text-align: center; min-width: 150px; }
+        .popup-info h4 { margin: 5px 0; color: var(--primary); text-transform: uppercase; }
     </style>
 </head>
 <body>
 
     <div class="map-header">
-        <strong style="font-size: 1.1rem; color: var(--primary);">AllSportsLocal</strong><br>
-        <span style="opacity: 0.8;">Dodirni mapu da postaviš svoj teren</span>
-    </div>
-
-    <div class="locate-btn" onclick="findMe()">
-        <i class="fa-solid fa-location-crosshairs fa-lg"></i>
+        <strong style="color: var(--primary);">ALLSPORTSLOCAL</strong><br>
+        Samo ulice, gradovi i granice. Bez restorana i kafića.
     </div>
     
     <div id="map"></div>
@@ -63,7 +45,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, set, onValue, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCyyqnqeS-9jurBX-6VIRp8CiPTMbXkXgw",
@@ -74,53 +56,75 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
+        // Inicijalizacija mape
         var map = L.map('map', { zoomControl: false }).setView([44.8, 20.4], 7);
-        
-        L.tileLayer('https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
-            maxZoom: 20, subdomains:['mt0','mt1','mt2','mt3']
+
+        // 1. Satelitski sloj (Čista slika)
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Esri World Imagery'
         }).addTo(map);
 
-        L.control.zoom({ position: 'bottomright' }).addTo(map);
+        // 2. Prozirni sloj sa ulicama, granicama i gradovima (BEZ RESTORANA/POI)
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', {
+            pane: 'shadowPane', // Postavljamo labele iznad svega
+            subdomains: 'abcd',
+            maxZoom: 20
+        }).addTo(map);
+        
+        // Dodatni sloj za administrativne granice
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
+            opacity: 0.3
+        }).addTo(map);
 
-        let myPhoneId = localStorage.getItem('myPhoneId') || 'user_' + Math.random().toString(36).substr(2, 9);
+        let myPhoneId = localStorage.getItem('myPhoneId') || 'u_' + Math.random().toString(36).substr(2, 9);
         localStorage.setItem('myPhoneId', myPhoneId);
 
-        window.findMe = () => {
-            map.locate({setView: true, maxZoom: 16});
-        };
-
-        const tereniRef = ref(db, 'tereni');
-        onValue(tereniRef, (snapshot) => {
+        onValue(ref(db, 'tereni'), (snapshot) => {
             map.eachLayer(l => { if(l instanceof L.Marker) map.removeLayer(l); });
             const data = snapshot.val();
             if(data) {
                 Object.keys(data).forEach(id => {
                     const t = data[id];
                     const isMine = id === myPhoneId;
-                    
-                    const html = `<div class="popup-info">
-                                    <small>${isMine ? 'VAŠ TEREN' : 'TEREN'}</small>
-                                    <h4>${t.ime}</h4>
-                                    <small>${t.vreme || ''}</small>
-                                  </div>`;
-
                     L.marker([t.lat, t.lng], {
-                        icon: L.divIcon({ className: 'custom-div-icon', html: `<div class='marker-pin' style='background:${isMine ? "#00ff88" : "#00d2ff"}'></div>`, iconSize: [30, 42], iconAnchor: [15, 42] })
-                    }).addTo(map).bindPopup(html);
+                        icon: L.divIcon({ className: 'c-icon', html: `<div class='marker-pin' style='background:${isMine ? "#00ff88" : "#00d2ff"}'></div>`, iconAnchor: [12, 24] })
+                    }).addTo(map).bindPopup(`<div class="popup-info"><h4>${t.ime}</h4><small>${isMine ? 'VAŠA LOKACIJA' : 'TEREN'}</small></div>`);
                 });
             }
         });
 
-        map.on('click', (e) => {
-            const ime = prompt("Naziv sportskog terena:");
-            if(ime && ime.trim() !== "") {
-                set(ref(db, 'tereni/' + myPhoneId), {
-                    ime: ime,
-                    lat: e.latlng.lat,
-                    lng: e.latlng.lng,
-                    vreme: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
-                });
+        map.on('click', async (e) => {
+            const userRef = ref(db, 'tereni/' + myPhoneId);
+            const snapshot = await get(userRef);
+            const postojeciPodaci = snapshot.exists() ? snapshot.val() : null;
+
+            if (postojeciPodaci) {
+                let proveraPina = prompt("UNESITE VAŠ PIN ZA IZMENU:");
+                if (!proveraPina || proveraPina.toUpperCase() !== postojeciPodaci.pin) {
+                    alert("POGREŠAN PIN!");
+                    return;
+                }
             }
+
+            let novoIme = prompt("NAZIV TERENA:");
+            if (!novoIme) return;
+            novoIme = novoIme.toUpperCase(); // Konvertuje u velika slova
+
+            let noviPin = prompt("POSTAVITE PIN (MIN 4 ZNAKA):");
+            if (!noviPin || noviPin.length < 4) {
+                alert("PIN PREKRATAK!");
+                return;
+            }
+            noviPin = noviPin.toUpperCase(); // Konvertuje u velika slova
+
+            set(userRef, {
+                ime: novoIme,
+                pin: noviPin,
+                lat: e.latlng.lat,
+                lng: e.latlng.lng,
+                vreme: new Date().toLocaleTimeString()
+            });
+            alert("USPEŠNO SAČUVANO!");
         });
     </script>
 </body>
