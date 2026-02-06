@@ -3,29 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AllSportsLocal - Jedan Teren</title>
+    <title>AllSportsLocal Pro</title>
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     
     <style>
+        :root { --primary: #00d2ff; --secondary: #3a7bd5; --dark: #121212; }
         body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', sans-serif; background: #000; overflow: hidden; }
         #map { height: 100vh; width: 100vw; }
 
-        .map-overlay {
-            position: absolute; top: 15px; left: 50%; transform: translateX(-50%);
-            z-index: 1000; background: rgba(0,0,0,0.85); color: white;
-            padding: 12px 25px; border-radius: 30px; font-size: 0.9rem;
-            text-align: center; width: 70%; border: 1px solid #444;
-            pointer-events: none;
+        /* Header */
+        .map-header {
+            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+            z-index: 1000; background: rgba(18, 18, 18, 0.85); color: white;
+            padding: 15px 25px; border-radius: 20px; font-size: 0.9rem;
+            text-align: center; width: 80%; max-width: 400px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1);
         }
 
-        /* Stil za popup na mapi */
-        .leaflet-popup-content { font-weight: bold; text-align: center; }
+        /* Moja Lokacija dugme */
+        .locate-btn {
+            position: absolute; bottom: 100px; right: 12px;
+            z-index: 1000; background: white; width: 44px; height: 44px;
+            border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3); cursor: pointer; color: #333;
+        }
+
+        /* Profi Marker */
+        .marker-pin {
+            width: 20px; height: 20px; border-radius: 50% 50% 50% 0;
+            background: var(--primary); position: absolute;
+            transform: rotate(-45deg); left: 50%; top: 50%; margin: -10px 0 0 -10px;
+            box-shadow: 0 0 10px var(--primary); border: 2px solid white;
+        }
+
+        /* Popup */
+        .leaflet-popup-content-wrapper { background: #1e1e1e; color: white; border-radius: 15px; }
+        .popup-info { padding: 10px; text-align: center; }
+        .popup-info h4 { margin: 5px 0; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; }
+        .popup-info small { color: #888; }
     </style>
 </head>
 <body>
 
-    <div class="map-overlay">Dodirni mapu da postaviš svoj teren. Nova lokacija će zameniti staru.</div>
+    <div class="map-header">
+        <strong style="font-size: 1.1rem; color: var(--primary);">AllSportsLocal</strong><br>
+        <span style="opacity: 0.8;">Dodirni mapu da postaviš svoj teren</span>
+    </div>
+
+    <div class="locate-btn" onclick="findMe()">
+        <i class="fa-solid fa-location-crosshairs fa-lg"></i>
+    </div>
+    
     <div id="map"></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -43,60 +74,51 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Inicijalizacija satelitske mape
         var map = L.map('map', { zoomControl: false }).setView([44.8, 20.4], 7);
+        
         L.tileLayer('https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
             maxZoom: 20, subdomains:['mt0','mt1','mt2','mt3']
         }).addTo(map);
+
         L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-        // Dobavljanje ID-a telefona iz lokalne memorije
-        let myPhoneId = localStorage.getItem('myPhoneId');
-        if (!myPhoneId) {
-            myPhoneId = 'dev_' + Math.random().toString(36).substr(2, 9);
-            localStorage.setItem('myPhoneId', myPhoneId);
-        }
+        let myPhoneId = localStorage.getItem('myPhoneId') || 'user_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('myPhoneId', myPhoneId);
 
-        // --- PRIKAZIVANJE TERENA ---
+        window.findMe = () => {
+            map.locate({setView: true, maxZoom: 16});
+        };
+
         const tereniRef = ref(db, 'tereni');
         onValue(tereniRef, (snapshot) => {
-            // Ukloni trenutne markere pre osvežavanja
-            map.eachLayer((layer) => {
-                if (layer instanceof L.Marker) map.removeLayer(layer);
-            });
-
+            map.eachLayer(l => { if(l instanceof L.Marker) map.removeLayer(l); });
             const data = snapshot.val();
-            if (data) {
+            if(data) {
                 Object.keys(data).forEach(id => {
                     const t = data[id];
-                    const marker = L.marker([t.lat, t.lng]).addTo(map);
-                    // Ako je to teren ovog telefona, oboji ga drugačije ili naglasi
-                    if (id === myPhoneId) {
-                        marker.bindPopup(`<b>Vaš teren: ${t.ime}</b>`).openPopup();
-                    } else {
-                        marker.bindPopup(`<b>Teren: ${t.ime}</b>`);
-                    }
+                    const isMine = id === myPhoneId;
+                    
+                    const html = `<div class="popup-info">
+                                    <small>${isMine ? 'VAŠ TEREN' : 'TEREN'}</small>
+                                    <h4>${t.ime}</h4>
+                                    <small>${t.vreme || ''}</small>
+                                  </div>`;
+
+                    L.marker([t.lat, t.lng], {
+                        icon: L.divIcon({ className: 'custom-div-icon', html: `<div class='marker-pin' style='background:${isMine ? "#00ff88" : "#00d2ff"}'></div>`, iconSize: [30, 42], iconAnchor: [15, 42] })
+                    }).addTo(map).bindPopup(html);
                 });
             }
         });
 
-        // --- DODAVANJE / POMERANJE TERENA ---
         map.on('click', (e) => {
-            const { lat, lng } = e.latlng;
-            
-            const ime = prompt("Unesite ime terena (stara lokacija će biti obrisana):");
-            
-            if (ime && ime.trim() !== "") {
-                // 'set' na istu putanju (myPhoneId) automatski briše prethodne podatke tog telefona
+            const ime = prompt("Naziv sportskog terena:");
+            if(ime && ime.trim() !== "") {
                 set(ref(db, 'tereni/' + myPhoneId), {
                     ime: ime,
-                    lat: lat,
-                    lng: lng,
-                    vreme: new Date().toISOString()
-                }).then(() => {
-                    console.log("Lokacija ažurirana.");
-                }).catch((error) => {
-                    alert("Greška: " + error.message);
+                    lat: e.latlng.lat,
+                    lng: e.latlng.lng,
+                    vreme: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
                 });
             }
         });
