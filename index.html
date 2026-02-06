@@ -1,64 +1,54 @@
 <!DOCTYPE html>
-<html lang="bs">
+<html lang="sr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AllSportsLocal - Satelitska Mapa</title>
+    <title>AllSportsLocal - Firebase Auth & Map</title>
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
+        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', sans-serif; overflow: hidden; background: #000; }
         
-        /* Početna strana */
+        /* Landing Page */
         #landing-page {
             position: absolute;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&w=1350&q=80');
-            background-size: cover;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            width: 100%; height: 100%;
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&w=1350&q=80');
+            background-size: cover; background-position: center;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
             z-index: 2000;
         }
 
-        .hero-title { color: white; font-size: 2.5rem; margin-bottom: 20px; text-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
-        .btn-group { display: flex; flex-direction: column; gap: 15px; width: 80%; max-width: 300px; }
+        .hero-title { color: white; font-size: 2.2rem; margin-bottom: 30px; text-align: center; }
 
-        button {
-            padding: 15px;
-            border: none;
-            border-radius: 25px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        /* Modali (Login/Reg Forme) */
+        .auth-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); z-index: 3000; justify-content: center; align-items: center;
         }
+        .auth-form {
+            background: white; padding: 25px; border-radius: 15px; width: 85%; max-width: 350px;
+            display: flex; flex-direction: column; gap: 15px;
+        }
+        input { padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; }
 
-        .btn-login { background-color: #ffffff; color: #333; }
-        .btn-reg { background-color: #4CAF50; color: white; }
-        .btn-explore { background-color: #2196F3; color: white; }
+        /* Dugmad */
+        .btn-group { display: flex; flex-direction: column; gap: 12px; width: 80%; max-width: 300px; }
+        button { padding: 14px; border: none; border-radius: 25px; font-weight: bold; cursor: pointer; font-size: 1rem; }
+        .btn-blue { background: #2196F3; color: white; }
+        .btn-green { background: #4CAF50; color: white; }
+        .btn-white { background: white; color: #333; }
+        .btn-close { background: #ff4444; color: white; margin-top: 10px; }
 
-        /* Navigacija iznad mape */
+        /* Mapa UI */
         #map-ui {
-            position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
-            display: none;
-            width: 90%;
-            display: flex;
-            justify-content: center;
-            gap: 10px;
+            position: absolute; top: 15px; width: 100%; z-index: 1000;
+            display: none; justify-content: center; gap: 10px;
         }
-
-        .btn-small { padding: 8px 15px; font-size: 0.8rem; border-radius: 15px; }
-
-        /* Mapa */
-        #map { height: 100vh; width: 100vw; display: none; background: #000; }
+        .btn-mini { padding: 8px 15px; font-size: 0.8rem; border-radius: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        #map { height: 100vh; width: 100vw; display: none; }
+        #user-info { position: absolute; bottom: 20px; left: 10px; z-index: 1000; color: white; background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 5px; display: none; font-size: 0.8rem; }
     </style>
 </head>
 <body>
@@ -66,62 +56,113 @@
     <div id="landing-page">
         <h1 class="hero-title">AllSportsLocal</h1>
         <div class="btn-group">
-            <button class="btn-login" onclick="authAlert('Login')">Login</button>
-            <button class="btn-reg" onclick="authAlert('Registracija')">Registracija</button>
-            <button class="btn-explore" onclick="startExplore()">Explore Mapa</button>
+            <button class="btn-white" onclick="toggleAuth('login')">Prijava (Login)</button>
+            <button class="btn-green" onclick="toggleAuth('reg')">Registracija</button>
+            <button class="btn-blue" onclick="startExplore()">Istraži Mapu</button>
         </div>
     </div>
 
-    <div id="map-ui" style="display: none;">
-        <button class="btn-login btn-small" onclick="authAlert('Login')">Login</button>
-        <button class="btn-reg btn-small" onclick="authAlert('Registracija')">Registracija</button>
+    <div id="auth-modal" class="auth-overlay">
+        <div class="auth-form">
+            <h2 id="modal-title" style="margin:0">Prijava</h2>
+            <input type="email" id="email" placeholder="Email">
+            <input type="password" id="password" placeholder="Lozinka">
+            <button class="btn-blue" id="auth-submit-btn" onclick="handleAuth()">Potvrdi</button>
+            <button class="btn-close" onclick="toggleAuth()">Zatvori</button>
+        </div>
     </div>
+
+    <div id="map-ui">
+        <button class="btn-white btn-mini" onclick="toggleAuth('login')">Login</button>
+        <button class="btn-green btn-mini" onclick="toggleAuth('reg')">Registracija</button>
+    </div>
+    <div id="user-info"></div>
 
     <div id="map"></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    
+
     <script type="module">
+        // Firebase Modularni Import
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
             databaseURL: "https://allsportslocal-ea1d4-default-rtdb.europe-west1.firebasedatabase.app/",
-            appId: "1:161980114353:web:f8deefef0d5d85b1cc8990"
+            appId: "1:161980114353:web:f8deefef0d5d85b1cc8990",
+            // Napomena: Firebase Auth zahteva i apiKey. Ako ga nemaš u zapisu, nađi ga u Firebase Project Settings.
+            apiKey: "AIzaSy..." 
         };
 
         const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
         const db = getDatabase(app);
+
+        let currentMode = 'login';
+
+        // Funkcija za prebacivanje forme
+        window.toggleAuth = (mode) => {
+            const modal = document.getElementById('auth-modal');
+            if(!mode) { modal.style.display = 'none'; return; }
+            currentMode = mode;
+            document.getElementById('modal-title').innerText = mode === 'login' ? 'Prijava' : 'Registracija';
+            modal.style.display = 'flex';
+        };
+
+        // Glavna logika za Login/Reg
+        window.handleAuth = async () => {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                if (currentMode === 'reg') {
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    // Čuvanje dodatnih podataka u bazu nakon registracije
+                    await set(ref(db, 'users/' + userCredential.user.uid), {
+                        email: email,
+                        lastLogin: new Date().toISOString()
+                    });
+                    alert("Uspešna registracija!");
+                } else {
+                    await signInWithEmailAndPassword(auth, email, password);
+                    alert("Uspešna prijava!");
+                }
+                toggleAuth();
+            } catch (error) {
+                alert("Greška: " + error.message);
+            }
+        };
+
+        // Praćenje stanja prijave
+        onAuthStateChanged(auth, (user) => {
+            const userInfo = document.getElementById('user-info');
+            if (user) {
+                userInfo.style.display = 'block';
+                userInfo.innerText = "Prijavljeni ste kao: " + user.email;
+                document.getElementById('map-ui').style.display = 'none'; // Sakrij dugmad ako je prijavljen
+            } else {
+                userInfo.style.display = 'none';
+            }
+        });
     </script>
 
     <script>
-        function authAlert(type) {
-            alert(type + " funkcija je povezana sa vašim Firebase nalogom.");
-        }
-
         function startExplore() {
-            // Sakrij landing, prikaži mapu i UI
             document.getElementById('landing-page').style.display = 'none';
             document.getElementById('map').style.display = 'block';
             document.getElementById('map-ui').style.display = 'flex';
 
-            // Inicijalizacija mape
-            var map = L.map('map', {
-                zoomControl: false // Sakrivamo da ne smeta dugmićima na vrhu
-            }).setView([44.378, 17.331], 7); // Centrirano na Balkan
+            var map = L.map('map', { zoomControl: false }).setView([44.378, 17.331], 7);
 
-            // DODAVANJE SATELITSKE MAPE SA ULICAMA, GRADIDIMA I GRANICAMA
-            // Koristimo Google Hybrid (Satelit + Labels)
-            var googleHybrid = L.tileLayer('https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+            // Google Hybrid: Satelit + Granice + Mesta + Ulice
+            L.tileLayer('https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
                 maxZoom: 20,
                 subdomains:['mt0','mt1','mt2','mt3'],
                 attribution: '&copy; Google Maps'
             }).addTo(map);
 
-            // Dodajemo kontrolu zuma dole desno
             L.control.zoom({ position: 'bottomright' }).addTo(map);
-
-            // Osvežavanje veličine mape
             setTimeout(() => { map.invalidateSize(); }, 200);
         }
     </script>
