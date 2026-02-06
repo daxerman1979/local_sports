@@ -3,75 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AllSportsLocal - Pro</title>
+    <title>AllSportsLocal Pro</title>
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     
     <style>
         :root { --primary: #00d2ff; --bg: #0a0a0a; --card: #1e1e1e; }
-        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', sans-serif; background: var(--bg); overflow: hidden; color: white; }
         
+        /* Zabrana zumiranja na nivou celog dokumenta */
+        body, html { 
+            margin: 0; padding: 0; height: 100%; 
+            font-family: 'Segoe UI', sans-serif; 
+            background: var(--bg); overflow: hidden; color: white;
+            touch-action: pan-x pan-y; /* Sprečava pinch-zoom ali dopušta pomeranje */
+        }
+
         /* LANDING STRANA */
         #landing {
             position: fixed; inset: 0; z-index: 5000;
-            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
-                        url('https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=1600&auto=format&fit=crop');
+            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), 
+                        url('https://images.unsplash.com/photo-1517649763962-0c623066013b?q=80&w=1600&auto=format&fit=crop');
             background-size: cover; background-position: center;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            text-align: center; transition: 0.5s ease;
+            transition: 0.5s;
         }
-        #landing h1 { font-size: 2.5rem; letter-spacing: 3px; margin-bottom: 10px; color: var(--primary); text-shadow: 0 0 20px rgba(0,210,255,0.5); }
         .btn-enter { 
-            padding: 15px 40px; background: var(--primary); color: black; border: none; 
-            border-radius: 50px; font-weight: bold; font-size: 1.1rem; cursor: pointer;
-            box-shadow: 0 10px 20px rgba(0,210,255,0.3); text-transform: uppercase;
+            padding: 18px 45px; background: var(--primary); color: black; border: none; 
+            border-radius: 50px; font-weight: 900; font-size: 1.2rem; cursor: pointer;
+            text-transform: uppercase; letter-spacing: 2px;
         }
 
-        /* MAPA */
-        #map { height: 100vh; width: 100vw; display: none; }
-
-        /* DISKRETAN SEARCH */
-        .search-container {
-            position: absolute; top: 20px; left: 15px; z-index: 1000;
-            width: calc(100% - 30px); max-width: 300px;
+        /* DISKRETAN SEARCH (Samo ikonica koja se širi) */
+        .search-box {
+            position: absolute; top: 15px; left: 15px; z-index: 1000;
+            display: flex; align-items: center;
+            background: rgba(0,0,0,0.6); border-radius: 25px;
+            padding: 5px; border: 1px solid rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px); transition: 0.3s;
+            width: 40px; overflow: hidden;
         }
+        .search-box:focus-within { width: 250px; background: rgba(0,0,0,0.9); }
         #search-input {
-            width: 100%; padding: 12px 15px; border-radius: 25px; border: 1px solid rgba(255,255,255,0.1);
-            background: rgba(30, 30, 30, 0.9); color: white; backdrop-filter: blur(10px);
-            font-size: 16px; /* SPREČAVA AUTO-ZUM NA IPHONE-U */
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5); outline: none;
+            background: none; border: none; color: white; padding: 8px 10px;
+            font-size: 16px; outline: none; width: 200px;
         }
+        .search-icon { padding: 8px; color: var(--primary); }
 
-        /* GPS DUGME */
+        /* GPS DUGME - DESNO DOLE */
         .gps-btn {
             position: absolute; bottom: 30px; right: 20px; z-index: 1000;
-            background: var(--primary); color: black; width: 50px; height: 50px;
+            background: var(--primary); color: black; width: 55px; height: 55px;
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4); cursor: pointer;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5); cursor: pointer;
         }
 
-        /* MODAL */
+        /* MODAL BEZ ZUMA */
         #custom-modal {
-            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9);
             z-index: 6000; justify-content: center; align-items: center;
         }
         .modal-card {
-            background: var(--card); padding: 25px; border-radius: 20px;
+            background: var(--card); padding: 30px; border-radius: 25px;
             width: 85%; max-width: 320px; text-align: center; border: 1px solid #333;
         }
         .modal-card input {
-            width: 100%; padding: 12px; margin: 15px 0; border-radius: 10px;
-            border: 1px solid #444; background: #282828; color: white;
-            text-transform: uppercase; text-align: center; font-size: 16px; box-sizing: border-box;
+            width: 100%; padding: 15px; margin: 20px 0; border-radius: 12px;
+            border: 1px solid #444; background: #222; color: white;
+            text-transform: uppercase; text-align: center; 
+            font-size: 16px; /* KLJUČNO PROTIV ZUMA */
+            box-sizing: border-box;
         }
-        .btn-action { width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: bold; margin-top: 5px; text-transform: uppercase; cursor: pointer; }
 
         /* MARKER PIN */
         .marker-pin {
-            width: 24px; height: 24px; border-radius: 50% 50% 50% 0;
+            width: 26px; height: 26px; border-radius: 50% 50% 50% 0;
             background: var(--primary); position: absolute;
-            transform: rotate(-45deg); left: 50%; top: 50%; margin: -12px 0 0 -12px;
+            transform: rotate(-45deg); left: 50%; top: 50%; margin: -13px 0 0 -13px;
             border: 2px solid white; box-shadow: 0 0 15px var(--primary);
         }
     </style>
@@ -79,29 +87,29 @@
 <body>
 
     <div id="landing">
-        <h1 style="text-transform: uppercase;">AllSportsLocal</h1>
-        <p style="margin-bottom: 30px; opacity: 0.8;">PRONAĐI SVOJ TEREN</p>
-        <button class="btn-enter" onclick="enterApp()">UĐI NA MAPU</button>
+        <h1 style="letter-spacing: 5px; text-transform: uppercase;">AllSportsLocal</h1>
+        <button class="btn-enter" onclick="enterApp()">KRENI</button>
     </div>
 
-    <div class="search-container" id="search-box" style="display: none;">
-        <input type="text" id="search-input" placeholder="Pretraži gradove..." onkeydown="if(event.key==='Enter') searchLocation()">
+    <div class="search-box" id="search-container" style="display: none;">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input type="text" id="search-input" placeholder="GRAD..." onkeydown="if(event.key==='Enter') searchLocation()">
     </div>
 
     <div class="gps-btn" id="gps-box" style="display: none;" onclick="goToMyLocation()">
-        <i class="fa-solid fa-location-crosshairs fa-xl"></i>
+        <i class="fa-solid fa-location-arrow fa-xl"></i>
     </div>
 
     <div id="custom-modal">
         <div class="modal-card">
-            <h3 id="m-title" style="margin-top:0;"></h3>
-            <input type="text" id="m-input">
-            <button class="btn-action" style="background:var(--primary); color:black;" id="m-btn">POTVRDI</button>
-            <button class="btn-action" style="background:transparent; color:#ff4444;" onclick="closeM()">ODUSTANI</button>
+            <h3 id="m-title" style="margin:0; text-transform: uppercase;"></h3>
+            <input type="text" id="m-input" autocomplete="off">
+            <button onclick="processModal()" style="width:100%; padding:15px; border-radius:12px; background:var(--primary); font-weight:bold; border:none; text-transform:uppercase;">POTVRDI</button>
+            <button onclick="closeM()" style="background:none; border:none; color:grey; margin-top:15px; width:100%; text-transform:uppercase; font-size:0.7rem;">ODUSTANI</button>
         </div>
     </div>
     
-    <div id="map"></div>
+    <div id="map" style="height: 100vh; width: 100vw; display: none;"></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
@@ -118,7 +126,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        let map, myPhoneId;
+        let map, myPhoneId, modalCallback;
         myPhoneId = localStorage.getItem('myPhoneId') || 'u_' + Math.random().toString(36).substr(2, 9);
         localStorage.setItem('myPhoneId', myPhoneId);
 
@@ -127,17 +135,21 @@
             setTimeout(() => {
                 document.getElementById('landing').style.display = 'none';
                 document.getElementById('map').style.display = 'block';
-                document.getElementById('search-box').style.display = 'block';
+                document.getElementById('search-container').style.display = 'flex';
                 document.getElementById('gps-box').style.display = 'flex';
                 initMap();
-                goToMyLocation(); // Automatski fokus na korisnika pri ulasku
             }, 500);
         };
 
         function initMap() {
-            map = L.map('map', { zoomControl: false }).setView([44.8, 20.4], 7);
+            map = L.map('map', { zoomControl: false, zoomSnap: 0.5 }).setView([44.8, 20.4], 7);
+            
+            // Satelit i čiste labele
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
             L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', { pane: 'shadowPane' }).addTo(map);
+
+            // Prvo lociranje
+            map.locate({setView: true, maxZoom: 15});
 
             onValue(ref(db, 'tereni'), (snap) => {
                 map.eachLayer(l => { if(l instanceof L.Marker) map.removeLayer(l); });
@@ -146,8 +158,8 @@
                     Object.keys(data).forEach(id => {
                         const t = data[id];
                         L.marker([t.lat, t.lng], {
-                            icon: L.divIcon({ className: 'c-icon', html: `<div class='marker-pin' style='background:${id === myPhoneId ? "#00ff88" : "#00d2ff"}'></div>`, iconAnchor: [12, 24] })
-                        }).addTo(map).bindPopup(`<b style="color:black">${t.ime}</b>`);
+                            icon: L.divIcon({ className: 'c-icon', html: `<div class='marker-pin' style='background:${id === myPhoneId ? "#00ff88" : "#00d2ff"}'></div>`, iconAnchor: [13, 26] })
+                        }).addTo(map).bindPopup(`<b style="color:black; text-transform:uppercase;">${t.ime}</b>`);
                     });
                 }
             });
@@ -155,31 +167,33 @@
             map.on('click', async (e) => {
                 const snap = await get(ref(db, 'tereni/' + myPhoneId));
                 const data = snap.exists() ? snap.val() : null;
+                
                 if(data) {
-                    openM("POTVRDA PIN-A", (pin) => {
+                    openM("UNESI PIN ZA IZMENU", (pin) => {
                         if(pin === data.pin) setupTeren(e.latlng, pin);
                         else alert("POGREŠAN PIN!");
                     });
-                } else setupTeren(e.latlng, null);
+                } else {
+                    setupTeren(e.latlng, null);
+                }
             });
         }
 
-        window.goToMyLocation = () => {
-            map.locate({setView: true, maxZoom: 15});
-        };
+        window.goToMyLocation = () => map.locate({setView: true, maxZoom: 16});
 
         window.searchLocation = async () => {
             const query = document.getElementById('search-input').value;
             if(!query) return;
             const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}`);
             const data = await res.json();
-            if(data.length > 0) map.setView([data[0].lat, data[0].long], 13);
+            if(data.length > 0) map.setView([data[0].lat, data[0].lon], 13);
+            document.activeElement.blur(); // Zatvara tastaturu
         };
 
         function setupTeren(latlng, pin) {
             openM("NAZIV TERENA", (ime) => {
                 if(pin) save(ime, latlng, pin);
-                else openM("POSTAVI PIN (4 ZN)", (nPin) => save(ime, latlng, nPin));
+                else openM("POSTAVI PIN (MIN 4)", (nPin) => save(ime, latlng, nPin));
             });
         }
 
@@ -188,15 +202,17 @@
         }
 
         window.openM = (t, cb) => {
-            const m = document.getElementById('custom-modal');
             document.getElementById('m-title').innerText = t;
             document.getElementById('m-input').value = "";
-            m.style.display = 'flex';
-            document.getElementById('m-btn').onclick = () => {
-                const v = document.getElementById('m-input').value.toUpperCase().trim();
-                if(v) { cb(v); closeM(); }
-            };
+            document.getElementById('custom-modal').style.display = 'flex';
+            modalCallback = cb;
         };
+
+        window.processModal = () => {
+            const v = document.getElementById('m-input').value.toUpperCase().trim();
+            if(v) { modalCallback(v); closeM(); }
+        };
+
         window.closeM = () => document.getElementById('custom-modal').style.display = 'none';
     </script>
 </body>
