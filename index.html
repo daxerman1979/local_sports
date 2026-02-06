@@ -24,24 +24,24 @@
             background-size: cover; background-position: center;
             display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px;
         }
-        #landing h1 { font-size: 1.8rem; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 20px; max-width: 100%; }
+        #landing h1 { font-size: 1.8rem; letter-spacing: 4px; text-transform: uppercase; text-align: center; width: 100%; margin-bottom: 25px; }
         .btn-enter { padding: 16px 50px; background: var(--primary); color: black; border: none; border-radius: 50px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
 
-        /* SEARCH - DISKRETAN */
+        /* SEARCH */
         .search-box {
             position: absolute; top: 15px; left: 15px; z-index: 1000;
-            display: flex; align-items: center; background: rgba(30, 30, 30, 0.9);
+            display: flex; align-items: center; background: rgba(20, 20, 20, 0.9);
             border-radius: 30px; border: 1px solid rgba(255,255,255,0.2);
-            width: 45px; height: 45px; transition: 0.4s; overflow: hidden;
+            width: 45px; height: 45px; transition: 0.4s; overflow: hidden; backdrop-filter: blur(10px);
         }
-        .search-box:focus-within { width: 280px; }
+        .search-box:focus-within { width: 260px; }
         #search-input {
-            background: none; border: none; color: white; padding: 10px 15px;
-            font-size: 16px; outline: none; width: 220px;
+            background: none; border: none; color: white; padding: 10px;
+            font-size: 16px; outline: none; width: 200px;
         }
         .search-icon { min-width: 45px; text-align: center; color: var(--primary); }
 
-        /* GPS DUGME */
+        /* GPS */
         .gps-btn {
             position: absolute; bottom: 30px; right: 20px; z-index: 1000;
             background: var(--primary); color: black; width: 55px; height: 55px;
@@ -55,15 +55,16 @@
             z-index: 6000; justify-content: center; align-items: center;
         }
         .modal-card {
-            background: var(--card); padding: 30px; border-radius: 20px;
-            width: 90%; max-width: 320px; border: 1px solid #333;
+            background: var(--card); padding: 25px; border-radius: 20px;
+            width: 85%; max-width: 320px; border: 1px solid #333; text-align: center;
         }
         .modal-card input {
             width: 100%; padding: 15px; margin: 15px 0; border-radius: 10px;
-            border: 1px solid #444; background: #222; color: white; font-size: 16px; text-align: center;
+            border: 1px solid #444; background: #222; color: white; font-size: 16px; 
+            text-align: center; text-transform: uppercase;
         }
+        .btn-m { width: 100%; padding: 15px; border-radius: 10px; border: none; font-weight: bold; text-transform: uppercase; cursor: pointer; }
 
-        /* PIN MARKER */
         .marker-pin {
             width: 26px; height: 26px; border-radius: 50% 50% 50% 0;
             background: var(--primary); position: absolute;
@@ -81,7 +82,7 @@
 
     <div class="search-box" id="search-container" style="display: none;">
         <i class="fa-solid fa-magnifying-glass search-icon"></i>
-        <input type="text" id="search-input" placeholder="Pretraži grad..." autocomplete="off">
+        <input type="text" id="search-input" placeholder="GRAD..." autocomplete="off">
     </div>
 
     <div class="gps-btn" id="gps-box" style="display: none;" onclick="goToMyLocation()">
@@ -90,10 +91,10 @@
 
     <div id="custom-modal">
         <div class="modal-card">
-            <h3 id="m-title" style="margin:0; text-transform: uppercase; text-align: center;"></h3>
-            <input type="text" id="m-input" autocomplete="off">
-            <button id="m-confirm" style="width:100%; padding:15px; border-radius:10px; background:var(--primary); font-weight:bold; border:none; text-transform:uppercase;">POTVRDI</button>
-            <button onclick="closeM()" style="background:none; border:none; color:grey; margin-top:15px; width:100%; text-transform:uppercase; font-size:0.75rem;">ODUSTANI</button>
+            <h3 id="m-title" style="margin:0; font-size: 1rem; color: var(--primary);"></h3>
+            <input type="text" id="m-input" autocomplete="off" spellcheck="false">
+            <button id="m-confirm" class="btn-m" style="background: var(--primary); color: black;">POTVRDI</button>
+            <button onclick="closeM()" class="btn-m" style="background: transparent; color: #777; margin-top: 5px;">ODUSTANI</button>
         </div>
     </div>
     
@@ -141,7 +142,7 @@
                         const t = data[id];
                         L.marker([t.lat, t.lng], {
                             icon: L.divIcon({ className: 'c-icon', html: `<div class='marker-pin' style='background:${id === myPhoneId ? "#00ff88" : "#00d2ff"}'></div>`, iconAnchor: [13, 26] })
-                        }).addTo(map).bindPopup(`<b style="color:black">${t.ime}</b>`);
+                        }).addTo(map).bindPopup(`<b style="color:black;text-transform:uppercase;">${t.ime}</b>`);
                     });
                 }
             });
@@ -149,15 +150,42 @@
             map.on('click', async (e) => {
                 const snap = await get(ref(db, 'tereni/' + myPhoneId));
                 if(snap.exists()) {
-                    const data = snap.val();
-                    openM("PIN ZA IZMENU", (pin) => {
-                        if(pin === data.pin) setupTeren(e.latlng, pin);
-                        else alert("POGREŠAN PIN!");
+                    const existing = snap.val();
+                    openM("UNESI PIN ZA IZMENU", (pin) => {
+                        if(pin.toUpperCase() === existing.pin.toUpperCase()) {
+                            postaviIme(e.latlng, pin);
+                        } else {
+                            alert("POGREŠAN PIN!");
+                        }
                     });
                 } else {
-                    setupTeren(e.latlng, null);
+                    postaviIme(e.latlng, null);
                 }
             });
+        }
+
+        function postaviIme(latlng, postojeciPin) {
+            openM("NAZIV TERENA", (ime) => {
+                if(postojeciPin) {
+                    save(ime, latlng, postojeciPin);
+                } else {
+                    openM("POSTAVI PIN (4 ZN)", (noviPin) => {
+                        save(ime, latlng, noviPin);
+                    });
+                }
+            });
+        }
+
+        function save(ime, latlng, pin) {
+            set(ref(db, 'tereni/' + myPhoneId), {
+                ime: ime.toUpperCase(),
+                pin: pin.toUpperCase(),
+                lat: latlng.lat,
+                lng: latlng.lng,
+                vreme: new Date().toLocaleTimeString()
+            }).then(() => {
+                console.log("Sačuvano!");
+            }).catch(e => alert("Greška: " + e.message));
         }
 
         window.goToMyLocation = () => map.locate({setView: true, maxZoom: 16});
@@ -167,23 +195,10 @@
                 const query = e.target.value;
                 const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}`);
                 const data = await res.json();
-                if(data && data.length > 0) {
-                    map.setView([parseFloat(data[0].lat), parseFloat(data[0].lon)], 13);
-                }
+                if(data && data.length > 0) map.setView([data[0].lat, data[0].lon], 13);
                 e.target.blur();
             }
         });
-
-        function setupTeren(latlng, pin) {
-            openM("NAZIV TERENA", (ime) => {
-                if(pin) save(ime, latlng, pin);
-                else openM("POSTAVI PIN (4 ZN)", (nPin) => save(ime, latlng, nPin));
-            });
-        }
-
-        function save(ime, latlng, pin) {
-            set(ref(db, 'tereni/' + myPhoneId), { ime, pin, lat: latlng.lat, lng: latlng.lng });
-        }
 
         window.openM = (t, cb) => {
             document.getElementById('m-title').innerText = t;
@@ -191,7 +206,7 @@
             document.getElementById('custom-modal').style.display = 'flex';
             document.getElementById('m-confirm').onclick = () => {
                 const v = document.getElementById('m-input').value.trim();
-                if(v) { cb(v.toUpperCase()); closeM(); }
+                if(v) { cb(v); closeM(); }
             };
         };
         window.closeM = () => document.getElementById('custom-modal').style.display = 'none';
