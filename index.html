@@ -3,40 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AllSportsLocal - Clean Map</title>
+    <title>AllSportsLocal Pro UI</title>
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
     <style>
-        :root { --primary: #00d2ff; --dark: #121212; }
-        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', sans-serif; background: #000; overflow: hidden; }
-        #map { height: 100vh; width: 100vw; }
+        :root { --primary: #00d2ff; --bg: #121212; --card: #1e1e1e; }
+        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', sans-serif; background: #000; overflow: hidden; color: white; }
+        #map { height: 100vh; width: 100vw; z-index: 1; }
 
+        /* Moderna gornja traka */
         .map-header {
             position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
-            z-index: 1000; background: rgba(18, 18, 18, 0.9); color: white;
-            padding: 12px 20px; border-radius: 20px; font-size: 0.8rem;
-            text-align: center; width: 85%; max-width: 350px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.5); backdrop-filter: blur(10px);
+            z-index: 1000; background: rgba(30, 30, 30, 0.9);
+            padding: 12px 25px; border-radius: 20px; font-size: 0.8rem;
+            text-align: center; width: 80%; max-width: 350px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.6); backdrop-filter: blur(10px);
             border: 1px solid rgba(255,255,255,0.1); pointer-events: none;
+            letter-spacing: 1px;
         }
 
+        /* Stil za CUSTOM MODAL (zamena za prompt/alert) */
+        #custom-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center;
+        }
+        .modal-card {
+            background: var(--card); padding: 30px; border-radius: 25px;
+            width: 85%; max-width: 320px; text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid #333;
+        }
+        .modal-card h3 { margin-top: 0; color: var(--primary); font-size: 1.2rem; }
+        .modal-card input {
+            width: 100%; padding: 15px; margin: 15px 0; border-radius: 12px;
+            border: 1px solid #444; background: #282828; color: white;
+            text-transform: uppercase; text-align: center; font-size: 1rem; box-sizing: border-box;
+        }
+        .modal-card button {
+            width: 100%; padding: 12px; border-radius: 12px; border: none;
+            font-weight: bold; cursor: pointer; margin-top: 10px; text-transform: uppercase;
+        }
+        .btn-confirm { background: var(--primary); color: #000; }
+        .btn-cancel { background: transparent; color: #ff4444; }
+
+        /* Marker Pin */
         .marker-pin {
             width: 24px; height: 24px; border-radius: 50% 50% 50% 0;
             background: var(--primary); position: absolute;
             transform: rotate(-45deg); left: 50%; top: 50%; margin: -12px 0 0 -12px;
-            border: 2px solid white; box-shadow: 0 0 10px var(--primary);
+            border: 2px solid white; box-shadow: 0 0 15px var(--primary);
         }
-
-        .popup-info { padding: 10px; text-align: center; min-width: 150px; }
-        .popup-info h4 { margin: 5px 0; color: var(--primary); text-transform: uppercase; }
     </style>
 </head>
 <body>
 
     <div class="map-header">
         <strong style="color: var(--primary);">ALLSPORTSLOCAL</strong><br>
-        Samo ulice, gradovi i granice. Bez restorana i kafića.
+        DODIRNI MAPU ZA POSTAVKU TERENA
+    </div>
+
+    <div id="custom-modal">
+        <div class="modal-card">
+            <h3 id="modal-title">UNOS PODATAKA</h3>
+            <p id="modal-desc" style="font-size: 0.8rem; color: #aaa;"></p>
+            <input type="text" id="modal-input" placeholder="...">
+            <button class="btn-confirm" id="modal-confirm-btn">POTVRDI</button>
+            <button class="btn-cancel" onclick="closeModal()">ODUSTANI</button>
+        </div>
     </div>
     
     <div id="map"></div>
@@ -56,29 +89,31 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // Inicijalizacija mape
         var map = L.map('map', { zoomControl: false }).setView([44.8, 20.4], 7);
 
-        // 1. Satelitski sloj (Čista slika)
-        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-            attribution: 'Esri World Imagery'
-        }).addTo(map);
-
-        // 2. Prozirni sloj sa ulicama, granicama i gradovima (BEZ RESTORANA/POI)
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', {
-            pane: 'shadowPane', // Postavljamo labele iznad svega
-            subdomains: 'abcd',
-            maxZoom: 20
-        }).addTo(map);
-        
-        // Dodatni sloj za administrativne granice
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
-            opacity: 0.3
-        }).addTo(map);
+        // Satelit bez restorana
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', { pane: 'shadowPane' }).addTo(map);
 
         let myPhoneId = localStorage.getItem('myPhoneId') || 'u_' + Math.random().toString(36).substr(2, 9);
         localStorage.setItem('myPhoneId', myPhoneId);
 
+        // UI Modal Funkcije
+        window.openModal = (title, desc, callback) => {
+            const modal = document.getElementById('custom-modal');
+            const input = document.getElementById('modal-input');
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-desc').innerText = desc;
+            input.value = "";
+            modal.style.display = 'flex';
+            document.getElementById('modal-confirm-btn').onclick = () => {
+                const val = input.value.toUpperCase().trim();
+                if(val) { callback(val); closeModal(); }
+            };
+        };
+        window.closeModal = () => document.getElementById('custom-modal').style.display = 'none';
+
+        // Prikaz markera
         onValue(ref(db, 'tereni'), (snapshot) => {
             map.eachLayer(l => { if(l instanceof L.Marker) map.removeLayer(l); });
             const data = snapshot.val();
@@ -88,44 +123,53 @@
                     const isMine = id === myPhoneId;
                     L.marker([t.lat, t.lng], {
                         icon: L.divIcon({ className: 'c-icon', html: `<div class='marker-pin' style='background:${isMine ? "#00ff88" : "#00d2ff"}'></div>`, iconAnchor: [12, 24] })
-                    }).addTo(map).bindPopup(`<div class="popup-info"><h4>${t.ime}</h4><small>${isMine ? 'VAŠA LOKACIJA' : 'TEREN'}</small></div>`);
+                    }).addTo(map).bindPopup(`<div style="text-align:center"><b>${t.ime}</b><br><small>${isMine ? 'VAŠ TEREN' : 'TEREN'}</small></div>`);
                 });
             }
         });
 
+        // Klik na mapu
         map.on('click', async (e) => {
             const userRef = ref(db, 'tereni/' + myPhoneId);
             const snapshot = await get(userRef);
-            const postojeciPodaci = snapshot.exists() ? snapshot.val() : null;
+            const data = snapshot.exists() ? snapshot.val() : null;
 
-            if (postojeciPodaci) {
-                let proveraPina = prompt("UNESITE VAŠ PIN ZA IZMENU:");
-                if (!proveraPina || proveraPina.toUpperCase() !== postojeciPodaci.pin) {
-                    alert("POGREŠAN PIN!");
-                    return;
+            if (data) {
+                // Ako već ima teren, prvo traži PIN za dozvolu premeštanja
+                openModal("POTVRDA PIN-A", "VEĆ IMATE TEREN. UNESITE PIN DA GA PREMESTITE:", (pin) => {
+                    if (pin === data.pin) {
+                        unosImena(e.latlng.lat, e.latlng.lng, pin);
+                    } else {
+                        alert("POGREŠAN PIN!");
+                    }
+                });
+            } else {
+                // Prvi put postavlja
+                unosImena(e.latlng.lat, e.latlng.lng, null);
+            }
+        });
+
+        function unosImena(lat, lng, stariPin) {
+            openModal("NAZIV TERENA", "UNESITE IME SPORTSKOG TERENA:", (ime) => {
+                if(stariPin) {
+                    snimiUBazu(ime, lat, lng, stariPin);
+                } else {
+                    openModal("POSTAVITE PIN", "UNESITE 4 ZNAKA ZA ZAŠTITU KARTICE:", (noviPin) => {
+                        snimiUBazu(ime, lat, lng, noviPin);
+                    });
                 }
-            }
+            });
+        }
 
-            let novoIme = prompt("NAZIV TERENA:");
-            if (!novoIme) return;
-            novoIme = novoIme.toUpperCase(); // Konvertuje u velika slova
-
-            let noviPin = prompt("POSTAVITE PIN (MIN 4 ZNAKA):");
-            if (!noviPin || noviPin.length < 4) {
-                alert("PIN PREKRATAK!");
-                return;
-            }
-            noviPin = noviPin.toUpperCase(); // Konvertuje u velika slova
-
-            set(userRef, {
-                ime: novoIme,
-                pin: noviPin,
-                lat: e.latlng.lat,
-                lng: e.latlng.lng,
+        function snimiUBazu(ime, lat, lng, pin) {
+            set(ref(db, 'tereni/' + myPhoneId), {
+                ime: ime,
+                pin: pin,
+                lat: lat,
+                lng: lng,
                 vreme: new Date().toLocaleTimeString()
             });
-            alert("USPEŠNO SAČUVANO!");
-        });
+        }
     </script>
 </body>
 </html>
