@@ -3,50 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AllSportsLocal Pro UI</title>
+    <title>AllSportsLocal - Pro</title>
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     
     <style>
-        :root { --primary: #00d2ff; --bg: #121212; --card: #1e1e1e; }
-        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', sans-serif; background: #000; overflow: hidden; color: white; }
-        #map { height: 100vh; width: 100vw; z-index: 1; }
-
-        /* Moderna gornja traka */
-        .map-header {
-            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
-            z-index: 1000; background: rgba(30, 30, 30, 0.9);
-            padding: 12px 25px; border-radius: 20px; font-size: 0.8rem;
-            text-align: center; width: 80%; max-width: 350px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.6); backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1); pointer-events: none;
-            letter-spacing: 1px;
+        :root { --primary: #00d2ff; --bg: #0a0a0a; --card: #1e1e1e; }
+        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', sans-serif; background: var(--bg); overflow: hidden; color: white; }
+        
+        /* LANDING STRANA */
+        #landing {
+            position: fixed; inset: 0; z-index: 5000;
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
+                        url('https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=1600&auto=format&fit=crop');
+            background-size: cover; background-position: center;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; transition: 0.5s ease;
+        }
+        #landing h1 { font-size: 2.5rem; letter-spacing: 3px; margin-bottom: 10px; color: var(--primary); text-shadow: 0 0 20px rgba(0,210,255,0.5); }
+        .btn-enter { 
+            padding: 15px 40px; background: var(--primary); color: black; border: none; 
+            border-radius: 50px; font-weight: bold; font-size: 1.1rem; cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0,210,255,0.3); text-transform: uppercase;
         }
 
-        /* Stil za CUSTOM MODAL (zamena za prompt/alert) */
+        /* MAPA */
+        #map { height: 100vh; width: 100vw; display: none; }
+
+        /* DISKRETAN SEARCH */
+        .search-container {
+            position: absolute; top: 20px; left: 15px; z-index: 1000;
+            width: calc(100% - 30px); max-width: 300px;
+        }
+        #search-input {
+            width: 100%; padding: 12px 15px; border-radius: 25px; border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(30, 30, 30, 0.9); color: white; backdrop-filter: blur(10px);
+            font-size: 16px; /* SPREČAVA AUTO-ZUM NA IPHONE-U */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5); outline: none;
+        }
+
+        /* GPS DUGME */
+        .gps-btn {
+            position: absolute; bottom: 30px; right: 20px; z-index: 1000;
+            background: var(--primary); color: black; width: 50px; height: 50px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4); cursor: pointer;
+        }
+
+        /* MODAL */
         #custom-modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); z-index: 2000; justify-content: center; align-items: center;
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+            z-index: 6000; justify-content: center; align-items: center;
         }
         .modal-card {
-            background: var(--card); padding: 30px; border-radius: 25px;
-            width: 85%; max-width: 320px; text-align: center;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid #333;
+            background: var(--card); padding: 25px; border-radius: 20px;
+            width: 85%; max-width: 320px; text-align: center; border: 1px solid #333;
         }
-        .modal-card h3 { margin-top: 0; color: var(--primary); font-size: 1.2rem; }
         .modal-card input {
-            width: 100%; padding: 15px; margin: 15px 0; border-radius: 12px;
+            width: 100%; padding: 12px; margin: 15px 0; border-radius: 10px;
             border: 1px solid #444; background: #282828; color: white;
-            text-transform: uppercase; text-align: center; font-size: 1rem; box-sizing: border-box;
+            text-transform: uppercase; text-align: center; font-size: 16px; box-sizing: border-box;
         }
-        .modal-card button {
-            width: 100%; padding: 12px; border-radius: 12px; border: none;
-            font-weight: bold; cursor: pointer; margin-top: 10px; text-transform: uppercase;
-        }
-        .btn-confirm { background: var(--primary); color: #000; }
-        .btn-cancel { background: transparent; color: #ff4444; }
+        .btn-action { width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: bold; margin-top: 5px; text-transform: uppercase; cursor: pointer; }
 
-        /* Marker Pin */
+        /* MARKER PIN */
         .marker-pin {
             width: 24px; height: 24px; border-radius: 50% 50% 50% 0;
             background: var(--primary); position: absolute;
@@ -57,18 +78,26 @@
 </head>
 <body>
 
-    <div class="map-header">
-        <strong style="color: var(--primary);">ALLSPORTSLOCAL</strong><br>
-        DODIRNI MAPU ZA POSTAVKU TERENA
+    <div id="landing">
+        <h1 style="text-transform: uppercase;">AllSportsLocal</h1>
+        <p style="margin-bottom: 30px; opacity: 0.8;">PRONAĐI SVOJ TEREN</p>
+        <button class="btn-enter" onclick="enterApp()">UĐI NA MAPU</button>
+    </div>
+
+    <div class="search-container" id="search-box" style="display: none;">
+        <input type="text" id="search-input" placeholder="Pretraži gradove..." onkeydown="if(event.key==='Enter') searchLocation()">
+    </div>
+
+    <div class="gps-btn" id="gps-box" style="display: none;" onclick="goToMyLocation()">
+        <i class="fa-solid fa-location-crosshairs fa-xl"></i>
     </div>
 
     <div id="custom-modal">
         <div class="modal-card">
-            <h3 id="modal-title">UNOS PODATAKA</h3>
-            <p id="modal-desc" style="font-size: 0.8rem; color: #aaa;"></p>
-            <input type="text" id="modal-input" placeholder="...">
-            <button class="btn-confirm" id="modal-confirm-btn">POTVRDI</button>
-            <button class="btn-cancel" onclick="closeModal()">ODUSTANI</button>
+            <h3 id="m-title" style="margin-top:0;"></h3>
+            <input type="text" id="m-input">
+            <button class="btn-action" style="background:var(--primary); color:black;" id="m-btn">POTVRDI</button>
+            <button class="btn-action" style="background:transparent; color:#ff4444;" onclick="closeM()">ODUSTANI</button>
         </div>
     </div>
     
@@ -89,87 +118,86 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        var map = L.map('map', { zoomControl: false }).setView([44.8, 20.4], 7);
-
-        // Satelit bez restorana
-        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', { pane: 'shadowPane' }).addTo(map);
-
-        let myPhoneId = localStorage.getItem('myPhoneId') || 'u_' + Math.random().toString(36).substr(2, 9);
+        let map, myPhoneId;
+        myPhoneId = localStorage.getItem('myPhoneId') || 'u_' + Math.random().toString(36).substr(2, 9);
         localStorage.setItem('myPhoneId', myPhoneId);
 
-        // UI Modal Funkcije
-        window.openModal = (title, desc, callback) => {
-            const modal = document.getElementById('custom-modal');
-            const input = document.getElementById('modal-input');
-            document.getElementById('modal-title').innerText = title;
-            document.getElementById('modal-desc').innerText = desc;
-            input.value = "";
-            modal.style.display = 'flex';
-            document.getElementById('modal-confirm-btn').onclick = () => {
-                const val = input.value.toUpperCase().trim();
-                if(val) { callback(val); closeModal(); }
-            };
+        window.enterApp = () => {
+            document.getElementById('landing').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('landing').style.display = 'none';
+                document.getElementById('map').style.display = 'block';
+                document.getElementById('search-box').style.display = 'block';
+                document.getElementById('gps-box').style.display = 'flex';
+                initMap();
+                goToMyLocation(); // Automatski fokus na korisnika pri ulasku
+            }, 500);
         };
-        window.closeModal = () => document.getElementById('custom-modal').style.display = 'none';
 
-        // Prikaz markera
-        onValue(ref(db, 'tereni'), (snapshot) => {
-            map.eachLayer(l => { if(l instanceof L.Marker) map.removeLayer(l); });
-            const data = snapshot.val();
-            if(data) {
-                Object.keys(data).forEach(id => {
-                    const t = data[id];
-                    const isMine = id === myPhoneId;
-                    L.marker([t.lat, t.lng], {
-                        icon: L.divIcon({ className: 'c-icon', html: `<div class='marker-pin' style='background:${isMine ? "#00ff88" : "#00d2ff"}'></div>`, iconAnchor: [12, 24] })
-                    }).addTo(map).bindPopup(`<div style="text-align:center"><b>${t.ime}</b><br><small>${isMine ? 'VAŠ TEREN' : 'TEREN'}</small></div>`);
-                });
-            }
-        });
+        function initMap() {
+            map = L.map('map', { zoomControl: false }).setView([44.8, 20.4], 7);
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', { pane: 'shadowPane' }).addTo(map);
 
-        // Klik na mapu
-        map.on('click', async (e) => {
-            const userRef = ref(db, 'tereni/' + myPhoneId);
-            const snapshot = await get(userRef);
-            const data = snapshot.exists() ? snapshot.val() : null;
-
-            if (data) {
-                // Ako već ima teren, prvo traži PIN za dozvolu premeštanja
-                openModal("POTVRDA PIN-A", "VEĆ IMATE TEREN. UNESITE PIN DA GA PREMESTITE:", (pin) => {
-                    if (pin === data.pin) {
-                        unosImena(e.latlng.lat, e.latlng.lng, pin);
-                    } else {
-                        alert("POGREŠAN PIN!");
-                    }
-                });
-            } else {
-                // Prvi put postavlja
-                unosImena(e.latlng.lat, e.latlng.lng, null);
-            }
-        });
-
-        function unosImena(lat, lng, stariPin) {
-            openModal("NAZIV TERENA", "UNESITE IME SPORTSKOG TERENA:", (ime) => {
-                if(stariPin) {
-                    snimiUBazu(ime, lat, lng, stariPin);
-                } else {
-                    openModal("POSTAVITE PIN", "UNESITE 4 ZNAKA ZA ZAŠTITU KARTICE:", (noviPin) => {
-                        snimiUBazu(ime, lat, lng, noviPin);
+            onValue(ref(db, 'tereni'), (snap) => {
+                map.eachLayer(l => { if(l instanceof L.Marker) map.removeLayer(l); });
+                const data = snap.val();
+                if(data) {
+                    Object.keys(data).forEach(id => {
+                        const t = data[id];
+                        L.marker([t.lat, t.lng], {
+                            icon: L.divIcon({ className: 'c-icon', html: `<div class='marker-pin' style='background:${id === myPhoneId ? "#00ff88" : "#00d2ff"}'></div>`, iconAnchor: [12, 24] })
+                        }).addTo(map).bindPopup(`<b style="color:black">${t.ime}</b>`);
                     });
                 }
             });
-        }
 
-        function snimiUBazu(ime, lat, lng, pin) {
-            set(ref(db, 'tereni/' + myPhoneId), {
-                ime: ime,
-                pin: pin,
-                lat: lat,
-                lng: lng,
-                vreme: new Date().toLocaleTimeString()
+            map.on('click', async (e) => {
+                const snap = await get(ref(db, 'tereni/' + myPhoneId));
+                const data = snap.exists() ? snap.val() : null;
+                if(data) {
+                    openM("POTVRDA PIN-A", (pin) => {
+                        if(pin === data.pin) setupTeren(e.latlng, pin);
+                        else alert("POGREŠAN PIN!");
+                    });
+                } else setupTeren(e.latlng, null);
             });
         }
+
+        window.goToMyLocation = () => {
+            map.locate({setView: true, maxZoom: 15});
+        };
+
+        window.searchLocation = async () => {
+            const query = document.getElementById('search-input').value;
+            if(!query) return;
+            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}`);
+            const data = await res.json();
+            if(data.length > 0) map.setView([data[0].lat, data[0].long], 13);
+        };
+
+        function setupTeren(latlng, pin) {
+            openM("NAZIV TERENA", (ime) => {
+                if(pin) save(ime, latlng, pin);
+                else openM("POSTAVI PIN (4 ZN)", (nPin) => save(ime, latlng, nPin));
+            });
+        }
+
+        function save(ime, latlng, pin) {
+            set(ref(db, 'tereni/' + myPhoneId), { ime, pin, lat: latlng.lat, lng: latlng.lng });
+        }
+
+        window.openM = (t, cb) => {
+            const m = document.getElementById('custom-modal');
+            document.getElementById('m-title').innerText = t;
+            document.getElementById('m-input').value = "";
+            m.style.display = 'flex';
+            document.getElementById('m-btn').onclick = () => {
+                const v = document.getElementById('m-input').value.toUpperCase().trim();
+                if(v) { cb(v); closeM(); }
+            };
+        };
+        window.closeM = () => document.getElementById('custom-modal').style.display = 'none';
     </script>
 </body>
 </html>
