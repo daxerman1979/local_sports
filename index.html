@@ -9,12 +9,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&display=swap" rel="stylesheet">
     
     <style>
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent; 
+        }
         
-        /* Sprečava bilo kakvo skrolovanje ili pomeranje pozadine */
-        body, html { 
+        html, body { 
             margin: 0; padding: 0; height: 100%; width: 100%; 
-            overflow: hidden; background: #000; position: fixed; 
+            overflow: hidden; background: #000; position: fixed;
+            /* Sprečava sistemsko povećanje teksta */
+            -webkit-text-size-adjust: 100%;
         }
 
         #hero {
@@ -32,15 +36,18 @@
         .search-container {
             position: absolute; top: 15px; right: 15px; z-index: 3000;
             display: none; align-items: center; width: calc(100% - 30px);
+            /* Onemogućava browser-u da manipuliše zumom u ovom kontejneru */
+            touch-action: pan-y;
         }
 
         #search-input {
             height: 50px; border-radius: 25px; border: 2px solid #007AFF; width: 0; opacity: 0;
             transition: width 0.3s ease, opacity 0.3s ease; 
-            /* Font 16px sprečava sistemski zoom */
+            /* 16px je OBAVEZNO da bi se izbegao auto-zoom na mobilnim uređajima */
             font-size: 16px !important; 
             padding: 0; background: white; color: #000;
             outline: none;
+            -webkit-appearance: none; /* Uklanja default stilove na iOSu */
         }
 
         .search-container.active #search-input { width: 100%; padding: 0 55px 0 20px; opacity: 1; }
@@ -48,7 +55,9 @@
         .search-icon {
             width: 50px; height: 50px; background: #007AFF; border-radius: 50%;
             display: flex; justify-content: center; align-items: center;
-            color: white; font-size: 20px; position: absolute; right: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            color: white; font-size: 20px; position: absolute; right: 0; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            cursor: pointer;
         }
 
         /* GPS PLAVA TAČKA */
@@ -74,7 +83,7 @@
     </div>
 
     <div class="search-container" id="searchBox">
-        <input type="text" id="search-input" placeholder="Pretraži grad...">
+        <input type="text" id="search-input" placeholder="Pretraži grad..." autocomplete="off">
         <div class="search-icon" onclick="toggleSearch()">🔍</div>
     </div>
 
@@ -96,12 +105,11 @@
         }
 
         function setupMap() {
-            // "tap: false" rešava probleme sa duplim klikovima na Android Chrome-u
             map = L.map('map', {
                 zoomControl: false,
                 tap: false,
                 dragging: true
-            }).setView([44.7866, 20.4489], 15);
+            }).setView([44.7866, 20.4489], 13);
 
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
             L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png').addTo(map);
@@ -132,14 +140,15 @@
             
             if (!container.classList.contains('active')) {
                 container.classList.add('active');
-                setTimeout(() => input.focus(), 100);
+                // Kratak delay pre focusa pomaže mobilnim pretraživačima
+                setTimeout(() => input.focus(), 200);
             } else {
                 if (input.value !== '') {
                     fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(input.value)}`)
                         .then(res => res.json())
                         .then(data => {
                             if (data.length > 0) {
-                                map.panTo([data[0].lat, data[0].lon]);
+                                map.setView([data[0].lat, data[0].lon], 13);
                             }
                         });
                 }
@@ -148,12 +157,9 @@
             }
         }
 
-        // DODATNA ZAŠTITA ZA CHROME (Sprečava promenu skale)
-        window.visualViewport.addEventListener('resize', () => {
-            if (window.visualViewport.scale > 1) {
-                // Forsirano vraćanje na 1:1
-                document.body.style.zoom = "100%"; 
-            }
+        // Dodatna JS zaštita: Forsira vraćanje skale na 1 ako sistem pokuša da zumira
+        document.addEventListener('gesturestart', function (e) {
+            e.preventDefault();
         });
 
         document.getElementById('search-input').addEventListener('keypress', (e) => {
