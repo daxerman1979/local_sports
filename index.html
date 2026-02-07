@@ -17,7 +17,6 @@
         html, body { 
             margin: 0; padding: 0; height: 100%; width: 100%; 
             overflow: hidden; background: #000; position: fixed;
-            /* Sprečava sistemsko povećanje teksta */
             -webkit-text-size-adjust: 100%;
         }
 
@@ -36,18 +35,16 @@
         .search-container {
             position: absolute; top: 15px; right: 15px; z-index: 3000;
             display: none; align-items: center; width: calc(100% - 30px);
-            /* Onemogućava browser-u da manipuliše zumom u ovom kontejneru */
             touch-action: pan-y;
         }
 
         #search-input {
             height: 50px; border-radius: 25px; border: 2px solid #007AFF; width: 0; opacity: 0;
             transition: width 0.3s ease, opacity 0.3s ease; 
-            /* 16px je OBAVEZNO da bi se izbegao auto-zoom na mobilnim uređajima */
             font-size: 16px !important; 
             padding: 0; background: white; color: #000;
             outline: none;
-            -webkit-appearance: none; /* Uklanja default stilove na iOSu */
+            -webkit-appearance: none;
         }
 
         .search-container.active #search-input { width: 100%; padding: 0 55px 0 20px; opacity: 1; }
@@ -59,6 +56,16 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
             cursor: pointer;
         }
+
+        /* DUGME ZA LOKACIJU */
+        .location-btn {
+            position: absolute; bottom: 30px; right: 20px; z-index: 3000;
+            width: 55px; height: 55px; background: white; border-radius: 50%;
+            display: none; justify-content: center; align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            cursor: pointer;
+        }
+        .location-btn img { width: 25px; height: 25px; }
 
         /* GPS PLAVA TAČKA */
         .user-location-dot {
@@ -87,12 +94,17 @@
         <div class="search-icon" onclick="toggleSearch()">🔍</div>
     </div>
 
+    <div class="location-btn" id="locBtn" onclick="goToMyLocation()">
+        <img src="https://cdn-icons-png.flaticon.com/512/1865/1865269.png" alt="Loc">
+    </div>
+
     <div id="map"></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         let map;
         let userMarker;
+        let currentLat, currentLon;
 
         function initApp() {
             document.getElementById('hero').style.opacity = '0';
@@ -100,6 +112,7 @@
                 document.getElementById('hero').style.display = 'none';
                 document.getElementById('map').style.display = 'block';
                 document.getElementById('searchBox').style.display = 'flex';
+                document.getElementById('locBtn').style.display = 'flex';
                 setupMap();
             }, 500);
         }
@@ -116,21 +129,29 @@
 
             if (navigator.geolocation) {
                 navigator.geolocation.watchPosition(position => {
-                    const lat = position.coords.latitude;
-                    const lon = position.coords.longitude;
+                    currentLat = position.coords.latitude;
+                    currentLon = position.coords.longitude;
                     
                     if (!userMarker) {
-                        map.setView([lat, lon], 15);
+                        map.setView([currentLat, currentLon], 15);
                         const pulsingIcon = L.divIcon({
                             className: 'custom-div-icon',
                             html: '<div class="user-location-dot"></div>',
                             iconSize: [14, 14], iconAnchor: [7, 7]
                         });
-                        userMarker = L.marker([lat, lon], { icon: pulsingIcon }).addTo(map);
+                        userMarker = L.marker([currentLat, currentLon], { icon: pulsingIcon }).addTo(map);
                     } else {
-                        userMarker.setLatLng([lat, lon]);
+                        userMarker.setLatLng([currentLat, currentLon]);
                     }
                 }, null, { enableHighAccuracy: true });
+            }
+        }
+
+        function goToMyLocation() {
+            if (currentLat && currentLon) {
+                map.flyTo([currentLat, currentLon], 16, { animate: true, duration: 1.5 });
+            } else {
+                alert("Lociranje u toku...");
             }
         }
 
@@ -140,7 +161,6 @@
             
             if (!container.classList.contains('active')) {
                 container.classList.add('active');
-                // Kratak delay pre focusa pomaže mobilnim pretraživačima
                 setTimeout(() => input.focus(), 200);
             } else {
                 if (input.value !== '') {
@@ -157,10 +177,7 @@
             }
         }
 
-        // Dodatna JS zaštita: Forsira vraćanje skale na 1 ako sistem pokuša da zumira
-        document.addEventListener('gesturestart', function (e) {
-            e.preventDefault();
-        });
+        document.addEventListener('gesturestart', function (e) { e.preventDefault(); });
 
         document.getElementById('search-input').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') toggleSearch();
