@@ -3,133 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sport Lokator Mobile</title>
+    <title>Sport Satelit</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&display=swap" rel="stylesheet">
     
     <style>
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background: #000; }
 
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            width: 100%;
-            overflow: hidden; /* Sprečava skrolovanje van mape */
-            background-color: #1a1a1a;
-        }
-
-        /* Portrait Mode Optimizacija */
+        /* Početna strana */
         #hero {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.8)), 
-                        url('https://images.unsplash.com/photo-1540747913346-19e3adcc174b?q=80&w=1000&auto=format&fit=crop') center/cover;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-            text-align: center;
-            padding: 20px;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), 
+                        url('https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1000&auto=format&fit=crop') center/cover;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 2000; transition: 0.5s;
         }
 
-        #hero h1 {
-            color: #fff;
-            font-family: 'Oswald', sans-serif;
-            font-size: 2.5rem;
-            margin-bottom: 30px;
-            text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
-        }
+        #hero h1 { color: #fff; font-family: 'Oswald', sans-serif; font-size: 3rem; text-align: center; }
 
-        .sport-icon {
-            width: 120px;
-            height: 120px;
-            background: rgba(255,255,255,0.1);
-            border: 3px solid #fff;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            box-shadow: 0 0 20px rgba(255,255,255,0.2);
-        }
+        /* Mapa - SVE FUNKCIJE ZUMA SU DOZVOLJENE OVDE */
+        #map { width: 100vw; height: 100vh; display: none; }
 
-        /* Mapa - preko celog ekrana */
-        #map {
-            width: 100vw;
-            height: 100vh;
-            display: none;
-        }
-
-        /* Mobilni Search - veći i pristupačniji */
+        /* Search Bar */
         .search-container {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            z-index: 3000;
-            display: none;
-            align-items: center;
-            justify-content: flex-end;
-            width: calc(100% - 30px);
+            position: absolute; top: 15px; right: 15px; z-index: 3000;
+            display: none; align-items: center; width: calc(100% - 30px);
         }
 
         #search-input {
-            height: 50px;
-            border-radius: 25px;
-            border: none;
-            padding: 0;
-            width: 0;
-            opacity: 0;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            font-size: 16px; /* Sprečava iOS auto-zoom na inputu */
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            height: 50px; border-radius: 25px; border: 2px solid #00d4ff; width: 0; opacity: 0;
+            transition: all 0.3s ease; 
+            /* Font od 16px ili više sprečava automatski zoom na iPhone-u */
+            font-size: 16px; 
+            padding: 0; background: white; color: #000;
         }
 
-        .search-container.active #search-input {
-            width: 100%;
-            padding: 0 55px 0 20px;
-            opacity: 1;
-        }
+        .search-container.active #search-input { width: 100%; padding: 0 55px 0 20px; opacity: 1; }
 
         .search-icon {
-            width: 50px;
-            height: 50px;
-            background: #fff;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            font-size: 22px;
-            position: absolute;
-            right: 0;
+            width: 50px; height: 50px; background: #00d4ff; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            color: white; font-size: 20px; position: absolute; right: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
 
-        /* Sakrivanje nepotrebnih Leaflet elemenata */
-        .leaflet-control-attribution { font-size: 8px !important; }
+        /* Pulsirajuća plava tačka */
+        .user-location-dot {
+            width: 14px; height: 14px; background: #00d4ff; border-radius: 50%;
+            border: 2px solid white; position: relative;
+        }
+        .user-location-dot::after {
+            content: ''; position: absolute; top: -13px; left: -13px;
+            width: 40px; height: 40px; border-radius: 50%;
+            background: rgba(0, 212, 255, 0.3); animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0% { transform: scale(0.5); opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
     </style>
 </head>
 <body>
 
     <div id="hero" onclick="initApp()">
-        <h1>LOKALNI<br>SPORTOVI</h1>
-        <div class="sport-icon">
-            <img src="https://cdn-icons-png.flaticon.com/512/857/857418.png" width="80" alt="Start">
+        <h1>LOKALNI<br>SPORT</h1>
+        <div style="border: 3px solid white; border-radius: 50%; padding: 20px;">
+            <img src="https://cdn-icons-png.flaticon.com/512/857/857418.png" width="60" alt="Start">
         </div>
-        <p style="color: #ddd; margin-top: 20px; font-weight: bold;">DODIRNI EKRAN ZA MAPU</p>
     </div>
 
     <div class="search-container" id="searchBox">
-        <input type="text" id="search-input" placeholder="Pronađi grad...">
+        <input type="text" id="search-input" placeholder="Pretraži grad...">
         <div class="search-icon" onclick="toggleSearch()">🔍</div>
     </div>
 
@@ -140,44 +82,44 @@
         let map;
 
         function initApp() {
-            document.getElementById('hero').style.display = 'none';
-            document.getElementById('map').style.display = 'block';
-            document.getElementById('searchBox').style.display = 'flex';
-            setupMap();
+            document.getElementById('hero').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('hero').style.display = 'none';
+                document.getElementById('map').style.display = 'block';
+                document.getElementById('searchBox').style.display = 'flex';
+                setupMap();
+            }, 500);
         }
 
         function setupMap() {
-            // Podešavanja za mobilni: onemogućen svaki vid zumiranja
+            // OVDE SU SVE OPCIJE ZUMA UKLJUČENE (true) za slobodno korišćenje mape
             map = L.map('map', {
                 zoomControl: false,
-                scrollWheelZoom: false,
-                doubleClickZoom: false,
-                touchZoom: false,
-                boxZoom: false,
-                keyboard: false,
-                dragging: true, // Dozvoljava pomeranje prstom
-                tap: true      // Omogućava tap na mobilnim uređajima
-            }).setView([44.0165, 21.0059], 12); 
+                dragging: true,
+                touchZoom: true,
+                scrollWheelZoom: true,
+                doubleClickZoom: true,
+                tap: true
+            }).setView([44.7866, 20.4489], 15);
 
-            // Čist stil mape: granice, gradovi i ulice
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; OSM'
-            }).addTo(map);
+            // Besplatan satelit
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
+            
+            // Labele (ulice i gradovi) - besplatno
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png').addTo(map);
 
-            // GPS lociranje
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(position => {
                     const lat = position.coords.latitude;
                     const lon = position.coords.longitude;
-                    map.setView([lat, lon], 12);
-                    L.circle([lat, lon], {
-                        color: 'blue',
-                        fillColor: '#30f',
-                        fillOpacity: 0.2,
-                        radius: 300
-                    }).addTo(map);
-                }, () => {
-                    console.log("GPS pristup odbijen.");
+                    map.setView([lat, lon], 15);
+                    
+                    const pulsingIcon = L.divIcon({
+                        className: 'custom-div-icon',
+                        html: '<div class="user-location-dot"></div>',
+                        iconSize: [14, 14], iconAnchor: [7, 7]
+                    });
+                    L.marker([lat, lon], { icon: pulsingIcon }).addTo(map);
                 });
             }
         }
@@ -188,27 +130,23 @@
             
             if (!container.classList.contains('active')) {
                 container.classList.add('active');
-                input.focus();
+                // Fokusiranje bez sistemskog zumiranja ekrana
+                setTimeout(() => input.focus(), 300);
             } else {
                 if (input.value !== '') {
-                    searchCity(input.value);
+                    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${input.value}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.length > 0) {
+                                map.panTo([data[0].lat, data[0].lon]);
+                            }
+                        });
                 }
                 container.classList.remove('active');
             }
         }
 
-        function searchCity(city) {
-            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${city}`)
-                .then(res => res.json())
-                .then(data => {
-                    if (data.length > 0) {
-                        // Samo pomera mapu na grad, ne menja nivo zuma (onemogućeno)
-                        map.panTo([data[0].lat, data[0].lon]);
-                    }
-                });
-        }
-
-        // Enter taster na tastaturi telefona
+        // Enter na tastaturi
         document.getElementById('search-input').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') toggleSearch();
         });
