@@ -3,196 +3,215 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AllSportsLocal v4</title>
-
+    <title>Sport Lokator Mobile</title>
+    
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&display=swap" rel="stylesheet">
     
     <style>
-        :root { --primary: #00d2ff; --accent: #00ff88; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body, html { margin: 0; padding: 0; height: 100%; font-family: sans-serif; background: #000; overflow: hidden; color: white; touch-action: pan-x pan-y; }
-
-        /* NASLOVNA */
-        #landing {
-            position: fixed; inset: 0; z-index: 9999;
-            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1517649763962-0c623066013b?q=80&w=1200');
-            background-size: cover; background-position: center;
-            display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
-        }
-        #landing h1 { font-size: 1.8rem; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 25px; padding: 0 20px; }
-        .btn-enter { padding: 18px 60px; background: var(--primary); color: #000; border: none; border-radius: 50px; font-weight: bold; text-transform: uppercase; cursor: pointer; }
-
-        /* MAPA & UI */
-        #map { height: 100vh; width: 100vw; display: none; }
-        .search-box {
-            position: absolute; top: 15px; left: 15px; z-index: 1000;
-            display: flex; align-items: center; background: rgba(20,20,20,0.9);
-            border-radius: 30px; border: 1px solid #444; width: 45px; height: 45px;
-            transition: 0.4s; overflow: hidden; backdrop-filter: blur(10px);
-        }
-        .search-box:focus-within { width: 260px; border-color: var(--primary); }
-        #search-input { background: none; border: none; color: white; padding: 10px; font-size: 16px; outline: none; width: 200px; }
-        .search-icon { min-width: 45px; text-align: center; color: var(--primary); }
-
-        .gps-btn {
-            position: absolute; bottom: 30px; right: 20px; z-index: 1000;
-            background: var(--primary); color: #000; width: 55px; height: 55px;
-            border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        /* MODAL */
-        #modal-ui { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 10000; justify-content: center; align-items: center; }
-        .modal-card { background: #1e1e1e; padding: 30px; border-radius: 20px; width: 85%; max-width: 320px; border: 1px solid #333; text-align: center; }
-        .modal-card input { width: 100%; padding: 15px; margin: 15px 0; border-radius: 10px; border: 1px solid #444; background: #000; color: white; font-size: 16px; text-align: center; text-transform: uppercase; }
-        .btn-confirm { width: 100%; padding: 15px; border-radius: 10px; border: none; background: var(--primary); color: #000; font-weight: bold; text-transform: uppercase; cursor: pointer; }
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            overflow: hidden; /* Sprečava skrolovanje van mape */
+            background-color: #1a1a1a;
+        }
 
-        /* MARKER */
-        .marker-pin { width: 26px; height: 26px; border-radius: 50% 50% 50% 0; background: var(--primary); position: absolute; transform: rotate(-45deg); left: 50%; top: 50%; margin: -13px 0 0 -13px; border: 2px solid white; box-shadow: 0 0 10px var(--primary); }
-        .marker-own { background: var(--accent) !important; box-shadow: 0 0 10px var(--accent); }
+        /* Portrait Mode Optimizacija */
+        #hero {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.8)), 
+                        url('https://images.unsplash.com/photo-1540747913346-19e3adcc174b?q=80&w=1000&auto=format&fit=crop') center/cover;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            text-align: center;
+            padding: 20px;
+        }
+
+        #hero h1 {
+            color: #fff;
+            font-family: 'Oswald', sans-serif;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .sport-icon {
+            width: 120px;
+            height: 120px;
+            background: rgba(255,255,255,0.1);
+            border: 3px solid #fff;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(255,255,255,0.2);
+        }
+
+        /* Mapa - preko celog ekrana */
+        #map {
+            width: 100vw;
+            height: 100vh;
+            display: none;
+        }
+
+        /* Mobilni Search - veći i pristupačniji */
+        .search-container {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 3000;
+            display: none;
+            align-items: center;
+            justify-content: flex-end;
+            width: calc(100% - 30px);
+        }
+
+        #search-input {
+            height: 50px;
+            border-radius: 25px;
+            border: none;
+            padding: 0;
+            width: 0;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 16px; /* Sprečava iOS auto-zoom na inputu */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .search-container.active #search-input {
+            width: 100%;
+            padding: 0 55px 0 20px;
+            opacity: 1;
+        }
+
+        .search-icon {
+            width: 50px;
+            height: 50px;
+            background: #fff;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            font-size: 22px;
+            position: absolute;
+            right: 0;
+        }
+
+        /* Sakrivanje nepotrebnih Leaflet elemenata */
+        .leaflet-control-attribution { font-size: 8px !important; }
     </style>
 </head>
 <body>
 
-    <div id="landing">
-        <h1>AllSportsLocal</h1>
-        <button class="btn-enter" onclick="startApp()">UĐI NA MAPU</button>
-    </div>
-
-    <div class="search-box" id="s-box" style="display: none;">
-        <i class="fa-solid fa-magnifying-glass search-icon"></i>
-        <input type="text" id="search-input" placeholder="GRAD..." autocomplete="off">
-    </div>
-
-    <div class="gps-btn" id="g-box" style="display: none;" onclick="findMe()">
-        <i class="fa-solid fa-location-arrow fa-xl"></i>
-    </div>
-
-    <div id="modal-ui">
-        <div class="modal-card">
-            <h3 id="mt" style="margin:0; color:var(--primary); font-size:1rem;"></h3>
-            <input type="text" id="mi" spellcheck="false" autocomplete="off">
-            <button id="mb" class="btn-confirm">POTVRDI</button>
-            <button onclick="closeM()" style="background:none; border:none; color:gray; margin-top:10px; width:100%; font-size:0.7rem; text-transform:uppercase;">ODUSTANI</button>
+    <div id="hero" onclick="initApp()">
+        <h1>LOKALNI<br>SPORTOVI</h1>
+        <div class="sport-icon">
+            <img src="https://cdn-icons-png.flaticon.com/512/857/857418.png" width="80" alt="Start">
         </div>
+        <p style="color: #ddd; margin-top: 20px; font-weight: bold;">DODIRNI EKRAN ZA MAPU</p>
     </div>
-    
+
+    <div class="search-container" id="searchBox">
+        <input type="text" id="search-input" placeholder="Pronađi grad...">
+        <div class="search-icon" onclick="toggleSearch()">🔍</div>
+    </div>
+
     <div id="map"></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        let map;
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.10/firebase-app.js";
-        import { getDatabase, ref, set, onValue, get } from "https://www.gstatic.com/firebasejs/10.7.10/firebase-database.js";
-
-        const firebaseConfig = {
-            databaseURL: "https://allsportslocal-ea1d4-default-rtdb.europe-west1.firebasedatabase.app/"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-
-        let map, myPhoneId, modalCB;
-        myPhoneId = localStorage.getItem('myPhoneId') || 'u' + Math.random().toString(36).substr(2, 7);
-        localStorage.setItem('myPhoneId', myPhoneId);
-
-        window.startApp = () => {
-            document.getElementById('landing').style.display = 'none';
+        function initApp() {
+            document.getElementById('hero').style.display = 'none';
             document.getElementById('map').style.display = 'block';
-            document.getElementById('s-box').style.display = 'flex';
-            document.getElementById('g-box').style.display = 'flex';
-            if(!map) initMap();
-        };
-
-        function initMap() {
-            map = L.map('map', { zoomControl: false }).setView([44.8, 20.4], 7);
-            
-            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png', { pane: 'shadowPane' }).addTo(map);
-
-            window.findMe = () => { map.locate({setView: true, maxZoom: 15}); };
-            findMe();
-
-            onValue(ref(db, 'tereni'), (snap) => {
-                map.eachLayer(l => { if(l instanceof L.Marker) map.removeLayer(l); });
-                const data = snap.val();
-                if(data) {
-                    Object.keys(data).forEach(id => {
-                        const t = data[id];
-                        L.marker([t.lat, t.lng], {
-                            icon: L.divIcon({ className: 'c', html: `<div class='marker-pin ${id === myPhoneId ? "marker-own" : ""}'></div>`, iconAnchor:[13,26] })
-                        }).addTo(map).bindPopup(`<b style="color:#000; text-transform:uppercase;">${t.ime}</b>`);
-                    });
-                }
-            });
-
-            map.on('click', async (e) => {
-                const snap = await get(ref(db, 'tereni/' + myPhoneId));
-                if(snap.exists()) {
-                    const old = snap.val();
-                    openM("UNESI PIN ZA IZMENU", (pin) => {
-                        if(pin.toUpperCase() === old.pin.toUpperCase()) {
-                            unosImena(e.latlng, pin.toUpperCase());
-                        } else {
-                            alert("POGREŠAN PIN!");
-                        }
-                    });
-                } else {
-                    unosImena(e.latlng, null);
-                }
-            });
+            document.getElementById('searchBox').style.display = 'flex';
+            setupMap();
         }
 
-        function unosImena(latlng, pin) {
-            openM("NAZIV TERENA", (ime) => {
-                if(pin) {
-                    snimi(ime, latlng, pin);
-                } else {
-                    openM("POSTAVI NOVI PIN", (novi) => {
-                        snimi(ime, latlng, novi);
-                    });
-                }
-            });
-        }
+        function setupMap() {
+            // Podešavanja za mobilni: onemogućen svaki vid zumiranja
+            map = L.map('map', {
+                zoomControl: false,
+                scrollWheelZoom: false,
+                doubleClickZoom: false,
+                touchZoom: false,
+                boxZoom: false,
+                keyboard: false,
+                dragging: true, // Dozvoljava pomeranje prstom
+                tap: true      // Omogućava tap na mobilnim uređajima
+            }).setView([44.0165, 21.0059], 12); 
 
-        function snimi(ime, latlng, pin) {
-            // Putanja mora odgovarati tvom pravilu: tereni/$phoneId
-            set(ref(db, 'tereni/' + myPhoneId), {
-                ime: ime.toUpperCase(),
-                pin: pin.toUpperCase(),
-                lat: latlng.lat,
-                lng: latlng.lng
-            }).then(() => {
-                alert("USPEŠNO DODATO U BAZU!");
-            }).catch(err => {
-                alert("FIREBASE GREŠKA: " + err.message);
-            });
-        }
+            // Čist stil mape: granice, gradovi i ulice
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OSM'
+            }).addTo(map);
 
-        // SEARCH
-        document.getElementById('search-input').onkeypress = async (e) => {
-            if(e.key === 'Enter') {
-                const q = e.target.value;
-                e.target.blur();
-                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${q}`)
-                    .then(r => r.json())
-                    .then(d => {
-                        if(d.length > 0) map.setView([d[0].lat, d[0].lon], 13);
-                    });
+            // GPS lociranje
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    map.setView([lat, lon], 12);
+                    L.circle([lat, lon], {
+                        color: 'blue',
+                        fillColor: '#30f',
+                        fillOpacity: 0.2,
+                        radius: 300
+                    }).addTo(map);
+                }, () => {
+                    console.log("GPS pristup odbijen.");
+                });
             }
-        };
+        }
 
-        window.openM = (t, cb) => {
-            document.getElementById('mt').innerText = t;
-            document.getElementById('mi').value = "";
-            document.getElementById('modal-ui').style.display = 'flex';
-            modalCB = cb;
-            document.getElementById('mb').onclick = () => {
-                const v = document.getElementById('mi').value.trim();
-                if(v) { modalCB(v); closeM(); }
-            };
-        };
-        window.closeM = () => document.getElementById('modal-ui').style.display = 'none';
+        function toggleSearch() {
+            const container = document.getElementById('searchBox');
+            const input = document.getElementById('search-input');
+            
+            if (!container.classList.contains('active')) {
+                container.classList.add('active');
+                input.focus();
+            } else {
+                if (input.value !== '') {
+                    searchCity(input.value);
+                }
+                container.classList.remove('active');
+            }
+        }
+
+        function searchCity(city) {
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${city}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.length > 0) {
+                        // Samo pomera mapu na grad, ne menja nivo zuma (onemogućeno)
+                        map.panTo([data[0].lat, data[0].lon]);
+                    }
+                });
+        }
+
+        // Enter taster na tastaturi telefona
+        document.getElementById('search-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') toggleSearch();
+        });
     </script>
 </body>
 </html>
