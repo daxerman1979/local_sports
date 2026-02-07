@@ -2,7 +2,7 @@
 <html lang="sr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Sport Satelit</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -10,66 +10,83 @@
     
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background: #000; }
+        body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background: #000; font-family: sans-serif; }
 
+        /* Početni ekran */
         #hero {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), 
                         url('https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1000&auto=format&fit=crop') center/cover;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            z-index: 2000; transition: 0.5s;
+            z-index: 2000; transition: opacity 0.5s ease;
         }
 
-        #hero h1 { color: #fff; font-family: 'Oswald', sans-serif; font-size: 3rem; text-align: center; }
+        #hero h1 { color: #fff; font-family: 'Oswald', sans-serif; font-size: 3.5rem; text-align: center; margin-bottom: 20px; line-height: 1; }
 
+        /* Mapa */
         #map { width: 100vw; height: 100vh; display: none; }
 
+        /* Pretraga */
         .search-container {
-            position: absolute; top: 15px; right: 15px; z-index: 3000;
-            display: none; align-items: center; width: calc(100% - 30px);
+            position: absolute; top: 20px; right: 20px; z-index: 3000;
+            display: none; align-items: center; justify-content: flex-end;
+            width: calc(100% - 40px);
         }
 
         #search-input {
-            height: 50px; border-radius: 25px; border: 2px solid #00d4ff; width: 0; opacity: 0;
-            transition: width 0.3s ease, opacity 0.3s ease; 
-            /* Font od 16px je minimum za iOS da ne bi zumirao */
-            font-size: 16px; 
+            height: 50px; border-radius: 25px; border: none; width: 0; opacity: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 16px; /* Ključno protiv zumiranja */
             padding: 0; background: white; color: #000;
-            /* Onemogućava zumiranje na dodir */
-            touch-action: manipulation;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
-        .search-container.active #search-input { width: 100%; padding: 0 55px 0 20px; opacity: 1; }
+        .search-container.active #search-input {
+            width: 100%;
+            padding: 0 60px 0 20px;
+            opacity: 1;
+        }
 
         .search-icon {
-            width: 50px; height: 50px; background: #00d4ff; border-radius: 50%;
+            width: 50px; height: 50px; background: #007AFF; border-radius: 50%;
             display: flex; justify-content: center; align-items: center;
-            color: white; font-size: 20px; position: absolute; right: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            color: white; font-size: 20px; position: absolute; right: 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            cursor: pointer; z-index: 3001;
         }
 
+        /* GPS Plava Tačka */
         .user-location-dot {
-            width: 14px; height: 14px; background: #00d4ff; border-radius: 50%;
-            border: 2px solid white; position: relative;
+            width: 16px; height: 16px; background: #007AFF; border: 3px solid white;
+            border-radius: 50%; box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            position: relative;
         }
         .user-location-dot::after {
-            content: ''; position: absolute; top: -13px; left: -13px;
-            width: 40px; height: 40px; border-radius: 50%;
-            background: rgba(0, 212, 255, 0.3); animation: pulse 2s infinite;
+            content: ''; position: absolute; top: -12px; left: -12px;
+            width: 34px; height: 34px; border-radius: 50%;
+            background: rgba(0, 122, 255, 0.3); animation: pulse 2s infinite;
         }
-        @keyframes pulse { 0% { transform: scale(0.5); opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
+        @keyframes pulse {
+            0% { transform: scale(0.6); opacity: 1; }
+            100% { transform: scale(2.2); opacity: 0; }
+        }
+
+        /* Uklanjanje Leaflet vodenog žiga za čistiji dizajn (opciono) */
+        .leaflet-control-attribution { display: none; }
     </style>
 </head>
 <body>
 
     <div id="hero" onclick="initApp()">
         <h1>LOKALNI<br>SPORT</h1>
-        <div style="border: 3px solid white; border-radius: 50%; padding: 20px;">
+        <div style="border: 3px solid white; border-radius: 50%; padding: 20px; cursor: pointer;">
             <img src="https://cdn-icons-png.flaticon.com/512/857/857418.png" width="60" alt="Start">
         </div>
+        <p style="color: white; margin-top: 15px; font-weight: bold;">DODIRNI ZA POČETAK</p>
     </div>
 
     <div class="search-container" id="searchBox">
-        <input type="text" id="search-input" placeholder="Pretraži grad..." readonly onfocus="this.removeAttribute('readonly');">
+        <input type="text" id="search-input" placeholder="Pretraži grad ili ulicu...">
         <div class="search-icon" onclick="toggleSearch()">🔍</div>
     </div>
 
@@ -78,6 +95,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         let map;
+        let userMarker;
 
         function initApp() {
             document.getElementById('hero').style.opacity = '0';
@@ -90,31 +108,37 @@
         }
 
         function setupMap() {
+            // Inicijalizacija mape sa isključenim tap-om za bolje mobilno iskustvo
             map = L.map('map', {
                 zoomControl: false,
-                dragging: true,
-                touchZoom: true,
-                scrollWheelZoom: true,
-                doubleClickZoom: true,
-                tap: true
+                tap: false 
             }).setView([44.7866, 20.4489], 15);
 
+            // Satelitski sloj
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
+            // Labeli (imena ulica i gradova) iznad satelita
             L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png').addTo(map);
 
+            // Geolokacija
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(position => {
+                // Koristimo watchPosition da prati korisnika uživo
+                navigator.geolocation.watchPosition(position => {
                     const lat = position.coords.latitude;
                     const lon = position.coords.longitude;
-                    map.setView([lat, lon], 15);
-                    
-                    const pulsingIcon = L.divIcon({
-                        className: 'custom-div-icon',
-                        html: '<div class="user-location-dot"></div>',
-                        iconSize: [14, 14], iconAnchor: [7, 7]
-                    });
-                    L.marker([lat, lon], { icon: pulsingIcon }).addTo(map);
-                });
+
+                    if (!userMarker) {
+                        map.setView([lat, lon], 15);
+                        const pulsingIcon = L.divIcon({
+                            className: 'custom-div-icon',
+                            html: '<div class="user-location-dot"></div>',
+                            iconSize: [16, 16],
+                            iconAnchor: [8, 8]
+                        });
+                        userMarker = L.marker([lat, lon], { icon: pulsingIcon }).addTo(map);
+                    } else {
+                        userMarker.setLatLng([lat, lon]);
+                    }
+                }, err => console.log(err), { enableHighAccuracy: true });
             }
         }
 
@@ -124,36 +148,36 @@
             
             if (!container.classList.contains('active')) {
                 container.classList.add('active');
-                // Fokus bez zumiranja
-                setTimeout(() => {
-                    input.focus();
-                }, 100);
+                setTimeout(() => input.focus(), 300);
             } else {
-                if (input.value !== '') {
-                    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${input.value}`)
-                        .then(res => res.json())
-                        .then(data => {
-                            if (data.length > 0) {
-                                map.panTo([data[0].lat, data[0].lon]);
-                            }
-                        });
+                if (input.value.trim() !== '') {
+                    executeSearch(input.value);
                 }
                 container.classList.remove('active');
-                input.setAttribute('readonly', 'readonly'); // Vraćamo zaštitu
+                input.blur();
             }
         }
 
-        // Dodatna JS zaštita: Ako se visualViewport promijeni (zoom), vraća ga na 1
-        if (window.visualViewport) {
-            window.visualViewport.addEventListener('resize', () => {
-                if (window.visualViewport.scale > 1) {
-                    window.visualViewport.scale = 1;
-                }
-            });
+        function executeSearch(query) {
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.length > 0) {
+                        const { lat, lon } = data[0];
+                        map.flyTo([lat, lon], 14, { duration: 1.5 });
+                    }
+                })
+                .catch(err => console.error("Search error:", err));
         }
 
+        // Enter taster za pretragu
         document.getElementById('search-input').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') toggleSearch();
+        });
+
+        // Prevencija bilo kakvog zumiranja na dupli klik ili gestove na iOS-u
+        document.addEventListener('gesturestart', function(e) {
+            e.preventDefault();
         });
     </script>
 </body>
