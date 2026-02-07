@@ -12,7 +12,6 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background: #000; }
 
-        /* Početna strana */
         #hero {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), 
@@ -23,10 +22,8 @@
 
         #hero h1 { color: #fff; font-family: 'Oswald', sans-serif; font-size: 3rem; text-align: center; }
 
-        /* Mapa - SVE FUNKCIJE ZUMA SU DOZVOLJENE OVDE */
         #map { width: 100vw; height: 100vh; display: none; }
 
-        /* Search Bar */
         .search-container {
             position: absolute; top: 15px; right: 15px; z-index: 3000;
             display: none; align-items: center; width: calc(100% - 30px);
@@ -34,10 +31,12 @@
 
         #search-input {
             height: 50px; border-radius: 25px; border: 2px solid #00d4ff; width: 0; opacity: 0;
-            transition: all 0.3s ease; 
-            /* Font od 16px ili više sprečava automatski zoom na iPhone-u */
+            transition: width 0.3s ease, opacity 0.3s ease; 
+            /* Font od 16px je minimum za iOS da ne bi zumirao */
             font-size: 16px; 
             padding: 0; background: white; color: #000;
+            /* Onemogućava zumiranje na dodir */
+            touch-action: manipulation;
         }
 
         .search-container.active #search-input { width: 100%; padding: 0 55px 0 20px; opacity: 1; }
@@ -48,7 +47,6 @@
             color: white; font-size: 20px; position: absolute; right: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
 
-        /* Pulsirajuća plava tačka */
         .user-location-dot {
             width: 14px; height: 14px; background: #00d4ff; border-radius: 50%;
             border: 2px solid white; position: relative;
@@ -71,7 +69,7 @@
     </div>
 
     <div class="search-container" id="searchBox">
-        <input type="text" id="search-input" placeholder="Pretraži grad...">
+        <input type="text" id="search-input" placeholder="Pretraži grad..." readonly onfocus="this.removeAttribute('readonly');">
         <div class="search-icon" onclick="toggleSearch()">🔍</div>
     </div>
 
@@ -92,7 +90,6 @@
         }
 
         function setupMap() {
-            // OVDE SU SVE OPCIJE ZUMA UKLJUČENE (true) za slobodno korišćenje mape
             map = L.map('map', {
                 zoomControl: false,
                 dragging: true,
@@ -102,10 +99,7 @@
                 tap: true
             }).setView([44.7866, 20.4489], 15);
 
-            // Besplatan satelit
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
-            
-            // Labele (ulice i gradovi) - besplatno
             L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png').addTo(map);
 
             if (navigator.geolocation) {
@@ -130,8 +124,10 @@
             
             if (!container.classList.contains('active')) {
                 container.classList.add('active');
-                // Fokusiranje bez sistemskog zumiranja ekrana
-                setTimeout(() => input.focus(), 300);
+                // Fokus bez zumiranja
+                setTimeout(() => {
+                    input.focus();
+                }, 100);
             } else {
                 if (input.value !== '') {
                     fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${input.value}`)
@@ -143,10 +139,19 @@
                         });
                 }
                 container.classList.remove('active');
+                input.setAttribute('readonly', 'readonly'); // Vraćamo zaštitu
             }
         }
 
-        // Enter na tastaturi
+        // Dodatna JS zaštita: Ako se visualViewport promijeni (zoom), vraća ga na 1
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', () => {
+                if (window.visualViewport.scale > 1) {
+                    window.visualViewport.scale = 1;
+                }
+            });
+        }
+
         document.getElementById('search-input').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') toggleSearch();
         });
