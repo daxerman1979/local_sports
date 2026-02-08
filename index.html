@@ -16,7 +16,6 @@
             -webkit-text-size-adjust: 100%; font-family: 'Segoe UI', sans-serif;
         }
 
-        /* POCETNI EKRAN */
         #hero {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.9)), 
@@ -26,54 +25,39 @@
         }
         #hero h1 { color: #fff; font-family: 'Oswald', sans-serif; font-size: 3rem; margin-bottom: 20px; }
 
-        /* MAPA I ELEMENTI */
         #map { width: 100vw; height: 100vh; background: #111; display: none; }
         
-        .search-container { 
-            position: absolute; top: 15px; left: 15px; right: 15px; z-index: 1000; display: none;
-        }
-        #search-input { 
-            width: 100%; height: 50px; border-radius: 25px; border: 2px solid #007AFF; 
-            padding: 0 20px; font-size: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); outline: none;
-        }
+        .search-container { position: absolute; top: 15px; left: 15px; right: 15px; z-index: 1000; display: none; }
+        #search-input { width: 100%; height: 50px; border-radius: 25px; border: 2px solid #007AFF; padding: 0 20px; font-size: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); outline: none; }
 
-        .location-btn { 
-            position: absolute; bottom: 30px; right: 20px; z-index: 1000; 
-            width: 55px; height: 55px; background: white; border-radius: 50%; 
-            display: none; justify-content: center; align-items: center; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4); cursor: pointer; 
-        }
+        .location-btn { position: absolute; bottom: 30px; right: 20px; z-index: 1000; width: 55px; height: 55px; background: white; border-radius: 50%; display: none; justify-content: center; align-items: center; cursor: pointer; }
 
-        /* POPUP FORMA */
-        .popup-box { padding: 5px; min-width: 220px; display: flex; flex-direction: column; gap: 8px; }
-        .popup-box input, .popup-box select { padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; width: 100%; }
-        .popup-box button { background: #007AFF; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-
-        /* KARTICA KOJA IZLAZI IZ LOPTE SA STRANE */
-        .sport-marker-wrapper {
-            display: flex;
-            align-items: center;
-            white-space: nowrap;
-        }
-        .sport-ball {
-            font-size: 32px; /* Veličina lopte */
-            z-index: 10;
-            filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.4));
-        }
-        .sport-label {
-            background: rgba(255, 255, 255, 0.95);
-            color: #000;
-            font-weight: 800;
-            font-size: 14px;
-            padding: 4px 12px 4px 18px;
-            border-radius: 0 15px 15px 0;
-            margin-left: -12px; /* Da ulazi pod loptu */
-            border: 2px solid #007AFF;
-            border-left: none;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
-            z-index: 5;
-        }
+        /* DIZAJN MARKERA I KARTICA */
+        .sport-marker-wrapper { display: flex; align-items: center; white-space: nowrap; cursor: pointer; }
+        .sport-ball { font-size: 32px; z-index: 10; filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.4)); }
         
+        /* Ime terena (lebdeća kartica) */
+        .sport-label {
+            background: white; color: #000; font-weight: 800; font-size: 14px;
+            padding: 4px 12px 4px 18px; border-radius: 0 15px 15px 0;
+            margin-left: -12px; border: 2px solid #007AFF; border-left: none;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.2); z-index: 5;
+        }
+
+        /* Donja kartica (Info i brisanje) - zamenjuje Cloud Popup */
+        .info-card {
+            background: #fff; border: 2px solid #007AFF; border-radius: 12px;
+            padding: 10px; font-size: 12px; display: flex; flex-direction: column; gap: 5px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); min-width: 140px;
+        }
+        .timer-text { color: #ff3b30; font-weight: bold; font-family: monospace; font-size: 14px; }
+        .del-btn { background: #ff3b30; color: white; border: none; padding: 5px; border-radius: 5px; font-weight: bold; cursor: pointer; }
+
+        /* Forme */
+        .popup-box { padding: 5px; min-width: 220px; display: flex; flex-direction: column; gap: 8px; }
+        .popup-box input, .popup-box select { padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; }
+        .popup-box button { background: #007AFF; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; }
+
         .user-dot { width: 16px; height: 16px; background: #007AFF; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 10px #007AFF; }
     </style>
 </head>
@@ -81,20 +65,12 @@
 
     <div id="hero" onclick="startApp()">
         <h1>ALL SPORTS LOCAL</h1>
-        <div style="border: 2px solid white; border-radius: 50%; padding: 20px; cursor: pointer;">
-            <span style="font-size: 40px;">⚽</span>
-        </div>
-        <p style="color:white; margin-top:15px; font-size:14px;">DODIRNI ZA ULAZ</p>
+        <div style="border: 2px solid white; border-radius: 50%; padding: 20px; cursor: pointer;"><span style="font-size: 40px;">⚽</span></div>
+        <p style="color:white; margin-top:15px;">DODIRNI ZA ULAZ</p>
     </div>
 
-    <div class="search-container" id="sContainer">
-        <input type="text" id="search-input" placeholder="Pretraži lokaciju...">
-    </div>
-
-    <div class="location-btn" id="lBtn" onclick="goToMyLocation()">
-        <img src="https://cdn-icons-png.flaticon.com/512/1865/1865269.png" width="28">
-    </div>
-
+    <div class="search-container" id="sContainer"><input type="text" id="search-input" placeholder="Pretraži lokaciju..."></div>
+    <div class="location-btn" id="lBtn" onclick="goToMyLocation()"><img src="https://cdn-icons-png.flaticon.com/512/1865/1865269.png" width="28"></div>
     <div id="map"></div>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -108,26 +84,14 @@
 
         let map, userMarker, currentLat, currentLon;
         let markersLayer = L.layerGroup();
-
-        // Prave lopte (Emoji sistem - siguran prikaz)
-        const sportEmojis = {
-            "Fudbal": "⚽",
-            "Košarka": "🏀",
-            "Rukomet": "🤾",
-            "Hokej": "🏒",
-            "Odbojka": "🏐",
-            "Tenis": "🎾"
-        };
+        const sportEmojis = { "Fudbal": "⚽", "Košarka": "🏀", "Rukomet": "🤾", "Hokej": "🏒", "Odbojka": "🏐", "Tenis": "🎾" };
 
         function startApp() {
-            document.getElementById('hero').style.opacity = '0';
-            setTimeout(() => { 
-                document.getElementById('hero').style.display = 'none'; 
-                document.getElementById('map').style.display = 'block';
-                document.getElementById('sContainer').style.display = 'block';
-                document.getElementById('lBtn').style.display = 'flex';
-                initMap();
-            }, 800);
+            document.getElementById('hero').style.display = 'none'; 
+            document.getElementById('map').style.display = 'block';
+            document.getElementById('sContainer').style.display = 'block';
+            document.getElementById('lBtn').style.display = 'flex';
+            initMap();
         }
 
         function initMap() {
@@ -138,28 +102,22 @@
             markersLayer.addTo(map);
 
             map.on('click', e => {
-                const savedNick = localStorage.getItem('app_nick') || '';
-                const html = `
-                    <div class="popup-box">
-                        <b style="text-align:center">DODAJ TEREN</b>
-                        <input type="text" id="p_nick" placeholder="Tvoj Nadimak" value="${savedNick}">
-                        <select id="p_sport">
-                            <option value="Fudbal">Fudbal</option>
-                            <option value="Košarka">Košarka</option>
-                            <option value="Rukomet">Rukomet</option>
-                            <option value="Hokej">Hokej</option>
-                            <option value="Odbojka">Odbojka</option>
-                            <option value="Tenis">Tenis</option>
-                        </select>
-                        <input type="text" id="p_name" placeholder="Ime terena">
-                        <input type="password" id="p_pin" placeholder="PIN (6 simbola)" maxlength="6">
-                        <button onclick="processTeren(${e.latlng.lat}, ${e.latlng.lng})">POTVRDI</button>
-                    </div>`;
+                const sn = localStorage.getItem('app_nick') || '';
+                const html = `<div class="popup-box">
+                    <b style="text-align:center">DODAJ TEREN</b>
+                    <input type="text" id="p_nick" placeholder="Tvoj Nadimak" value="${sn}">
+                    <select id="p_sport"><option value="Fudbal">Fudbal</option><option value="Košarka">Košarka</option><option value="Rukomet">Rukomet</option><option value="Hokej">Hokej</option><option value="Odbojka">Odbojka</option><option value="Tenis">Tenis</option></select>
+                    <input type="text" id="p_name" placeholder="Ime terena">
+                    <input type="password" id="p_pin" placeholder="PIN (6 simbola)" maxlength="6">
+                    <button onclick="processTeren(${e.latlng.lat}, ${e.latlng.lng})">POTVRDI</button>
+                </div>`;
                 L.popup().setLatLng(e.latlng).setContent(html).openOn(map);
             });
 
             loadAllTereni();
             trackGPS();
+            // Provera isteka na svakih 10 sekundi
+            setInterval(cleanupExpired, 10000);
         }
 
         async function processTeren(lat, lng) {
@@ -167,35 +125,27 @@
             const sport = document.getElementById('p_sport').value;
             const name = document.getElementById('p_name').value.trim();
             const pin = document.getElementById('p_pin').value;
-
-            if (nick.length < 3 || name.length < 2 || pin.length !== 6) {
-                alert("Greška: PIN mora imati 6 cifara!");
-                return;
-            }
+            if (nick.length < 3 || name.length < 2 || pin.length !== 6) return alert("Proverite unos!");
 
             const userRef = db.ref('users/' + nick);
             const snap = await userRef.get();
+            const now = Date.now();
 
             if (snap.exists()) {
                 if (snap.val().pin === pin) {
-                    if (snap.val().lastTerenKey) {
-                        await db.ref('tereni/' + snap.val().lastTerenKey).remove();
-                    }
-                    saveNew(nick, name, sport, lat, lng, userRef);
-                } else {
-                    alert("Pogrešan PIN!");
-                }
+                    if (snap.val().lastTerenKey) await db.ref('tereni/' + snap.val().lastTerenKey).remove();
+                    saveNew(nick, name, sport, lat, lng, userRef, now);
+                } else alert("Pogrešan PIN!");
             } else {
                 await userRef.set({ pin: pin });
-                saveNew(nick, name, sport, lat, lng, userRef);
+                saveNew(nick, name, sport, lat, lng, userRef, now);
             }
         }
 
-        async function saveNew(nick, name, sport, lat, lng, userRef) {
-            const newTerenRef = db.ref('tereni').push();
-            const key = newTerenRef.key;
-            await newTerenRef.set({ name, sport, lat, lng, creator: nick });
-            await userRef.update({ lastTerenKey: key });
+        async function saveNew(nick, name, sport, lat, lng, userRef, time) {
+            const newRef = db.ref('tereni').push();
+            await newRef.set({ name, sport, lat, lng, creator: nick, expires: time + (24 * 60 * 60 * 1000) });
+            await userRef.update({ lastTerenKey: newRef.key });
             localStorage.setItem('app_nick', nick);
             map.closePopup();
         }
@@ -205,34 +155,65 @@
                 markersLayer.clearLayers();
                 snap.forEach(child => {
                     const d = child.val();
-                    const emoji = sportEmojis[d.sport] || "⚽";
-                    
+                    const key = child.key;
+                    if (Date.now() > d.expires) { db.ref('tereni/' + key).remove(); return; }
+
                     const customIcon = L.divIcon({
                         className: '',
-                        html: `
-                            <div class="sport-marker-wrapper">
-                                <div class="sport-ball">${emoji}</div>
-                                <div class="sport-label">${d.name}</div>
-                            </div>`,
-                        iconSize: [40, 40],
-                        iconAnchor: [15, 20]
+                        html: `<div class="sport-marker-wrapper"><div class="sport-ball">${sportEmojis[d.sport] || "⚽"}</div><div class="sport-label">${d.name}</div></div>`,
+                        iconSize: [40, 40], iconAnchor: [15, 20]
                     });
 
-                    L.marker([d.lat, d.lng], { icon: customIcon }).addTo(markersLayer)
-                     .bindPopup(`<b>Sport: ${d.sport}</b><br>Postavio: ${d.creator}`);
+                    const marker = L.marker([d.lat, d.lng], { icon: customIcon }).addTo(markersLayer);
+                    
+                    // Info kartica koja izlazi na klik loptice
+                    const infoHtml = `<div class="info-card">
+                        <b>${d.sport}</b>
+                        <span>Ističe za:</span>
+                        <span class="timer-text" id="timer-${key}">--:--:--</span>
+                        <button class="del-btn" onclick="requestDelete('${key}', '${d.creator}')">OBRIŠI</button>
+                    </div>`;
+                    marker.bindPopup(infoHtml, { offset: L.point(80, 20) });
+
+                    // Pokreni tajmer za ovaj marker
+                    setInterval(() => updateTimerUI(key, d.expires), 1000);
                 });
+            });
+        }
+
+        function updateTimerUI(key, expires) {
+            const el = document.getElementById(`timer-${key}`);
+            if (!el) return;
+            const diff = expires - Date.now();
+            if (diff <= 0) { el.innerText = "ISTEKLO"; return; }
+            const h = Math.floor(diff / 3600000).toString().padStart(2, '0');
+            const m = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
+            const s = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
+            el.innerText = `${h}:${m}:${s}`;
+        }
+
+        window.requestDelete = async function(key, creator) {
+            const pin = prompt(`Unesite PIN za nadimak "${creator}" da obrišete teren:`);
+            if (!pin) return;
+            const userSnap = await db.ref('users/' + creator).get();
+            if (userSnap.exists() && userSnap.val().pin === pin) {
+                await db.ref('tereni/' + key).remove();
+                alert("Teren obrisan!");
+            } else alert("Pogrešan PIN!");
+        }
+
+        function cleanupExpired() {
+            db.ref('tereni').get().then(snap => {
+                snap.forEach(child => { if(Date.now() > child.val().expires) child.ref.remove(); });
             });
         }
 
         function trackGPS() {
             navigator.geolocation.watchPosition(pos => {
                 currentLat = pos.coords.latitude; currentLon = pos.coords.longitude;
-                if (!userMarker) {
-                    userMarker = L.marker([currentLat, currentLon], { 
-                        icon: L.divIcon({ className:'', html:'<div class="user-dot"></div>', iconAnchor:[8,8] }) 
-                    }).addTo(map);
-                } else userMarker.setLatLng([currentLat, currentLon]);
-            }, null, { enableHighAccuracy: true });
+                if (!userMarker) userMarker = L.marker([currentLat, currentLon], { icon: L.divIcon({ className:'', html:'<div class="user-dot"></div>', iconAnchor:[8,8] }) }).addTo(map);
+                else userMarker.setLatLng([currentLat, currentLon]);
+            });
         }
 
         function goToMyLocation() { if(currentLat) map.flyTo([currentLat, currentLon], 16); }
