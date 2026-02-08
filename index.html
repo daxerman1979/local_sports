@@ -13,53 +13,50 @@
         html, body { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background: #000; position: fixed; font-family: 'Segoe UI', sans-serif; }
 
         #hero { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.9)), url('https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=1470&auto=format&fit=crop') center/cover; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 2000; transition: 0.8s; }
-        #hero h1 { color: #fff; font-family: 'Oswald', sans-serif; font-size: 3rem; }
+        #hero h1 { color: #fff; font-family: 'Oswald', sans-serif; font-size: 3rem; text-align: center; }
 
         #map { width: 100vw; height: 100vh; background: #111; display: none; }
         
         .search-container { position: absolute; top: 15px; left: 15px; right: 15px; z-index: 1000; display: none; }
-        #search-input { width: 100%; height: 50px; border-radius: 25px; border: 2px solid #007AFF; padding: 0 20px; font-size: 16px; outline: none; }
+        #search-input { width: 100%; height: 50px; border-radius: 25px; border: 2px solid #007AFF; padding: 0 20px; font-size: 16px; outline: none; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
 
         /* MARKER I KARTICE */
         .sport-marker-wrapper { display: flex; align-items: center; white-space: nowrap; cursor: pointer; }
         .sport-ball { font-size: 32px; z-index: 20; filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.4)); }
         
-        /* Glavna kartica sa desne strane */
         .live-card {
             background: white; border: 2px solid #007AFF; border-radius: 0 12px 12px 0;
             padding: 8px 15px 8px 20px; margin-left: -18px;
             display: flex; flex-direction: column; gap: 4px;
             box-shadow: 4px 4px 12px rgba(0,0,0,0.3); z-index: 5;
-            min-width: 180px;
+            min-width: 160px;
         }
 
         .match-info { font-size: 13px; font-weight: bold; color: #333; }
-        .match-score { font-size: 20px; color: #007AFF; font-family: 'Oswald', sans-serif; }
-        .match-status { font-size: 10px; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; align-self: flex-start; }
+        .match-score { font-size: 22px; color: #007AFF; font-family: 'Oswald', sans-serif; margin: 2px 0; }
+        .match-status { font-size: 10px; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; align-self: flex-start; font-weight: bold; }
         .status-live { background: #ff3b30; color: white; animation: blink 1s infinite; }
-        .status-up { background: #4cd964; color: white; }
-        .status-end { background: #8e8e93; color: white; }
+        .status-upcoming { background: #4cd964; color: white; }
+        .status-ended { background: #8e8e93; color: white; }
 
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
-        /* Kontrole na levoj strani (Samo za vlasnika) */
         .owner-controls {
-            background: #f1f1f1; border: 2px solid #333; border-radius: 12px 0 0 12px;
-            padding: 5px 15px 5px 10px; margin-right: -15px;
-            display: flex; flex-direction: column; gap: 5px; z-index: 5;
+            background: #f9f9f9; border: 2px solid #333; border-radius: 12px 0 0 12px;
+            padding: 5px 12px 5px 8px; margin-right: -15px;
+            display: flex; flex-direction: column; gap: 4px; z-index: 5;
         }
 
-        .btn-sm { padding: 4px 8px; font-size: 10px; border: none; border-radius: 4px; color: white; cursor: pointer; font-weight: bold; }
+        .btn-sm { padding: 4px 6px; font-size: 9px; border: none; border-radius: 4px; color: white; cursor: pointer; font-weight: bold; width: 45px; }
         .btn-blue { background: #007AFF; }
         .btn-red { background: #ff3b30; }
 
-        /* Forme */
         .popup-box { padding: 5px; min-width: 240px; display: flex; flex-direction: column; gap: 8px; }
-        .popup-box input, .popup-box select { padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; }
-        .popup-box button { background: #007AFF; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; }
+        .popup-box input, .popup-box select { padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; width: 100%; }
+        .popup-box button { background: #007AFF; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
-        .location-btn { position: absolute; bottom: 30px; right: 20px; z-index: 1000; width: 55px; height: 55px; background: white; border-radius: 50%; display: none; justify-content: center; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
-        .user-dot { width: 16px; height: 16px; background: #007AFF; border-radius: 50%; border: 2px solid white; }
+        .location-btn { position: absolute; bottom: 30px; right: 20px; z-index: 1000; width: 55px; height: 55px; background: white; border-radius: 50%; display: none; justify-content: center; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.4); cursor: pointer; }
+        .user-dot { width: 16px; height: 16px; background: #007AFF; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 10px #007AFF; }
     </style>
 </head>
 <body>
@@ -67,10 +64,10 @@
     <div id="hero" onclick="startApp()">
         <h1>ALL SPORTS LOCAL</h1>
         <div style="border: 2px solid white; border-radius: 50%; padding: 20px; cursor: pointer;"><span style="font-size: 40px;">⚽</span></div>
-        <p style="color:white; margin-top:15px;">DODIRNI ZA START</p>
+        <p style="color:white; margin-top:15px; font-size:14px;">DODIRNI ZA ULAZ</p>
     </div>
 
-    <div class="search-container" id="sContainer"><input type="text" id="search-input" placeholder="Pretraži lokaciju..."></div>
+    <div class="search-container" id="sContainer"><input type="text" id="search-input" placeholder="Pretraži grad ili ulicu..."></div>
     <div class="location-btn" id="lBtn" onclick="goToMyLocation()"><img src="https://cdn-icons-png.flaticon.com/512/1865/1865269.png" width="28"></div>
     <div id="map"></div>
 
@@ -105,13 +102,13 @@
             map.on('click', e => {
                 const sn = localStorage.getItem('app_nick') || '';
                 const html = `<div class="popup-box">
-                    <b style="text-align:center">DODAJ TEREN I MEČ</b>
+                    <b style="text-align:center">POSTAVI TEREN I MEČ</b>
                     <input type="text" id="p_nick" placeholder="Tvoj Nadimak" value="${sn}">
                     <select id="p_sport"><option value="Fudbal">Fudbal</option><option value="Košarka">Košarka</option><option value="Rukomet">Rukomet</option><option value="Hokej">Hokej</option><option value="Odbojka">Odbojka</option><option value="Tenis">Tenis</option></select>
                     <input type="text" id="p_name" placeholder="Ime terena">
                     <input type="text" id="p_t1" placeholder="Tim 1">
                     <input type="text" id="p_t2" placeholder="Tim 2">
-                    <input type="datetime-local" id="p_time">
+                    <input type="text" id="p_time" placeholder="Vreme (npr. 20:30h)">
                     <input type="password" id="p_pin" placeholder="PIN (6 simbola)" maxlength="6">
                     <button onclick="processTeren(${e.latlng.lat}, ${e.latlng.lng})">SAČUVAJ</button>
                 </div>`;
@@ -126,12 +123,12 @@
             const nick = document.getElementById('p_nick').value.trim().toLowerCase();
             const sport = document.getElementById('p_sport').value;
             const name = document.getElementById('p_name').value.trim();
-            const t1 = document.getElementById('p_t1').value.trim() || "Tim A";
-            const t2 = document.getElementById('p_t2').value.trim() || "Tim B";
-            const time = document.getElementById('p_time').value;
+            const t1 = document.getElementById('p_t1').value.trim() || "Tim 1";
+            const t2 = document.getElementById('p_t2').value.trim() || "Tim 2";
+            const time = document.getElementById('p_time').value.trim() || "Uskoro";
             const pin = document.getElementById('p_pin').value;
 
-            if (nick.length < 3 || pin.length !== 6) return alert("Nick i PIN obavezni!");
+            if (nick.length < 3 || pin.length !== 6) return alert("Nick i PIN (6 cifara) obavezni!");
 
             const userRef = db.ref('users/' + nick);
             const snap = await userRef.get();
@@ -140,7 +137,7 @@
             const matchData = {
                 name, sport, lat, lng, creator: nick, expires,
                 t1, t2, score1: 0, score2: 0, 
-                startTime: time || "Uskoro",
+                startTime: time,
                 status: "upcoming"
             };
 
@@ -182,13 +179,13 @@
                                 <div class="sport-ball">${sportEmojis[d.sport] || "⚽"}</div>
                                 <div class="live-card">
                                     <span class="match-status status-${d.status}">${d.status}</span>
-                                    <div class="match-info">${d.name}</div>
+                                    <div class="match-info" style="color:#007AFF">${d.name}</div>
                                     <div class="match-info">${d.t1} vs ${d.t2}</div>
                                     <div class="match-score">${d.score1} : ${d.score2}</div>
-                                    <div style="font-size:9px; color:#888">${d.startTime}</div>
+                                    <div style="font-size:10px; color:#888">${d.startTime}</div>
                                 </div>
                             </div>`,
-                        iconSize: [250, 100], iconAnchor: [125, 50]
+                        iconSize: [260, 100], iconAnchor: [130, 50]
                     });
 
                     L.marker([d.lat, d.lng], { icon: customIcon }).addTo(markersLayer);
@@ -197,13 +194,12 @@
         }
 
         window.updateScore = async function(key, team) {
-            const pin = prompt("Unesite PIN za promenu rezultata:");
+            const pin = prompt("Unesite PIN:");
             const snap = await db.ref('tereni/' + key).get();
             const creatorSnap = await db.ref('users/' + snap.val().creator).get();
-            
             if (creatorSnap.val().pin === pin) {
                 const updates = {};
-                updates['score' + team] = snap.val()['score' + team] + 1;
+                updates['score' + team] = (snap.val()['score' + team] || 0) + 1;
                 db.ref('tereni/' + key).update(updates);
             } else alert("Pogrešan PIN!");
         };
@@ -233,6 +229,13 @@
         }
 
         function goToMyLocation() { if(currentLat) map.flyTo([currentLat, currentLon], 16); }
+
+        document.getElementById('search-input').addEventListener('keypress', e => {
+            if(e.key === 'Enter') {
+                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(e.target.value)}`)
+                .then(r => r.json()).then(data => { if(data[0]) map.setView([data[0].lat, data[0].lon], 14); });
+            }
+        });
     </script>
 </body>
 </html>
