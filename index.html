@@ -9,17 +9,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&display=swap" rel="stylesheet">
     
     <style>
-        * { 
-            box-sizing: border-box; 
-            -webkit-tap-highlight-color: transparent; 
-        }
-        
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         html, body { 
             margin: 0; padding: 0; height: 100%; width: 100%; 
             overflow: hidden; background: #000; position: fixed;
             -webkit-text-size-adjust: 100%;
         }
-
         #hero {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.8)), 
@@ -27,55 +22,33 @@
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             z-index: 2000; transition: 0.5s; padding: 20px;
         }
-
         #hero h1 { color: #fff; font-family: 'Oswald', sans-serif; font-size: 3rem; text-align: center; margin-bottom: 10px; }
-
-        .disclaimer {
-            color: #ccc;
-            font-family: Arial, sans-serif;
-            font-size: 12px;
-            text-align: center;
-            max-width: 300px;
-            margin-bottom: 30px;
-            line-height: 1.4;
-        }
-
+        .disclaimer { color: #ccc; font-family: Arial, sans-serif; font-size: 12px; text-align: center; max-width: 300px; margin-bottom: 30px; line-height: 1.4; }
         #map { width: 100vw; height: 100vh; display: none; background: #111; }
-
+        
         .search-container {
             position: absolute; top: 15px; right: 15px; z-index: 3000;
             display: none; align-items: center; width: calc(100% - 30px);
-            touch-action: pan-y;
         }
-
         #search-input {
             height: 50px; border-radius: 25px; border: 2px solid #007AFF; width: 0; opacity: 0;
-            transition: width 0.3s ease, opacity 0.3s ease; 
-            font-size: 16px !important; 
-            padding: 0; background: white; color: #000;
-            outline: none;
-            -webkit-appearance: none;
+            transition: width 0.3s ease, opacity 0.3s ease; font-size: 16px !important; 
+            padding: 0; background: white; color: #000; outline: none;
         }
-
         .search-container.active #search-input { width: 100%; padding: 0 55px 0 20px; opacity: 1; }
-
         .search-icon {
             width: 50px; height: 50px; background: #007AFF; border-radius: 50%;
             display: flex; justify-content: center; align-items: center;
-            color: white; font-size: 20px; position: absolute; right: 0; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            cursor: pointer;
+            color: white; font-size: 20px; position: absolute; right: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
-
         .location-btn {
             position: absolute; bottom: 30px; right: 20px; z-index: 3000;
             width: 55px; height: 55px; background: white; border-radius: 50%;
-            display: none; justify-content: center; align-items: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-            cursor: pointer;
+            display: none; justify-content: center; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
         }
         .location-btn img { width: 25px; height: 25px; }
-
+        
+        /* Markeri stil */
         .user-location-dot {
             width: 14px; height: 14px; background: #007AFF; border-radius: 50%;
             border: 2px solid white; position: relative;
@@ -93,12 +66,11 @@
     <div id="hero">
         <h1>LOKALNI<br>SPORT</h1>
         <div class="disclaimer">
-            Sajt je zabavnog karaktera. Sve informacije su nezvanične. 
-            Vlasnik sajta ne odgovara za bilo koji sadržaj ili tačnost podataka. 
-            Nastavkom korišćenja prihvatate ove uslove.
+            Sajt je zabavnog karaktera. Sve informacije su nezvanične. Vlasnik ne odgovara za sadržaj. 
+            Klikom na mapu dodajete teren (max 1 po osobi).
         </div>
         <div style="border: 3px solid white; border-radius: 50%; padding: 20px; cursor: pointer;" onclick="initApp()">
-            <img src="https://cdn-icons-png.flaticon.com/512/857/857418.png" width="60" alt="Start">
+            <img src="https://cdn-icons-png.flaticon.com/512/857/857418.png" width="60">
         </div>
     </div>
 
@@ -108,13 +80,23 @@
     </div>
 
     <div class="location-btn" id="locBtn" onclick="goToMyLocation()">
-        <img src="https://cdn-icons-png.flaticon.com/512/1865/1865269.png" alt="Loc">
+        <img src="https://cdn-icons-png.flaticon.com/512/1865/1865269.png">
     </div>
 
     <div id="map"></div>
 
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
+        // Konfiguracija Firebase-a
+        const firebaseConfig = {
+            databaseURL: "https://hoodsports-162ca-default-rtdb.europe-west1.firebasedatabase.app/"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
         let map;
         let userMarker;
         let currentLat, currentLon;
@@ -127,32 +109,29 @@
                 document.getElementById('searchBox').style.display = 'flex';
                 document.getElementById('locBtn').style.display = 'flex';
                 setupMap();
+                loadTereni();
             }, 500);
         }
 
         function setupMap() {
-            map = L.map('map', {
-                zoomControl: false,
-                tap: false,
-                dragging: true
-            }).setView([44.7866, 20.4489], 13);
-
+            map = L.map('map', { zoomControl: false, tap: false }).setView([44.7866, 20.4489], 13);
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
             L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png').addTo(map);
+
+            // KLIK NA MAPU ZA DODAVANJE TERENA
+            map.on('click', function(e) {
+                addTeren(e.latlng.lat, e.latlng.lng);
+            });
 
             if (navigator.geolocation) {
                 navigator.geolocation.watchPosition(position => {
                     currentLat = position.coords.latitude;
                     currentLon = position.coords.longitude;
-                    
                     if (!userMarker) {
                         map.setView([currentLat, currentLon], 15);
-                        const pulsingIcon = L.divIcon({
-                            className: 'custom-div-icon',
-                            html: '<div class="user-location-dot"></div>',
-                            iconSize: [14, 14], iconAnchor: [7, 7]
-                        });
-                        userMarker = L.marker([currentLat, currentLon], { icon: pulsingIcon }).addTo(map);
+                        userMarker = L.marker([currentLat, currentLon], {
+                            icon: L.divIcon({ className: 'custom-div-icon', html: '<div class="user-location-dot"></div>', iconSize: [14, 14], iconAnchor: [7, 7] })
+                        }).addTo(map);
                     } else {
                         userMarker.setLatLng([currentLat, currentLon]);
                     }
@@ -160,39 +139,55 @@
             }
         }
 
-        function goToMyLocation() {
-            if (currentLat && currentLon) {
-                map.flyTo([currentLat, currentLon], 16, { animate: true, duration: 1.5 });
+        function addTeren(lat, lng) {
+            // Provera da li je korisnik već postavio teren
+            if (localStorage.getItem('terenPostavljen')) {
+                alert("Već ste postavili jedan teren. Hvala!");
+                return;
+            }
+
+            const naziv = prompt("Unesite ime sportskog terena:");
+            if (naziv && naziv.trim().length > 2) {
+                const noviTerenRef = database.ref('tereni').push();
+                noviTerenRef.set({
+                    naziv: naziv,
+                    lat: lat,
+                    lng: lng,
+                    vreme: Date.now()
+                }).then(() => {
+                    localStorage.setItem('terenPostavljen', 'true');
+                });
             }
         }
+
+        function loadTereni() {
+            database.ref('tereni').on('child_added', (snapshot) => {
+                const data = snapshot.val();
+                L.marker([data.lat, data.lng]).addTo(map)
+                 .bindPopup(`<b>${data.naziv}</b>`)
+                 .openPopup();
+            });
+        }
+
+        function goToMyLocation() { if (currentLat && currentLon) map.flyTo([currentLat, currentLon], 16); }
 
         function toggleSearch() {
             const container = document.getElementById('searchBox');
             const input = document.getElementById('search-input');
-            
             if (!container.classList.contains('active')) {
                 container.classList.add('active');
                 setTimeout(() => input.focus(), 200);
             } else {
                 if (input.value !== '') {
                     fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(input.value)}`)
-                        .then(res => res.json())
-                        .then(data => {
-                            if (data.length > 0) {
-                                map.setView([data[0].lat, data[0].lon], 13);
-                            }
+                        .then(res => res.json()).then(data => {
+                            if (data.length > 0) map.setView([data[0].lat, data[0].lon], 13);
                         });
                 }
                 container.classList.remove('active');
                 input.blur();
             }
         }
-
-        document.addEventListener('gesturestart', function (e) { e.preventDefault(); });
-
-        document.getElementById('search-input').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') toggleSearch();
-        });
     </script>
 </body>
 </html>
