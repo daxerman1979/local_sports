@@ -30,33 +30,26 @@
         .search-container { position: absolute; top: 15px; left: 15px; right: 15px; z-index: 1000; display: none; }
         #search-input { width: 100%; height: 50px; border-radius: 25px; border: 2px solid #007AFF; padding: 0 20px; font-size: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); outline: none; }
 
-        .location-btn { position: absolute; bottom: 30px; right: 20px; z-index: 1000; width: 55px; height: 55px; background: white; border-radius: 50%; display: none; justify-content: center; align-items: center; cursor: pointer; }
+        .location-btn { position: absolute; bottom: 30px; right: 20px; z-index: 1000; width: 55px; height: 55px; background: white; border-radius: 50%; display: none; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
 
-        /* DIZAJN MARKERA I KARTICA */
+        /* JEDINSTVENA KARTICA KOJA IZLAZI IZ LOPTE */
         .sport-marker-wrapper { display: flex; align-items: center; white-space: nowrap; cursor: pointer; }
         .sport-ball { font-size: 32px; z-index: 10; filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.4)); }
         
-        /* Ime terena (lebdeća kartica) */
-        .sport-label {
-            background: white; color: #000; font-weight: 800; font-size: 14px;
-            padding: 4px 12px 4px 18px; border-radius: 0 15px 15px 0;
-            margin-left: -12px; border: 2px solid #007AFF; border-left: none;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.2); z-index: 5;
+        .combined-card {
+            background: white; border: 2px solid #007AFF; border-radius: 0 15px 15px 0;
+            padding: 6px 12px 6px 18px; margin-left: -15px;
+            display: flex; flex-direction: column; gap: 2px;
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.2); z-index: 5;
         }
-
-        /* Donja kartica (Info i brisanje) - zamenjuje Cloud Popup */
-        .info-card {
-            background: #fff; border: 2px solid #007AFF; border-radius: 12px;
-            padding: 10px; font-size: 12px; display: flex; flex-direction: column; gap: 5px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3); min-width: 140px;
-        }
-        .timer-text { color: #ff3b30; font-weight: bold; font-family: monospace; font-size: 14px; }
-        .del-btn { background: #ff3b30; color: white; border: none; padding: 5px; border-radius: 5px; font-weight: bold; cursor: pointer; }
+        .card-name { color: #000; font-weight: 800; font-size: 14px; margin: 0; }
+        .card-timer { color: #ff3b30; font-weight: bold; font-family: monospace; font-size: 11px; }
+        .card-del { background: #ff3b30; color: white; border: none; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: bold; cursor: pointer; margin-top: 2px; align-self: flex-start; }
 
         /* Forme */
         .popup-box { padding: 5px; min-width: 220px; display: flex; flex-direction: column; gap: 8px; }
-        .popup-box input, .popup-box select { padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; }
-        .popup-box button { background: #007AFF; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; }
+        .popup-box input, .popup-box select { padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; width: 100%; }
+        .popup-box button { background: #007AFF; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
         .user-dot { width: 16px; height: 16px; background: #007AFF; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 10px #007AFF; }
     </style>
@@ -66,7 +59,7 @@
     <div id="hero" onclick="startApp()">
         <h1>ALL SPORTS LOCAL</h1>
         <div style="border: 2px solid white; border-radius: 50%; padding: 20px; cursor: pointer;"><span style="font-size: 40px;">⚽</span></div>
-        <p style="color:white; margin-top:15px;">DODIRNI ZA ULAZ</p>
+        <p style="color:white; margin-top:15px; font-size:14px;">DODIRNI ZA ULAZ</p>
     </div>
 
     <div class="search-container" id="sContainer"><input type="text" id="search-input" placeholder="Pretraži lokaciju..."></div>
@@ -104,7 +97,7 @@
             map.on('click', e => {
                 const sn = localStorage.getItem('app_nick') || '';
                 const html = `<div class="popup-box">
-                    <b style="text-align:center">DODAJ TEREN</b>
+                    <b style="text-align:center">POSTAVI TEREN</b>
                     <input type="text" id="p_nick" placeholder="Tvoj Nadimak" value="${sn}">
                     <select id="p_sport"><option value="Fudbal">Fudbal</option><option value="Košarka">Košarka</option><option value="Rukomet">Rukomet</option><option value="Hokej">Hokej</option><option value="Odbojka">Odbojka</option><option value="Tenis">Tenis</option></select>
                     <input type="text" id="p_name" placeholder="Ime terena">
@@ -116,8 +109,7 @@
 
             loadAllTereni();
             trackGPS();
-            // Provera isteka na svakih 10 sekundi
-            setInterval(cleanupExpired, 10000);
+            setInterval(cleanupExpired, 60000); // Čišćenje svake minute
         }
 
         async function processTeren(lat, lng) {
@@ -125,26 +117,27 @@
             const sport = document.getElementById('p_sport').value;
             const name = document.getElementById('p_name').value.trim();
             const pin = document.getElementById('p_pin').value;
-            if (nick.length < 3 || name.length < 2 || pin.length !== 6) return alert("Proverite unos!");
+            if (nick.length < 3 || name.length < 2 || pin.length !== 6) return alert("Sva polja su obavezna (PIN 6 cifara)!");
 
             const userRef = db.ref('users/' + nick);
             const snap = await userRef.get();
             const now = Date.now();
+            const expires = now + (24 * 60 * 60 * 1000);
 
             if (snap.exists()) {
                 if (snap.val().pin === pin) {
                     if (snap.val().lastTerenKey) await db.ref('tereni/' + snap.val().lastTerenKey).remove();
-                    saveNew(nick, name, sport, lat, lng, userRef, now);
+                    saveNew(nick, name, sport, lat, lng, userRef, expires);
                 } else alert("Pogrešan PIN!");
             } else {
                 await userRef.set({ pin: pin });
-                saveNew(nick, name, sport, lat, lng, userRef, now);
+                saveNew(nick, name, sport, lat, lng, userRef, expires);
             }
         }
 
-        async function saveNew(nick, name, sport, lat, lng, userRef, time) {
+        async function saveNew(nick, name, sport, lat, lng, userRef, expires) {
             const newRef = db.ref('tereni').push();
-            await newRef.set({ name, sport, lat, lng, creator: nick, expires: time + (24 * 60 * 60 * 1000) });
+            await newRef.set({ name, sport, lat, lng, creator: nick, expires: expires });
             await userRef.update({ lastTerenKey: newRef.key });
             localStorage.setItem('app_nick', nick);
             map.closePopup();
@@ -160,45 +153,47 @@
 
                     const customIcon = L.divIcon({
                         className: '',
-                        html: `<div class="sport-marker-wrapper"><div class="sport-ball">${sportEmojis[d.sport] || "⚽"}</div><div class="sport-label">${d.name}</div></div>`,
+                        html: `
+                            <div class="sport-marker-wrapper" onclick="event.stopPropagation();">
+                                <div class="sport-ball">${sportEmojis[d.sport] || "⚽"}</div>
+                                <div class="combined-card">
+                                    <p class="card-name">${d.name}</p>
+                                    <span class="card-timer" id="t-${key}">--:--:--</span>
+                                    <button class="card-del" onclick="reqDel('${key}', '${d.creator}')">OBRIŠI</button>
+                                </div>
+                            </div>`,
                         iconSize: [40, 40], iconAnchor: [15, 20]
                     });
 
-                    const marker = L.marker([d.lat, d.lng], { icon: customIcon }).addTo(markersLayer);
+                    L.marker([d.lat, d.lng], { icon: customIcon }).addTo(markersLayer);
                     
-                    // Info kartica koja izlazi na klik loptice
-                    const infoHtml = `<div class="info-card">
-                        <b>${d.sport}</b>
-                        <span>Ističe za:</span>
-                        <span class="timer-text" id="timer-${key}">--:--:--</span>
-                        <button class="del-btn" onclick="requestDelete('${key}', '${d.creator}')">OBRIŠI</button>
-                    </div>`;
-                    marker.bindPopup(infoHtml, { offset: L.point(80, 20) });
-
-                    // Pokreni tajmer za ovaj marker
-                    setInterval(() => updateTimerUI(key, d.expires), 1000);
+                    // Pokretanje tajmera odmah nakon iscrtavanja
+                    setTimeout(() => startTimer(key, d.expires), 100);
                 });
             });
         }
 
-        function updateTimerUI(key, expires) {
-            const el = document.getElementById(`timer-${key}`);
-            if (!el) return;
-            const diff = expires - Date.now();
-            if (diff <= 0) { el.innerText = "ISTEKLO"; return; }
-            const h = Math.floor(diff / 3600000).toString().padStart(2, '0');
-            const m = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
-            const s = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
-            el.innerText = `${h}:${m}:${s}`;
+        function startTimer(key, expires) {
+            const update = () => {
+                const el = document.getElementById(`t-${key}`);
+                if (!el) return;
+                const diff = expires - Date.now();
+                if (diff <= 0) { el.innerText = "ISTEKLO"; return; }
+                const h = Math.floor(diff / 3600000).toString().padStart(2, '0');
+                const m = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
+                const s = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
+                el.innerText = `${h}:${m}:${s}`;
+            };
+            update();
+            setInterval(update, 1000);
         }
 
-        window.requestDelete = async function(key, creator) {
-            const pin = prompt(`Unesite PIN za nadimak "${creator}" da obrišete teren:`);
+        window.reqDel = async function(key, creator) {
+            const pin = prompt(`Unesite PIN za nadimak "${creator}":`);
             if (!pin) return;
             const userSnap = await db.ref('users/' + creator).get();
             if (userSnap.exists() && userSnap.val().pin === pin) {
                 await db.ref('tereni/' + key).remove();
-                alert("Teren obrisan!");
             } else alert("Pogrešan PIN!");
         }
 
@@ -213,7 +208,7 @@
                 currentLat = pos.coords.latitude; currentLon = pos.coords.longitude;
                 if (!userMarker) userMarker = L.marker([currentLat, currentLon], { icon: L.divIcon({ className:'', html:'<div class="user-dot"></div>', iconAnchor:[8,8] }) }).addTo(map);
                 else userMarker.setLatLng([currentLat, currentLon]);
-            });
+            }, null, { enableHighAccuracy: true });
         }
 
         function goToMyLocation() { if(currentLat) map.flyTo([currentLat, currentLon], 16); }
