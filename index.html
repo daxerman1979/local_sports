@@ -24,6 +24,7 @@
         }
         #hero h1 { color: #fff; font-family: 'Oswald', sans-serif; font-size: 3rem; text-align: center; margin-bottom: 10px; }
         .disclaimer { color: #ccc; font-family: Arial, sans-serif; font-size: 12px; text-align: center; max-width: 300px; margin-bottom: 30px; line-height: 1.4; }
+        
         #map { width: 100vw; height: 100vh; display: none; background: #111; }
         
         .search-container {
@@ -47,8 +48,19 @@
             display: none; justify-content: center; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
         }
         .location-btn img { width: 25px; height: 25px; }
-        
-        /* Markeri stil */
+
+        /* Stil za formu unutar mape */
+        .popup-form { padding: 10px; min-width: 180px; }
+        .popup-form input { 
+            width: 100%; padding: 8px; margin-bottom: 10px; 
+            border: 1px solid #ccc; border-radius: 5px; font-size: 14px;
+        }
+        .popup-form button { 
+            width: 100%; background: #007AFF; color: white; 
+            border: none; padding: 8px; border-radius: 5px; cursor: pointer;
+        }
+
+        /* GPS PLAVA TAČKA */
         .user-location-dot {
             width: 14px; height: 14px; background: #007AFF; border-radius: 50%;
             border: 2px solid white; position: relative;
@@ -87,13 +99,10 @@
 
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
     <script>
-        // Konfiguracija Firebase-a
-        const firebaseConfig = {
-            databaseURL: "https://hoodsports-162ca-default-rtdb.europe-west1.firebasedatabase.app/"
-        };
+        const firebaseConfig = { databaseURL: "https://hoodsports-162ca-default-rtdb.europe-west1.firebasedatabase.app/" };
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
@@ -118,9 +127,19 @@
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
             L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png').addTo(map);
 
-            // KLIK NA MAPU ZA DODAVANJE TERENA
             map.on('click', function(e) {
-                addTeren(e.latlng.lat, e.latlng.lng);
+                if (localStorage.getItem('terenPostavljen')) {
+                    L.popup().setLatLng(e.latlng).setContent("Već ste postavili teren!").openOn(map);
+                    return;
+                }
+                
+                const formHtml = `
+                    <div class="popup-form">
+                        <input type="text" id="nazivTerena" placeholder="Ime terena..." autofocus>
+                        <button onclick="saveTeren(${e.latlng.lat}, ${e.latlng.lng})">Sačuvaj</button>
+                    </div>
+                `;
+                L.popup().setLatLng(e.latlng).setContent(formHtml).openOn(map);
             });
 
             if (navigator.geolocation) {
@@ -128,7 +147,6 @@
                     currentLat = position.coords.latitude;
                     currentLon = position.coords.longitude;
                     if (!userMarker) {
-                        map.setView([currentLat, currentLon], 15);
                         userMarker = L.marker([currentLat, currentLon], {
                             icon: L.divIcon({ className: 'custom-div-icon', html: '<div class="user-location-dot"></div>', iconSize: [14, 14], iconAnchor: [7, 7] })
                         }).addTo(map);
@@ -139,33 +157,26 @@
             }
         }
 
-        function addTeren(lat, lng) {
-            // Provera da li je korisnik već postavio teren
-            if (localStorage.getItem('terenPostavljen')) {
-                alert("Već ste postavili jedan teren. Hvala!");
-                return;
-            }
-
-            const naziv = prompt("Unesite ime sportskog terena:");
+        window.saveTeren = function(lat, lng) {
+            const naziv = document.getElementById('nazivTerena').value;
             if (naziv && naziv.trim().length > 2) {
-                const noviTerenRef = database.ref('tereni').push();
-                noviTerenRef.set({
+                database.ref('tereni').push({
                     naziv: naziv,
                     lat: lat,
-                    lng: lng,
-                    vreme: Date.now()
+                    lng: lng
                 }).then(() => {
                     localStorage.setItem('terenPostavljen', 'true');
+                    map.closePopup();
                 });
             }
-        }
+        };
 
         function loadTereni() {
             database.ref('tereni').on('child_added', (snapshot) => {
                 const data = snapshot.val();
-                L.marker([data.lat, data.lng]).addTo(map)
-                 .bindPopup(`<b>${data.naziv}</b>`)
-                 .openPopup();
+                L.marker([data.lat, data.lng])
+                 .addTo(map)
+                 .bindPopup(`<b style="font-size:16px;">${data.naziv}</b>`);
             });
         }
 
