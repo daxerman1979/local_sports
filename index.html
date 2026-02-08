@@ -42,9 +42,9 @@
         }
         .btn-primary { background: #007AFF; color: white; box-shadow: 0 4px 15px rgba(0,122,255,0.4); }
         .btn-google { background: white; color: #444; margin-top: 15px; }
-        .btn-outline { background: transparent; color: #fff; font-size: 14px; text-decoration: underline; margin-top: 15px; border:none; width: auto; display: inline-block;}
+        .btn-outline { background: transparent; color: #fff; font-size: 14px; text-decoration: underline; margin-top: 15px; border:none; width: auto; display: inline-block; cursor: pointer; }
 
-        .separator { margin: 20px 0; color: rgba(255,255,255,0.5); font-size: 12px; display: flex; align-items: center; }
+        .separator { margin: 15px 0; color: rgba(255,255,255,0.5); font-size: 12px; display: flex; align-items: center; }
         .separator::before, .separator::after { content: ""; flex: 1; height: 1px; background: rgba(255,255,255,0.2); margin: 0 10px; }
 
         /* MAPA */
@@ -69,11 +69,19 @@
         }
 
         .user-dot { width: 14px; height: 14px; background: #007AFF; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 10px #007AFF; }
+        
+        /* Loading overlay */
+        #loader {
+            position: fixed; top:0; left:0; width:100%; height:100%; background: black;
+            display: flex; justify-content: center; align-items: center; z-index: 9999; color: white;
+        }
     </style>
 </head>
 <body>
 
-    <div id="hero">
+    <div id="loader">Učitavanje...</div>
+
+    <div id="hero" style="display: none;">
         <h1 id="authTitle">SPORT SATELIT</h1>
         <div class="auth-card">
             <input type="email" id="email" placeholder="Email adresa">
@@ -86,7 +94,7 @@
                 <img src="https://cdn-icons-png.flaticon.com/512/2991/2991148.png" width="20"> Nastavi sa Google-om
             </button>
 
-            <button class="btn btn-outline" id="toggleBtn" onclick="toggleMode()">Nemaš nalog? Registruj se</button>
+            <div id="toggleBtn" class="btn-outline" onclick="toggleMode()">Nemaš nalog? Registruj se</div>
         </div>
     </div>
 
@@ -105,6 +113,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script>
+        // 1. Inicijalizacija
         const firebaseConfig = { 
             databaseURL: "https://hoodsports-162ca-default-rtdb.europe-west1.firebasedatabase.app/" 
         };
@@ -115,39 +124,41 @@
         let map, userMarker, currentLat, currentLon, isRegisterMode = false;
         let userProfile = null;
 
+        // 2. Praćenje stanja prijave (Ovo rešava grešku sa inicijalizacijom)
         auth.onAuthStateChanged(user => {
+            document.getElementById('loader').style.display = 'none';
             if (user) {
                 checkAndLoadProfile(user);
             } else {
                 document.getElementById('hero').style.display = 'flex';
                 document.getElementById('map').style.display = 'none';
-                document.getElementById('searchBox').style.display = 'none';
-                document.getElementById('locBtn').style.display = 'none';
-                document.getElementById('logoutBtn').style.display = 'none';
             }
         });
 
+        // 3. Google Login Funkcija
         async function loginWithGoogle() {
             const provider = new firebase.auth.GoogleAuthProvider();
             try {
                 await auth.signInWithPopup(provider);
             } catch (err) {
-                alert("Greška pri Google prijavi: " + err.message);
+                alert("Google greška: " + err.message);
             }
         }
 
+        // 4. Email/Password Login i Registracija
         async function handleAuth() {
             const email = document.getElementById('email').value.trim();
             const pass = document.getElementById('password').value;
 
             if (!email || pass.length < 6) {
-                alert("Unesite ispravan email i lozinku (min 6 karaktera).");
+                alert("Unesite email i lozinku (min 6 karaktera).");
                 return;
             }
 
             try {
                 if (isRegisterMode) {
                     await auth.createUserWithEmailAndPassword(email, pass);
+                    alert("Uspešna registracija!");
                 } else {
                     await auth.signInWithEmailAndPassword(email, pass);
                 }
@@ -156,17 +167,19 @@
             }
         }
 
+        // 5. Učitavanje korisničkog profila iz baze
         async function checkAndLoadProfile(user) {
             const userRef = db.ref('users/' + user.uid);
             const snap = await userRef.get();
             
             if (!snap.exists()) {
+                // Ako je novi korisnik (Google ili prva registracija)
+                userProfile = { hasPlaced: false, email: user.email };
                 await userRef.set({
                     hasPlaced: false,
                     email: user.email,
                     createdAt: Date.now()
                 });
-                userProfile = { uid: user.uid, hasPlaced: false, email: user.email };
             } else {
                 userProfile = { uid: user.uid, ...snap.val() };
             }
@@ -175,15 +188,12 @@
         }
 
         function enterApp() {
-            document.getElementById('hero').style.opacity = '0';
-            setTimeout(() => {
-                document.getElementById('hero').style.display = 'none';
-                document.getElementById('map').style.display = 'block';
-                document.getElementById('searchBox').style.display = 'block';
-                document.getElementById('locBtn').style.display = 'flex';
-                document.getElementById('logoutBtn').style.display = 'block';
-                if(!map) initMap();
-            }, 500);
+            document.getElementById('hero').style.display = 'none';
+            document.getElementById('map').style.display = 'block';
+            document.getElementById('searchBox').style.display = 'block';
+            document.getElementById('locBtn').style.display = 'flex';
+            document.getElementById('logoutBtn').style.display = 'block';
+            if(!map) initMap();
         }
 
         function initMap() {
@@ -192,14 +202,14 @@
             L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png').addTo(map);
 
             map.on('click', e => {
-                if (userProfile.hasPlaced) {
-                    L.popup().setLatLng(e.latlng).setContent("<p style='padding:5px;'>Limit: 1 teren po nalogu.</p>").openOn(map);
+                if (userProfile && userProfile.hasPlaced) {
+                    L.popup().setLatLng(e.latlng).setContent("<p style='padding:5px;'>Dozvoljen je samo 1 teren po nalogu.</p>").openOn(map);
                     return;
                 }
                 const html = `
                     <div style="padding:10px; min-width:150px;">
                         <input type="text" id="tName" placeholder="Ime terena..." style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #ccc; border-radius:5px;">
-                        <button onclick="saveTeren(${e.latlng.lat}, ${e.latlng.lng})" style="width:100%; background:#007AFF; color:white; border:none; padding:10px; border-radius:5px; font-weight:bold; cursor:pointer;">DODAJ TEREN</button>
+                        <button onclick="saveTeren(${e.latlng.lat}, ${e.latlng.lng})" style="width:100%; background:#007AFF; color:white; border:none; padding:10px; border-radius:5px; font-weight:bold; cursor:pointer;">DODAJ</button>
                     </div>`;
                 L.popup().setLatLng(e.latlng).setContent(html).openOn(map);
             });
@@ -217,13 +227,13 @@
                     name: name, 
                     lat: lat, 
                     lng: lng, 
-                    creator: userProfile.email 
+                    creator: auth.currentUser.email 
                 });
-                await db.ref('users/' + userProfile.uid).update({ hasPlaced: true });
+                await db.ref('users/' + auth.currentUser.uid).update({ hasPlaced: true });
                 userProfile.hasPlaced = true;
                 map.closePopup();
             } catch (e) {
-                alert("Greška pri čuvanju.");
+                alert("Greška pri čuvanju podataka.");
             }
         };
 
