@@ -20,7 +20,6 @@
         .search-container { position: absolute; top: 15px; left: 15px; right: 15px; z-index: 1000; display: none; }
         #search-input { width: 100%; height: 50px; border-radius: 25px; border: 2px solid #007AFF; padding: 0 20px; font-size: 16px; outline: none; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
 
-        /* MARKER I KARTICE */
         .sport-marker-wrapper { display: flex; align-items: center; white-space: nowrap; cursor: pointer; }
         .sport-ball { font-size: 32px; z-index: 20; filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.4)); }
         
@@ -33,7 +32,7 @@
         }
 
         .match-info { font-size: 13px; font-weight: bold; color: #333; }
-        .match-score { font-size: 22px; color: #007AFF; font-family: 'Oswald', sans-serif; margin: 2px 0; }
+        .match-score { font-size: 24px; color: #007AFF; font-family: 'Oswald', sans-serif; margin: 2px 0; }
         .match-status { font-size: 10px; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; align-self: flex-start; font-weight: bold; }
         .status-live { background: #ff3b30; color: white; animation: blink 1s infinite; }
         .status-upcoming { background: #4cd964; color: white; }
@@ -41,8 +40,9 @@
 
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
+        /* KONTROLE - Vidljive samo vlasniku */
         .owner-controls {
-            background: #f9f9f9; border: 2px solid #333; border-radius: 12px 0 0 12px;
+            background: #f1f1f1; border: 2px solid #333; border-radius: 12px 0 0 12px;
             padding: 5px 12px 5px 8px; margin-right: -15px;
             display: flex; flex-direction: column; gap: 4px; z-index: 5;
         }
@@ -102,13 +102,13 @@
             map.on('click', e => {
                 const sn = localStorage.getItem('app_nick') || '';
                 const html = `<div class="popup-box">
-                    <b style="text-align:center">POSTAVI TEREN I MEČ</b>
+                    <b style="text-align:center">DODAJ TEREN I MEČ</b>
                     <input type="text" id="p_nick" placeholder="Tvoj Nadimak" value="${sn}">
                     <select id="p_sport"><option value="Fudbal">Fudbal</option><option value="Košarka">Košarka</option><option value="Rukomet">Rukomet</option><option value="Hokej">Hokej</option><option value="Odbojka">Odbojka</option><option value="Tenis">Tenis</option></select>
                     <input type="text" id="p_name" placeholder="Ime terena">
                     <input type="text" id="p_t1" placeholder="Tim 1">
                     <input type="text" id="p_t2" placeholder="Tim 2">
-                    <input type="text" id="p_time" placeholder="Vreme (npr. 20:30h)">
+                    <input type="text" id="p_time" placeholder="Vreme (npr. 18:00)">
                     <input type="password" id="p_pin" placeholder="PIN (6 simbola)" maxlength="6">
                     <button onclick="processTeren(${e.latlng.lat}, ${e.latlng.lng})">SAČUVAJ</button>
                 </div>`;
@@ -121,37 +121,38 @@
 
         async function processTeren(lat, lng) {
             const nick = document.getElementById('p_nick').value.trim().toLowerCase();
-            const sport = document.getElementById('p_sport').value;
+            const pin = document.getElementById('p_pin').value;
             const name = document.getElementById('p_name').value.trim();
+            const sport = document.getElementById('p_sport').value;
             const t1 = document.getElementById('p_t1').value.trim() || "Tim 1";
             const t2 = document.getElementById('p_t2').value.trim() || "Tim 2";
             const time = document.getElementById('p_time').value.trim() || "Uskoro";
-            const pin = document.getElementById('p_pin').value;
 
-            if (nick.length < 3 || pin.length !== 6) return alert("Nick i PIN (6 cifara) obavezni!");
+            if (nick.length < 3 || pin.length !== 6) return alert("Nick i PIN obavezni!");
 
             const userRef = db.ref('users/' + nick);
             const snap = await userRef.get();
             const expires = Date.now() + (24 * 60 * 60 * 1000);
 
-            const matchData = {
-                name, sport, lat, lng, creator: nick, expires,
-                t1, t2, score1: 0, score2: 0, 
-                startTime: time,
-                status: "upcoming"
-            };
+            const matchData = { name, sport, lat, lng, creator: nick, expires, t1, t2, score1: 0, score2: 0, startTime: time, status: "upcoming" };
 
-            if (snap.exists() && snap.val().pin === pin) {
-                if (snap.val().lastTerenKey) await db.ref('tereni/' + snap.val().lastTerenKey).remove();
-                const newRef = db.ref('tereni').push();
-                await newRef.set(matchData);
-                await userRef.update({ lastTerenKey: newRef.key });
-            } else if (!snap.exists()) {
+            if (snap.exists()) {
+                if (snap.val().pin === pin) {
+                    sessionStorage.setItem('verified_pin', pin);
+                    sessionStorage.setItem('active_nick', nick);
+                    if (snap.val().lastTerenKey) await db.ref('tereni/' + snap.val().lastTerenKey).remove();
+                    const newRef = db.ref('tereni').push();
+                    await newRef.set(matchData);
+                    await userRef.update({ lastTerenKey: newRef.key });
+                } else return alert("Pogrešan PIN!");
+            } else {
                 await userRef.set({ pin: pin });
+                sessionStorage.setItem('verified_pin', pin);
+                sessionStorage.setItem('active_nick', nick);
                 const newRef = db.ref('tereni').push();
                 await newRef.set(matchData);
                 await userRef.update({ lastTerenKey: newRef.key });
-            } else return alert("Pogrešan PIN!");
+            }
 
             localStorage.setItem('app_nick', nick);
             map.closePopup();
@@ -160,22 +161,30 @@
         function syncData() {
             db.ref('tereni').on('value', snap => {
                 markersLayer.clearLayers();
+                const sessionNick = sessionStorage.getItem('active_nick');
+                const sessionPin = sessionStorage.getItem('verified_pin');
+
                 snap.forEach(child => {
                     const d = child.val();
                     const key = child.key;
                     if (Date.now() > d.expires) { child.ref.remove(); return; }
 
+                    const isOwner = (sessionNick === d.creator);
+
+                    const controls = isOwner ? `
+                        <div class="owner-controls">
+                            <button class="btn-sm btn-blue" onclick="event.stopPropagation(); changeStatus('${key}', 'live')">LIVE</button>
+                            <button class="btn-sm btn-red" onclick="event.stopPropagation(); updateScore('${key}', 1)">+ T1</button>
+                            <button class="btn-sm btn-red" onclick="event.stopPropagation(); updateScore('${key}', 2)">+ T2</button>
+                            <button class="btn-sm btn-blue" onclick="event.stopPropagation(); changeStatus('${key}', 'ended')">KRAJ</button>
+                            <button class="btn-sm btn-red" onclick="event.stopPropagation(); reqDel('${key}')">DEL</button>
+                        </div>` : '';
+
                     const customIcon = L.divIcon({
                         className: '',
                         html: `
                             <div class="sport-marker-wrapper">
-                                <div class="owner-controls">
-                                    <button class="btn-sm btn-blue" onclick="event.stopPropagation(); changeStatus('${key}', 'live')">LIVE</button>
-                                    <button class="btn-sm btn-red" onclick="event.stopPropagation(); updateScore('${key}', 1)">+ T1</button>
-                                    <button class="btn-sm btn-red" onclick="event.stopPropagation(); updateScore('${key}', 2)">+ T2</button>
-                                    <button class="btn-sm btn-blue" onclick="event.stopPropagation(); changeStatus('${key}', 'ended')">KRAJ</button>
-                                    <button class="btn-sm btn-red" onclick="event.stopPropagation(); reqDel('${key}', '${d.creator}')">DEL</button>
-                                </div>
+                                ${controls}
                                 <div class="sport-ball">${sportEmojis[d.sport] || "⚽"}</div>
                                 <div class="live-card">
                                     <span class="match-status status-${d.status}">${d.status}</span>
@@ -193,31 +202,20 @@
             });
         }
 
-        window.updateScore = async function(key, team) {
-            const pin = prompt("Unesite PIN:");
-            const snap = await db.ref('tereni/' + key).get();
-            const creatorSnap = await db.ref('users/' + snap.val().creator).get();
-            if (creatorSnap.val().pin === pin) {
+        window.updateScore = function(key, team) {
+            db.ref('tereni/' + key).get().then(snap => {
                 const updates = {};
                 updates['score' + team] = (snap.val()['score' + team] || 0) + 1;
                 db.ref('tereni/' + key).update(updates);
-            } else alert("Pogrešan PIN!");
+            });
         };
 
-        window.changeStatus = async function(key, newStatus) {
-            const pin = prompt("Unesite PIN:");
-            const snap = await db.ref('tereni/' + key).get();
-            const creatorSnap = await db.ref('users/' + snap.val().creator).get();
-            if (creatorSnap.val().pin === pin) {
-                db.ref('tereni/' + key).update({ status: newStatus });
-            } else alert("Pogrešan PIN!");
+        window.changeStatus = function(key, newStatus) {
+            db.ref('tereni/' + key).update({ status: newStatus });
         };
 
-        window.reqDel = async function(key, creator) {
-            const pin = prompt("Unesite PIN za brisanje:");
-            const userSnap = await db.ref('users/' + creator).get();
-            if (userSnap.val().pin === pin) db.ref('tereni/' + key).remove();
-            else alert("Pogrešan PIN!");
+        window.reqDel = function(key) {
+            if(confirm("Obrisati teren?")) db.ref('tereni/' + key).remove();
         };
 
         function trackGPS() {
@@ -229,13 +227,6 @@
         }
 
         function goToMyLocation() { if(currentLat) map.flyTo([currentLat, currentLon], 16); }
-
-        document.getElementById('search-input').addEventListener('keypress', e => {
-            if(e.key === 'Enter') {
-                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(e.target.value)}`)
-                .then(r => r.json()).then(data => { if(data[0]) map.setView([data[0].lat, data[0].lon], 14); });
-            }
-        });
     </script>
 </body>
 </html>
