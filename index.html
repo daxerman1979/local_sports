@@ -25,13 +25,12 @@
             z-index: 2000; transition: 0.8s; text-align: center; padding: 20px;
         }
         #hero h1 { color: #fff; font-family: 'Oswald', sans-serif; font-size: 3rem; margin-bottom: 20px; }
-        .disclaimer { color: #bbb; font-size: 11px; max-width: 250px; margin-bottom: 20px; }
 
         /* MAPA I ELEMENTI */
-        #map { width: 100vw; height: 100vh; background: #111; z-index: 1; }
+        #map { width: 100vw; height: 100vh; background: #111; display: none; }
         
         .search-container { 
-            position: absolute; top: 15px; left: 15px; right: 15px; z-index: 1000; 
+            position: absolute; top: 15px; left: 15px; right: 15px; z-index: 1000; display: none;
         }
         #search-input { 
             width: 100%; height: 50px; border-radius: 25px; border: 2px solid #007AFF; 
@@ -41,14 +40,26 @@
         .location-btn { 
             position: absolute; bottom: 30px; right: 20px; z-index: 1000; 
             width: 55px; height: 55px; background: white; border-radius: 50%; 
-            display: flex; justify-content: center; align-items: center; 
+            display: none; justify-content: center; align-items: center; 
             box-shadow: 0 4px 15px rgba(0,0,0,0.4); cursor: pointer; 
         }
 
         /* POPUP FORMA */
-        .popup-box { padding: 5px; min-width: 200px; display: flex; flex-direction: column; gap: 8px; }
-        .popup-box input { padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; width: 100%; }
+        .popup-box { padding: 5px; min-width: 220px; display: flex; flex-direction: column; gap: 8px; }
+        .popup-box input, .popup-box select { padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; width: 100%; }
         .popup-box button { background: #007AFF; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+
+        /* CUSTOM MARKER - LOPTICA I KARTICA */
+        .ball-marker {
+            display: flex; flex-direction: column; align-items: center;
+        }
+        .ball-label {
+            background: white; padding: 4px 10px; border-radius: 12px; font-weight: bold;
+            font-size: 13px; box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            white-space: nowrap; margin-bottom: 5px; border: 1px solid #007AFF;
+            position: relative;
+        }
+        .ball-img { width: 30px; height: 30px; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.5)); }
         
         .user-dot { width: 16px; height: 16px; background: #007AFF; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 10px #007AFF; }
     </style>
@@ -57,21 +68,17 @@
 
     <div id="hero" onclick="startApp()">
         <h1>ALL SPORTS LOCAL</h1>
-        <div class="disclaimer">
-            Sajt je zabavnog karaktera. Informacije su nezvanične. Vlasnik ne odgovara za sadržaj. 
-            Postavljanjem terena prihvatate uslove.
-        </div>
         <div style="border: 2px solid white; border-radius: 50%; padding: 20px; cursor: pointer;">
             <img src="https://cdn-icons-png.flaticon.com/512/857/857418.png" width="50">
         </div>
-        <p style="color:white; margin-top:15px; font-size:14px;">KLIKNI ZA START</p>
+        <p style="color:white; margin-top:15px; font-size:14px;">DODIRNI ZA ULAZ</p>
     </div>
 
-    <div class="search-container">
+    <div class="search-container" id="sContainer">
         <input type="text" id="search-input" placeholder="Pretraži grad ili ulicu..." autocomplete="off">
     </div>
 
-    <div class="location-btn" onclick="goToMyLocation()">
+    <div class="location-btn" id="lBtn" onclick="goToMyLocation()">
         <img src="https://cdn-icons-png.flaticon.com/512/1865/1865269.png" width="28">
     </div>
 
@@ -89,13 +96,29 @@
         let map, userMarker, currentLat, currentLon;
         let markersLayer = L.layerGroup();
 
+        // Slike loptica za sportove
+        const ballIcons = {
+            "Fudbal": "https://cdn-icons-png.flaticon.com/512/53/53283.png",
+            "Košarka": "https://cdn-icons-png.flaticon.com/512/2503/2503450.png",
+            "Rukomet": "https://cdn-icons-png.flaticon.com/512/2906/2906666.png",
+            "Hokej": "https://cdn-icons-png.flaticon.com/512/913/913809.png",
+            "Odbojka": "https://cdn-icons-png.flaticon.com/512/1162/1162151.png",
+            "Tenis": "https://cdn-icons-png.flaticon.com/512/3106/3106403.png"
+        };
+
         function startApp() {
             document.getElementById('hero').style.opacity = '0';
-            setTimeout(() => { document.getElementById('hero').style.display = 'none'; }, 800);
-            if (!map) initMap();
+            setTimeout(() => { 
+                document.getElementById('hero').style.display = 'none'; 
+                document.getElementById('map').style.display = 'block';
+                document.getElementById('sContainer').style.display = 'block';
+                document.getElementById('lBtn').style.display = 'flex';
+                initMap();
+            }, 800);
         }
 
         function initMap() {
+            if (map) return;
             map = L.map('map', { zoomControl: false, tap: false }).setView([44.7866, 20.4489], 13);
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
             L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png').addTo(map);
@@ -105,12 +128,19 @@
                 const savedNick = localStorage.getItem('app_nick') || '';
                 const html = `
                     <div class="popup-box">
-                        <b style="text-align:center">DODAJ / ZAMENI TEREN</b>
+                        <b style="text-align:center">POSTAVI TEREN</b>
                         <input type="text" id="p_nick" placeholder="Tvoj Nadimak" value="${savedNick}">
-                        <input type="text" id="p_name" placeholder="Ime terena">
+                        <select id="p_sport">
+                            <option value="Fudbal">Fudbal</option>
+                            <option value="Košarka">Košarka</option>
+                            <option value="Rukomet">Rukomet</option>
+                            <option value="Hokej">Hokej</option>
+                            <option value="Odbojka">Odbojka</option>
+                            <option value="Tenis">Tenis</option>
+                        </select>
+                        <input type="text" id="p_name" placeholder="Ime terena (npr. Blok 5)">
                         <input type="password" id="p_pin" placeholder="PIN (6 simbola)" maxlength="6">
-                        <button onclick="processTeren(${e.latlng.lat}, ${e.latlng.lng})">POTVRDI</button>
-                        <small style="font-size:9px; color:red; text-align:center;">*Novi teren automatski briše vaš stari.</small>
+                        <button onclick="processTeren(${e.latlng.lat}, ${e.latlng.lng})">SAČUVAJ</button>
                     </div>`;
                 L.popup().setLatLng(e.latlng).setContent(html).openOn(map);
             });
@@ -121,11 +151,12 @@
 
         async function processTeren(lat, lng) {
             const nick = document.getElementById('p_nick').value.trim().toLowerCase();
+            const sport = document.getElementById('p_sport').value;
             const name = document.getElementById('p_name').value.trim();
             const pin = document.getElementById('p_pin').value;
 
             if (nick.length < 3 || name.length < 2 || pin.length !== 6) {
-                alert("Nadimak (min 3), Ime terena i PIN (6 cifara) su obavezni!");
+                alert("Greška: Proverite PIN (6 cifara) i ostala polja!");
                 return;
             }
 
@@ -134,26 +165,24 @@
 
             if (snap.exists()) {
                 if (snap.val().pin === pin) {
-                    // Ako korisnik postoji i PIN je tačan, brišemo stari teren pre upisa novog
                     if (snap.val().lastTerenKey) {
                         await db.ref('tereni/' + snap.val().lastTerenKey).remove();
                     }
-                    saveNew(nick, name, lat, lng, userRef);
+                    saveNew(nick, name, sport, lat, lng, userRef);
                 } else {
-                    alert("Pogrešan PIN za ovaj nadimak!");
+                    alert("Pogrešan PIN!");
                 }
             } else {
-                // Prva registracija nadimka i PIN-a
                 await userRef.set({ pin: pin });
-                saveNew(nick, name, lat, lng, userRef);
+                saveNew(nick, name, sport, lat, lng, userRef);
             }
         }
 
-        async function saveNew(nick, name, lat, lng, userRef) {
+        async function saveNew(nick, name, sport, lat, lng, userRef) {
             const newTerenRef = db.ref('tereni').push();
             const key = newTerenRef.key;
             
-            await newTerenRef.set({ name, lat, lng, creator: nick });
+            await newTerenRef.set({ name, sport, lat, lng, creator: nick });
             await userRef.update({ lastTerenKey: key });
             
             localStorage.setItem('app_nick', nick);
@@ -165,9 +194,21 @@
                 markersLayer.clearLayers();
                 snap.forEach(child => {
                     const d = child.val();
-                    const m = L.marker([d.lat, d.lng]).addTo(markersLayer);
-                    // Kartica sa imenom koja je stalno vidljiva ili se otvara na klik
-                    m.bindPopup(`<b style="font-size:16px;">${d.name}</b><br><small>Postavio: ${d.creator}</small>`).openPopup();
+                    const iconUrl = ballIcons[d.sport] || ballIcons["Fudbal"];
+                    
+                    const customIcon = L.divIcon({
+                        className: '',
+                        html: `
+                            <div class="ball-marker">
+                                <div class="ball-label">${d.name}</div>
+                                <img src="${iconUrl}" class="ball-img">
+                            </div>`,
+                        iconSize: [100, 60],
+                        iconAnchor: [50, 60]
+                    });
+
+                    L.marker([d.lat, d.lng], { icon: customIcon }).addTo(markersLayer)
+                     .bindPopup(`<b>Sport: ${d.sport}</b><br>Postavio: ${d.creator}`);
                 });
             });
         }
@@ -185,14 +226,11 @@
 
         function goToMyLocation() { if(currentLat) map.flyTo([currentLat, currentLon], 16); }
 
-        // PRETRAGA KOJA RADI NA MAPI
         document.getElementById('search-input').addEventListener('keypress', e => {
             if(e.key === 'Enter') {
-                const q = e.target.value;
-                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}`)
+                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(e.target.value)}`)
                 .then(r => r.json()).then(data => { 
                     if(data[0]) map.setView([data[0].lat, data[0].lon], 14); 
-                    else alert("Lokacija nije pronađena.");
                 });
             }
         });
