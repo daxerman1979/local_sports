@@ -16,26 +16,37 @@
             -webkit-text-size-adjust: 100%; font-family: 'Segoe UI', sans-serif;
         }
 
+        /* POCETNI EKRAN */
         #hero {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.8)), 
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.9)), 
                         url('https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=1470&auto=format&fit=crop') center/cover;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            z-index: 2000; transition: 0.8s;
+            z-index: 2000; transition: 0.8s; text-align: center; padding: 20px;
+        }
+        #hero h1 { color: #fff; font-family: 'Oswald', sans-serif; font-size: 3rem; margin-bottom: 20px; }
+        .disclaimer { color: #bbb; font-size: 11px; max-width: 250px; margin-bottom: 20px; }
+
+        /* MAPA I ELEMENTI */
+        #map { width: 100vw; height: 100vh; background: #111; z-index: 1; }
+        
+        .search-container { 
+            position: absolute; top: 15px; left: 15px; right: 15px; z-index: 1000; 
+        }
+        #search-input { 
+            width: 100%; height: 50px; border-radius: 25px; border: 2px solid #007AFF; 
+            padding: 0 20px; font-size: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); outline: none;
         }
 
-        #hero h1 { color: #fff; font-family: 'Oswald', sans-serif; font-size: 3.5rem; text-align: center; margin-bottom: 20px; }
+        .location-btn { 
+            position: absolute; bottom: 30px; right: 20px; z-index: 1000; 
+            width: 55px; height: 55px; background: white; border-radius: 50%; 
+            display: flex; justify-content: center; align-items: center; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4); cursor: pointer; 
+        }
 
-        #map { width: 100vw; height: 100vh; background: #111; }
-
-        /* UI */
-        .search-container { position: absolute; top: 15px; left: 15px; right: 15px; z-index: 1000; }
-        #search-input { width: 100%; height: 50px; border-radius: 25px; border: none; padding: 0 20px; font-size: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); outline: none; }
-
-        .location-btn { position: absolute; bottom: 30px; right: 20px; z-index: 1000; width: 55px; height: 55px; background: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.4); cursor: pointer; }
-
-        /* Popups */
-        .popup-box { padding: 10px; min-width: 200px; display: flex; flex-direction: column; gap: 8px; }
+        /* POPUP FORMA */
+        .popup-box { padding: 5px; min-width: 200px; display: flex; flex-direction: column; gap: 8px; }
         .popup-box input { padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; width: 100%; }
         .popup-box button { background: #007AFF; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
         
@@ -45,15 +56,19 @@
 <body>
 
     <div id="hero" onclick="startApp()">
-        <h1>ALL SPORTS<br>LOCAL</h1>
-        <div style="color: white; border: 2px solid white; border-radius: 50%; padding: 20px; cursor: pointer;">
-            <img src="https://cdn-icons-png.flaticon.com/512/857/857418.png" width="50" alt="Start">
+        <h1>ALL SPORTS LOCAL</h1>
+        <div class="disclaimer">
+            Sajt je zabavnog karaktera. Informacije su nezvanične. Vlasnik ne odgovara za sadržaj. 
+            Postavljanjem terena prihvatate uslove.
         </div>
-        <p style="color: #ccc; margin-top: 20px; font-size: 12px;">Klikni za ulaz</p>
+        <div style="border: 2px solid white; border-radius: 50%; padding: 20px; cursor: pointer;">
+            <img src="https://cdn-icons-png.flaticon.com/512/857/857418.png" width="50">
+        </div>
+        <p style="color:white; margin-top:15px; font-size:14px;">KLIKNI ZA START</p>
     </div>
 
     <div class="search-container">
-        <input type="text" id="search-input" placeholder="Pretraži grad ili ulicu...">
+        <input type="text" id="search-input" placeholder="Pretraži grad ili ulicu..." autocomplete="off">
     </div>
 
     <div class="location-btn" onclick="goToMyLocation()">
@@ -77,7 +92,7 @@
         function startApp() {
             document.getElementById('hero').style.opacity = '0';
             setTimeout(() => { document.getElementById('hero').style.display = 'none'; }, 800);
-            initMap();
+            if (!map) initMap();
         }
 
         function initMap() {
@@ -87,14 +102,15 @@
             markersLayer.addTo(map);
 
             map.on('click', e => {
-                const isReturning = localStorage.getItem('app_nick');
+                const savedNick = localStorage.getItem('app_nick') || '';
                 const html = `
                     <div class="popup-box">
-                        <b style="text-align:center">${isReturning ? 'Zameni stari teren' : 'Novo dodavanje'}</b>
-                        <input type="text" id="p_nick" placeholder="Tvoj Nadimak" value="${isReturning || ''}" ${isReturning ? 'disabled' : ''}>
-                        <input type="text" id="p_name" placeholder="Ime terena (npr. Basket Blok 70)">
-                        <input type="password" id="p_pin" placeholder="PIN (6 cifara)" maxlength="6">
-                        <button onclick="processTeren(${e.latlng.lat}, ${e.latlng.lng})">SAČUVAJ</button>
+                        <b style="text-align:center">DODAJ / ZAMENI TEREN</b>
+                        <input type="text" id="p_nick" placeholder="Tvoj Nadimak" value="${savedNick}">
+                        <input type="text" id="p_name" placeholder="Ime terena">
+                        <input type="password" id="p_pin" placeholder="PIN (6 simbola)" maxlength="6">
+                        <button onclick="processTeren(${e.latlng.lat}, ${e.latlng.lng})">POTVRDI</button>
+                        <small style="font-size:9px; color:red; text-align:center;">*Novi teren automatski briše vaš stari.</small>
                     </div>`;
                 L.popup().setLatLng(e.latlng).setContent(html).openOn(map);
             });
@@ -108,8 +124,8 @@
             const name = document.getElementById('p_name').value.trim();
             const pin = document.getElementById('p_pin').value;
 
-            if (!nick || !name || pin.length !== 6) {
-                alert("Sva polja su obavezna! PIN mora imati 6 cifara.");
+            if (nick.length < 3 || name.length < 2 || pin.length !== 6) {
+                alert("Nadimak (min 3), Ime terena i PIN (6 cifara) su obavezni!");
                 return;
             }
 
@@ -117,9 +133,8 @@
             const snap = await userRef.get();
 
             if (snap.exists()) {
-                // Korisnik postoji, proveri PIN
                 if (snap.val().pin === pin) {
-                    // Obriši stari teren ako postoji
+                    // Ako korisnik postoji i PIN je tačan, brišemo stari teren pre upisa novog
                     if (snap.val().lastTerenKey) {
                         await db.ref('tereni/' + snap.val().lastTerenKey).remove();
                     }
@@ -128,7 +143,7 @@
                     alert("Pogrešan PIN za ovaj nadimak!");
                 }
             } else {
-                // Potpuno novi korisnik
+                // Prva registracija nadimka i PIN-a
                 await userRef.set({ pin: pin });
                 saveNew(nick, name, lat, lng, userRef);
             }
@@ -136,14 +151,13 @@
 
         async function saveNew(nick, name, lat, lng, userRef) {
             const newTerenRef = db.ref('tereni').push();
-            const terenKey = newTerenRef.key;
+            const key = newTerenRef.key;
             
             await newTerenRef.set({ name, lat, lng, creator: nick });
-            await userRef.update({ lastTerenKey: terenKey });
+            await userRef.update({ lastTerenKey: key });
             
             localStorage.setItem('app_nick', nick);
             map.closePopup();
-            alert("Teren uspešno postavljen!");
         }
 
         function loadAllTereni() {
@@ -151,8 +165,9 @@
                 markersLayer.clearLayers();
                 snap.forEach(child => {
                     const d = child.val();
-                    L.marker([d.lat, d.lng]).addTo(markersLayer)
-                     .bindPopup(`<b>${d.name}</b><br><small>Vlasnik: ${d.creator}</small>`);
+                    const m = L.marker([d.lat, d.lng]).addTo(markersLayer);
+                    // Kartica sa imenom koja je stalno vidljiva ili se otvara na klik
+                    m.bindPopup(`<b style="font-size:16px;">${d.name}</b><br><small>Postavio: ${d.creator}</small>`).openPopup();
                 });
             });
         }
@@ -161,17 +176,24 @@
             navigator.geolocation.watchPosition(pos => {
                 currentLat = pos.coords.latitude; currentLon = pos.coords.longitude;
                 if (!userMarker) {
-                    userMarker = L.marker([currentLat, currentLon], { icon: L.divIcon({ className:'', html:'<div class="user-dot"></div>' }) }).addTo(map);
+                    userMarker = L.marker([currentLat, currentLon], { 
+                        icon: L.divIcon({ className:'', html:'<div class="user-dot"></div>', iconAnchor:[8,8] }) 
+                    }).addTo(map);
                 } else userMarker.setLatLng([currentLat, currentLon]);
             }, null, { enableHighAccuracy: true });
         }
 
         function goToMyLocation() { if(currentLat) map.flyTo([currentLat, currentLon], 16); }
 
+        // PRETRAGA KOJA RADI NA MAPI
         document.getElementById('search-input').addEventListener('keypress', e => {
             if(e.key === 'Enter') {
-                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(e.target.value)}`)
-                .then(r => r.json()).then(data => { if(data[0]) map.setView([data[0].lat, data[0].lon], 14); });
+                const q = e.target.value;
+                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}`)
+                .then(r => r.json()).then(data => { 
+                    if(data[0]) map.setView([data[0].lat, data[0].lon], 14); 
+                    else alert("Lokacija nije pronađena.");
+                });
             }
         });
     </script>
