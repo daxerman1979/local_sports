@@ -49,29 +49,28 @@
         .popup-box input, .popup-box select { padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; width: 100%; }
         .popup-box button { background: #007AFF; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
-        /* CUSTOM MARKER - PRAVA LOPTA I BOCNA KARTICA */
-        .custom-ball-marker {
+        /* KARTICA KOJA IZLAZI IZ LOPTE SA STRANE */
+        .sport-marker-wrapper {
             display: flex;
             align-items: center;
-            min-width: 200px;
+            white-space: nowrap;
         }
-        .ball-icon { 
-            width: 38px; height: 38px; 
+        .sport-ball {
+            font-size: 32px; /* Veličina lopte */
             z-index: 10;
-            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.4));
+            filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.4));
         }
-        .side-card {
-            background: white;
-            color: #111;
-            padding: 5px 12px 5px 20px;
-            border-radius: 0 20px 20px 0;
+        .sport-label {
+            background: rgba(255, 255, 255, 0.95);
+            color: #000;
             font-weight: 800;
             font-size: 14px;
-            margin-left: -18px; /* Ulazi pod loptu */
+            padding: 4px 12px 4px 18px;
+            border-radius: 0 15px 15px 0;
+            margin-left: -12px; /* Da ulazi pod loptu */
             border: 2px solid #007AFF;
             border-left: none;
-            box-shadow: 3px 3px 10px rgba(0,0,0,0.3);
-            white-space: nowrap;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
             z-index: 5;
         }
         
@@ -83,13 +82,13 @@
     <div id="hero" onclick="startApp()">
         <h1>ALL SPORTS LOCAL</h1>
         <div style="border: 2px solid white; border-radius: 50%; padding: 20px; cursor: pointer;">
-            <img src="https://cdn-icons-png.flaticon.com/512/857/857418.png" width="50">
+            <span style="font-size: 40px;">⚽</span>
         </div>
         <p style="color:white; margin-top:15px; font-size:14px;">DODIRNI ZA ULAZ</p>
     </div>
 
     <div class="search-container" id="sContainer">
-        <input type="text" id="search-input" placeholder="Pretraži grad ili ulicu...">
+        <input type="text" id="search-input" placeholder="Pretraži lokaciju...">
     </div>
 
     <div class="location-btn" id="lBtn" onclick="goToMyLocation()">
@@ -110,14 +109,14 @@
         let map, userMarker, currentLat, currentLon;
         let markersLayer = L.layerGroup();
 
-        // Prave, jasne ikone sportova
-        const sportBalls = {
-            "Fudbal": "https://cdn-icons-png.flaticon.com/512/53/53283.png",
-            "Košarka": "https://cdn-icons-png.flaticon.com/512/731/731962.png",
-            "Rukomet": "https://cdn-icons-png.flaticon.com/512/2906/2906666.png",
-            "Hokej": "https://cdn-icons-png.flaticon.com/512/913/913809.png",
-            "Odbojka": "https://cdn-icons-png.flaticon.com/512/1162/1162151.png",
-            "Tenis": "https://cdn-icons-png.flaticon.com/512/3106/3106403.png"
+        // Prave lopte (Emoji sistem - siguran prikaz)
+        const sportEmojis = {
+            "Fudbal": "⚽",
+            "Košarka": "🏀",
+            "Rukomet": "🤾",
+            "Hokej": "🏒",
+            "Odbojka": "🏐",
+            "Tenis": "🎾"
         };
 
         function startApp() {
@@ -206,17 +205,17 @@
                 markersLayer.clearLayers();
                 snap.forEach(child => {
                     const d = child.val();
-                    const iconUrl = sportBalls[d.sport] || sportBalls["Fudbal"];
+                    const emoji = sportEmojis[d.sport] || "⚽";
                     
                     const customIcon = L.divIcon({
                         className: '',
                         html: `
-                            <div class="custom-ball-marker">
-                                <img src="${iconUrl}" class="ball-icon">
-                                <div class="side-card">${d.name}</div>
+                            <div class="sport-marker-wrapper">
+                                <div class="sport-ball">${emoji}</div>
+                                <div class="sport-label">${d.name}</div>
                             </div>`,
                         iconSize: [40, 40],
-                        iconAnchor: [20, 20]
+                        iconAnchor: [15, 20]
                     });
 
                     L.marker([d.lat, d.lng], { icon: customIcon }).addTo(markersLayer)
