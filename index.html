@@ -49,31 +49,30 @@
         .popup-box input, .popup-box select { padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; width: 100%; }
         .popup-box button { background: #007AFF; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
-        /* CUSTOM MARKER - LOPTICA I BOCNA KARTICA */
-        .ball-marker-container {
+        /* CUSTOM MARKER - PRAVA LOPTA I BOCNA KARTICA */
+        .custom-ball-marker {
             display: flex;
             align-items: center;
-            justify-content: flex-start;
-            min-width: 150px;
+            min-width: 200px;
         }
-        .ball-img { 
-            width: 35px; height: 35px; 
-            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.4));
-            z-index: 2;
+        .ball-icon { 
+            width: 38px; height: 38px; 
+            z-index: 10;
+            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.4));
         }
-        .ball-label-side {
+        .side-card {
             background: white;
-            padding: 4px 12px 4px 20px;
-            border-radius: 0 15px 15px 0;
-            font-weight: 700;
-            font-size: 13px;
-            color: #333;
-            box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
-            margin-left: -15px; /* Preklapanje sa lopticom */
-            border: 1px solid #007AFF;
+            color: #111;
+            padding: 5px 12px 5px 20px;
+            border-radius: 0 20px 20px 0;
+            font-weight: 800;
+            font-size: 14px;
+            margin-left: -18px; /* Ulazi pod loptu */
+            border: 2px solid #007AFF;
             border-left: none;
+            box-shadow: 3px 3px 10px rgba(0,0,0,0.3);
             white-space: nowrap;
-            z-index: 1;
+            z-index: 5;
         }
         
         .user-dot { width: 16px; height: 16px; background: #007AFF; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 10px #007AFF; }
@@ -90,7 +89,7 @@
     </div>
 
     <div class="search-container" id="sContainer">
-        <input type="text" id="search-input" placeholder="Pretraži lokaciju...">
+        <input type="text" id="search-input" placeholder="Pretraži grad ili ulicu...">
     </div>
 
     <div class="location-btn" id="lBtn" onclick="goToMyLocation()">
@@ -111,13 +110,13 @@
         let map, userMarker, currentLat, currentLon;
         let markersLayer = L.layerGroup();
 
-        // Prave ikonice sportova
-        const ballIcons = {
-            "Fudbal": "https://cdn-icons-png.flaticon.com/512/33/33736.png",
-            "Košarka": "https://cdn-icons-png.flaticon.com/512/889/889455.png",
+        // Prave, jasne ikone sportova
+        const sportBalls = {
+            "Fudbal": "https://cdn-icons-png.flaticon.com/512/53/53283.png",
+            "Košarka": "https://cdn-icons-png.flaticon.com/512/731/731962.png",
             "Rukomet": "https://cdn-icons-png.flaticon.com/512/2906/2906666.png",
             "Hokej": "https://cdn-icons-png.flaticon.com/512/913/913809.png",
-            "Odbojka": "https://cdn-icons-png.flaticon.com/512/2312/2312523.png",
+            "Odbojka": "https://cdn-icons-png.flaticon.com/512/1162/1162151.png",
             "Tenis": "https://cdn-icons-png.flaticon.com/512/3106/3106403.png"
         };
 
@@ -143,7 +142,7 @@
                 const savedNick = localStorage.getItem('app_nick') || '';
                 const html = `
                     <div class="popup-box">
-                        <b style="text-align:center">POSTAVI TEREN</b>
+                        <b style="text-align:center">DODAJ TEREN</b>
                         <input type="text" id="p_nick" placeholder="Tvoj Nadimak" value="${savedNick}">
                         <select id="p_sport">
                             <option value="Fudbal">Fudbal</option>
@@ -155,7 +154,7 @@
                         </select>
                         <input type="text" id="p_name" placeholder="Ime terena">
                         <input type="password" id="p_pin" placeholder="PIN (6 simbola)" maxlength="6">
-                        <button onclick="processTeren(${e.latlng.lat}, ${e.latlng.lng})">SAČUVAJ</button>
+                        <button onclick="processTeren(${e.latlng.lat}, ${e.latlng.lng})">POTVRDI</button>
                     </div>`;
                 L.popup().setLatLng(e.latlng).setContent(html).openOn(map);
             });
@@ -171,7 +170,7 @@
             const pin = document.getElementById('p_pin').value;
 
             if (nick.length < 3 || name.length < 2 || pin.length !== 6) {
-                alert("Proverite unos! PIN mora imati 6 cifara.");
+                alert("Greška: PIN mora imati 6 cifara!");
                 return;
             }
 
@@ -207,21 +206,21 @@
                 markersLayer.clearLayers();
                 snap.forEach(child => {
                     const d = child.val();
-                    const iconUrl = ballIcons[d.sport] || ballIcons["Fudbal"];
+                    const iconUrl = sportBalls[d.sport] || sportBalls["Fudbal"];
                     
                     const customIcon = L.divIcon({
                         className: '',
                         html: `
-                            <div class="ball-marker-container">
-                                <img src="${iconUrl}" class="ball-img">
-                                <div class="ball-label-side">${d.name}</div>
+                            <div class="custom-ball-marker">
+                                <img src="${iconUrl}" class="ball-icon">
+                                <div class="side-card">${d.name}</div>
                             </div>`,
                         iconSize: [40, 40],
                         iconAnchor: [20, 20]
                     });
 
                     L.marker([d.lat, d.lng], { icon: customIcon }).addTo(markersLayer)
-                     .bindPopup(`<b>${d.sport}</b><br>Postavio: ${d.creator}`);
+                     .bindPopup(`<b>Sport: ${d.sport}</b><br>Postavio: ${d.creator}`);
                 });
             });
         }
