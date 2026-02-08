@@ -18,145 +18,146 @@
 
         #hero {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.9)), 
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.8)), 
                         url('https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=1470&auto=format&fit=crop') center/cover;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            z-index: 2000; padding: 20px;
+            z-index: 2000; transition: 0.8s;
         }
 
-        .auth-card {
-            background: rgba(255,255,255,0.15); padding: 30px; border-radius: 25px;
-            width: 100%; max-width: 380px; backdrop-filter: blur(15px);
-            border: 1px solid rgba(255,255,255,0.2); text-align: center;
-        }
+        #hero h1 { color: #fff; font-family: 'Oswald', sans-serif; font-size: 3.5rem; text-align: center; margin-bottom: 20px; }
 
-        .auth-card input { width: 100%; padding: 14px; margin: 10px 0; border-radius: 12px; border: none; font-size: 16px; }
+        #map { width: 100vw; height: 100vh; background: #111; }
 
-        .btn { width: 100%; padding: 14px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 16px; transition: 0.3s; }
-        .btn-primary { background: #007AFF; color: white; }
-        .btn-google { background: white; color: #444; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .btn-outline { background: transparent; color: #fff; font-size: 14px; text-decoration: underline; cursor: pointer; margin-top: 15px; }
+        /* UI */
+        .search-container { position: absolute; top: 15px; left: 15px; right: 15px; z-index: 1000; }
+        #search-input { width: 100%; height: 50px; border-radius: 25px; border: none; padding: 0 20px; font-size: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); outline: none; }
 
-        #map { width: 100vw; height: 100vh; display: none; }
-        .search-container { position: absolute; top: 15px; left: 15px; right: 15px; z-index: 3000; display: none; }
-        #search-input { width: 100%; height: 50px; border-radius: 25px; border: none; padding: 0 20px; font-size: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .location-btn { position: absolute; bottom: 30px; right: 20px; z-index: 1000; width: 55px; height: 55px; background: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.4); cursor: pointer; }
 
-        .logout-btn { position: absolute; bottom: 30px; left: 20px; z-index: 3100; background: rgba(255,0,0,0.8); color: white; padding: 10px 20px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; display: none; }
-        .location-btn { position: absolute; bottom: 30px; right: 20px; z-index: 3000; width: 55px; height: 55px; background: white; border-radius: 50%; display: none; justify-content: center; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.3); cursor: pointer; }
-        .user-dot { width: 14px; height: 14px; background: #007AFF; border-radius: 50%; border: 2px solid white; }
+        /* Popups */
+        .popup-box { padding: 10px; min-width: 200px; display: flex; flex-direction: column; gap: 8px; }
+        .popup-box input { padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; width: 100%; }
+        .popup-box button { background: #007AFF; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        
+        .user-dot { width: 16px; height: 16px; background: #007AFF; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 10px #007AFF; }
     </style>
 </head>
 <body>
 
-    <div id="hero">
-        <h1 id="authTitle" style="color:white; font-family:'Oswald';">ALL SPORTS LOCAL</h1>
-        <div class="auth-card">
-            <input type="email" id="email" placeholder="Email adresa">
-            <input type="password" id="password" placeholder="Lozinka (min 6 karaktera)">
-            <button class="btn btn-primary" onclick="handleAuth()" id="mainBtn">PRIJAVI SE</button>
-            <div style="color:white; margin:10px 0; font-size:12px;">ILI</div>
-            <button class="btn btn-google" onclick="loginWithGoogle()">
-                <img src="https://cdn-icons-png.flaticon.com/512/2991/2991148.png" width="20"> Google Prijava
-            </button>
-            <div class="btn-outline" id="toggleBtn" onclick="toggleMode()">Nemaš nalog? Registruj se</div>
+    <div id="hero" onclick="startApp()">
+        <h1>ALL SPORTS<br>LOCAL</h1>
+        <div style="color: white; border: 2px solid white; border-radius: 50%; padding: 20px; cursor: pointer;">
+            <img src="https://cdn-icons-png.flaticon.com/512/857/857418.png" width="50" alt="Start">
         </div>
+        <p style="color: #ccc; margin-top: 20px; font-size: 12px;">Klikni za ulaz</p>
     </div>
 
-    <div class="logout-btn" id="logoutBtn" onclick="logout()">ODJAVA</div>
-    <div class="search-container" id="searchBox">
+    <div class="search-container">
         <input type="text" id="search-input" placeholder="Pretraži grad ili ulicu...">
     </div>
-    <div class="location-btn" id="locBtn" onclick="goToMyLocation()">
-        <img src="https://cdn-icons-png.flaticon.com/512/1865/1865269.png" width="25">
+
+    <div class="location-btn" onclick="goToMyLocation()">
+        <img src="https://cdn-icons-png.flaticon.com/512/1865/1865269.png" width="28">
     </div>
+
     <div id="map"></div>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script>
-        // VAŠA NOVA KONFIGURACIJA
-        const firebaseConfig = { 
-            databaseURL: "https://allsportslocal-ea1d4-default-rtdb.europe-west1.firebasedatabase.app/" 
-        };
+        const firebaseConfig = { databaseURL: "https://allsportslocal-ea1d4-default-rtdb.europe-west1.firebasedatabase.app/" };
         firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
         const db = firebase.database();
 
-        let map, userMarker, currentLat, currentLon, isRegisterMode = false, userProfile = null;
+        let map, userMarker, currentLat, currentLon;
+        let markersLayer = L.layerGroup();
 
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                checkAndLoadProfile(user);
-            } else {
-                document.getElementById('hero').style.display = 'flex';
-                document.getElementById('map').style.display = 'none';
-                document.getElementById('searchBox').style.display = 'none';
-                document.getElementById('locBtn').style.display = 'none';
-                document.getElementById('logoutBtn').style.display = 'none';
-            }
-        });
-
-        async function loginWithGoogle() {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            try { await auth.signInWithPopup(provider); } catch (e) { alert(e.message); }
-        }
-
-        async function handleAuth() {
-            const email = document.getElementById('email').value.trim();
-            const pass = document.getElementById('password').value;
-            if (!email || pass.length < 6) return alert("Email i lozinka (min 6) su obavezni.");
-            try {
-                if (isRegisterMode) {
-                    await auth.createUserWithEmailAndPassword(email, pass);
-                } else {
-                    await auth.signInWithEmailAndPassword(email, pass);
-                }
-            } catch (e) { alert(e.message); }
-        }
-
-        async function checkAndLoadProfile(user) {
-            const userRef = db.ref('users/' + user.uid);
-            const snap = await userRef.get();
-            if (!snap.exists()) {
-                await userRef.set({ hasPlaced: false, email: user.email });
-                userProfile = { hasPlaced: false, email: user.email };
-            } else {
-                userProfile = snap.val();
-            }
-            showApp();
-        }
-
-        function showApp() {
-            document.getElementById('hero').style.display = 'none';
-            document.getElementById('map').style.display = 'block';
-            document.getElementById('searchBox').style.display = 'block';
-            document.getElementById('locBtn').style.display = 'flex';
-            document.getElementById('logoutBtn').style.display = 'block';
-            if (!map) initMap();
+        function startApp() {
+            document.getElementById('hero').style.opacity = '0';
+            setTimeout(() => { document.getElementById('hero').style.display = 'none'; }, 800);
+            initMap();
         }
 
         function initMap() {
             map = L.map('map', { zoomControl: false, tap: false }).setView([44.7866, 20.4489], 13);
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
             L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png').addTo(map);
+            markersLayer.addTo(map);
 
             map.on('click', e => {
-                if (userProfile && userProfile.hasPlaced) return alert("Možete dodati samo jedan teren.");
-                const html = `<div style="padding:10px;">
-                    <input type="text" id="tName" placeholder="Ime terena..." style="width:100%; padding:8px; margin-bottom:8px; border:1px solid #ccc; border-radius:5px;">
-                    <button onclick="saveTeren(${e.latlng.lat}, ${e.latlng.lng})" style="width:100%; background:#007AFF; color:white; border:none; padding:10px; border-radius:5px; font-weight:bold;">SAČUVAJ</button>
-                </div>`;
+                const isReturning = localStorage.getItem('app_nick');
+                const html = `
+                    <div class="popup-box">
+                        <b style="text-align:center">${isReturning ? 'Zameni stari teren' : 'Novo dodavanje'}</b>
+                        <input type="text" id="p_nick" placeholder="Tvoj Nadimak" value="${isReturning || ''}" ${isReturning ? 'disabled' : ''}>
+                        <input type="text" id="p_name" placeholder="Ime terena (npr. Basket Blok 70)">
+                        <input type="password" id="p_pin" placeholder="PIN (6 cifara)" maxlength="6">
+                        <button onclick="processTeren(${e.latlng.lat}, ${e.latlng.lng})">SAČUVAJ</button>
+                    </div>`;
                 L.popup().setLatLng(e.latlng).setContent(html).openOn(map);
             });
 
-            db.ref('tereni').on('child_added', snap => {
-                const d = snap.val();
-                L.marker([d.lat, d.lng]).addTo(map).bindPopup(`<b>${d.name}</b><br>Dodao: ${d.creator}`);
-            });
+            loadAllTereni();
+            trackGPS();
+        }
 
+        async function processTeren(lat, lng) {
+            const nick = document.getElementById('p_nick').value.trim().toLowerCase();
+            const name = document.getElementById('p_name').value.trim();
+            const pin = document.getElementById('p_pin').value;
+
+            if (!nick || !name || pin.length !== 6) {
+                alert("Sva polja su obavezna! PIN mora imati 6 cifara.");
+                return;
+            }
+
+            const userRef = db.ref('users/' + nick);
+            const snap = await userRef.get();
+
+            if (snap.exists()) {
+                // Korisnik postoji, proveri PIN
+                if (snap.val().pin === pin) {
+                    // Obriši stari teren ako postoji
+                    if (snap.val().lastTerenKey) {
+                        await db.ref('tereni/' + snap.val().lastTerenKey).remove();
+                    }
+                    saveNew(nick, name, lat, lng, userRef);
+                } else {
+                    alert("Pogrešan PIN za ovaj nadimak!");
+                }
+            } else {
+                // Potpuno novi korisnik
+                await userRef.set({ pin: pin });
+                saveNew(nick, name, lat, lng, userRef);
+            }
+        }
+
+        async function saveNew(nick, name, lat, lng, userRef) {
+            const newTerenRef = db.ref('tereni').push();
+            const terenKey = newTerenRef.key;
+            
+            await newTerenRef.set({ name, lat, lng, creator: nick });
+            await userRef.update({ lastTerenKey: terenKey });
+            
+            localStorage.setItem('app_nick', nick);
+            map.closePopup();
+            alert("Teren uspešno postavljen!");
+        }
+
+        function loadAllTereni() {
+            db.ref('tereni').on('value', snap => {
+                markersLayer.clearLayers();
+                snap.forEach(child => {
+                    const d = child.val();
+                    L.marker([d.lat, d.lng]).addTo(markersLayer)
+                     .bindPopup(`<b>${d.name}</b><br><small>Vlasnik: ${d.creator}</small>`);
+                });
+            });
+        }
+
+        function trackGPS() {
             navigator.geolocation.watchPosition(pos => {
                 currentLat = pos.coords.latitude; currentLon = pos.coords.longitude;
                 if (!userMarker) {
@@ -165,25 +166,6 @@
             }, null, { enableHighAccuracy: true });
         }
 
-        window.saveTeren = async function(lat, lng) {
-            const name = document.getElementById('tName').value.trim();
-            if (name.length < 2) return;
-            try {
-                await db.ref('tereni').push({ name, lat, lng, creator: auth.currentUser.email });
-                await db.ref('users/' + auth.currentUser.uid).update({ hasPlaced: true });
-                userProfile.hasPlaced = true;
-                map.closePopup();
-            } catch (e) { alert("Greška: " + e.message); }
-        }
-
-        function toggleMode() {
-            isRegisterMode = !isRegisterMode;
-            document.getElementById('authTitle').innerText = isRegisterMode ? "REGISTRACIJA" : "ALL SPORTS LOCAL";
-            document.getElementById('mainBtn').innerText = isRegisterMode ? "NAPRAVI NALOG" : "PRIJAVI SE";
-            document.getElementById('toggleBtn').innerText = isRegisterMode ? "Nazad na prijavu" : "Nemaš nalog? Registruj se";
-        }
-
-        function logout() { auth.signOut().then(() => location.reload()); }
         function goToMyLocation() { if(currentLat) map.flyTo([currentLat, currentLon], 16); }
 
         document.getElementById('search-input').addEventListener('keypress', e => {
