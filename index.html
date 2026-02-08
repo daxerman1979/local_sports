@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Sport Satelit</title>
+    <title>Sport Satelit PRO</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&display=swap" rel="stylesheet">
@@ -13,192 +13,190 @@
         html, body { 
             margin: 0; padding: 0; height: 100%; width: 100%; 
             overflow: hidden; background: #000; position: fixed;
-            -webkit-text-size-adjust: 100%;
+            -webkit-text-size-adjust: 100%; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
+
+        /* AUTH SCREEN */
         #hero {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.8)), 
+            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.9)), 
                         url('https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1000&auto=format&fit=crop') center/cover;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            z-index: 2000; transition: 0.5s; padding: 20px;
+            z-index: 2000; padding: 20px; transition: 0.5s;
         }
-        #hero h1 { color: #fff; font-family: 'Oswald', sans-serif; font-size: 3rem; text-align: center; margin-bottom: 10px; }
-        .disclaimer { color: #ccc; font-family: Arial, sans-serif; font-size: 12px; text-align: center; max-width: 300px; margin-bottom: 30px; line-height: 1.4; }
+        #hero h1 { color: #fff; font-family: 'Oswald', sans-serif; font-size: 2.5rem; margin-bottom: 20px; text-align: center; }
         
-        #map { width: 100vw; height: 100vh; display: none; background: #111; }
-        
+        .auth-card {
+            background: rgba(255,255,255,0.1); padding: 25px; border-radius: 20px;
+            width: 100%; max-width: 350px; backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1); text-align: center;
+        }
+        .auth-card input {
+            width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: none; font-size: 16px;
+        }
+        .btn {
+            width: 100%; padding: 12px; border: none; border-radius: 10px; 
+            font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px;
+        }
+        .btn-primary { background: #007AFF; color: white; }
+        .btn-outline { background: transparent; color: #aaa; font-size: 14px; text-decoration: underline; }
+
+        /* MAP UI */
+        #map { width: 100vw; height: 100vh; display: none; }
         .search-container {
-            position: absolute; top: 15px; right: 15px; z-index: 3000;
-            display: none; align-items: center; width: calc(100% - 30px);
+            position: absolute; top: 15px; left: 15px; right: 15px; z-index: 3000;
+            display: none; align-items: center;
         }
         #search-input {
-            height: 50px; border-radius: 25px; border: 2px solid #007AFF; width: 0; opacity: 0;
-            transition: width 0.3s ease, opacity 0.3s ease; font-size: 16px !important; 
-            padding: 0; background: white; color: #000; outline: none;
+            flex: 1; height: 50px; border-radius: 25px; border: 2px solid #007AFF;
+            padding: 0 20px; font-size: 16px; outline: none;
         }
-        .search-container.active #search-input { width: 100%; padding: 0 55px 0 20px; opacity: 1; }
-        .search-icon {
-            width: 50px; height: 50px; background: #007AFF; border-radius: 50%;
-            display: flex; justify-content: center; align-items: center;
-            color: white; font-size: 20px; position: absolute; right: 0; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        .logout-btn {
+            position: absolute; top: 15px; right: 15px; z-index: 3100;
+            background: white; padding: 8px 15px; border-radius: 20px; font-size: 12px; font-weight: bold;
         }
         .location-btn {
             position: absolute; bottom: 30px; right: 20px; z-index: 3000;
             width: 55px; height: 55px; background: white; border-radius: 50%;
-            display: none; justify-content: center; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-        }
-        .location-btn img { width: 25px; height: 25px; }
-
-        /* Stil za formu unutar mape */
-        .popup-form { padding: 10px; min-width: 180px; }
-        .popup-form input { 
-            width: 100%; padding: 8px; margin-bottom: 10px; 
-            border: 1px solid #ccc; border-radius: 5px; font-size: 14px;
-        }
-        .popup-form button { 
-            width: 100%; background: #007AFF; color: white; 
-            border: none; padding: 8px; border-radius: 5px; cursor: pointer;
+            display: none; justify-content: center; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
 
-        /* GPS PLAVA TAČKA */
-        .user-location-dot {
-            width: 14px; height: 14px; background: #007AFF; border-radius: 50%;
-            border: 2px solid white; position: relative;
-        }
-        .user-location-dot::after {
-            content: ''; position: absolute; top: -13px; left: -13px;
-            width: 40px; height: 40px; border-radius: 50%;
-            background: rgba(0, 122, 255, 0.3); animation: pulse 2s infinite;
-        }
-        @keyframes pulse { 0% { transform: scale(0.5); opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
+        /* MARKER STYLE */
+        .user-dot { width: 14px; height: 14px; background: #007AFF; border-radius: 50%; border: 2px solid white; }
     </style>
 </head>
 <body>
 
     <div id="hero">
-        <h1>LOKALNI<br>SPORT</h1>
-        <div class="disclaimer">
-            Sajt je zabavnog karaktera. Sve informacije su nezvanične. Vlasnik ne odgovara za sadržaj. 
-            Klikom na mapu dodajete teren (max 1 po osobi).
-        </div>
-        <div style="border: 3px solid white; border-radius: 50%; padding: 20px; cursor: pointer;" onclick="initApp()">
-            <img src="https://cdn-icons-png.flaticon.com/512/857/857418.png" width="60">
+        <h1 id="authTitle">PRIJAVA</h1>
+        <div class="auth-card">
+            <input type="email" id="email" placeholder="Email adresa">
+            <input type="password" id="password" placeholder="Lozinka (min 6 karaktera)">
+            <button class="btn btn-primary" id="mainBtn" onclick="handleAuth()">PRIJAVI SE</button>
+            <button class="btn btn-outline" id="toggleBtn" onclick="toggleMode()">Nemaš nalog? Registruj se</button>
+            <p style="color: #666; font-size: 11px; margin-top: 20px;">Sajt je zabavnog karaktera. Korišćenjem prihvatate uslove.</p>
         </div>
     </div>
 
+    <div class="logout-btn" id="logoutBtn" style="display:none;" onclick="logout()">ODJAVA</div>
     <div class="search-container" id="searchBox">
-        <input type="text" id="search-input" placeholder="Pretraži grad..." autocomplete="off">
-        <div class="search-icon" onclick="toggleSearch()">🔍</div>
+        <input type="text" id="search-input" placeholder="Pretraži grad...">
     </div>
-
     <div class="location-btn" id="locBtn" onclick="goToMyLocation()">
-        <img src="https://cdn-icons-png.flaticon.com/512/1865/1865269.png">
+        <img src="https://cdn-icons-png.flaticon.com/512/1865/1865269.png" width="25">
     </div>
-
     <div id="map"></div>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script>
         const firebaseConfig = { databaseURL: "https://hoodsports-162ca-default-rtdb.europe-west1.firebasedatabase.app/" };
         firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
+        const auth = firebase.auth();
+        const db = firebase.database();
 
-        let map;
-        let userMarker;
-        let currentLat, currentLon;
+        let map, userMarker, currentLat, currentLon, isRegisterMode = false;
+        let userProfile = null;
 
-        function initApp() {
-            document.getElementById('hero').style.opacity = '0';
-            setTimeout(() => {
-                document.getElementById('hero').style.display = 'none';
-                document.getElementById('map').style.display = 'block';
-                document.getElementById('searchBox').style.display = 'flex';
-                document.getElementById('locBtn').style.display = 'flex';
-                setupMap();
-                loadTereni();
-            }, 500);
+        // 1. PROVERA SESIJE (DA LI JE VEĆ ULOGOVAN)
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                loadUserProfile(user);
+            } else {
+                showAuth(true);
+            }
+        });
+
+        async function handleAuth() {
+            const email = document.getElementById('email').value;
+            const pass = document.getElementById('password').value;
+
+            try {
+                if (isRegisterMode) {
+                    const res = await auth.createUserWithEmailAndPassword(email, pass);
+                    // Inicijalizuj profil u bazi
+                    await db.ref('users/' + res.user.uid).set({ hasPlaced: false, email: email });
+                } else {
+                    await auth.signInWithEmailAndPassword(email, pass);
+                }
+            } catch (err) {
+                alert("Greška: " + err.message);
+            }
         }
 
-        function setupMap() {
+        async function loadUserProfile(user) {
+            const snap = await db.ref('users/' + user.uid).get();
+            userProfile = { uid: user.uid, ...snap.val() };
+            
+            document.getElementById('hero').style.display = 'none';
+            document.getElementById('map').style.display = 'block';
+            document.getElementById('searchBox').style.display = 'flex';
+            document.getElementById('locBtn').style.display = 'flex';
+            document.getElementById('logoutBtn').style.display = 'block';
+            
+            if(!map) initMap();
+        }
+
+        function initMap() {
             map = L.map('map', { zoomControl: false, tap: false }).setView([44.7866, 20.4489], 13);
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
             L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png').addTo(map);
 
-            map.on('click', function(e) {
-                if (localStorage.getItem('terenPostavljen')) {
-                    L.popup().setLatLng(e.latlng).setContent("Već ste postavili teren!").openOn(map);
+            map.on('click', e => {
+                if (userProfile.hasPlaced) {
+                    L.popup().setLatLng(e.latlng).setContent("Već ste dodali jedan teren.").openOn(map);
                     return;
                 }
-                
-                const formHtml = `
-                    <div class="popup-form">
-                        <input type="text" id="nazivTerena" placeholder="Ime terena..." autofocus>
-                        <button onclick="saveTeren(${e.latlng.lat}, ${e.latlng.lng})">Sačuvaj</button>
-                    </div>
-                `;
-                L.popup().setLatLng(e.latlng).setContent(formHtml).openOn(map);
+                const html = `<div style="padding:10px;">
+                    <input type="text" id="tName" placeholder="Ime terena..." style="padding:8px; width:100%;"><br><br>
+                    <button onclick="saveTeren(${e.latlng.lat}, ${e.latlng.lng})" style="width:100%; background:#007AFF; color:white; border:none; padding:10px; border-radius:5px; font-weight:bold;">SAČUVAJ</button>
+                </div>`;
+                L.popup().setLatLng(e.latlng).setContent(html).openOn(map);
             });
 
-            if (navigator.geolocation) {
-                navigator.geolocation.watchPosition(position => {
-                    currentLat = position.coords.latitude;
-                    currentLon = position.coords.longitude;
-                    if (!userMarker) {
-                        userMarker = L.marker([currentLat, currentLon], {
-                            icon: L.divIcon({ className: 'custom-div-icon', html: '<div class="user-location-dot"></div>', iconSize: [14, 14], iconAnchor: [7, 7] })
-                        }).addTo(map);
-                    } else {
-                        userMarker.setLatLng([currentLat, currentLon]);
-                    }
-                }, null, { enableHighAccuracy: true });
-            }
+            loadMarkers();
+            trackGPS();
         }
 
-        window.saveTeren = function(lat, lng) {
-            const naziv = document.getElementById('nazivTerena').value;
-            if (naziv && naziv.trim().length > 2) {
-                database.ref('tereni').push({
-                    naziv: naziv,
-                    lat: lat,
-                    lng: lng
-                }).then(() => {
-                    localStorage.setItem('terenPostavljen', 'true');
-                    map.closePopup();
-                });
-            }
+        window.saveTeren = async function(lat, lng) {
+            const name = document.getElementById('tName').value;
+            if (name.length < 2) return;
+
+            await db.ref('tereni').push({ name: name, lat: lat, lng: lng, creator: userProfile.email });
+            await db.ref('users/' + userProfile.uid).update({ hasPlaced: true });
+            userProfile.hasPlaced = true;
+            map.closePopup();
         };
 
-        function loadTereni() {
-            database.ref('tereni').on('child_added', (snapshot) => {
-                const data = snapshot.val();
-                L.marker([data.lat, data.lng])
-                 .addTo(map)
-                 .bindPopup(`<b style="font-size:16px;">${data.naziv}</b>`);
+        function loadMarkers() {
+            db.ref('tereni').on('child_added', snap => {
+                const d = snap.val();
+                L.marker([d.lat, d.lng]).addTo(map).bindPopup(`<b>${d.name}</b><br><small>Dodao: ${d.creator}</small>`);
             });
         }
 
-        function goToMyLocation() { if (currentLat && currentLon) map.flyTo([currentLat, currentLon], 16); }
-
-        function toggleSearch() {
-            const container = document.getElementById('searchBox');
-            const input = document.getElementById('search-input');
-            if (!container.classList.contains('active')) {
-                container.classList.add('active');
-                setTimeout(() => input.focus(), 200);
-            } else {
-                if (input.value !== '') {
-                    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(input.value)}`)
-                        .then(res => res.json()).then(data => {
-                            if (data.length > 0) map.setView([data[0].lat, data[0].lon], 13);
-                        });
-                }
-                container.classList.remove('active');
-                input.blur();
-            }
+        function trackGPS() {
+            navigator.geolocation.watchPosition(pos => {
+                currentLat = pos.coords.latitude; currentLon = pos.coords.longitude;
+                if (!userMarker) {
+                    userMarker = L.marker([currentLat, currentLon], { icon: L.divIcon({ className:'', html:'<div class="user-dot"></div>' }) }).addTo(map);
+                } else userMarker.setLatLng([currentLat, currentLon]);
+            });
         }
+
+        function logout() { auth.signOut(); location.reload(); }
+
+        function toggleMode() {
+            isRegisterMode = !isRegisterMode;
+            document.getElementById('authTitle').innerText = isRegisterMode ? "REGISTRACIJA" : "PRIJAVA";
+            document.getElementById('mainBtn').innerText = isRegisterMode ? "NAPRAVI NALOG" : "PRIJAVI SE";
+            document.getElementById('toggleBtn').innerText = isRegisterMode ? "Već imaš nalog? Prijavi se" : "Nemaš nalog? Registruj se";
+        }
+
+        function goToMyLocation() { if(currentLat) map.flyTo([currentLat, currentLon], 16); }
     </script>
 </body>
 </html>
