@@ -49,17 +49,32 @@
         .popup-box input, .popup-box select { padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; width: 100%; }
         .popup-box button { background: #007AFF; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
-        /* CUSTOM MARKER - LOPTICA I KARTICA */
-        .ball-marker {
-            display: flex; flex-direction: column; align-items: center;
+        /* CUSTOM MARKER - LOPTICA I BOCNA KARTICA */
+        .ball-marker-container {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            min-width: 150px;
         }
-        .ball-label {
-            background: white; padding: 4px 10px; border-radius: 12px; font-weight: bold;
-            font-size: 13px; box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-            white-space: nowrap; margin-bottom: 5px; border: 1px solid #007AFF;
-            position: relative;
+        .ball-img { 
+            width: 35px; height: 35px; 
+            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.4));
+            z-index: 2;
         }
-        .ball-img { width: 30px; height: 30px; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.5)); }
+        .ball-label-side {
+            background: white;
+            padding: 4px 12px 4px 20px;
+            border-radius: 0 15px 15px 0;
+            font-weight: 700;
+            font-size: 13px;
+            color: #333;
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+            margin-left: -15px; /* Preklapanje sa lopticom */
+            border: 1px solid #007AFF;
+            border-left: none;
+            white-space: nowrap;
+            z-index: 1;
+        }
         
         .user-dot { width: 16px; height: 16px; background: #007AFF; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 10px #007AFF; }
     </style>
@@ -75,7 +90,7 @@
     </div>
 
     <div class="search-container" id="sContainer">
-        <input type="text" id="search-input" placeholder="Pretraži grad ili ulicu..." autocomplete="off">
+        <input type="text" id="search-input" placeholder="Pretraži lokaciju...">
     </div>
 
     <div class="location-btn" id="lBtn" onclick="goToMyLocation()">
@@ -96,13 +111,13 @@
         let map, userMarker, currentLat, currentLon;
         let markersLayer = L.layerGroup();
 
-        // Slike loptica za sportove
+        // Prave ikonice sportova
         const ballIcons = {
-            "Fudbal": "https://cdn-icons-png.flaticon.com/512/53/53283.png",
-            "Košarka": "https://cdn-icons-png.flaticon.com/512/2503/2503450.png",
+            "Fudbal": "https://cdn-icons-png.flaticon.com/512/33/33736.png",
+            "Košarka": "https://cdn-icons-png.flaticon.com/512/889/889455.png",
             "Rukomet": "https://cdn-icons-png.flaticon.com/512/2906/2906666.png",
             "Hokej": "https://cdn-icons-png.flaticon.com/512/913/913809.png",
-            "Odbojka": "https://cdn-icons-png.flaticon.com/512/1162/1162151.png",
+            "Odbojka": "https://cdn-icons-png.flaticon.com/512/2312/2312523.png",
             "Tenis": "https://cdn-icons-png.flaticon.com/512/3106/3106403.png"
         };
 
@@ -138,7 +153,7 @@
                             <option value="Odbojka">Odbojka</option>
                             <option value="Tenis">Tenis</option>
                         </select>
-                        <input type="text" id="p_name" placeholder="Ime terena (npr. Blok 5)">
+                        <input type="text" id="p_name" placeholder="Ime terena">
                         <input type="password" id="p_pin" placeholder="PIN (6 simbola)" maxlength="6">
                         <button onclick="processTeren(${e.latlng.lat}, ${e.latlng.lng})">SAČUVAJ</button>
                     </div>`;
@@ -156,7 +171,7 @@
             const pin = document.getElementById('p_pin').value;
 
             if (nick.length < 3 || name.length < 2 || pin.length !== 6) {
-                alert("Greška: Proverite PIN (6 cifara) i ostala polja!");
+                alert("Proverite unos! PIN mora imati 6 cifara.");
                 return;
             }
 
@@ -181,10 +196,8 @@
         async function saveNew(nick, name, sport, lat, lng, userRef) {
             const newTerenRef = db.ref('tereni').push();
             const key = newTerenRef.key;
-            
             await newTerenRef.set({ name, sport, lat, lng, creator: nick });
             await userRef.update({ lastTerenKey: key });
-            
             localStorage.setItem('app_nick', nick);
             map.closePopup();
         }
@@ -199,16 +212,16 @@
                     const customIcon = L.divIcon({
                         className: '',
                         html: `
-                            <div class="ball-marker">
-                                <div class="ball-label">${d.name}</div>
+                            <div class="ball-marker-container">
                                 <img src="${iconUrl}" class="ball-img">
+                                <div class="ball-label-side">${d.name}</div>
                             </div>`,
-                        iconSize: [100, 60],
-                        iconAnchor: [50, 60]
+                        iconSize: [40, 40],
+                        iconAnchor: [20, 20]
                     });
 
                     L.marker([d.lat, d.lng], { icon: customIcon }).addTo(markersLayer)
-                     .bindPopup(`<b>Sport: ${d.sport}</b><br>Postavio: ${d.creator}`);
+                     .bindPopup(`<b>${d.sport}</b><br>Postavio: ${d.creator}`);
                 });
             });
         }
@@ -229,9 +242,7 @@
         document.getElementById('search-input').addEventListener('keypress', e => {
             if(e.key === 'Enter') {
                 fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(e.target.value)}`)
-                .then(r => r.json()).then(data => { 
-                    if(data[0]) map.setView([data[0].lat, data[0].lon], 14); 
-                });
+                .then(r => r.json()).then(data => { if(data[0]) map.setView([data[0].lat, data[0].lon], 14); });
             }
         });
     </script>
