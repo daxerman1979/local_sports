@@ -12,31 +12,36 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         html, body { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background: #000; position: fixed; font-family: 'Segoe UI', sans-serif; }
 
-        /* HERO SCREEN */
         #hero { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.9)), url('https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=1470&auto=format&fit=crop') center/cover; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 2000; transition: 0.8s; }
         #hero h1 { color: #fff; font-family: 'Oswald', sans-serif; font-size: 3rem; text-align: center; }
 
-        /* MAPA */
         #map { width: 100vw; height: 100vh; background: #111; display: none; }
         
-        /* SEARCH */
         .search-container { position: absolute; top: 15px; left: 15px; right: 15px; z-index: 1000; display: none; }
         #search-input { width: 100%; height: 50px; border-radius: 25px; border: 2px solid #007AFF; padding: 0 20px; font-size: 16px; outline: none; box-shadow: 0 4px 15px rgba(0,0,0,0.5); background: white; }
 
-        /* MARKERI - TANKA KARTICA */
+        /* MARKERI - TANKA KARTICA SA TIMOVIMA */
         .sport-marker-wrapper { display: flex; align-items: center; white-space: nowrap; cursor: pointer; }
         .sport-ball { font-size: 32px; z-index: 20; filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.4)); }
         
         .live-card-thin {
             background: white; border: 2px solid #007AFF; border-radius: 0 20px 20px 0;
-            padding: 2px 15px 2px 20px; margin-left: -18px;
-            display: flex; align-items: center; gap: 10px;
+            padding: 0 15px 0 20px; margin-left: -18px;
+            display: flex; align-items: center; gap: 8px;
             box-shadow: 3px 3px 10px rgba(0,0,0,0.2); z-index: 5;
-            height: 36px; /* Ista visina kao loptica */
+            height: 38px;
         }
-        .match-score-thin { font-size: 18px; color: #007AFF; font-family: 'Oswald', sans-serif; min-width: 40px; text-align: center; border-left: 1px solid #ddd; padding-left: 10px; }
-        .match-name-thin { font-size: 13px; font-weight: 800; color: #333; }
-        .mini-status { width: 8px; height: 8px; border-radius: 50%; }
+        .match-details { display: flex; flex-direction: column; line-height: 1.1; }
+        .match-name-thin { font-size: 10px; font-weight: 400; color: #666; text-transform: uppercase; }
+        .match-teams-thin { font-size: 13px; font-weight: 800; color: #111; }
+        
+        .match-score-thin { 
+            font-size: 18px; color: #007AFF; font-family: 'Oswald', sans-serif; 
+            min-width: 45px; text-align: center; border-left: 1px solid #ddd; 
+            padding-left: 10px; margin-left: 5px;
+        }
+        
+        .mini-status { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
         .status-live { background: #ff3b30; animation: blink 1s infinite; }
         .status-upcoming { background: #4cd964; }
         .status-ended { background: #8e8e93; }
@@ -51,16 +56,13 @@
         }
         #admin-panel.active { bottom: 0; }
         .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
-        .admin-btn { padding: 12px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; color: white; }
+        .admin-btn { padding: 14px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; color: white; }
         .btn-blue { background: #007AFF; }
         .btn-red { background: #ff3b30; }
         .btn-grey { background: #8e8e93; }
 
-        /* LOKACIJA I DOT */
         .location-btn { position: absolute; bottom: 30px; right: 20px; z-index: 1000; width: 55px; height: 55px; background: white; border-radius: 50%; display: none; justify-content: center; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
         .user-dot { width: 16px; height: 16px; background: #007AFF; border-radius: 50%; border: 2px solid white; }
-
-        /* LEAFLET POPUP STIL */
         .popup-box { padding: 5px; min-width: 220px; display: flex; flex-direction: column; gap: 8px; }
         .popup-box input { padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; }
         .popup-box button { background: #007AFF; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; }
@@ -71,20 +73,22 @@
     <div id="hero" onclick="startApp()">
         <h1>ALL SPORTS LOCAL</h1>
         <div style="border: 2px solid white; border-radius: 50%; padding: 20px; cursor: pointer;"><span style="font-size: 40px;">⚽</span></div>
-        <p style="color:white; margin-top:15px;">DODIRNI ZA START</p>
+        <p style="color:white; margin-top:15px;">KLIKNI ZA START</p>
     </div>
 
     <div id="admin-panel">
-        <div onclick="closeAdmin()" style="float:right; cursor:pointer; font-size:24px;">&times;</div>
+        <div onclick="closeAdmin()" style="float:right; cursor:pointer; font-size:24px; padding:10px;">&times;</div>
         <h2 id="adm-name" style="margin:0; font-family:'Oswald'; color:#007AFF;"></h2>
-        <p id="adm-teams" style="margin:5px 0; font-size:14px; color:#666;"></p>
-        <div class="admin-grid">
+        <p id="adm-teams" style="margin:5px 0; font-size:16px; font-weight:bold; color:#111;"></p>
+        
+        <div id="active-controls" class="admin-grid">
             <button class="admin-btn btn-blue" onclick="adminStatus('live')">UŽIVO (LIVE)</button>
             <button class="admin-btn btn-grey" onclick="adminStatus('ended')">ZAVRŠI MEČ</button>
             <button class="admin-btn btn-blue" onclick="adminScore(1)">GOL TIM 1</button>
             <button class="admin-btn btn-blue" onclick="adminScore(2)">GOL TIM 2</button>
-            <button class="admin-btn btn-red" style="grid-column: span 2;" onclick="adminDelete()">UKLONI TEREN</button>
         </div>
+        
+        <button class="admin-btn btn-red" style="width:100%; margin-top:12px;" onclick="adminDelete()">OBRIŠI TEREN SA MAPE</button>
     </div>
 
     <div class="search-container" id="sContainer"><input type="text" id="search-input" placeholder="Pretraži lokaciju..."></div>
@@ -119,7 +123,6 @@
             L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png').addTo(map);
             markersLayer.addTo(map);
 
-            // Klik na mapu otvara formu za NOVI teren
             map.on('click', e => {
                 const sn = localStorage.getItem('app_nick') || '';
                 const html = `<div class="popup-box">
@@ -144,21 +147,15 @@
             const name = document.getElementById('p_name').value.trim();
             const t1 = document.getElementById('p_t1').value.trim() || "A";
             const t2 = document.getElementById('p_t2').value.trim() || "B";
-
             if (nick.length < 3 || pin.length !== 6) return alert("Nick i PIN 6 cifara!");
-
             const userRef = db.ref('users/' + nick);
             const snap = await userRef.get();
-            const expires = Date.now() + (24 * 60 * 60 * 1000);
-
             if (snap.exists() && snap.val().pin !== pin) return alert("Pogrešan PIN!");
             if (!snap.exists()) await userRef.set({ pin: pin });
             if (snap.exists() && snap.val().lastTerenKey) await db.ref('tereni/' + snap.val().lastTerenKey).remove();
-
             const newRef = db.ref('tereni').push();
-            await newRef.set({ name, lat, lng, creator: nick, expires, t1, t2, score1: 0, score2: 0, status: "upcoming", sport: "Fudbal" });
+            await newRef.set({ name, lat, lng, creator: nick, expires: Date.now() + 86400000, t1, t2, score1: 0, score2: 0, status: "upcoming", sport: "Fudbal" });
             await userRef.update({ lastTerenKey: newRef.key });
-
             localStorage.setItem('app_nick', nick);
             map.closePopup();
         }
@@ -174,29 +171,36 @@
                     const customIcon = L.divIcon({
                         className: '',
                         html: `
-                            <div class="sport-marker-wrapper" onclick="handleMarkerClick(event, '${key}', '${d.creator}', '${d.name}', '${d.t1}', '${d.t2}')">
+                            <div class="sport-marker-wrapper" onclick="handleMarkerClick(event, '${key}', '${d.creator}', '${d.name}', '${d.t1}', '${d.t2}', '${d.status}')">
                                 <div class="sport-ball">${sportEmojis[d.sport] || "⚽"}</div>
                                 <div class="live-card-thin">
                                     <div class="mini-status status-${d.status}"></div>
-                                    <div class="match-name-thin">${d.name}</div>
+                                    <div class="match-details">
+                                        <div class="match-name-thin">${d.name}</div>
+                                        <div class="match-teams-thin">${d.t1} - ${d.t2}</div>
+                                    </div>
                                     <div class="match-score-thin">${d.score1}:${d.score2}</div>
                                 </div>
                             </div>`,
-                        iconSize: [180, 40], iconAnchor: [20, 20]
+                        iconSize: [220, 40], iconAnchor: [20, 20]
                     });
-
                     L.marker([d.lat, d.lng], { icon: customIcon }).addTo(markersLayer);
                 });
             });
         }
 
-        window.handleMarkerClick = function(e, key, creator, name, t1, t2) {
-            e.stopPropagation(); // Ključno: sprečava mapu da otvori "Dodaj teren"
+        window.handleMarkerClick = function(e, key, creator, name, t1, t2, status) {
+            e.stopPropagation();
             const myNick = localStorage.getItem('app_nick');
             if (myNick === creator) {
                 currentAdminKey = key;
                 document.getElementById('adm-name').innerText = name;
                 document.getElementById('adm-teams').innerText = `${t1} vs ${t2}`;
+                
+                // Sakrij kontrole rezultata ako je meč završen
+                const controls = document.getElementById('active-controls');
+                controls.style.display = (status === 'ended') ? 'none' : 'grid';
+                
                 document.getElementById('admin-panel').classList.add('active');
             }
         };
@@ -210,7 +214,10 @@
             db.ref('tereni/' + currentAdminKey).update(updates);
         };
 
-        window.adminStatus = (status) => db.ref('tereni/' + currentAdminKey).update({ status });
+        window.adminStatus = (status) => {
+            db.ref('tereni/' + currentAdminKey).update({ status });
+            if(status === 'ended') closeAdmin();
+        }
         
         window.adminDelete = () => {
             if(confirm("Obriši teren?")) {
@@ -226,7 +233,6 @@
                 else userMarker.setLatLng([currentLat, currentLon]);
             }, null, { enableHighAccuracy: true });
         }
-
         function goToMyLocation() { if(currentLat) map.flyTo([currentLat, currentLon], 16); }
     </script>
 </body>
