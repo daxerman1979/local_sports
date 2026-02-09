@@ -17,27 +17,19 @@
 
         #map { width: 100vw; height: 100vh; background: #111; display: none; }
         
-        .search-container { position: absolute; top: 15px; left: 15px; right: 15px; z-index: 1000; display: none; }
-        #search-input { width: 100%; height: 50px; border-radius: 25px; border: 2px solid #007AFF; padding: 0 20px; font-size: 16px; outline: none; box-shadow: 0 4px 15px rgba(0,0,0,0.5); background: white; }
+        /* DISKRETAN SEARCH BAR */
+        .search-container { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 80%; max-width: 300px; z-index: 1000; display: none; }
+        #search-input { 
+            width: 100%; height: 35px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.2); 
+            padding: 0 15px; font-size: 13px; outline: none; 
+            background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(5px); 
+            color: white; transition: 0.3s;
+        }
+        #search-input::placeholder { color: rgba(255,255,255,0.5); }
+        #search-input:focus { background: rgba(255, 255, 255, 0.3); border-color: #007AFF; width: 100%; }
 
-        /* FIX ZA ZUMIRANJE I POZICIONIRANJE */
-        .sport-marker-wrapper { 
-            display: flex; 
-            align-items: center; 
-            white-space: nowrap; 
-            cursor: pointer; 
-            transition: transform 0.2s ease-out;
-            transform-origin: center left; /* Sidro je na loptici */
-        }
-        
-        .sport-ball { 
-            font-size: 32px; 
-            z-index: 20; 
-            filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.4)); 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+        .sport-marker-wrapper { display: flex; align-items: center; white-space: nowrap; cursor: pointer; transition: transform 0.2s ease-out; transform-origin: center left; }
+        .sport-ball { font-size: 32px; z-index: 20; filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.4)); display: flex; align-items: center; justify-content: center; }
         
         .live-card-thin {
             background: white; border: 2px solid #007AFF; border-radius: 0 20px 20px 0;
@@ -45,10 +37,8 @@
             display: flex; align-items: center; gap: 8px;
             box-shadow: 3px 3px 10px rgba(0,0,0,0.2); z-index: 5;
             height: 38px;
-            pointer-events: auto;
         }
 
-        /* ZOOM OUT - SMANJIVANJE BEZ POMERANJA POZICIJE */
         .zoom-out .live-card-thin { display: none; }
         .zoom-out .sport-ball { font-size: 16px; }
 
@@ -63,7 +53,6 @@
         .status-ended { background: #8e8e93; }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-        /* ADMIN PANEL */
         #admin-panel { position: fixed; bottom: -100%; left: 0; width: 100%; background: white; border-radius: 25px 25px 0 0; padding: 25px; z-index: 3000; transition: 0.4s ease-out; box-shadow: 0 -5px 25px rgba(0,0,0,0.4); text-align: center; }
         #admin-panel.active { bottom: 0; }
         .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
@@ -100,7 +89,7 @@
         <button class="admin-btn btn-red" style="width:100%; margin-top:12px;" onclick="adminDelete()">OBRIŠI TEREN SA MAPE</button>
     </div>
 
-    <div class="search-container" id="sContainer"><input type="text" id="search-input" placeholder="Pretraži lokaciju..."></div>
+    <div class="search-container" id="sContainer"><input type="text" id="search-input" placeholder="Pretraži lokaciju..." autocomplete="off"></div>
     <div class="location-btn" id="lBtn" onclick="goToMyLocation()"><img src="https://cdn-icons-png.flaticon.com/512/1865/1865269.png" width="28"></div>
     <div id="map"></div>
 
@@ -128,36 +117,21 @@
 
         function initMap() {
             if (map) return;
-            map = L.map('map', { 
-                zoomControl: false, 
-                tap: false,
-                maxZoom: 19,
-                minZoom: 3
-            }).setView([44.7866, 20.4489], 13);
-            
+            map = L.map('map', { zoomControl: false, tap: false, maxZoom: 19, minZoom: 3 }).setView([44.7866, 20.4489], 13);
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
             L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png').addTo(map);
             markersLayer.addTo(map);
-
-            // Osvežavanje pri svakoj promeni pogleda
             map.on('zoomend moveend', filterAndRender);
-
             map.on('click', e => {
                 const sn = localStorage.getItem('app_nick') || '';
-                const html = `<div class="popup-box"><b style="text-align:center">DODAJ TEREN</b><input type="text" id="p_nick" placeholder="Nick" value="${sn}"><input type="text" id="p_name" placeholder="Ime terena"><input type="text" id="p_t1" placeholder="Tim 1"><input type="text" id="p_t2" placeholder="Tim 2"><input type="password" id="p_pin" placeholder="PIN (6 cifara)" maxlength="6"><button onclick="processTeren(${e.latlng.lat}, ${e.latlng.lng})">SAČUVAJ</button></div>`;
+                const html = `<div class="popup-box"><b style="text-align:center">DODAJ TEREN</b><input type="text" id="p_nick" placeholder="Nick" value="${sn}"><input type="text" id="p_name" placeholder="Ime terena"><input type="text" id="p_t1" placeholder="Tim 1"><input type="text" id="p_t2" placeholder="Tim 2"><input type="text" id="p_pin" placeholder="PIN (6 simbola)" maxlength="6"><button onclick="processTeren(${e.latlng.lat}, ${e.latlng.lng})">SAČUVAJ</button></div>`;
                 L.popup().setLatLng(e.latlng).setContent(html).openOn(map);
             });
-
             db.ref('tereni').on('value', snap => {
                 allTereni = [];
-                snap.forEach(child => { 
-                    const data = child.val();
-                    data.key = child.key;
-                    allTereni.push(data);
-                });
+                snap.forEach(child => { const data = child.val(); data.key = child.key; allTereni.push(data); });
                 filterAndRender();
             });
-
             trackGPS();
         }
 
@@ -165,31 +139,14 @@
             markersLayer.clearLayers();
             const center = map.getCenter();
             const zoom = map.getZoom();
-            
-            // Isključujemo kartice ako je zum manji od 14
             const isZoomedOut = zoom < 14;
-
             allTereni.forEach(d => {
                 const pos = L.latLng(d.lat, d.lng);
                 const dist = center.distanceTo(pos) / 1000;
-
                 if (dist <= 20) {
                     const customIcon = L.divIcon({
-                        className: '', // Prazno da ne bi Leaflet dodavao svoje stilove
-                        html: `
-                            <div class="sport-marker-wrapper ${isZoomedOut ? 'zoom-out' : ''}" 
-                                 onclick="handleMarkerClick(event, '${d.key}', '${d.creator}', '${d.name}', '${d.t1}', '${d.t2}', '${d.status}')">
-                                <div class="sport-ball">${sportEmojis[d.sport] || "⚽"}</div>
-                                <div class="live-card-thin">
-                                    <div class="mini-status status-${d.status}"></div>
-                                    <div class="match-details">
-                                        <div class="match-name-thin">${d.name}</div>
-                                        <div class="match-teams-thin">${d.t1} - ${d.t2}</div>
-                                    </div>
-                                    <div class="match-score-thin">${d.score1}:${d.score2}</div>
-                                </div>
-                            </div>`,
-                        // Dinamičko sidro: na loptici (sredina markera)
+                        className: '',
+                        html: `<div class="sport-marker-wrapper ${isZoomedOut ? 'zoom-out' : ''}" onclick="handleMarkerClick(event, '${d.key}', '${d.creator}', '${d.name}', '${d.t1}', '${d.t2}', '${d.status}')"><div class="sport-ball">${sportEmojis[d.sport] || "⚽"}</div><div class="live-card-thin"><div class="mini-status status-${d.status}"></div><div class="match-details"><div class="match-name-thin">${d.name}</div><div class="match-teams-thin">${d.t1} - ${d.t2}</div></div><div class="match-score-thin">${d.score1}:${d.score2}</div></div></div>`,
                         iconSize: isZoomedOut ? [20, 20] : [220, 40],
                         iconAnchor: isZoomedOut ? [10, 10] : [20, 20] 
                     });
@@ -201,22 +158,16 @@
         window.handleMarkerClick = async function(e, key, creator, name, t1, t2, status) {
             e.stopPropagation();
             let myNick = localStorage.getItem('app_nick');
-            
             if (myNick !== creator) {
                 const pinAttempt = prompt(`Povratak kontrole za "${name}"? Unesite PIN:`);
                 if (!pinAttempt) return;
-
                 const userSnap = await db.ref('users/' + creator).get();
-                if (userSnap.exists() && userSnap.val().pin === pinAttempt) {
+                if (userSnap.exists() && userSnap.val().pin == pinAttempt) {
                     localStorage.setItem('app_nick', creator);
                     myNick = creator;
                     alert("Uspešno!");
-                } else {
-                    alert("Pogrešan PIN.");
-                    return;
-                }
+                } else { alert("Pogrešan PIN."); return; }
             }
-
             currentAdminKey = key;
             document.getElementById('adm-name').innerText = name;
             document.getElementById('adm-teams').innerText = `${t1} vs ${t2}`;
@@ -226,22 +177,19 @@
 
         async function processTeren(lat, lng) {
             const nick = document.getElementById('p_nick').value.trim().toLowerCase();
-            const pin = document.getElementById('p_pin').value;
+            const pin = document.getElementById('p_pin').value.trim();
             const name = document.getElementById('p_name').value.trim();
             const t1 = document.getElementById('p_t1').value.trim() || "A";
             const t2 = document.getElementById('p_t2').value.trim() || "B";
             if (nick.length < 3 || pin.length !== 6) return alert("Popunite sve!");
-            
             const userRef = db.ref('users/' + nick);
             const snap = await userRef.get();
-            if (snap.exists() && snap.val().pin !== pin) return alert("Pogrešan PIN!");
+            if (snap.exists() && snap.val().pin != pin) return alert("Pogrešan PIN!");
             if (!snap.exists()) await userRef.set({ pin: pin });
             if (snap.exists() && snap.val().lastTerenKey) await db.ref('tereni/' + snap.val().lastTerenKey).remove();
-            
             const newRef = db.ref('tereni').push();
             await newRef.set({ name, lat, lng, creator: nick, expires: Date.now() + 86400000, t1, t2, score1: 0, score2: 0, status: "upcoming", sport: "Fudbal" });
             await userRef.update({ lastTerenKey: newRef.key });
-            
             localStorage.setItem('app_nick', nick);
             map.closePopup();
         }
@@ -259,9 +207,7 @@
         function trackGPS() {
             navigator.geolocation.watchPosition(pos => {
                 currentLat = pos.coords.latitude; currentLon = pos.coords.longitude;
-                if (!userMarker) userMarker = L.marker([currentLat, currentLon], { 
-                    icon: L.divIcon({ className:'', html:'<div class="user-dot"></div>', iconAnchor:[8,8] }) 
-                }).addTo(map);
+                if (!userMarker) userMarker = L.marker([currentLat, currentLon], { icon: L.divIcon({ className:'', html:'<div class="user-dot"></div>', iconAnchor:[8,8] }) }).addTo(map);
                 else userMarker.setLatLng([currentLat, currentLon]);
             }, null, { enableHighAccuracy: true });
         }
