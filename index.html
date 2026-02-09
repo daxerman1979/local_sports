@@ -20,9 +20,9 @@
         .search-container { position: absolute; top: 15px; left: 15px; right: 15px; z-index: 1000; display: none; }
         #search-input { width: 100%; height: 50px; border-radius: 25px; border: 2px solid #007AFF; padding: 0 20px; font-size: 16px; outline: none; box-shadow: 0 4px 15px rgba(0,0,0,0.5); background: white; }
 
-        /* MARKERI - TANKA KARTICA SA TIMOVIMA */
-        .sport-marker-wrapper { display: flex; align-items: center; white-space: nowrap; cursor: pointer; }
-        .sport-ball { font-size: 32px; z-index: 20; filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.4)); }
+        /* MARKERI */
+        .sport-marker-wrapper { display: flex; align-items: center; white-space: nowrap; cursor: pointer; transition: 0.3s; }
+        .sport-ball { font-size: 32px; z-index: 20; filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.4)); transition: font-size 0.3s; }
         
         .live-card-thin {
             background: white; border: 2px solid #007AFF; border-radius: 0 20px 20px 0;
@@ -31,15 +31,15 @@
             box-shadow: 3px 3px 10px rgba(0,0,0,0.2); z-index: 5;
             height: 38px;
         }
+
+        /* ZOOM OUT STIL - SAMO SITNA LOPTICA */
+        .zoom-out .live-card-thin { display: none; }
+        .zoom-out .sport-ball { font-size: 16px; }
+
         .match-details { display: flex; flex-direction: column; line-height: 1.1; }
         .match-name-thin { font-size: 10px; font-weight: 400; color: #666; text-transform: uppercase; }
         .match-teams-thin { font-size: 13px; font-weight: 800; color: #111; }
-        
-        .match-score-thin { 
-            font-size: 18px; color: #007AFF; font-family: 'Oswald', sans-serif; 
-            min-width: 45px; text-align: center; border-left: 1px solid #ddd; 
-            padding-left: 10px; margin-left: 5px;
-        }
+        .match-score-thin { font-size: 18px; color: #007AFF; font-family: 'Oswald', sans-serif; min-width: 45px; text-align: center; border-left: 1px solid #ddd; padding-left: 10px; margin-left: 5px; }
         
         .mini-status { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
         .status-live { background: #ff3b30; animation: blink 1s infinite; }
@@ -48,12 +48,7 @@
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
         /* ADMIN PANEL */
-        #admin-panel {
-            position: fixed; bottom: -100%; left: 0; width: 100%; 
-            background: white; border-radius: 25px 25px 0 0;
-            padding: 25px; z-index: 3000; transition: 0.4s ease-out;
-            box-shadow: 0 -5px 25px rgba(0,0,0,0.4); text-align: center;
-        }
+        #admin-panel { position: fixed; bottom: -100%; left: 0; width: 100%; background: white; border-radius: 25px 25px 0 0; padding: 25px; z-index: 3000; transition: 0.4s ease-out; box-shadow: 0 -5px 25px rgba(0,0,0,0.4); text-align: center; }
         #admin-panel.active { bottom: 0; }
         .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
         .admin-btn { padding: 14px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; color: white; }
@@ -61,7 +56,7 @@
         .btn-red { background: #ff3b30; }
         .btn-grey { background: #8e8e93; }
 
-        .location-btn { position: absolute; bottom: 30px; right: 20px; z-index: 1000; width: 55px; height: 55px; background: white; border-radius: 50%; display: none; justify-content: center; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
+        .location-btn { position: absolute; bottom: 30px; right: 20px; z-index: 1000; width: 55px; height: 55px; background: white; border-radius: 50%; display: none; justify-content: center; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.4); cursor: pointer; }
         .user-dot { width: 16px; height: 16px; background: #007AFF; border-radius: 50%; border: 2px solid white; }
         .popup-box { padding: 5px; min-width: 220px; display: flex; flex-direction: column; gap: 8px; }
         .popup-box input { padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; }
@@ -80,14 +75,12 @@
         <div onclick="closeAdmin()" style="float:right; cursor:pointer; font-size:24px; padding:10px;">&times;</div>
         <h2 id="adm-name" style="margin:0; font-family:'Oswald'; color:#007AFF;"></h2>
         <p id="adm-teams" style="margin:5px 0; font-size:16px; font-weight:bold; color:#111;"></p>
-        
         <div id="active-controls" class="admin-grid">
             <button class="admin-btn btn-blue" onclick="adminStatus('live')">UŽIVO (LIVE)</button>
             <button class="admin-btn btn-grey" onclick="adminStatus('ended')">ZAVRŠI MEČ</button>
             <button class="admin-btn btn-blue" onclick="adminScore(1)">GOL TIM 1</button>
             <button class="admin-btn btn-blue" onclick="adminScore(2)">GOL TIM 2</button>
         </div>
-        
         <button class="admin-btn btn-red" style="width:100%; margin-top:12px;" onclick="adminDelete()">OBRIŠI TEREN SA MAPE</button>
     </div>
 
@@ -106,6 +99,7 @@
 
         let map, userMarker, currentLat, currentLon, currentAdminKey = null;
         let markersLayer = L.layerGroup();
+        let allTereni = [];
         const sportEmojis = { "Fudbal": "⚽", "Košarka": "🏀", "Rukomet": "🤾", "Hokej": "🏒", "Odbojka": "🏐", "Tenis": "🎾" };
 
         function startApp() {
@@ -123,22 +117,47 @@
             L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png').addTo(map);
             markersLayer.addTo(map);
 
+            map.on('zoomend moveend', filterAndRender);
+
             map.on('click', e => {
                 const sn = localStorage.getItem('app_nick') || '';
-                const html = `<div class="popup-box">
-                    <b style="text-align:center">DODAJ TEREN</b>
-                    <input type="text" id="p_nick" placeholder="Nick" value="${sn}">
-                    <input type="text" id="p_name" placeholder="Ime terena">
-                    <input type="text" id="p_t1" placeholder="Tim 1">
-                    <input type="text" id="p_t2" placeholder="Tim 2">
-                    <input type="password" id="p_pin" placeholder="PIN (6 cifara)" maxlength="6">
-                    <button onclick="processTeren(${e.latlng.lat}, ${e.latlng.lng})">SAČUVAJ</button>
-                </div>`;
+                const html = `<div class="popup-box"><b style="text-align:center">DODAJ TEREN</b><input type="text" id="p_nick" placeholder="Nick" value="${sn}"><input type="text" id="p_name" placeholder="Ime terena"><input type="text" id="p_t1" placeholder="Tim 1"><input type="text" id="p_t2" placeholder="Tim 2"><input type="password" id="p_pin" placeholder="PIN (6 cifara)" maxlength="6"><button onclick="processTeren(${e.latlng.lat}, ${e.latlng.lng})">SAČUVAJ</button></div>`;
                 L.popup().setLatLng(e.latlng).setContent(html).openOn(map);
             });
 
-            syncData();
+            db.ref('tereni').on('value', snap => {
+                allTereni = [];
+                snap.forEach(child => { 
+                    const data = child.val();
+                    data.key = child.key;
+                    allTereni.push(data);
+                });
+                filterAndRender();
+            });
+
             trackGPS();
+        }
+
+        function filterAndRender() {
+            markersLayer.clearLayers();
+            const center = map.getCenter();
+            const zoom = map.getZoom();
+            const isZoomedOut = zoom < 15;
+
+            allTereni.forEach(d => {
+                const pos = L.latLng(d.lat, d.lng);
+                const dist = center.distanceTo(pos) / 1000; // Kilometri
+
+                if (dist <= 20) {
+                    const customIcon = L.divIcon({
+                        className: isZoomedOut ? 'zoom-out' : '',
+                        html: `<div class="sport-marker-wrapper" onclick="handleMarkerClick(event, '${d.key}', '${d.creator}', '${d.name}', '${d.t1}', '${d.t2}', '${d.status}')"><div class="sport-ball">${sportEmojis[d.sport] || "⚽"}</div><div class="live-card-thin"><div class="mini-status status-${d.status}"></div><div class="match-details"><div class="match-name-thin">${d.name}</div><div class="match-teams-thin">${d.t1} - ${d.t2}</div></div><div class="match-score-thin">${d.score1}:${d.score2}</div></div></div>`,
+                        iconSize: isZoomedOut ? [20, 20] : [220, 40],
+                        iconAnchor: isZoomedOut ? [10, 10] : [20, 20]
+                    });
+                    L.marker([d.lat, d.lng], { icon: customIcon }).addTo(markersLayer);
+                }
+            });
         }
 
         async function processTeren(lat, lng) {
@@ -160,35 +179,6 @@
             map.closePopup();
         }
 
-        function syncData() {
-            db.ref('tereni').on('value', snap => {
-                markersLayer.clearLayers();
-                snap.forEach(child => {
-                    const d = child.val();
-                    const key = child.key;
-                    if (Date.now() > d.expires) { child.ref.remove(); return; }
-
-                    const customIcon = L.divIcon({
-                        className: '',
-                        html: `
-                            <div class="sport-marker-wrapper" onclick="handleMarkerClick(event, '${key}', '${d.creator}', '${d.name}', '${d.t1}', '${d.t2}', '${d.status}')">
-                                <div class="sport-ball">${sportEmojis[d.sport] || "⚽"}</div>
-                                <div class="live-card-thin">
-                                    <div class="mini-status status-${d.status}"></div>
-                                    <div class="match-details">
-                                        <div class="match-name-thin">${d.name}</div>
-                                        <div class="match-teams-thin">${d.t1} - ${d.t2}</div>
-                                    </div>
-                                    <div class="match-score-thin">${d.score1}:${d.score2}</div>
-                                </div>
-                            </div>`,
-                        iconSize: [220, 40], iconAnchor: [20, 20]
-                    });
-                    L.marker([d.lat, d.lng], { icon: customIcon }).addTo(markersLayer);
-                });
-            });
-        }
-
         window.handleMarkerClick = function(e, key, creator, name, t1, t2, status) {
             e.stopPropagation();
             const myNick = localStorage.getItem('app_nick');
@@ -196,35 +186,20 @@
                 currentAdminKey = key;
                 document.getElementById('adm-name').innerText = name;
                 document.getElementById('adm-teams').innerText = `${t1} vs ${t2}`;
-                
-                // Sakrij kontrole rezultata ako je meč završen
-                const controls = document.getElementById('active-controls');
-                controls.style.display = (status === 'ended') ? 'none' : 'grid';
-                
+                document.getElementById('active-controls').style.display = (status === 'ended') ? 'none' : 'grid';
                 document.getElementById('admin-panel').classList.add('active');
             }
         };
 
         window.closeAdmin = () => document.getElementById('admin-panel').classList.remove('active');
-
         window.adminScore = async (team) => {
             const snap = await db.ref('tereni/' + currentAdminKey).get();
             const updates = {};
             updates['score' + team] = (snap.val()['score' + team] || 0) + 1;
             db.ref('tereni/' + currentAdminKey).update(updates);
         };
-
-        window.adminStatus = (status) => {
-            db.ref('tereni/' + currentAdminKey).update({ status });
-            if(status === 'ended') closeAdmin();
-        }
-        
-        window.adminDelete = () => {
-            if(confirm("Obriši teren?")) {
-                db.ref('tereni/' + currentAdminKey).remove();
-                closeAdmin();
-            }
-        };
+        window.adminStatus = (status) => { db.ref('tereni/' + currentAdminKey).update({ status }); if(status === 'ended') closeAdmin(); }
+        window.adminDelete = () => { if(confirm("Obriši teren?")) { db.ref('tereni/' + currentAdminKey).remove(); closeAdmin(); } };
 
         function trackGPS() {
             navigator.geolocation.watchPosition(pos => {
