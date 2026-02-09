@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>All Sports Local PRO</title>
+    <title>All Sports Local LIVE PRO</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&display=swap" rel="stylesheet">
@@ -14,11 +14,11 @@
 
         /* AUTH SCREEN */
         #hero { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.9)), url('https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=1470&auto=format&fit=crop') center/cover; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 2000; transition: 0.8s; color: white; padding: 20px; }
-        #hero h1 { font-family: 'Oswald', sans-serif; font-size: 2.5rem; margin-bottom: 20px; }
-        .auth-box { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); padding: 20px; border-radius: 15px; width: 100%; max-width: 320px; display: flex; flex-direction: column; gap: 10px; }
-        .auth-box input { padding: 12px; border-radius: 8px; border: none; outline: none; text-transform: uppercase; }
-        .auth-btn { background: #007AFF; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .toggle-auth { font-size: 12px; text-decoration: underline; cursor: pointer; text-align: center; }
+        #hero h1 { font-family: 'Oswald', sans-serif; font-size: 2.5rem; margin-bottom: 20px; text-align: center; }
+        .auth-box { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); padding: 20px; border-radius: 15px; width: 100%; max-width: 320px; display: flex; flex-direction: column; gap: 10px; border: 1px solid rgba(255,255,255,0.2); }
+        .auth-box input { padding: 12px; border-radius: 8px; border: none; outline: none; text-transform: uppercase; background: rgba(255,255,255,0.9); color: #000; }
+        .auth-btn { background: #007AFF; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        .toggle-auth { font-size: 12px; text-decoration: underline; cursor: pointer; text-align: center; margin-top: 5px; opacity: 0.8; }
 
         #map { width: 100vw; height: 100vh; background: #111; display: none; }
         
@@ -42,7 +42,7 @@
 
         .match-details { display: flex; flex-direction: column; line-height: 1.1; }
         .match-name-thin { font-size: 9px; font-weight: 400; color: #666; text-transform: uppercase; }
-        .match-teams-thin { font-size: 12px; font-weight: 800; color: #111; text-transform: uppercase; }
+        .match-teams-thin { font-size: 13px; font-weight: 800; color: #111; text-transform: uppercase; }
         .match-score-thin { font-size: 18px; color: #007AFF; font-family: 'Oswald', sans-serif; min-width: 45px; text-align: center; border-left: 1px solid #ddd; padding-left: 10px; margin-left: 5px; }
         
         .mini-status { width: 8px; height: 8px; border-radius: 50%; }
@@ -63,8 +63,8 @@
         .location-btn { position: absolute; bottom: 30px; right: 20px; z-index: 1000; width: 55px; height: 55px; background: white; border-radius: 50%; display: none; justify-content: center; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
         .user-dot { width: 16px; height: 16px; background: #007AFF; border-radius: 50%; border: 2px solid white; }
         .popup-box { padding: 5px; min-width: 220px; display: flex; flex-direction: column; gap: 8px; }
-        .popup-box input, .popup-box select { padding: 10px; border-radius: 8px; border: 1px solid #ccc; text-transform: uppercase; }
-        .popup-box button { background: #007AFF; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; }
+        .popup-box input, .popup-box select { padding: 10px; border-radius: 8px; border: 1px solid #ccc; text-transform: uppercase; font-size: 16px; }
+        .popup-box button { background: #007AFF; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -75,13 +75,13 @@
             <input type="email" id="email" placeholder="EMAIL">
             <input type="password" id="password" placeholder="LOZINKA">
             <button class="auth-btn" id="main-auth-btn" onclick="handleAuth()">PRIJAVI SE</button>
-            <span class="toggle-auth" id="toggle-text" onclick="toggleAuthMode()">Nemaš nalog? Registruj se</span>
+            <span class="toggle-auth" id="toggle-text" onclick="toggleAuthMode()">NEMAŠ NALOG? REGISTRUJ SE</span>
         </div>
     </div>
 
     <div id="admin-panel">
         <div onclick="closeAdmin()" style="float:right; cursor:pointer; font-size:24px; padding:10px;">&times;</div>
-        <span id="adm-expiry" style="font-size:12px; color:red; font-weight:bold;">ISTIČE ZA: --:--</span>
+        <span id="adm-expiry" style="font-size:12px; color:red; font-weight:bold; text-transform: uppercase;">ISTIČE ZA: --:--</span>
         <h2 id="adm-name" style="margin:0; font-family:'Oswald'; color:#007AFF; text-transform: uppercase;"></h2>
         <p id="adm-teams" style="margin:5px 0; font-size:16px; font-weight:bold; color:#111; text-transform: uppercase;"></p>
         <div id="active-controls" class="admin-grid">
@@ -104,7 +104,7 @@
 
     <script>
         const firebaseConfig = { 
-            apiKey: "TVOJ_API_KEY", // OBAVEZNO DODAJ SVOJ API KEY IZ FIREBASE KONZOLE
+            apiKey: "AIzaSyCyyqnqeS-9jurBX-6VIRp8CiPTMbXkXgw",
             authDomain: "allsportslocal-ea1d4.firebaseapp.com",
             databaseURL: "https://allsportslocal-ea1d4-default-rtdb.europe-west1.firebasedatabase.app/",
             projectId: "allsportslocal-ea1d4"
@@ -121,16 +121,17 @@
         function toggleAuthMode() {
             isLoginMode = !isLoginMode;
             document.getElementById('main-auth-btn').innerText = isLoginMode ? 'PRIJAVI SE' : 'REGISTRUJ SE';
-            document.getElementById('toggle-text').innerText = isLoginMode ? 'Nemaš nalog? Registruj se' : 'Imaš nalog? Prijavi se';
+            document.getElementById('toggle-text').innerText = isLoginMode ? 'NEMAŠ NALOG? REGISTRUJ SE' : 'IMAŠ NALOG? PRIJAVI SE';
         }
 
         async function handleAuth() {
             const email = document.getElementById('email').value;
             const pass = document.getElementById('password').value;
+            if(!email || !pass) return alert("UNESITE PODATKE");
             try {
                 if (isLoginMode) await auth.signInWithEmailAndPassword(email, pass);
                 else await auth.createUserWithEmailAndPassword(email, pass);
-            } catch (e) { alert(e.message); }
+            } catch (e) { alert("GREŠKA: " + e.message); }
         }
 
         auth.onAuthStateChanged(user => {
@@ -146,7 +147,7 @@
         // --- MAPA I PODACI ---
         function initMap() {
             if (map) return;
-            map = L.map('map', { zoomControl: false, tap: false }).setView([44.7866, 20.4489], 13);
+            map = L.map('map', { zoomControl: false, tap: false, maxZoom: 19, minZoom: 3 }).setView([44.7866, 20.4489], 13);
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
             L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png').addTo(map);
             markersLayer.addTo(map);
@@ -154,7 +155,13 @@
             map.on('zoomend moveend', renderMarkers);
             map.on('click', e => {
                 const html = `<div class="popup-box"><b>DODAJ TEREN</b>
-                <select id="p_sport"><option value="FUDBAL">FUDBAL</option><option value="KOŠARKA">KOŠARKA</option><option value="ODBOJKA">ODBOJKA</option></select>
+                <select id="p_sport">
+                    <option value="FUDBAL">FUDBAL</option>
+                    <option value="KOŠARKA">KOŠARKA</option>
+                    <option value="ODBOJKA">ODBOJKA</option>
+                    <option value="RUKOMET">RUKOMET</option>
+                    <option value="TENIS">TENIS</option>
+                </select>
                 <input type="text" id="p_name" placeholder="IME TERENA">
                 <input type="text" id="p_t1" placeholder="TIM 1">
                 <input type="text" id="p_t2" placeholder="TIM 2">
@@ -203,18 +210,20 @@
         }
 
         async function saveTeren(lat, lng) {
-            const name = document.getElementById('p_name').value.toUpperCase();
+            const nameInput = document.getElementById('p_name').value.toUpperCase();
             const sport = document.getElementById('p_sport').value;
             const t1 = document.getElementById('p_t1').value.toUpperCase() || "A";
             const t2 = document.getElementById('p_t2').value.toUpperCase() || "B";
             const uid = auth.currentUser.uid;
 
-            // Brišemo prethodni teren istog korisnika
-            const old = await db.ref('tereni').orderByChild('owner').equalTo(uid).get();
+            if(!nameInput) return alert("UNESITE IME TERENA");
+
+            // Brišemo prethodni teren istog vlasnika (ako želiš samo 1 teren po osobi)
+            const old = await db.ref('tereni').orderByChild('owner').equalTo(uid).once('value');
             old.forEach(c => c.ref.remove());
 
             await db.ref('tereni').push({
-                name, lat, lng, owner: uid, sport, t1, t2, 
+                name: nameInput, lat, lng, owner: uid, sport, t1, t2, 
                 score1: 0, score2: 0, status: 'upcoming', 
                 expires: Date.now() + 86400000 
             });
@@ -223,11 +232,13 @@
 
         function openAdmin(key) {
             const d = allTereni.find(x => x.key === key);
+            // Provera vlasništva za otvaranje panela
             if (d.owner !== auth.currentUser.uid) return;
             
             currentAdminKey = key;
             document.getElementById('adm-name').innerText = d.name;
             document.getElementById('adm-teams').innerText = `${d.t1} VS ${d.t2}`;
+            document.getElementById('active-controls').style.display = (d.status === 'ended') ? 'none' : 'grid';
             document.getElementById('admin-panel').classList.add('active');
             
             if (timerInterval) clearInterval(timerInterval);
@@ -236,7 +247,8 @@
                 if (diff <= 0) closeAdmin();
                 const h = Math.floor(diff / 3600000).toString().padStart(2, '0');
                 const m = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
-                document.getElementById('adm-expiry').innerText = `ISTIČE ZA: ${h}:${m}`;
+                const s = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
+                document.getElementById('adm-expiry').innerText = `ISTIČE ZA: ${h}:${m}:${s}`;
             }, 1000);
         }
 
@@ -245,7 +257,7 @@
             db.ref(`tereni/${currentAdminKey}`).update({ [`score${team}`]: d[`score${team}`] + 1 });
         };
         window.adminStatus = (s) => db.ref(`tereni/${currentAdminKey}`).update({ status: s });
-        window.adminDelete = () => { if(confirm("OBRIŠI?")) { db.ref(`tereni/${currentAdminKey}`).remove(); closeAdmin(); } };
+        window.adminDelete = () => { if(confirm("OBRIŠI TEREN?")) { db.ref(`tereni/${currentAdminKey}`).remove(); closeAdmin(); } };
         window.closeAdmin = () => { document.getElementById('admin-panel').classList.remove('active'); clearInterval(timerInterval); };
 
         function trackGPS() {
@@ -256,6 +268,13 @@
             }, null, { enableHighAccuracy: true });
         }
         function goToMyLocation() { if(currentLat) map.flyTo([currentLat, currentLon], 16); }
+
+        document.getElementById('search-input').addEventListener('keypress', e => {
+            if(e.key === 'Enter') {
+                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(e.target.value)}`)
+                .then(r => r.json()).then(data => { if(data[0]) map.setView([data[0].lat, data[0].lon], 14); });
+            }
+        });
     </script>
 </body>
 </html>
