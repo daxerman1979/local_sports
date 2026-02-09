@@ -20,9 +20,24 @@
         .search-container { position: absolute; top: 15px; left: 15px; right: 15px; z-index: 1000; display: none; }
         #search-input { width: 100%; height: 50px; border-radius: 25px; border: 2px solid #007AFF; padding: 0 20px; font-size: 16px; outline: none; box-shadow: 0 4px 15px rgba(0,0,0,0.5); background: white; }
 
-        /* MARKERI */
-        .sport-marker-wrapper { display: flex; align-items: center; white-space: nowrap; cursor: pointer; transition: 0.3s; }
-        .sport-ball { font-size: 32px; z-index: 20; filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.4)); transition: font-size 0.3s; }
+        /* FIX ZA ZUMIRANJE I POZICIONIRANJE */
+        .sport-marker-wrapper { 
+            display: flex; 
+            align-items: center; 
+            white-space: nowrap; 
+            cursor: pointer; 
+            transition: transform 0.2s ease-out;
+            transform-origin: center left; /* Sidro je na loptici */
+        }
+        
+        .sport-ball { 
+            font-size: 32px; 
+            z-index: 20; 
+            filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.4)); 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
         
         .live-card-thin {
             background: white; border: 2px solid #007AFF; border-radius: 0 20px 20px 0;
@@ -30,8 +45,10 @@
             display: flex; align-items: center; gap: 8px;
             box-shadow: 3px 3px 10px rgba(0,0,0,0.2); z-index: 5;
             height: 38px;
+            pointer-events: auto;
         }
 
+        /* ZOOM OUT - SMANJIVANJE BEZ POMERANJA POZICIJE */
         .zoom-out .live-card-thin { display: none; }
         .zoom-out .sport-ball { font-size: 16px; }
 
@@ -111,11 +128,18 @@
 
         function initMap() {
             if (map) return;
-            map = L.map('map', { zoomControl: false, tap: false }).setView([44.7866, 20.4489], 13);
+            map = L.map('map', { 
+                zoomControl: false, 
+                tap: false,
+                maxZoom: 19,
+                minZoom: 3
+            }).setView([44.7866, 20.4489], 13);
+            
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
             L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png').addTo(map);
             markersLayer.addTo(map);
 
+            // Osvežavanje pri svakoj promeni pogleda
             map.on('zoomend moveend', filterAndRender);
 
             map.on('click', e => {
@@ -141,7 +165,9 @@
             markersLayer.clearLayers();
             const center = map.getCenter();
             const zoom = map.getZoom();
-            const isZoomedOut = zoom < 15;
+            
+            // Isključujemo kartice ako je zum manji od 14
+            const isZoomedOut = zoom < 14;
 
             allTereni.forEach(d => {
                 const pos = L.latLng(d.lat, d.lng);
@@ -149,10 +175,23 @@
 
                 if (dist <= 20) {
                     const customIcon = L.divIcon({
-                        className: isZoomedOut ? 'zoom-out' : '',
-                        html: `<div class="sport-marker-wrapper" onclick="handleMarkerClick(event, '${d.key}', '${d.creator}', '${d.name}', '${d.t1}', '${d.t2}', '${d.status}')"><div class="sport-ball">${sportEmojis[d.sport] || "⚽"}</div><div class="live-card-thin"><div class="mini-status status-${d.status}"></div><div class="match-details"><div class="match-name-thin">${d.name}</div><div class="match-teams-thin">${d.t1} - ${d.t2}</div></div><div class="match-score-thin">${d.score1}:${d.score2}</div></div></div>`,
+                        className: '', // Prazno da ne bi Leaflet dodavao svoje stilove
+                        html: `
+                            <div class="sport-marker-wrapper ${isZoomedOut ? 'zoom-out' : ''}" 
+                                 onclick="handleMarkerClick(event, '${d.key}', '${d.creator}', '${d.name}', '${d.t1}', '${d.t2}', '${d.status}')">
+                                <div class="sport-ball">${sportEmojis[d.sport] || "⚽"}</div>
+                                <div class="live-card-thin">
+                                    <div class="mini-status status-${d.status}"></div>
+                                    <div class="match-details">
+                                        <div class="match-name-thin">${d.name}</div>
+                                        <div class="match-teams-thin">${d.t1} - ${d.t2}</div>
+                                    </div>
+                                    <div class="match-score-thin">${d.score1}:${d.score2}</div>
+                                </div>
+                            </div>`,
+                        // Dinamičko sidro: na loptici (sredina markera)
                         iconSize: isZoomedOut ? [20, 20] : [220, 40],
-                        iconAnchor: isZoomedOut ? [10, 10] : [20, 20]
+                        iconAnchor: isZoomedOut ? [10, 10] : [20, 20] 
                     });
                     L.marker([d.lat, d.lng], { icon: customIcon }).addTo(markersLayer);
                 }
@@ -163,23 +202,21 @@
             e.stopPropagation();
             let myNick = localStorage.getItem('app_nick');
             
-            // Ako nismo prepoznati kao vlasnik, pitaj za PIN
             if (myNick !== creator) {
-                const pinAttempt = prompt(`Da li ste vi vlasnik terena "${name}"? Unesite PIN da povratite kontrolu:`);
+                const pinAttempt = prompt(`Povratak kontrole za "${name}"? Unesite PIN:`);
                 if (!pinAttempt) return;
 
                 const userSnap = await db.ref('users/' + creator).get();
                 if (userSnap.exists() && userSnap.val().pin === pinAttempt) {
                     localStorage.setItem('app_nick', creator);
                     myNick = creator;
-                    alert("Kontrola povraćena!");
+                    alert("Uspešno!");
                 } else {
                     alert("Pogrešan PIN.");
                     return;
                 }
             }
 
-            // Ako je Nick sada ispravan, otvori Admin Panel
             currentAdminKey = key;
             document.getElementById('adm-name').innerText = name;
             document.getElementById('adm-teams').innerText = `${t1} vs ${t2}`;
@@ -193,7 +230,7 @@
             const name = document.getElementById('p_name').value.trim();
             const t1 = document.getElementById('p_t1').value.trim() || "A";
             const t2 = document.getElementById('p_t2').value.trim() || "B";
-            if (nick.length < 3 || pin.length !== 6) return alert("Nick i PIN 6 cifara!");
+            if (nick.length < 3 || pin.length !== 6) return alert("Popunite sve!");
             
             const userRef = db.ref('users/' + nick);
             const snap = await userRef.get();
@@ -217,12 +254,14 @@
             db.ref('tereni/' + currentAdminKey).update(updates);
         };
         window.adminStatus = (status) => { db.ref('tereni/' + currentAdminKey).update({ status }); if(status === 'ended') closeAdmin(); }
-        window.adminDelete = () => { if(confirm("Obriši teren?")) { db.ref('tereni/' + currentAdminKey).remove(); closeAdmin(); } };
+        window.adminDelete = () => { if(confirm("Obriši?")) { db.ref('tereni/' + currentAdminKey).remove(); closeAdmin(); } };
 
         function trackGPS() {
             navigator.geolocation.watchPosition(pos => {
                 currentLat = pos.coords.latitude; currentLon = pos.coords.longitude;
-                if (!userMarker) userMarker = L.marker([currentLat, currentLon], { icon: L.divIcon({ className:'', html:'<div class="user-dot"></div>', iconAnchor:[8,8] }) }).addTo(map);
+                if (!userMarker) userMarker = L.marker([currentLat, currentLon], { 
+                    icon: L.divIcon({ className:'', html:'<div class="user-dot"></div>', iconAnchor:[8,8] }) 
+                }).addTo(map);
                 else userMarker.setLatLng([currentLat, currentLon]);
             }, null, { enableHighAccuracy: true });
         }
