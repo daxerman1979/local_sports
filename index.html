@@ -32,7 +32,6 @@
             height: 38px;
         }
 
-        /* ZOOM OUT STIL - SAMO SITNA LOPTICA */
         .zoom-out .live-card-thin { display: none; }
         .zoom-out .sport-ball { font-size: 16px; }
 
@@ -146,7 +145,7 @@
 
             allTereni.forEach(d => {
                 const pos = L.latLng(d.lat, d.lng);
-                const dist = center.distanceTo(pos) / 1000; // Kilometri
+                const dist = center.distanceTo(pos) / 1000;
 
                 if (dist <= 20) {
                     const customIcon = L.divIcon({
@@ -160,6 +159,34 @@
             });
         }
 
+        window.handleMarkerClick = async function(e, key, creator, name, t1, t2, status) {
+            e.stopPropagation();
+            let myNick = localStorage.getItem('app_nick');
+            
+            // Ako nismo prepoznati kao vlasnik, pitaj za PIN
+            if (myNick !== creator) {
+                const pinAttempt = prompt(`Da li ste vi vlasnik terena "${name}"? Unesite PIN da povratite kontrolu:`);
+                if (!pinAttempt) return;
+
+                const userSnap = await db.ref('users/' + creator).get();
+                if (userSnap.exists() && userSnap.val().pin === pinAttempt) {
+                    localStorage.setItem('app_nick', creator);
+                    myNick = creator;
+                    alert("Kontrola povraćena!");
+                } else {
+                    alert("Pogrešan PIN.");
+                    return;
+                }
+            }
+
+            // Ako je Nick sada ispravan, otvori Admin Panel
+            currentAdminKey = key;
+            document.getElementById('adm-name').innerText = name;
+            document.getElementById('adm-teams').innerText = `${t1} vs ${t2}`;
+            document.getElementById('active-controls').style.display = (status === 'ended') ? 'none' : 'grid';
+            document.getElementById('admin-panel').classList.add('active');
+        };
+
         async function processTeren(lat, lng) {
             const nick = document.getElementById('p_nick').value.trim().toLowerCase();
             const pin = document.getElementById('p_pin').value;
@@ -167,29 +194,20 @@
             const t1 = document.getElementById('p_t1').value.trim() || "A";
             const t2 = document.getElementById('p_t2').value.trim() || "B";
             if (nick.length < 3 || pin.length !== 6) return alert("Nick i PIN 6 cifara!");
+            
             const userRef = db.ref('users/' + nick);
             const snap = await userRef.get();
             if (snap.exists() && snap.val().pin !== pin) return alert("Pogrešan PIN!");
             if (!snap.exists()) await userRef.set({ pin: pin });
             if (snap.exists() && snap.val().lastTerenKey) await db.ref('tereni/' + snap.val().lastTerenKey).remove();
+            
             const newRef = db.ref('tereni').push();
             await newRef.set({ name, lat, lng, creator: nick, expires: Date.now() + 86400000, t1, t2, score1: 0, score2: 0, status: "upcoming", sport: "Fudbal" });
             await userRef.update({ lastTerenKey: newRef.key });
+            
             localStorage.setItem('app_nick', nick);
             map.closePopup();
         }
-
-        window.handleMarkerClick = function(e, key, creator, name, t1, t2, status) {
-            e.stopPropagation();
-            const myNick = localStorage.getItem('app_nick');
-            if (myNick === creator) {
-                currentAdminKey = key;
-                document.getElementById('adm-name').innerText = name;
-                document.getElementById('adm-teams').innerText = `${t1} vs ${t2}`;
-                document.getElementById('active-controls').style.display = (status === 'ended') ? 'none' : 'grid';
-                document.getElementById('admin-panel').classList.add('active');
-            }
-        };
 
         window.closeAdmin = () => document.getElementById('admin-panel').classList.remove('active');
         window.adminScore = async (team) => {
