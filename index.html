@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>All Sports Local LIVE PRO</title>
+    <title>All Sports Local PRO</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&display=swap" rel="stylesheet">
@@ -86,13 +86,13 @@
         </div>
 
         <div id="match-setup" class="match-setup-box">
-            <b style="font-size:12px;">DODAJ UTAKMICU NA TEREN</b>
+            <b style="font-size:12px;">DODAJ UTAKMICU NA OVAJ TEREN</b>
             <input type="text" id="adm-t1" placeholder="TIM 1">
             <input type="text" id="adm-t2" placeholder="TIM 2">
             <button class="admin-btn btn-blue" onclick="setupMatch()">DODAJ UTAKMICU</button>
         </div>
 
-        <button class="admin-btn btn-red" style="width:100%; margin-top:20px;" onclick="adminDelete()">OBRIŠI TEREN SA MAPE</button>
+        <button class="admin-btn btn-red" style="width:100%; margin-top:20px;" onclick="adminDelete()">OBRIŠI OVAJ TEREN</button>
     </div>
 
     <div class="search-container" id="sContainer"><input type="text" id="search-input" placeholder="PRETRAŽI LOKACIJU..." autocomplete="off"></div>
@@ -123,9 +123,7 @@
             const e = document.getElementById('email').value;
             const p = document.getElementById('password').value;
             if(!e || !p) return alert("UNESITE EMAIL I LOZINKU");
-            try {
-                await auth.signInWithEmailAndPassword(e, p);
-            } catch {
+            try { await auth.signInWithEmailAndPassword(e, p); } catch {
                 try { await auth.createUserWithEmailAndPassword(e, p); } catch(err) { alert(err.message); }
             }
         }
@@ -148,8 +146,14 @@
             markersLayer.addTo(map);
 
             map.on('click', e => {
-                const html = `<div class="popup-box"><b>DODAJ TEREN</b>
-                <select id="p_sport"><option value="FUDBAL">FUDBAL</option><option value="KOŠARKA">KOŠARKA</option></select>
+                const html = `<div class="popup-box"><b>POSTAVI TEREN</b>
+                <select id="p_sport">
+                    <option value="FUDBAL">FUDBAL</option>
+                    <option value="KOŠARKA">KOŠARKA</option>
+                    <option value="ODBOJKA">ODBOJKA</option>
+                    <option value="RUKOMET">RUKOMET</option>
+                    <option value="TENIS">TENIS</option>
+                </select>
                 <input type="text" id="p_name" placeholder="IME TERENA">
                 <button onclick="saveTeren(${e.latlng.lat}, ${e.latlng.lng})">POSTAVI</button></div>`;
                 L.popup().setLatLng(e.latlng).setContent(html).openOn(map);
@@ -160,12 +164,10 @@
                 snap.forEach(c => {
                     let d = c.val(); d.key = c.key;
                     if(Date.now() > d.expires) { c.ref.remove(); return; }
-
-                    const zoom = map.getZoom();
-                    const isZoomedOut = zoom < 14;
                     
-                    const teamsText = (d.t1 && d.t2) ? `${d.t1} - ${d.t2}` : "KLIKNI ZA DETALJE";
-                    const scoreText = (d.score1 !== undefined) ? `${d.score1}:${d.score2}` : "";
+                    const isZoomedOut = map.getZoom() < 14;
+                    const teams = (d.t1 && d.t2) ? `${d.t1} - ${d.t2}` : "SLOBODAN TEREN";
+                    const score = (d.t1) ? `${d.score1}:${d.score2}` : "";
 
                     const icon = L.divIcon({
                         className: '',
@@ -175,9 +177,9 @@
                                 <div class="mini-status status-${d.status || 'upcoming'}"></div>
                                 <div class="match-details">
                                     <span class="match-name-thin">${d.name}</span>
-                                    <span class="match-teams-thin">${teamsText}</span>
+                                    <span class="match-teams-thin">${teams}</span>
                                 </div>
-                                ${scoreText ? `<div class="match-score-thin">${scoreText}</div>` : ''}
+                                ${score ? `<div class="match-score-thin">${score}</div>` : ''}
                             </div>
                         </div>`,
                         iconSize: isZoomedOut ? [20, 20] : [220, 42],
@@ -193,17 +195,16 @@
             const name = document.getElementById('p_name').value.toUpperCase();
             const sport = document.getElementById('p_sport').value;
             if(!name) return;
-            const uid = auth.currentUser.uid;
-            
+            // Ne brišemo stare terene - dopuštamo neograničeno
             await db.ref('tereni').push({
-                name, lat, lng, owner: uid, sport, status: 'upcoming', 
-                expires: Date.now() + 86400000 
+                name, lat, lng, owner: auth.currentUser.uid, sport, status: 'upcoming', 
+                score1: 0, score2: 0, expires: Date.now() + 86400000 
             });
             map.closePopup();
         }
 
         async function openAdmin(key) {
-            const snap = await db.ref(`tereni/${key}`).get();
+            const snap = await db.ref(`tereni/${key}`).once('value');
             const d = snap.val();
             if (d.owner !== auth.currentUser.uid) return;
             
@@ -226,17 +227,18 @@
             const t2 = document.getElementById('adm-t2').value.toUpperCase();
             if(!t1 || !t2) return;
             await db.ref(`tereni/${currentAdminKey}`).update({ t1, t2, score1: 0, score2: 0 });
-            closeAdmin();
+            // Ne zatvaramo panel odmah da se vide dugmići za poene
+            openAdmin(currentAdminKey);
         }
 
         window.adminScore = async (team) => {
-            const snap = await db.ref(`tereni/${currentAdminKey}`).get();
+            const snap = await db.ref(`tereni/${currentAdminKey}`).once('value');
             const d = snap.val();
             db.ref(`tereni/${currentAdminKey}`).update({ [`score${team}`]: (d[`score${team}`] || 0) + 1 });
         };
 
         window.adminStatus = (s) => db.ref(`tereni/${currentAdminKey}`).update({ status: s });
-        window.adminDelete = () => { if(confirm("OBRIŠI?")) { db.ref(`tereni/${currentAdminKey}`).remove(); closeAdmin(); } };
+        window.adminDelete = () => { if(confirm("OBRIŠI OVAJ TEREN?")) { db.ref(`tereni/${currentAdminKey}`).remove(); closeAdmin(); } };
         window.closeAdmin = () => document.getElementById('admin-panel').classList.remove('active');
 
         function trackGPS() {
