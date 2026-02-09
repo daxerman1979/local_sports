@@ -200,7 +200,7 @@
             
             const newRef = db.ref('tereni').push();
             // Vratili na 24 sata (86400000 ms)
-            await newRef.set({ name, lat, lng, creator: nick, expires: Date.now() + 86400000, t1, t2, score1: 0, score2: 0, status: "upcoming", sport: "Fudbal" });
+            await newRef.set({ name, lat, lng, creator: nick, expires: Date.now() + 60000, t1, t2, score1: 0, score2: 0, status: "upcoming", sport: "Fudbal" });
             await userRef.update({ lastTerenKey: newRef.key });
             localStorage.setItem('app_nick', nick);
             map.closePopup();
