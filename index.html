@@ -58,9 +58,8 @@
         .location-btn { position: absolute; bottom: 30px; right: 20px; z-index: 1000; width: 55px; height: 55px; background: white; border-radius: 50%; display: none; justify-content: center; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.4); cursor: pointer; }
         .user-dot { width: 16px; height: 16px; background: #007AFF; border-radius: 50%; border: 2px solid white; }
         
-        /* VELIKA SLOVA ZA SVA POLJA */
         .popup-box { padding: 5px; min-width: 220px; display: flex; flex-direction: column; gap: 8px; }
-        .popup-box input { padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; text-transform: uppercase; }
+        .popup-box input, .popup-box select { padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; text-transform: uppercase; width: 100%; }
         .popup-box button { background: #007AFF; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; text-transform: uppercase; }
     </style>
 </head>
@@ -102,7 +101,7 @@
         let map, userMarker, currentLat, currentLon, currentAdminKey = null, timerInterval = null;
         let markersLayer = L.layerGroup();
         let allTereni = [];
-        const sportEmojis = { "Fudbal": "⚽", "Košarka": "🏀", "Rukomet": "🤾", "Hokej": "🏒", "Odbojka": "🏐", "Tenis": "🎾" };
+        const sportEmojis = { "FUDBAL": "⚽", "KOŠARKA": "🏀", "RUKOMET": "🤾", "HOKEJ": "🏒", "ODBOJKA": "🏐", "TENIS": "🎾" };
 
         function startApp() {
             document.getElementById('hero').style.display = 'none'; 
@@ -121,7 +120,20 @@
             map.on('zoomend moveend', filterAndRender);
             map.on('click', e => {
                 const sn = (localStorage.getItem('app_nick') || '').toUpperCase();
-                const html = `<div class="popup-box"><b style="text-align:center">DODAJ TEREN</b><input type="text" id="p_nick" placeholder="NICK" value="${sn}"><input type="text" id="p_name" placeholder="IME TERENA"><input type="text" id="p_t1" placeholder="TIM 1"><input type="text" id="p_t2" placeholder="TIM 2"><input type="text" id="p_pin" placeholder="PIN (6 SIMBOLA)" maxlength="6"><button onclick="processTeren(${e.latlng.lat}, ${e.latlng.lng})">SAČUVAJ</button></div>`;
+                const html = `<div class="popup-box"><b style="text-align:center">DODAJ TEREN</b>
+                <input type="text" id="p_nick" placeholder="NICK" value="${sn}">
+                <select id="p_sport">
+                    <option value="FUDBAL">FUDBAL</option>
+                    <option value="KOŠARKA">KOŠARKA</option>
+                    <option value="ODBOJKA">ODBOJKA</option>
+                    <option value="RUKOMET">RUKOMET</option>
+                    <option value="TENIS">TENIS</option>
+                </select>
+                <input type="text" id="p_name" placeholder="IME TERENA">
+                <input type="text" id="p_t1" placeholder="TIM 1">
+                <input type="text" id="p_t2" placeholder="TIM 2">
+                <input type="text" id="p_pin" placeholder="PIN (6 SIMBOLA)" maxlength="6">
+                <button onclick="processTeren(${e.latlng.lat}, ${e.latlng.lng})">SAČUVAJ</button></div>`;
                 L.popup().setLatLng(e.latlng).setContent(html).openOn(map);
             });
             db.ref('tereni').on('value', snap => {
@@ -139,7 +151,7 @@
                 filterAndRender();
             });
             trackGPS();
-            setInterval(cleanupExpired, 5000);
+            setInterval(cleanupExpired, 10000);
         }
 
         function filterAndRender() {
@@ -203,6 +215,7 @@
             const nick = document.getElementById('p_nick').value.trim().toUpperCase();
             const pin = document.getElementById('p_pin').value.trim().toUpperCase();
             const name = document.getElementById('p_name').value.trim().toUpperCase();
+            const sport = document.getElementById('p_sport').value;
             const t1 = document.getElementById('p_t1').value.trim().toUpperCase() || "A";
             const t2 = document.getElementById('p_t2').value.trim().toUpperCase() || "B";
             
@@ -215,7 +228,8 @@
             if (snap.exists() && snap.val().lastTerenKey) await db.ref('tereni/' + snap.val().lastTerenKey).remove();
             
             const newRef = db.ref('tereni').push();
-            await newRef.set({ name, lat, lng, creator: nick, expires: Date.now() + 60000, t1, t2, score1: 0, score2: 0, status: "upcoming", sport: "Fudbal" });
+            // VREME: 24h = 86400000 ms
+            await newRef.set({ name, lat, lng, creator: nick, expires: Date.now() + 86400000, t1, t2, score1: 0, score2: 0, status: "upcoming", sport: sport });
             await userRef.update({ lastTerenKey: newRef.key });
             
             localStorage.setItem('app_nick', nick);
