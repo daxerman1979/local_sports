@@ -19,7 +19,6 @@
         
         .search-container { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 80%; max-width: 300px; z-index: 1000; display: none; }
         #search-input { width: 100%; height: 35px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.2); padding: 0 15px; font-size: 13px; outline: none; background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(5px); color: white; transition: 0.3s; text-transform: uppercase; }
-        #search-input::placeholder { color: rgba(255,255,255,0.5); text-transform: none; }
 
         .sport-marker-wrapper { display: flex; align-items: center; white-space: nowrap; cursor: pointer; transition: transform 0.2s ease-out; transform-origin: center left; }
         .sport-ball { font-size: 32px; z-index: 20; filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.4)); display: flex; align-items: center; justify-content: center; }
@@ -44,28 +43,22 @@
         .status-live { background: #ff3b30; animation: blink 1s infinite; }
         .status-upcoming { background: #4cd964; }
         .status-ended { background: #8e8e93; }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-        #admin-panel { position: fixed; bottom: -100%; left: 0; width: 100%; background: white; border-radius: 25px 25px 0 0; padding: 25px; z-index: 3000; transition: 0.4s ease-out; box-shadow: 0 -5px 25px rgba(0,0,0,0.4); text-align: center; }
+        /* ADMIN PANEL */
+        #admin-panel { position: fixed; bottom: -100%; left: 0; width: 100%; background: white; border-radius: 25px 25px 0 0; padding: 20px; z-index: 3000; transition: 0.4s ease-out; box-shadow: 0 -5px 25px rgba(0,0,0,0.4); text-align: center; max-height: 90vh; overflow-y: auto; }
         #admin-panel.active { bottom: 0; }
-        .admin-timer { font-size: 12px; color: #ff3b30; font-weight: bold; margin-bottom: 10px; display: block; }
-        .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
-        
-        /* FIX: touch-action sprečava zumiranje na dvostruki klik */
-        .admin-btn { 
-            padding: 14px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; color: white; text-transform: uppercase; 
-            touch-action: manipulation; 
-        }
-        
+        .admin-timer { font-size: 12px; color: #ff3b30; font-weight: bold; margin-bottom: 5px; display: block; }
+        .admin-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px; }
+        .admin-btn { padding: 12px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; color: white; text-transform: uppercase; touch-action: manipulation; }
         .btn-blue { background: #007AFF; }
         .btn-red { background: #ff3b30; }
         .btn-grey { background: #8e8e93; }
+        .history-box { background: #f0f0f0; margin-top: 10px; padding: 10px; border-radius: 8px; font-size: 12px; }
 
-        .location-btn { position: absolute; bottom: 30px; right: 20px; z-index: 1000; width: 55px; height: 55px; background: white; border-radius: 50%; display: none; justify-content: center; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.4); cursor: pointer; }
+        .location-btn { position: absolute; bottom: 30px; right: 20px; z-index: 1000; width: 55px; height: 55px; background: white; border-radius: 50%; display: none; justify-content: center; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
         .user-dot { width: 16px; height: 16px; background: #007AFF; border-radius: 50%; border: 2px solid white; }
-        
         .popup-box { padding: 5px; min-width: 220px; display: flex; flex-direction: column; gap: 8px; }
-        .popup-box input, .popup-box select { padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; text-transform: uppercase; width: 100%; }
+        .popup-box input, .popup-box select { padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; text-transform: uppercase; }
         .popup-box button { background: #007AFF; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; text-transform: uppercase; }
     </style>
 </head>
@@ -73,22 +66,28 @@
 
     <div id="hero" onclick="startApp()">
         <h1>ALL SPORTS LOCAL</h1>
-        <div style="border: 2px solid white; border-radius: 50%; padding: 20px; cursor: pointer;"><span style="font-size: 40px;">⚽</span></div>
+        <div style="border: 2px solid white; border-radius: 50%; padding: 20px;"><span style="font-size: 40px;">⚽</span></div>
         <p style="color:white; margin-top:15px;">KLIKNI ZA START</p>
     </div>
 
     <div id="admin-panel">
-        <div onclick="closeAdmin()" style="float:right; cursor:pointer; font-size:24px; padding:10px;">&times;</div>
+        <div onclick="closeAdmin()" style="float:right; cursor:pointer; font-size:24px;">&times;</div>
         <span class="admin-timer" id="adm-expiry">ISTIČE ZA: --:--:--</span>
         <h2 id="adm-name" style="margin:0; font-family:'Oswald'; color:#007AFF; text-transform: uppercase;"></h2>
-        <p id="adm-teams" style="margin:5px 0; font-size:16px; font-weight:bold; color:#111; text-transform: uppercase;"></p>
-        <div id="active-controls" class="admin-grid">
-            <button class="admin-btn btn-blue" onclick="adminStatus('live')">UŽIVO (LIVE)</button>
-            <button class="admin-btn btn-grey" onclick="adminStatus('ended')">ZAVRŠI MEČ</button>
-            <button class="admin-btn btn-blue" onclick="adminScore(1)">GOL TIM 1</button>
-            <button class="admin-btn btn-blue" onclick="adminScore(2)">GOL TIM 2</button>
+        <p id="adm-teams" style="margin:5px 0; font-weight:bold;"></p>
+        
+        <div class="history-box" id="adm-history">PERIODI: -</div>
+
+        <div id="active-controls">
+            <div class="admin-grid" id="score-buttons">
+                </div>
+            <div class="admin-grid">
+                <button class="admin-btn btn-grey" onclick="adminNextPeriod()">KRAJ PERIODA/SETA</button>
+                <button class="admin-btn btn-grey" onclick="adminStatus('live')">LIVE</button>
+                <button class="admin-btn btn-grey" onclick="adminStatus('ended')">ZAVRŠI MEČ</button>
+                <button class="admin-btn btn-red" onclick="adminDelete()">OBRIŠI SVE</button>
+            </div>
         </div>
-        <button class="admin-btn btn-red" style="width:100%; margin-top:12px;" onclick="adminDelete()">OBRIŠI TEREN SA MAPE</button>
     </div>
 
     <div class="search-container" id="sContainer"><input type="text" id="search-input" placeholder="PRETRAŽI LOKACIJU..." autocomplete="off"></div>
@@ -107,7 +106,7 @@
         let map, userMarker, currentLat, currentLon, currentAdminKey = null, timerInterval = null;
         let markersLayer = L.layerGroup();
         let allTereni = [];
-        const sportEmojis = { "FUDBAL": "⚽", "KOŠARKA": "🏀", "RUKOMET": "🤾", "HOKEJ": "🏒", "ODBOJKA": "🏐", "TENIS": "🎾" };
+        const sportEmojis = { "FUDBAL": "⚽", "KOŠARKA": "🏀", "RUKOMET": "🤾", "ODBOJKA": "🏐", "TENIS": "🎾" };
 
         function startApp() {
             document.getElementById('hero').style.display = 'none'; 
@@ -144,78 +143,11 @@
             });
             db.ref('tereni').on('value', snap => {
                 allTereni = [];
-                const now = Date.now();
-                snap.forEach(child => { 
-                    const data = child.val(); 
-                    if (now > data.expires) {
-                        child.ref.remove();
-                    } else {
-                        data.key = child.key; 
-                        allTereni.push(data);
-                    }
-                });
+                snap.forEach(child => { const data = child.val(); data.key = child.key; allTereni.push(data); });
                 filterAndRender();
             });
             trackGPS();
-            setInterval(cleanupExpired, 10000);
         }
-
-        function filterAndRender() {
-            markersLayer.clearLayers();
-            const center = map.getCenter();
-            const zoom = map.getZoom();
-            const isZoomedOut = zoom < 14;
-            allTereni.forEach(d => {
-                const pos = L.latLng(d.lat, d.lng);
-                const dist = center.distanceTo(pos) / 1000;
-                if (dist <= 20) {
-                    const customIcon = L.divIcon({
-                        className: '',
-                        html: `<div class="sport-marker-wrapper ${isZoomedOut ? 'zoom-out' : ''}" onclick="handleMarkerClick(event, '${d.key}', '${d.creator}', '${d.name}', '${d.t1}', '${d.t2}', '${d.status}', ${d.expires})"><div class="sport-ball">${sportEmojis[d.sport.toUpperCase()] || "⚽"}</div><div class="live-card-thin"><div class="mini-status status-${d.status}"></div><div class="match-details"><div class="match-name-thin">${d.name.toUpperCase()}</div><div class="match-teams-thin">${d.t1.toUpperCase()} - ${d.t2.toUpperCase()}</div></div><div class="match-score-thin">${d.score1}:${d.score2}</div></div></div>`,
-                        iconSize: isZoomedOut ? [20, 20] : [220, 40],
-                        iconAnchor: isZoomedOut ? [10, 10] : [20, 20] 
-                    });
-                    L.marker([d.lat, d.lng], { icon: customIcon }).addTo(markersLayer);
-                }
-            });
-        }
-
-        window.handleMarkerClick = async function(e, key, creator, name, t1, t2, status, expires) {
-            e.stopPropagation();
-            let myNick = (localStorage.getItem('app_nick') || '').toUpperCase();
-            let creatorUpper = creator.toUpperCase();
-            
-            if (myNick !== creatorUpper) {
-                const pinAttempt = prompt(`POVRATAK KONTROLE ZA "${name.toUpperCase()}"? UNESITE PIN:`);
-                if (!pinAttempt) return;
-                const userSnap = await db.ref('users/' + creatorUpper).get();
-                if (userSnap.exists() && userSnap.val().pin.toUpperCase() == pinAttempt.toUpperCase()) {
-                    localStorage.setItem('app_nick', creatorUpper);
-                    myNick = creatorUpper;
-                } else { alert("POGREŠAN PIN."); return; }
-            }
-            currentAdminKey = key;
-            document.getElementById('adm-name').innerText = name.toUpperCase();
-            document.getElementById('adm-teams').innerText = `${t1.toUpperCase()} VS ${t2.toUpperCase()}`;
-            document.getElementById('active-controls').style.display = (status === 'ended') ? 'none' : 'grid';
-            
-            if (timerInterval) clearInterval(timerInterval);
-            const updateAdminTimer = () => {
-                const diff = expires - Date.now();
-                if (diff <= 0) { 
-                    document.getElementById('adm-expiry').innerText = "ISTEKLO!"; 
-                    closeAdmin();
-                    return; 
-                }
-                const h = Math.floor(diff / 3600000).toString().padStart(2, '0');
-                const m = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
-                const s = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
-                document.getElementById('adm-expiry').innerText = `ISTIČE ZA: ${h}:${m}:${s}`;
-            };
-            updateAdminTimer();
-            timerInterval = setInterval(updateAdminTimer, 1000);
-            document.getElementById('admin-panel').classList.add('active');
-        };
 
         async function processTeren(lat, lng) {
             const nick = document.getElementById('p_nick').value.trim().toUpperCase();
@@ -226,42 +158,134 @@
             const t2 = document.getElementById('p_t2').value.trim().toUpperCase() || "B";
             
             if (nick.length < 3 || pin.length !== 6) return alert("POPUNITE SVE!");
-            
             const userRef = db.ref('users/' + nick);
             const snap = await userRef.get();
             if (snap.exists() && snap.val().pin.toUpperCase() != pin) return alert("POGREŠAN PIN!");
             if (!snap.exists()) await userRef.set({ pin: pin });
-            if (snap.exists() && snap.val().lastTerenKey) await db.ref('tereni/' + snap.val().lastTerenKey).remove();
             
+            // LIMIT: 1 Korisnik = 1 Teren
+            const oldTereni = await db.ref('tereni').orderByChild('creator').equalTo(nick).get();
+            oldTereni.forEach(c => c.ref.remove());
+
             const newRef = db.ref('tereni').push();
-            // VREME: 24h = 86400000 ms
-            await newRef.set({ name, lat, lng, creator: nick, expires: Date.now() + 86400000, t1, t2, score1: 0, score2: 0, status: "upcoming", sport: sport });
-            await userRef.update({ lastTerenKey: newRef.key });
+            await newRef.set({ 
+                name, lat, lng, creator: nick, expires: Date.now() + 86400000, 
+                t1, t2, score1: 0, score2: 0, status: "upcoming", sport, 
+                history: "", currentPeriod: 1 
+            });
             
             localStorage.setItem('app_nick', nick);
             map.closePopup();
         }
 
-        window.closeAdmin = () => {
-            document.getElementById('admin-panel').classList.remove('active');
-            if (timerInterval) clearInterval(timerInterval);
-        };
-
-        window.adminScore = async (team) => {
-            const snap = await db.ref('tereni/' + currentAdminKey).get();
-            const updates = {};
-            updates['score' + team] = (snap.val()['score' + team] || 0) + 1;
-            db.ref('tereni/' + currentAdminKey).update(updates);
-        };
-        window.adminStatus = (status) => { db.ref('tereni/' + currentAdminKey).update({ status }); if(status === 'ended') closeAdmin(); }
-        window.adminDelete = () => { if(confirm("OBRIŠI?")) { db.ref('tereni/' + currentAdminKey).remove(); closeAdmin(); } };
-
-        function cleanupExpired() {
-            const now = Date.now();
-            db.ref('tereni').get().then(snap => {
-                snap.forEach(child => { if(now > child.val().expires) child.ref.remove(); });
+        function filterAndRender() {
+            markersLayer.clearLayers();
+            const center = map.getCenter();
+            const zoom = map.getZoom();
+            allTereni.forEach(d => {
+                if (center.distanceTo(L.latLng(d.lat, d.lng)) / 1000 <= 20) {
+                    const isOut = zoom < 14;
+                    const icon = L.divIcon({
+                        className: '',
+                        html: `<div class="sport-marker-wrapper ${isOut?'zoom-out':''}" onclick="handleMarkerClick(event,'${d.key}')">
+                            <div class="sport-ball">${sportEmojis[d.sport] || "⚽"}</div>
+                            <div class="live-card-thin">
+                                <div class="mini-status status-${d.status}"></div>
+                                <div class="match-details">
+                                    <div class="match-name-thin">${d.name}</div>
+                                    <div class="match-teams-thin">${d.t1} - ${d.t2}</div>
+                                </div>
+                                <div class="match-score-thin">${d.score1}:${d.score2}</div>
+                            </div>
+                        </div>`,
+                        iconSize: isOut ? [20, 20] : [220, 40], iconAnchor: isOut ? [10, 10] : [20, 20] 
+                    });
+                    L.marker([d.lat, d.lng], { icon }).addTo(markersLayer);
+                }
             });
         }
+
+        window.handleMarkerClick = async function(e, key) {
+            e.stopPropagation();
+            const d = allTereni.find(t => t.key === key);
+            let myNick = (localStorage.getItem('app_nick') || '').toUpperCase();
+            
+            if (myNick !== d.creator) {
+                const p = prompt("UNESITE PIN ZA KONTROLU:");
+                if (!p) return;
+                const u = await db.ref('users/' + d.creator).get();
+                if (u.exists() && u.val().pin.toUpperCase() == p.toUpperCase()) {
+                    localStorage.setItem('app_nick', d.creator);
+                } else return alert("POGREŠAN PIN!");
+            }
+
+            currentAdminKey = key;
+            document.getElementById('adm-name').innerText = d.name;
+            document.getElementById('adm-teams').innerText = `${d.t1} VS ${d.t2}`;
+            document.getElementById('adm-history').innerText = `PERIODI: ${d.history || '-'}`;
+            
+            setupScoreButtons(d.sport);
+            
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                const diff = d.expires - Date.now();
+                if (diff <= 0) { closeAdmin(); return; }
+                const h = Math.floor(diff/3600000).toString().padStart(2,'0');
+                const m = Math.floor((diff%3600000)/60000).toString().padStart(2,'0');
+                const s = Math.floor((diff%60000)/1000).toString().padStart(2,'0');
+                document.getElementById('adm-expiry').innerText = `ISTIČE ZA: ${h}:${m}:${s}`;
+            }, 1000);
+
+            document.getElementById('admin-panel').classList.add('active');
+        };
+
+        function setupScoreButtons(sport) {
+            const container = document.getElementById('score-buttons');
+            container.innerHTML = '';
+            let btnConfig = [];
+            
+            if (sport === "KOŠARKA") {
+                btnConfig = [
+                    { t: 1, v: 1, n: "+1" }, { t: 2, v: 1, n: "+1" },
+                    { t: 1, v: 2, n: "+2" }, { t: 2, v: 2, n: "+2" },
+                    { t: 1, v: 3, n: "+3" }, { t: 2, v: 3, n: "+3" }
+                ];
+            } else {
+                btnConfig = [{ t: 1, v: 1, n: "+1" }, { t: 2, v: 1, n: "+1" }];
+            }
+
+            btnConfig.forEach(b => {
+                const btn = document.createElement('button');
+                btn.className = "admin-btn btn-blue";
+                btn.innerText = `TIM ${b.t} ${b.n}`;
+                btn.onclick = () => adminScore(b.t, b.v);
+                container.appendChild(btn);
+            });
+        }
+
+        async function adminScore(team, val) {
+            const s = await db.ref('tereni/' + currentAdminKey).get();
+            const key = 'score' + team;
+            db.ref('tereni/' + currentAdminKey).update({ [key]: (s.val()[key] || 0) + val });
+        }
+
+        async function adminNextPeriod() {
+            const s = (await db.ref('tereni/' + currentAdminKey).get()).val();
+            const currentRes = `${s.score1}:${s.score2}`;
+            const newHistory = s.history ? `${s.history} | ${currentRes}` : currentRes;
+            
+            // Ako je Odbojka/Tenis, glavni score ostaje kao broj setova, a trenutni se resetuje
+            // Ovde implementiramo generalni reset poena za novi period
+            db.ref('tereni/' + currentAdminKey).update({
+                history: newHistory,
+                score1: 0,
+                score2: 0
+            });
+        }
+
+        window.adminStatus = (status) => db.ref('tereni/' + currentAdminKey).update({ status });
+        window.adminDelete = () => { if(confirm("OBRIŠI?")) { db.ref('tereni/' + currentAdminKey).remove(); closeAdmin(); } };
+        window.closeAdmin = () => document.getElementById('admin-panel').classList.remove('active');
 
         function trackGPS() {
             navigator.geolocation.watchPosition(pos => {
