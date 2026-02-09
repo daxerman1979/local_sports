@@ -26,30 +26,30 @@
         
         .live-card-thin {
             background: white; border: 2px solid #007AFF; border-radius: 0 20px 20px 0;
-            padding: 2px 15px 2px 20px; margin-left: -18px;
+            padding: 0 15px 0 20px; margin-left: -18px;
             display: flex; align-items: center; gap: 8px;
             box-shadow: 3px 3px 10px rgba(0,0,0,0.2); z-index: 5;
-            height: 42px; position: relative;
+            height: 38px;
         }
 
         .zoom-out .live-card-thin { display: none; }
         .zoom-out .sport-ball { font-size: 16px; }
 
         .match-details { display: flex; flex-direction: column; line-height: 1.1; }
-        .match-name-thin { font-size: 9px; font-weight: 400; color: #666; text-transform: uppercase; }
-        .match-teams-thin { font-size: 12px; font-weight: 800; color: #111; }
+        .match-name-thin { font-size: 10px; font-weight: 400; color: #666; text-transform: uppercase; }
+        .match-teams-thin { font-size: 13px; font-weight: 800; color: #111; }
         .match-score-thin { font-size: 18px; color: #007AFF; font-family: 'Oswald', sans-serif; min-width: 45px; text-align: center; border-left: 1px solid #ddd; padding-left: 10px; margin-left: 5px; }
         
-        .expiry-timer { position: absolute; bottom: 2px; right: 15px; font-size: 7px; color: #888; font-weight: bold; }
-
         .mini-status { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
         .status-live { background: #ff3b30; animation: blink 1s infinite; }
         .status-upcoming { background: #4cd964; }
         .status-ended { background: #8e8e93; }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
+        /* ADMIN PANEL SA TAJMEROM */
         #admin-panel { position: fixed; bottom: -100%; left: 0; width: 100%; background: white; border-radius: 25px 25px 0 0; padding: 25px; z-index: 3000; transition: 0.4s ease-out; box-shadow: 0 -5px 25px rgba(0,0,0,0.4); text-align: center; }
         #admin-panel.active { bottom: 0; }
+        .admin-timer { font-size: 12px; color: #ff3b30; font-weight: bold; margin-bottom: 10px; display: block; }
         .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
         .admin-btn { padding: 14px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; color: white; }
         .btn-blue { background: #007AFF; }
@@ -73,6 +73,7 @@
 
     <div id="admin-panel">
         <div onclick="closeAdmin()" style="float:right; cursor:pointer; font-size:24px; padding:10px;">&times;</div>
+        <span class="admin-timer" id="adm-expiry">Ističe za: --:--:--</span>
         <h2 id="adm-name" style="margin:0; font-family:'Oswald'; color:#007AFF;"></h2>
         <p id="adm-teams" style="margin:5px 0; font-size:16px; font-weight:bold; color:#111;"></p>
         <div id="active-controls" class="admin-grid">
@@ -97,7 +98,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        let map, userMarker, currentLat, currentLon, currentAdminKey = null;
+        let map, userMarker, currentLat, currentLon, currentAdminKey = null, timerInterval = null;
         let markersLayer = L.layerGroup();
         let allTereni = [];
         const sportEmojis = { "Fudbal": "⚽", "Košarka": "🏀", "Rukomet": "🤾", "Hokej": "🏒", "Odbojka": "🏐", "Tenis": "🎾" };
@@ -128,7 +129,7 @@
                 filterAndRender();
             });
             trackGPS();
-            setInterval(updateAllTimers, 1000);
+            setInterval(cleanupExpired, 60000);
         }
 
         function filterAndRender() {
@@ -142,33 +143,16 @@
                 if (dist <= 20) {
                     const customIcon = L.divIcon({
                         className: '',
-                        html: `<div class="sport-marker-wrapper ${isZoomedOut ? 'zoom-out' : ''}" onclick="handleMarkerClick(event, '${d.key}', '${d.creator}', '${d.name}', '${d.t1}', '${d.t2}', '${d.status}')"><div class="sport-ball">${sportEmojis[d.sport] || "⚽"}</div><div class="live-card-thin"><div class="mini-status status-${d.status}"></div><div class="match-details"><div class="match-name-thin">${d.name}</div><div class="match-teams-thin">${d.t1} - ${d.t2}</div></div><div class="match-score-thin">${d.score1}:${d.score2}</div><div class="expiry-timer" id="exp-${d.key}">--:--</div></div></div>`,
-                        iconSize: isZoomedOut ? [20, 20] : [220, 42],
-                        iconAnchor: isZoomedOut ? [10, 10] : [20, 21] 
+                        html: `<div class="sport-marker-wrapper ${isZoomedOut ? 'zoom-out' : ''}" onclick="handleMarkerClick(event, '${d.key}', '${d.creator}', '${d.name}', '${d.t1}', '${d.t2}', '${d.status}', ${d.expires})"><div class="sport-ball">${sportEmojis[d.sport] || "⚽"}</div><div class="live-card-thin"><div class="mini-status status-${d.status}"></div><div class="match-details"><div class="match-name-thin">${d.name}</div><div class="match-teams-thin">${d.t1} - ${d.t2}</div></div><div class="match-score-thin">${d.score1}:${d.score2}</div></div></div>`,
+                        iconSize: isZoomedOut ? [20, 20] : [220, 40],
+                        iconAnchor: isZoomedOut ? [10, 10] : [20, 20] 
                     });
                     L.marker([d.lat, d.lng], { icon: customIcon }).addTo(markersLayer);
                 }
             });
         }
 
-        function updateAllTimers() {
-            const now = Date.now();
-            allTereni.forEach(d => {
-                const el = document.getElementById(`exp-${d.key}`);
-                if (!el) return;
-                const timeLeft = d.expires - now;
-                if (timeLeft <= 0) {
-                    el.innerText = "00:00";
-                    db.ref('tereni/' + d.key).remove();
-                } else {
-                    const m = Math.floor(timeLeft / 60000).toString().padStart(2, '0');
-                    const s = Math.floor((timeLeft % 60000) / 1000).toString().padStart(2, '0');
-                    el.innerText = `${m}:${s}`;
-                }
-            });
-        }
-
-        window.handleMarkerClick = async function(e, key, creator, name, t1, t2, status) {
+        window.handleMarkerClick = async function(e, key, creator, name, t1, t2, status, expires) {
             e.stopPropagation();
             let myNick = localStorage.getItem('app_nick');
             if (myNick !== creator) {
@@ -184,6 +168,20 @@
             document.getElementById('adm-name').innerText = name;
             document.getElementById('adm-teams').innerText = `${t1} vs ${t2}`;
             document.getElementById('active-controls').style.display = (status === 'ended') ? 'none' : 'grid';
+            
+            // Pokreni tajmer u Admin Panelu
+            if (timerInterval) clearInterval(timerInterval);
+            const updateAdminTimer = () => {
+                const diff = expires - Date.now();
+                if (diff <= 0) { document.getElementById('adm-expiry').innerText = "Isteklo!"; return; }
+                const h = Math.floor(diff / 3600000).toString().padStart(2, '0');
+                const m = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
+                const s = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
+                document.getElementById('adm-expiry').innerText = `Teren ističe za: ${h}:${m}:${s}`;
+            };
+            updateAdminTimer();
+            timerInterval = setInterval(updateAdminTimer, 1000);
+            
             document.getElementById('admin-panel').classList.add('active');
         };
 
@@ -201,14 +199,18 @@
             if (snap.exists() && snap.val().lastTerenKey) await db.ref('tereni/' + snap.val().lastTerenKey).remove();
             
             const newRef = db.ref('tereni').push();
-            // TEST VREME: 120000ms = 2 minuta
-            await newRef.set({ name, lat, lng, creator: nick, expires: Date.now() + 120000, t1, t2, score1: 0, score2: 0, status: "upcoming", sport: "Fudbal" });
+            // Vratili na 24 sata (86400000 ms)
+            await newRef.set({ name, lat, lng, creator: nick, expires: Date.now() + 86400000, t1, t2, score1: 0, score2: 0, status: "upcoming", sport: "Fudbal" });
             await userRef.update({ lastTerenKey: newRef.key });
             localStorage.setItem('app_nick', nick);
             map.closePopup();
         }
 
-        window.closeAdmin = () => document.getElementById('admin-panel').classList.remove('active');
+        window.closeAdmin = () => {
+            document.getElementById('admin-panel').classList.remove('active');
+            if (timerInterval) clearInterval(timerInterval);
+        };
+
         window.adminScore = async (team) => {
             const snap = await db.ref('tereni/' + currentAdminKey).get();
             const updates = {};
@@ -217,6 +219,12 @@
         };
         window.adminStatus = (status) => { db.ref('tereni/' + currentAdminKey).update({ status }); if(status === 'ended') closeAdmin(); }
         window.adminDelete = () => { if(confirm("Obriši?")) { db.ref('tereni/' + currentAdminKey).remove(); closeAdmin(); } };
+
+        function cleanupExpired() {
+            db.ref('tereni').get().then(snap => {
+                snap.forEach(child => { if(Date.now() > child.val().expires) child.ref.remove(); });
+            });
+        }
 
         function trackGPS() {
             navigator.geolocation.watchPosition(pos => {
