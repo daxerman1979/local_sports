@@ -50,7 +50,13 @@
         #admin-panel.active { bottom: 0; }
         .admin-timer { font-size: 12px; color: #ff3b30; font-weight: bold; margin-bottom: 10px; display: block; }
         .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
-        .admin-btn { padding: 14px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; color: white; text-transform: uppercase; }
+        
+        /* FIX: touch-action sprečava zumiranje na dvostruki klik */
+        .admin-btn { 
+            padding: 14px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; color: white; text-transform: uppercase; 
+            touch-action: manipulation; 
+        }
+        
         .btn-blue { background: #007AFF; }
         .btn-red { background: #ff3b30; }
         .btn-grey { background: #8e8e93; }
@@ -165,7 +171,7 @@
                 if (dist <= 20) {
                     const customIcon = L.divIcon({
                         className: '',
-                        html: `<div class="sport-marker-wrapper ${isZoomedOut ? 'zoom-out' : ''}" onclick="handleMarkerClick(event, '${d.key}', '${d.creator}', '${d.name}', '${d.t1}', '${d.t2}', '${d.status}', ${d.expires})"><div class="sport-ball">${sportEmojis[d.sport] || "⚽"}</div><div class="live-card-thin"><div class="mini-status status-${d.status}"></div><div class="match-details"><div class="match-name-thin">${d.name.toUpperCase()}</div><div class="match-teams-thin">${d.t1.toUpperCase()} - ${d.t2.toUpperCase()}</div></div><div class="match-score-thin">${d.score1}:${d.score2}</div></div></div>`,
+                        html: `<div class="sport-marker-wrapper ${isZoomedOut ? 'zoom-out' : ''}" onclick="handleMarkerClick(event, '${d.key}', '${d.creator}', '${d.name}', '${d.t1}', '${d.t2}', '${d.status}', ${d.expires})"><div class="sport-ball">${sportEmojis[d.sport.toUpperCase()] || "⚽"}</div><div class="live-card-thin"><div class="mini-status status-${d.status}"></div><div class="match-details"><div class="match-name-thin">${d.name.toUpperCase()}</div><div class="match-teams-thin">${d.t1.toUpperCase()} - ${d.t2.toUpperCase()}</div></div><div class="match-score-thin">${d.score1}:${d.score2}</div></div></div>`,
                         iconSize: isZoomedOut ? [20, 20] : [220, 40],
                         iconAnchor: isZoomedOut ? [10, 10] : [20, 20] 
                     });
