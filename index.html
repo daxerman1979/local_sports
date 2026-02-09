@@ -12,14 +12,18 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         html, body { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background: #000; position: fixed; font-family: 'Segoe UI', sans-serif; }
 
+        /* HERO SCREEN */
         #hero { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.9)), url('https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=1470&auto=format&fit=crop') center/cover; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 2000; transition: 0.8s; }
         #hero h1 { color: #fff; font-family: 'Oswald', sans-serif; font-size: 3rem; text-align: center; }
 
+        /* MAPA */
         #map { width: 100vw; height: 100vh; background: #111; display: none; }
         
+        /* SEARCH */
         .search-container { position: absolute; top: 15px; left: 15px; right: 15px; z-index: 1000; display: none; }
-        #search-input { width: 100%; height: 50px; border-radius: 25px; border: 2px solid #007AFF; padding: 0 20px; font-size: 16px; outline: none; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        #search-input { width: 100%; height: 50px; border-radius: 25px; border: 2px solid #007AFF; padding: 0 20px; font-size: 16px; outline: none; box-shadow: 0 4px 15px rgba(0,0,0,0.5); background: white; }
 
+        /* MARKERI */
         .sport-marker-wrapper { display: flex; align-items: center; white-space: nowrap; cursor: pointer; }
         .sport-ball { font-size: 32px; z-index: 20; filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.4)); }
         
@@ -28,34 +32,37 @@
             padding: 8px 15px 8px 20px; margin-left: -18px;
             display: flex; flex-direction: column; gap: 4px;
             box-shadow: 4px 4px 12px rgba(0,0,0,0.3); z-index: 5;
-            min-width: 160px;
+            min-width: 150px;
         }
-
-        .match-info { font-size: 13px; font-weight: bold; color: #333; }
         .match-score { font-size: 24px; color: #007AFF; font-family: 'Oswald', sans-serif; margin: 2px 0; }
         .match-status { font-size: 10px; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; align-self: flex-start; font-weight: bold; }
         .status-live { background: #ff3b30; color: white; animation: blink 1s infinite; }
         .status-upcoming { background: #4cd964; color: white; }
         .status-ended { background: #8e8e93; color: white; }
-
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
-        /* KONTROLE - Vidljive samo vlasniku */
-        .owner-controls {
-            background: #f1f1f1; border: 2px solid #333; border-radius: 12px 0 0 12px;
-            padding: 5px 12px 5px 8px; margin-right: -15px;
-            display: flex; flex-direction: column; gap: 4px; z-index: 5;
+        /* ELEGANTNI UPRAVLJAČKI PANEL (DASHBOARD) */
+        #admin-panel {
+            position: fixed; bottom: -100%; left: 0; width: 100%; 
+            background: white; border-radius: 25px 25px 0 0;
+            padding: 25px; z-index: 3000; transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 -5px 25px rgba(0,0,0,0.3);
+            text-align: center;
         }
-
-        .btn-sm { padding: 4px 6px; font-size: 9px; border: none; border-radius: 4px; color: white; cursor: pointer; font-weight: bold; width: 45px; }
+        #admin-panel.active { bottom: 0; }
+        .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .admin-btn { padding: 15px; border: none; border-radius: 12px; font-weight: bold; font-size: 14px; cursor: pointer; color: white; }
         .btn-blue { background: #007AFF; }
         .btn-red { background: #ff3b30; }
+        .btn-grey { background: #8e8e93; }
+        .close-admin { position: absolute; top: 10px; right: 20px; font-size: 24px; color: #888; cursor: pointer; }
 
+        /* POPUP FORME */
         .popup-box { padding: 5px; min-width: 240px; display: flex; flex-direction: column; gap: 8px; }
-        .popup-box input, .popup-box select { padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; width: 100%; }
-        .popup-box button { background: #007AFF; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .popup-box input, .popup-box select { padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; width: 100%; }
+        .popup-box button { background: #007AFF; color: white; border: none; padding: 14px; border-radius: 8px; font-weight: bold; }
 
-        .location-btn { position: absolute; bottom: 30px; right: 20px; z-index: 1000; width: 55px; height: 55px; background: white; border-radius: 50%; display: none; justify-content: center; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.4); cursor: pointer; }
+        .location-btn { position: absolute; bottom: 30px; right: 20px; z-index: 1000; width: 55px; height: 55px; background: white; border-radius: 50%; display: none; justify-content: center; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
         .user-dot { width: 16px; height: 16px; background: #007AFF; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 10px #007AFF; }
     </style>
 </head>
@@ -67,7 +74,20 @@
         <p style="color:white; margin-top:15px; font-size:14px;">DODIRNI ZA ULAZ</p>
     </div>
 
-    <div class="search-container" id="sContainer"><input type="text" id="search-input" placeholder="Pretraži grad ili ulicu..."></div>
+    <div id="admin-panel">
+        <div class="close-admin" onclick="closeAdmin()">&times;</div>
+        <h2 id="adm-name" style="margin:0; font-family:'Oswald'; color:#007AFF;">IME TERENA</h2>
+        <p id="adm-teams" style="margin:5px 0; color:#666;">Tim A vs Tim B</p>
+        <div class="admin-grid">
+            <button class="admin-btn btn-blue" onclick="adminStatus('live')">POČNI MEČ (LIVE)</button>
+            <button class="admin-btn btn-grey" onclick="adminStatus('ended')">KRAJ MEČA</button>
+            <button class="admin-btn btn-blue" onclick="adminScore(1)">+ GOL TIM 1</button>
+            <button class="admin-btn btn-blue" onclick="adminScore(2)">+ GOL TIM 2</button>
+            <button class="admin-btn btn-red" style="grid-column: span 2;" onclick="adminDelete()">OBRIŠI TEREN SA MAPE</button>
+        </div>
+    </div>
+
+    <div class="search-container" id="sContainer"><input type="text" id="search-input" placeholder="Pretraži lokaciju..."></div>
     <div class="location-btn" id="lBtn" onclick="goToMyLocation()"><img src="https://cdn-icons-png.flaticon.com/512/1865/1865269.png" width="28"></div>
     <div id="map"></div>
 
@@ -80,7 +100,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        let map, userMarker, currentLat, currentLon;
+        let map, userMarker, currentLat, currentLon, currentAdminKey = null;
         let markersLayer = L.layerGroup();
         const sportEmojis = { "Fudbal": "⚽", "Košarka": "🏀", "Rukomet": "🤾", "Hokej": "🏒", "Odbojka": "🏐", "Tenis": "🎾" };
 
@@ -108,8 +128,7 @@
                     <input type="text" id="p_name" placeholder="Ime terena">
                     <input type="text" id="p_t1" placeholder="Tim 1">
                     <input type="text" id="p_t2" placeholder="Tim 2">
-                    <input type="text" id="p_time" placeholder="Vreme (npr. 18:00)">
-                    <input type="password" id="p_pin" placeholder="PIN (6 simbola)" maxlength="6">
+                    <input type="password" id="p_pin" placeholder="PIN (6 cifara)" maxlength="6">
                     <button onclick="processTeren(${e.latlng.lat}, ${e.latlng.lng})">SAČUVAJ</button>
                 </div>`;
                 L.popup().setLatLng(e.latlng).setContent(html).openOn(map);
@@ -126,75 +145,52 @@
             const sport = document.getElementById('p_sport').value;
             const t1 = document.getElementById('p_t1').value.trim() || "Tim 1";
             const t2 = document.getElementById('p_t2').value.trim() || "Tim 2";
-            const time = document.getElementById('p_time').value.trim() || "Uskoro";
 
             if (nick.length < 3 || pin.length !== 6) return alert("Nick i PIN obavezni!");
 
             const userRef = db.ref('users/' + nick);
             const snap = await userRef.get();
             const expires = Date.now() + (24 * 60 * 60 * 1000);
+            const matchData = { name, sport, lat, lng, creator: nick, expires, t1, t2, score1: 0, score2: 0, status: "upcoming" };
 
-            const matchData = { name, sport, lat, lng, creator: nick, expires, t1, t2, score1: 0, score2: 0, startTime: time, status: "upcoming" };
+            if (snap.exists() && snap.val().pin !== pin) return alert("Pogrešan PIN!");
+            
+            if (!snap.exists()) await userRef.set({ pin: pin });
+            
+            if (snap.exists() && snap.val().lastTerenKey) await db.ref('tereni/' + snap.val().lastTerenKey).remove();
 
-            if (snap.exists()) {
-                if (snap.val().pin === pin) {
-                    sessionStorage.setItem('verified_pin', pin);
-                    sessionStorage.setItem('active_nick', nick);
-                    if (snap.val().lastTerenKey) await db.ref('tereni/' + snap.val().lastTerenKey).remove();
-                    const newRef = db.ref('tereni').push();
-                    await newRef.set(matchData);
-                    await userRef.update({ lastTerenKey: newRef.key });
-                } else return alert("Pogrešan PIN!");
-            } else {
-                await userRef.set({ pin: pin });
-                sessionStorage.setItem('verified_pin', pin);
-                sessionStorage.setItem('active_nick', nick);
-                const newRef = db.ref('tereni').push();
-                await newRef.set(matchData);
-                await userRef.update({ lastTerenKey: newRef.key });
-            }
+            const newRef = db.ref('tereni').push();
+            await newRef.set(matchData);
+            await userRef.update({ lastTerenKey: newRef.key });
 
             localStorage.setItem('app_nick', nick);
+            localStorage.setItem('app_pin', pin); // Sesija vlasnika
             map.closePopup();
         }
 
         function syncData() {
             db.ref('tereni').on('value', snap => {
                 markersLayer.clearLayers();
-                const sessionNick = sessionStorage.getItem('active_nick');
-                const sessionPin = sessionStorage.getItem('verified_pin');
+                const myNick = localStorage.getItem('app_nick');
 
                 snap.forEach(child => {
                     const d = child.val();
                     const key = child.key;
                     if (Date.now() > d.expires) { child.ref.remove(); return; }
 
-                    const isOwner = (sessionNick === d.creator);
-
-                    const controls = isOwner ? `
-                        <div class="owner-controls">
-                            <button class="btn-sm btn-blue" onclick="event.stopPropagation(); changeStatus('${key}', 'live')">LIVE</button>
-                            <button class="btn-sm btn-red" onclick="event.stopPropagation(); updateScore('${key}', 1)">+ T1</button>
-                            <button class="btn-sm btn-red" onclick="event.stopPropagation(); updateScore('${key}', 2)">+ T2</button>
-                            <button class="btn-sm btn-blue" onclick="event.stopPropagation(); changeStatus('${key}', 'ended')">KRAJ</button>
-                            <button class="btn-sm btn-red" onclick="event.stopPropagation(); reqDel('${key}')">DEL</button>
-                        </div>` : '';
-
                     const customIcon = L.divIcon({
                         className: '',
                         html: `
-                            <div class="sport-marker-wrapper">
-                                ${controls}
+                            <div class="sport-marker-wrapper" onclick="handleMarkerClick('${key}', '${d.creator}', '${d.name}', '${d.t1}', '${d.t2}')">
                                 <div class="sport-ball">${sportEmojis[d.sport] || "⚽"}</div>
                                 <div class="live-card">
                                     <span class="match-status status-${d.status}">${d.status}</span>
                                     <div class="match-info" style="color:#007AFF">${d.name}</div>
                                     <div class="match-info">${d.t1} vs ${d.t2}</div>
                                     <div class="match-score">${d.score1} : ${d.score2}</div>
-                                    <div style="font-size:10px; color:#888">${d.startTime}</div>
                                 </div>
                             </div>`,
-                        iconSize: [260, 100], iconAnchor: [130, 50]
+                        iconSize: [200, 80], iconAnchor: [30, 40]
                     });
 
                     L.marker([d.lat, d.lng], { icon: customIcon }).addTo(markersLayer);
@@ -202,20 +198,33 @@
             });
         }
 
-        window.updateScore = function(key, team) {
-            db.ref('tereni/' + key).get().then(snap => {
-                const updates = {};
-                updates['score' + team] = (snap.val()['score' + team] || 0) + 1;
-                db.ref('tereni/' + key).update(updates);
-            });
+        // UPRAVLJANJE KLIKOM
+        window.handleMarkerClick = function(key, creator, name, t1, t2) {
+            const myNick = localStorage.getItem('app_nick');
+            if (myNick === creator) {
+                currentAdminKey = key;
+                document.getElementById('adm-name').innerText = name;
+                document.getElementById('adm-teams').innerText = `${t1} vs ${t2}`;
+                document.getElementById('admin-panel').classList.add('active');
+            }
         };
 
-        window.changeStatus = function(key, newStatus) {
-            db.ref('tereni/' + key).update({ status: newStatus });
+        window.closeAdmin = () => document.getElementById('admin-panel').classList.remove('active');
+
+        window.adminScore = async (team) => {
+            const snap = await db.ref('tereni/' + currentAdminKey).get();
+            const updates = {};
+            updates['score' + team] = (snap.val()['score' + team] || 0) + 1;
+            db.ref('tereni/' + currentAdminKey).update(updates);
         };
 
-        window.reqDel = function(key) {
-            if(confirm("Obrisati teren?")) db.ref('tereni/' + key).remove();
+        window.adminStatus = (status) => db.ref('tereni/' + currentAdminKey).update({ status });
+        
+        window.adminDelete = () => {
+            if(confirm("Obriši ovaj teren?")) {
+                db.ref('tereni/' + currentAdminKey).remove();
+                closeAdmin();
+            }
         };
 
         function trackGPS() {
