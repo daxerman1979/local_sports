@@ -2,27 +2,33 @@
 <html lang="sr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>All Sports Local LIVE PRO</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&display=swap" rel="stylesheet">
     
     <style>
-        /* GLOBALNA BLOKADA ZUMIRANJA */
+        /* EKSTREMNA BLOKADA ZUMIRANJA */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-size: 16px; }
-        html, body { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background: #000; position: fixed; font-family: 'Segoe UI', sans-serif; touch-action: manipulation; }
+        html, body { 
+            margin: 0; padding: 0; height: 100%; width: 100%; 
+            overflow: hidden; background: #000; position: fixed; 
+            font-family: 'Segoe UI', sans-serif; 
+            touch-action: pan-x pan-y; 
+        }
 
-        input, select, button, textarea { font-size: 16px !important; }
+        /* Sva input polja moraju biti 16px da bi se izbegao zoom */
+        input, select, button, textarea { font-size: 16px !important; outline: none; }
 
         #hero { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.9)), url('https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=1470&auto=format&fit=crop') center/cover; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 2000; color: white; padding: 20px; }
         .auth-box { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); padding: 20px; border-radius: 15px; width: 100%; max-width: 320px; display: flex; flex-direction: column; gap: 10px; border: 1px solid rgba(255,255,255,0.2); }
-        .auth-box input { padding: 12px; border-radius: 8px; border: none; outline: none; text-transform: uppercase; background: rgba(255,255,255,0.9); color: #000; }
+        .auth-box input { padding: 12px; border-radius: 8px; border: none; background: rgba(255,255,255,0.9); color: #000; }
         .auth-btn { background: #007AFF; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
 
         #map { width: 100vw; height: 100vh; background: #111; display: none; }
         
-        /* MARKERI I ANIMACIJA */
+        /* MARKERI */
         .sport-marker-wrapper { display: flex; align-items: center; white-space: nowrap; cursor: pointer; }
         .sport-ball { font-size: 32px; z-index: 20; filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.4)); }
         
@@ -43,7 +49,7 @@
         .match-details { display: flex; flex-direction: column; line-height: 1.1; }
         .match-name-thin { font-size: 10px; font-weight: 800; color: #007AFF; text-transform: uppercase; }
         .match-teams-thin { font-size: 12px; font-weight: 700; color: #111; text-transform: uppercase; }
-        .match-time-info { font-size: 9px; color: #666; }
+        .match-timer { font-size: 10px; color: #ff3b30; font-weight: bold; }
         .match-score-thin { font-size: 18px; color: #007AFF; font-family: 'Oswald', sans-serif; min-width: 40px; text-align: center; border-left: 1px solid #ddd; padding-left: 10px; margin-left: 5px; }
 
         #admin-panel { position: fixed; bottom: -100%; left: 0; width: 100%; background: white; border-radius: 25px 25px 0 0; padding: 25px; z-index: 3000; transition: 0.4s ease-out; box-shadow: 0 -5px 25px rgba(0,0,0,0.4); text-align: center; }
@@ -57,13 +63,12 @@
         .location-btn { position: absolute; bottom: 30px; right: 20px; z-index: 1000; width: 55px; height: 55px; background: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
         
         .popup-box { padding: 5px; min-width: 240px; display: flex; flex-direction: column; gap: 8px; }
-        .popup-box input, .popup-box select { padding: 8px; border-radius: 8px; border: 1px solid #ccc; text-transform: uppercase; width: 100%; }
+        .popup-box input, .popup-box select { padding: 10px; border-radius: 8px; border: 1px solid #ccc; text-transform: uppercase; width: 100%; }
         .popup-box button { background: #007AFF; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: bold; }
 
-        .status-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; }
         .dot-live { background: #ff3b30; animation: blink 1s infinite; }
         .dot-upcoming { background: #4cd964; }
-        .dot-ended { background: #8e8e93; }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
     </style>
 </head>
@@ -74,7 +79,7 @@
         <div class="auth-box">
             <input type="email" id="email" placeholder="EMAIL" inputmode="email">
             <input type="password" id="password" placeholder="LOZINKA">
-            <button class="auth-btn" onclick="handleAuth()">PRISTUPI</button>
+            <button class="auth-btn" onclick="handleAuth()">ULAZ</button>
         </div>
     </div>
 
@@ -84,26 +89,23 @@
         
         <div id="adm-score-view" style="display:none; margin-top:10px;">
             <p id="adm-teams" style="font-weight:bold; font-size:18px; margin:0; text-transform: uppercase;"></p>
-            
             <div id="active-match-controls">
                 <div id="score-buttons" class="admin-grid"></div>
                 <div class="admin-grid">
-                    <button class="admin-btn btn-blue" onclick="adminStatus('live')">UŽIVO</button>
-                    <button class="admin-btn btn-grey" onclick="adminStatus('ended')">ZAVRŠI</button>
+                    <button class="admin-btn btn-red" onclick="adminStatus('live')">POČNI LIVE (START)</button>
+                    <button class="admin-btn btn-grey" onclick="adminStatus('ended')">ZAVRŠI MEČ</button>
                 </div>
             </div>
-            <div id="ended-match-msg" style="display:none; color: red; font-weight: bold; margin: 10px;">UTAKMICA JE ZAVRŠENA</div>
+            <div id="ended-msg" style="display:none; color: red; font-weight: bold; margin: 10px;">KRAJ UTAKMICE</div>
         </div>
 
         <div id="match-setup" style="display:flex; flex-direction:column; gap:8px; border-top:1px solid #ddd; padding-top:10px; margin-top:10px;">
             <input type="text" id="adm-t1" placeholder="TIM 1">
             <input type="text" id="adm-t2" placeholder="TIM 2">
-            <input type="date" id="adm-date">
-            <input type="time" id="adm-time">
-            <button class="admin-btn btn-blue" onclick="setupMatch()">POKRENI</button>
+            <button class="admin-btn btn-blue" onclick="setupMatch()">SAČUVAJ TIMOVE</button>
         </div>
 
-        <button class="admin-btn btn-red" style="width:100%; margin-top:20px;" onclick="adminDelete()">UKLONI TEREN</button>
+        <button class="admin-btn btn-red" style="width:100%; margin-top:20px;" onclick="adminDelete()">OBRIŠI TEREN</button>
     </div>
 
     <div id="map"></div>
@@ -132,7 +134,7 @@
         async function handleAuth() {
             const e = document.getElementById('email').value;
             const p = document.getElementById('password').value;
-            if(!e || !p) return alert("POPUNI POLJA");
+            if(!e || !p) return;
             try { await auth.signInWithEmailAndPassword(e, p); } 
             catch { try { await auth.createUserWithEmailAndPassword(e, p); } catch(err) { alert(err.message); } }
         }
@@ -148,16 +150,16 @@
 
         function initMap() {
             if (map) return;
-            map = L.map('map', { zoomControl: false, tap: false, maxZoom: 19, minZoom: 3 }).setView([44.7866, 20.4489], 13);
+            map = L.map('map', { zoomControl: false, tap: false }).setView([44.7866, 20.4489], 13);
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
             L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png').addTo(map);
             markersLayer.addTo(map);
 
             map.on('click', e => {
-                const html = `<div class="popup-box"><b>POSTAVI TEREN</b>
+                const html = `<div class="popup-box"><b>NOVI TEREN</b>
                 <select id="p_sport"><option value="FUDBAL">FUDBAL</option><option value="KOŠARKA">KOŠARKA</option></select>
-                <input type="text" id="p_name" placeholder="IME TERENA">
-                <button onclick="saveTeren(${e.latlng.lat}, ${e.latlng.lng})">OK</button></div>`;
+                <input type="text" id="p_name" placeholder="NAZIV">
+                <button onclick="saveTeren(${e.latlng.lat}, ${e.latlng.lng})">POSTAVI</button></div>`;
                 L.popup().setLatLng(e.latlng).setContent(html).openOn(map);
             });
 
@@ -168,17 +170,22 @@
                     let d = c.val(); d.key = c.key;
                     allTereni.push(d);
 
-                    const isLive = d.status === 'live';
+                    let timerHtml = "";
+                    if(d.status === 'live' && d.start_time) {
+                        const mins = Math.floor((Date.now() - d.start_time) / 60000);
+                        timerHtml = `<span class="match-timer">${mins}' LIVE</span>`;
+                    }
+
                     const icon = L.divIcon({
                         className: '',
-                        html: `<div class="sport-marker-wrapper ${isLive ? 'status-live-wrapper' : ''}">
+                        html: `<div class="sport-marker-wrapper ${d.status === 'live' ? 'status-live-wrapper' : ''}">
                             <div class="sport-ball">${sportEmojis[d.sport] || '⚽'}</div>
                             <div class="live-card-thin">
-                                <div class="status-dot dot-${d.status || 'upcoming'}"></div>
+                                <div class="dot dot-${d.status === 'live' ? 'live' : 'upcoming'}"></div>
                                 <div class="match-details">
                                     <span class="match-name-thin">${d.name}</span>
-                                    <span class="match-teams-thin">${(d.t1 && d.t2) ? d.t1+' - '+d.t2 : 'SLOBODNO'}</span>
-                                    ${(d.match_time) ? `<span class="match-time-info">${d.match_date} u ${d.match_time}</span>` : ''}
+                                    <span class="match-teams-thin">${(d.t1) ? d.t1+' - '+d.t2 : 'SLOBODNO'}</span>
+                                    ${timerHtml}
                                 </div>
                                 ${(d.score1 !== undefined) ? `<div class="match-score-thin">${d.score1}:${d.score2}</div>` : ''}
                             </div>
@@ -187,10 +194,7 @@
                     });
 
                     const marker = L.marker([d.lat, d.lng], { icon }).addTo(markersLayer);
-                    marker.on('click', (ev) => {
-                        L.DomEvent.stopPropagation(ev); 
-                        openAdmin(d.key);
-                    });
+                    marker.on('click', (ev) => { L.DomEvent.stopPropagation(ev); openAdmin(d.key); });
                 });
             });
             trackGPS();
@@ -218,24 +222,17 @@
                 document.getElementById('match-setup').style.display = 'none';
                 document.getElementById('adm-teams').innerText = `${d.t1} VS ${d.t2}`;
                 
-                // Generisanje dugmića po sportu
                 const btnContainer = document.getElementById('score-buttons');
                 btnContainer.innerHTML = '';
-                const points = (d.sport === "KOŠARKA") ? [1, 2, 3] : [1];
-                
-                points.forEach(p => {
+                const pts = (d.sport === "KOŠARKA") ? [1, 2, 3] : [1];
+                pts.forEach(p => {
                     btnContainer.innerHTML += `<button class="admin-btn btn-blue" onclick="adminScore(1, ${p})">+${p} T1</button>`;
                     btnContainer.innerHTML += `<button class="admin-btn btn-blue" onclick="adminScore(2, ${p})">+${p} T2</button>`;
                 });
 
-                // Provera statusa KRAJ
-                if(d.status === 'ended') {
-                    document.getElementById('active-match-controls').style.display = 'none';
-                    document.getElementById('ended-match-msg').style.display = 'block';
-                } else {
-                    document.getElementById('active-match-controls').style.display = 'block';
-                    document.getElementById('ended-match-msg').style.display = 'none';
-                }
+                const isEnded = d.status === 'ended';
+                document.getElementById('active-match-controls').style.display = isEnded ? 'none' : 'block';
+                document.getElementById('ended-msg').style.display = isEnded ? 'block' : 'none';
 
             } else {
                 document.getElementById('adm-score-view').style.display = 'none';
@@ -247,25 +244,21 @@
         async function setupMatch() {
             const t1 = document.getElementById('adm-t1').value.toUpperCase();
             const t2 = document.getElementById('adm-t2').value.toUpperCase();
-            const mDate = document.getElementById('adm-date').value;
-            const mTime = document.getElementById('adm-time').value;
             if(!t1 || !t2) return;
-            await db.ref(`tereni/${currentAdminKey}`).update({ 
-                t1, t2, score1: 0, score2: 0, status: 'upcoming',
-                match_date: mDate, match_time: mTime
-            });
-            closeAdmin();
+            await db.ref(`tereni/${currentAdminKey}`).update({ t1, t2, score1: 0, score2: 0 });
+            openAdmin(currentAdminKey);
         }
 
         window.adminScore = (team, val) => {
             const d = allTereni.find(x => x.key === currentAdminKey);
-            if(d.status === 'ended') return;
             db.ref(`tereni/${currentAdminKey}`).update({ [`score${team}`]: (d[`score${team}`] || 0) + val });
         };
 
         window.adminStatus = (s) => {
-            db.ref(`tereni/${currentAdminKey}`).update({ status: s });
-            if(s === 'ended') openAdmin(currentAdminKey); // Osveži panel
+            const upd = { status: s };
+            if(s === 'live') upd.start_time = Date.now();
+            db.ref(`tereni/${currentAdminKey}`).update(upd);
+            closeAdmin();
         };
 
         window.adminDelete = () => { if(confirm("OBRIŠI?")) { db.ref(`tereni/${currentAdminKey}`).remove(); closeAdmin(); } };
@@ -274,11 +267,14 @@
         function trackGPS() {
             navigator.geolocation.watchPosition(pos => {
                 currentLat = pos.coords.latitude; currentLon = pos.coords.longitude;
-                if (!userMarker) userMarker = L.marker([currentLat, currentLon], { icon: L.divIcon({ className:'', html:'<div class="user-dot" style="width:16px;height:16px;background:#007AFF;border-radius:50%;border:2px solid white;"></div>', iconAnchor:[8,8] }) }).addTo(map);
+                if (!userMarker) userMarker = L.marker([currentLat, currentLon], { icon: L.divIcon({ className:'', html:'<div style="width:16px;height:16px;background:#007AFF;border-radius:50%;border:2px solid white;"></div>', iconAnchor:[8,8] }) }).addTo(map);
                 else userMarker.setLatLng([currentLat, currentLon]);
             }, null, { enableHighAccuracy: true });
         }
         function goToMyLocation() { if(currentLat) map.flyTo([currentLat, currentLon], 16); }
+
+        // Interval za osvežavanje tajmera na mapi svake minute
+        setInterval(() => { if(allTereni.length > 0) markersLayer.clearLayers(); db.ref('tereni').once('value', () => {}); }, 60000);
     </script>
 </body>
 </html>
