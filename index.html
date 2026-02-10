@@ -174,10 +174,16 @@
         let steps = { 1: 1, 2: 1 }, userMarker, markersLayer = L.layerGroup();
         const sportEmojis = { "FUDBAL": "⚽", "KOŠARKA": "🏀" };
 
+        // AUTOMATSKI LOGOUT PRI ZATVARANJU
         async function handleAuth() {
             const e = document.getElementById('email').value, p = document.getElementById('password').value;
             if(!e || !p) return;
-            try { await auth.signInWithEmailAndPassword(e, p); } catch { try { await auth.createUserWithEmailAndPassword(e, p); } catch(err) { alert(err.message); } }
+            try { 
+                await auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
+                await auth.signInWithEmailAndPassword(e, p); 
+            } catch { 
+                try { await auth.createUserWithEmailAndPassword(e, p); } catch(err) { alert(err.message); } 
+            }
         }
 
         auth.onAuthStateChanged(user => { if (user) { document.getElementById('hero').style.display='none'; document.getElementById('map').style.display='block'; document.getElementById('lBtn').style.display='flex'; initMap(); } });
@@ -188,7 +194,6 @@
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', { opacity: 0.9, zIndex: 1000 }).addTo(map);
             markersLayer.addTo(map);
-            
             map.on('zoomend moveend', renderMarkers);
             map.on('click', e => {
                 const moji = allTereni.filter(t => t.owner === auth.currentUser.uid);
@@ -196,7 +201,6 @@
                 const html = `<div class="pop-header">Novi Teren</div><div class="pop-body"><label>Sport</label><select id="p_sport"><option value="FUDBAL">FUDBAL ⚽</option><option value="KOŠARKA">KOŠARKA 🏀</option></select><label>Naziv</label><input type="text" id="p_name" placeholder="Lokacija..."><button class="pop-btn" onclick="saveTeren(${e.latlng.lat}, ${e.latlng.lng})">Kreiraj</button></div>`;
                 L.popup().setLatLng(e.latlng).setContent(html).openOn(map);
             });
-
             db.ref('tereni').on('value', snap => { 
                 allTereni = []; snap.forEach(c => { let d = c.val(); d.key = c.key; allTereni.push(d); }); 
                 renderMarkers(); 
@@ -213,13 +217,17 @@
 
             allTereni.forEach(d => {
                 const pos = L.latLng(d.lat, d.lng);
-                
-                // OGRANIČENJE NA 20KM OD CENTRA MAPE
                 if (center.distanceTo(pos) > 20000) return;
 
                 let statusCls = d.status==='live' ? 'status-live-wrapper' : '';
                 let statusLabel = d.status==='live' ? `<span class="status-pill">LIVE</span>` : (d.status==='ended' ? `<span class="status-pill" style="background:#444;">KRAJ</span>` : "");
-                let timeLabel = (d.status !== 'ended' && d.scheduled_at) ? `<span class="time-label">${new Date(d.scheduled_at).toLocaleDateString('sr-RS',{day:'2-digit',month:'2-digit'})} ${new Date(d.scheduled_at).toLocaleTimeString('sr-RS',{hour:'2-digit',minute:'2-digit'})}</span>` : "";
+                
+                // VREME I DATUM UVEK STOJE
+                let timeLabel = "";
+                if (d.scheduled_at) {
+                    const dt = new Date(d.scheduled_at);
+                    timeLabel = `<span class="time-label">${dt.toLocaleDateString('sr-RS',{day:'2-digit',month:'2-digit'})} ${dt.toLocaleTimeString('sr-RS',{hour:'2-digit',minute:'2-digit'})}</span>`;
+                }
 
                 const icon = L.divIcon({ 
                     className: isHide ? 'zoom-hide' : '', 
