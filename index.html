@@ -24,49 +24,49 @@
         .user-location-dot { width: 18px; height: 18px; background: #007AFF; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 10px rgba(0,122,255,0.8); animation: pulse-gps 2s infinite; }
         @keyframes pulse-gps { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.2); opacity: 0.7; } 100% { transform: scale(1); opacity: 1; } }
         
-        /* NOVE KOMPAKTNIJE KARTICE */
-        .sport-marker-wrapper { display: flex; align-items: center; white-space: nowrap; cursor: pointer; transition: 0.3s; }
-        .sport-ball { font-size: 26px; z-index: 20; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); position: relative; }
+        /* MINI MODERNE KARTICE */
+        .sport-marker-wrapper { display: flex; align-items: center; white-space: nowrap; cursor: pointer; transition: 0.2s; }
+        .sport-ball { font-size: 24px; z-index: 20; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
         
         .live-card-thin {
             background: rgba(255, 255, 255, 0.95); 
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(4px);
             border: 2px solid #007AFF; 
-            border-radius: 40px;
-            padding: 2px 12px 2px 18px; 
-            margin-left: -15px;
+            border-radius: 30px;
+            padding: 2px 10px 2px 15px; 
+            margin-left: -12px;
             display: flex; 
             align-items: center; 
-            gap: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3); 
+            gap: 6px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4); 
             z-index: 5; 
-            height: 48px;
+            height: 42px;
         }
         
         .zoom-hide .live-card-thin { display: none; }
         .zoom-hide .sport-ball { font-size: 18px; }
 
         .status-live-wrapper .live-card-thin { border-color: #ff3b30; animation: pulse-border 1.5s infinite; }
-        @keyframes pulse-border { 0% { box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(255, 59, 48, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 59, 48, 0); } }
+        @keyframes pulse-border { 0% { box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.5); } 70% { box-shadow: 0 0 0 8px rgba(255, 59, 48, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 59, 48, 0); } }
 
         .match-details { display: flex; flex-direction: column; line-height: 1; }
-        .match-name-thin { font-size: 9px; font-weight: 800; color: #007AFF; text-transform: uppercase; letter-spacing: 0.5px; }
-        .match-teams-thin { font-size: 13px; font-weight: 900; color: #000; text-transform: uppercase; }
-        .match-sub-info { font-size: 9px; color: #fff; font-weight: 800; background: #ff3b30; padding: 1px 4px; border-radius: 4px; margin-left: 5px; vertical-align: middle; }
+        .match-name-thin { font-size: 8px; font-weight: 800; color: #007AFF; text-transform: uppercase; }
+        .match-teams-thin { font-size: 12px; font-weight: 900; color: #000; text-transform: uppercase; }
+        .match-sub-info { font-size: 8px; color: #fff; font-weight: 900; background: #ff3b30; padding: 1px 3px; border-radius: 3px; margin-left: 4px; }
         .match-score-thin { 
-            font-size: 22px; 
+            font-size: 19px; 
             color: #000; 
             font-family: 'Oswald', sans-serif; 
-            min-width: 45px; 
+            min-width: 35px; 
             text-align: center; 
             border-left: 1px solid #ddd; 
-            padding-left: 10px; 
-            margin-left: 5px; 
+            padding-left: 8px; 
+            margin-left: 4px; 
             font-weight: 700; 
         }
 
         /* KONTROLNI CENTAR */
-        #admin-panel { position: fixed; top: 0; left: 100%; width: 100%; height: 100%; background: #f4f7f6; z-index: 5000; transition: 0.3s ease-out; padding: 15px; display: flex; flex-direction: column; overflow: hidden; }
+        #admin-panel { position: fixed; top: 0; left: 100%; width: 100%; height: 100%; background: #f4f7f6; z-index: 7000; transition: 0.3s ease-out; padding: 15px; display: flex; flex-direction: column; overflow: hidden; }
         #admin-panel.active { left: 0; }
         .admin-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; height: 40px; }
         .admin-title { font-family: 'Oswald', sans-serif; font-size: 18px; color: #333; text-transform: uppercase; }
@@ -193,17 +193,15 @@
             if (map) return;
             map = L.map('map', { zoomControl: false, tap: false, maxZoom: 19, minZoom: 3 }).setView([44.7866, 20.4489], 6);
             
-            // 1. SATELITSKA PODLOGA
+            // 1. SATELITSKA PODLOGA (ESRI World Imagery)
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
             
-            // 2. DRŽAVNE GRANICE (Bela linija sa visokim kontrastom)
-            L.tileLayer('https://stamen-tiles.a.ssl.fastly.net/toner-lines/{z}/{x}/{y}.png', { 
-                opacity: 0.8,
-                pane: 'shadowPane' 
+            // 2. GRANICE I LABELE (ESRI World Boundaries and Places)
+            // Ovaj sloj je ključan jer se iscrtava preko satelita i daje bele granice država
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
+                opacity: 0.9,
+                zIndex: 1000
             }).addTo(map);
-
-            // 3. ADMIN GRANICE I LABELE (Gradovi i države)
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png').addTo(map);
 
             markersLayer.addTo(map);
             map.on('zoomend moveend', renderMarkers);
@@ -211,7 +209,7 @@
             map.on('click', e => {
                 const moji = allTereni.filter(t => t.owner === auth.currentUser.uid);
                 if (moji.length >= 3) { alert("LIMIT: MAX 3 TERENA!"); return; }
-                const html = `<div style="padding:10px;"><b>NOVI TEREN</b><br><select id="p_sport"><option value="FUDBAL">FUDBAL</option><option value="KOŠARKA">KOŠARKA</option></select><br><input type="text" id="p_name" placeholder="NAZIV" style="width:100%;margin:5px 0;"><br><button onclick="saveTeren(${e.latlng.lat}, ${e.latlng.lng})" style="width:100%;background:#007AFF;color:white;border:none;padding:5px;">SAČUVAJ</button></div>`;
+                const html = `<div style="padding:10px;"><b>NOVI TEREN</b><br><select id="p_sport"><option value="FUDBAL">FUDBAL</option><option value="KOŠARKA">KOŠARKA</option></select><br><input type="text" id="p_name" placeholder="NAZIV" style="width:100%;margin:5px 0;"><br><button onclick="saveTeren(${e.latlng.lat}, ${e.latlng.lng})" style="width:100%;background:#007AFF;color:white;border:none;padding:5px;border-radius:5px;">SAČUVAJ</button></div>`;
                 L.popup().setLatLng(e.latlng).setContent(html).openOn(map);
             });
 
@@ -228,17 +226,13 @@
             const zoom = map.getZoom(), center = map.getCenter(), isHide = zoom < 13;
             allTereni.forEach(d => {
                 const pos = L.latLng(d.lat, d.lng);
-                if (center.distanceTo(pos) > 50000) return; // 50km limit
+                if (center.distanceTo(pos) > 50000) return;
 
                 let statusCls = d.status==='live' ? 'status-live-wrapper' : '';
                 let info = "";
                 
                 if(d.status==='live') info = `<span class="match-sub-info">LIVE</span>`;
-                else if(d.status==='ended') info = `<span class="match-sub-info" style="background:#444;">KRAJ</span>`;
-                else if(d.scheduled_at) { 
-                    const dt = new Date(d.scheduled_at); 
-                    info = `<span style="font-size:8px; color:#666; margin-left:5px;">${dt.getHours()}:${dt.getMinutes().toString().padStart(2,'0')}</span>`; 
-                }
+                else if(d.status==='ended') info = `<span class="match-sub-info" style="background:#333;">KRAJ</span>`;
                 
                 const icon = L.divIcon({ 
                     className: isHide ? 'zoom-hide' : '', 
@@ -252,8 +246,8 @@
                                 <div class="match-score-thin">${d.score1}:${d.score2}</div>
                             </div>
                            </div>`, 
-                    iconSize: [200, 48], 
-                    iconAnchor: [15, 24] 
+                    iconSize: [180, 42], 
+                    iconAnchor: [12, 21] 
                 });
                 
                 L.marker([d.lat, d.lng], { icon }).addTo(markersLayer).on('click', e => { 
@@ -264,8 +258,10 @@
         }
 
         async function saveTeren(lat, lng) {
-            const name = document.getElementById('p_name').value.toUpperCase(), uid = auth.currentUser.uid;
+            const nameInput = document.getElementById('p_name');
+            const name = nameInput.value.toUpperCase();
             if(!name) return;
+            const uid = auth.currentUser.uid;
             await db.ref('tereni').push({ name, lat, lng, owner: uid, sport: document.getElementById('p_sport').value, status: 'upcoming', expires: Date.now()+86400000, score1: 0, score2: 0 });
             map.closePopup();
         }
