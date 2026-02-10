@@ -20,31 +20,25 @@
 
         #map { width: 100vw; height: 100vh; background: #111; display: none; }
 
-        /* PRECIZNI GPS DOT */
+        /* PRECIZNI GPS */
         .user-location-dot { width: 14px; height: 14px; background: #007AFF; border: 2px solid white; border-radius: 50%; box-shadow: 0 0 15px rgba(0,122,255,1); animation: pulse-gps 1.5s infinite; }
         @keyframes pulse-gps { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0,122,255,0.7); } 70% { transform: scale(1.2); box-shadow: 0 0 0 10px rgba(0,122,255,0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0,122,255,0); } }
         
-        /* ULTRA PRO SLIM KARTICE */
+        /* ULTRA PRO KARTICE SA PERIODIMA */
         .sport-marker-wrapper { display: flex; align-items: center; white-space: nowrap; cursor: pointer; transition: 0.2s; }
-        .sport-ball { font-size: 24px; z-index: 20; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); position: relative; }
+        .sport-ball { font-size: 26px; z-index: 20; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); position: relative; }
         
         .live-card-thin {
-            background: #fff; 
-            border: 2px solid #007AFF; 
-            border-radius: 8px;
-            padding: 0 8px; 
-            margin-left: -10px;
-            display: flex; 
-            align-items: center; 
-            height: 36px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5); 
-            z-index: 5; 
+            background: #fff; border: 2px solid #007AFF; border-radius: 10px;
+            padding: 2px 8px; margin-left: -12px;
+            display: flex; align-items: center; min-height: 44px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5); z-index: 5;
         }
         
         .zoom-hide .live-card-thin { display: none; }
         .zoom-hide .sport-ball { font-size: 18px; }
 
-        .status-live-wrapper .live-card-thin { border-color: #ff3b30; border-width: 2px; }
+        .status-live-wrapper .live-card-thin { border-color: #ff3b30; }
         .status-live-wrapper .sport-ball { animation: bounce-ball 0.5s ease infinite alternate; }
         @keyframes bounce-ball { from { transform: translateY(0); } to { transform: translateY(-3px); } }
 
@@ -54,15 +48,10 @@
         
         .status-pill { font-size: 7px; color: #fff; background: #ff3b30; padding: 1px 4px; border-radius: 3px; font-weight: 900; margin-left: 4px; }
         .match-score-thin { 
-            font-size: 20px; 
-            color: #000; 
-            font-family: 'Oswald', sans-serif; 
-            min-width: 40px; 
-            text-align: center; 
-            padding-left: 8px; 
-            font-weight: 700; 
-            letter-spacing: 1px;
+            font-size: 18px; color: #000; font-family: 'Oswald', sans-serif; 
+            min-width: 45px; text-align: center; padding-left: 8px; font-weight: 700; display: flex; flex-direction: column; line-height: 1;
         }
+        .periods-row { font-size: 8px; color: #ff3b30; font-weight: 800; letter-spacing: 0.5px; margin-top: 1px; }
 
         /* ADMIN PANEL */
         #admin-panel { position: fixed; top: 0; left: 100%; width: 100%; height: 100%; background: #f4f7f6; z-index: 7000; transition: 0.3s ease-out; padding: 15px; display: flex; flex-direction: column; }
@@ -191,20 +180,16 @@
         function initMap() {
             if (map) return;
             map = L.map('map', { zoomControl: false, tap: false, maxZoom: 19, minZoom: 3 }).setView([44.7866, 20.4489], 6);
-            
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', { opacity: 0.9, zIndex: 1000 }).addTo(map);
-
             markersLayer.addTo(map);
             map.on('zoomend moveend', renderMarkers);
-
             map.on('click', e => {
                 const moji = allTereni.filter(t => t.owner === auth.currentUser.uid);
                 if (moji.length >= 3) { alert("LIMIT: MAX 3 TERENA!"); return; }
                 const html = `<div style="padding:10px;"><b>NOVI TEREN</b><br><select id="p_sport"><option value="FUDBAL">FUDBAL</option><option value="KOŠARKA">KOŠARKA</option></select><br><input type="text" id="p_name" placeholder="NAZIV" style="width:100%;margin:5px 0;"><br><button onclick="saveTeren(${e.latlng.lat}, ${e.latlng.lng})" style="width:100%;background:#007AFF;color:white;border:none;padding:5px;border-radius:5px;">SAČUVAJ</button></div>`;
                 L.popup().setLatLng(e.latlng).setContent(html).openOn(map);
             });
-
             db.ref('tereni').on('value', snap => { 
                 allTereni = []; snap.forEach(c => { let d = c.val(); d.key = c.key; allTereni.push(d); }); 
                 renderMarkers(); 
@@ -219,11 +204,8 @@
             allTereni.forEach(d => {
                 const pos = L.latLng(d.lat, d.lng);
                 if (center.distanceTo(pos) > 50000) return;
-
                 let statusCls = d.status==='live' ? 'status-live-wrapper' : '';
-                let statusLabel = "";
-                if(d.status==='live') statusLabel = `<span class="status-pill">LIVE</span>`;
-                else if(d.status==='ended') statusLabel = `<span class="status-pill" style="background:#444;">KRAJ</span>`;
+                let statusLabel = d.status==='live' ? `<span class="status-pill">LIVE</span>` : (d.status==='ended' ? `<span class="status-pill" style="background:#444;">KRAJ</span>` : "");
                 
                 const icon = L.divIcon({ 
                     className: isHide ? 'zoom-hide' : '', 
@@ -234,24 +216,25 @@
                                     <span class="match-name-thin">${d.name}</span>
                                     <span class="match-teams-thin">${d.t1?d.t1+' - '+d.t2:'SLOBODNO'} ${statusLabel}</span>
                                 </div>
-                                <div class="match-score-thin">${d.score1}:${d.score2}</div>
+                                <div class="match-score-thin">
+                                    ${d.score1}:${d.score2}
+                                    ${d.sub_string ? `<div class="periods-row">${d.sub_string}</div>` : ''}
+                                </div>
                             </div>
                            </div>`, 
-                    iconSize: [160, 36], 
-                    iconAnchor: [10, 18] 
+                    iconSize: [180, 44], 
+                    iconAnchor: [12, 22] 
                 });
-                
                 L.marker([d.lat, d.lng], { icon }).addTo(markersLayer).on('click', e => { L.DomEvent.stopPropagation(e); openAdmin(d.key); });
             });
         }
 
         function trackGPS() {
             if (!navigator.geolocation) return;
+            // Forsiranje GPS senzora za maksimalnu preciznost
             navigator.geolocation.watchPosition(pos => {
                 currentLat = pos.coords.latitude;
                 currentLon = pos.coords.longitude;
-                const accuracy = pos.coords.accuracy;
-
                 if (!userMarker) {
                     userMarker = L.marker([currentLat, currentLon], { 
                         icon: L.divIcon({ className: 'user-location-dot', iconAnchor: [7, 7] }),
@@ -260,10 +243,10 @@
                 } else {
                     userMarker.setLatLng([currentLat, currentLon]);
                 }
-            }, err => { console.log(err); }, { 
+            }, err => { console.error(err); }, { 
                 enableHighAccuracy: true, 
-                maximumAge: 1000, 
-                timeout: 5000 
+                maximumAge: 0, 
+                timeout: 10000 
             });
         }
 
@@ -318,14 +301,18 @@
             if(!d || d.status !== 'live') return;
             const labels = d.sport === "KOŠARKA" ? ["Q1", "Q2", "Q3", "Q4"] : ["HT"];
             let p1 = 0, p2 = 0, target = null;
-            for (let l of labels) { if (!d.sub_details || !d.sub_details[l] || d.sub_details[l] === "0:0") { target = l; break; } else { const p = d.sub_details[l].split(':'); p1 += parseInt(p[0]); p2 += parseInt(p[1]); } }
-            if (!target) return alert("KRAJ PERIODA");
+            if (d.sub_details) {
+                for (let l of labels) { 
+                    if (!d.sub_details[l] || d.sub_details[l] === "0:0") { target = l; break; } 
+                    else { const p = d.sub_details[l].split(':'); p1 += parseInt(p[0]); p2 += parseInt(p[1]); } 
+                }
+            } else { target = labels[0]; }
+            if (!target) return alert("SVI PERIODI POPUNJENI");
             db.ref(`tereni/${currentAdminKey}/sub_details`).update({ [target]: `${d.score1 - p1}:${d.score2 - p2}` }).then(() => {
                 db.ref(`tereni/${currentAdminKey}`).once('value', s => {
                     let snap = s.val(), res = [];
-                    labels.forEach(l => { if(snap.sub_details && snap.sub_details[l] && snap.sub_details[l] !== "0:0") res.push(`${l} ${snap.sub_details[l]}`); });
+                    labels.forEach(l => { if(snap.sub_details && snap.sub_details[l]) res.push(`${l} ${snap.sub_details[l]}`); });
                     db.ref(`tereni/${currentAdminKey}`).update({ sub_string: res.join(' | ') });
-                    openAdmin(currentAdminKey);
                 });
             });
         }
