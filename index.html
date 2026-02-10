@@ -20,16 +20,13 @@
 
         #map { width: 100vw; height: 100vh; background: #111; display: none; }
 
-        /* SEARCH BAR */
         #search-container { position: absolute; top: 20px; left: 20px; z-index: 1000; width: calc(100% - 40px); max-width: 300px; }
         #city-search { width: 100%; padding: 12px 15px; border-radius: 25px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); color: white; font-weight: 600; font-size: 14px; }
         #city-search::placeholder { color: rgba(255,255,255,0.7); }
 
-        /* LOKACIJA DUGME */
         .location-btn { position: absolute; bottom: 30px; right: 20px; z-index: 1000; width: 45px; height: 45px; background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; }
         .location-btn img { filter: invert(1); opacity: 0.8; width: 22px; }
 
-        /* GPS I ANIMACIJE */
         .user-location-dot { width: 14px; height: 14px; background: #007AFF; border: 2px solid white; border-radius: 50%; box-shadow: 0 0 10px rgba(0,122,255,1); z-index: 10000; }
         .pulse-core { width: 100%; height: 100%; border-radius: 50%; background: rgba(0,122,255,0.4); animation: gps-pulse 2s infinite; }
         @keyframes gps-pulse { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(3); opacity: 0; } }
@@ -54,14 +51,12 @@
         .periods-row { font-size: 9px; color: #002d5f; font-weight: 900; letter-spacing: 0.5px; margin-top: 2px; }
         .time-label { color: #666; font-size: 8px; margin-left: 5px; font-weight: 500; }
 
-        /* POPUP UNOS TERENA */
         .leaflet-popup-content-wrapper { border-radius: 15px; padding: 0; overflow: hidden; }
         .leaflet-popup-content { margin: 0; width: 240px !important; }
         .pop-header { background: #007AFF; color: white; padding: 12px; text-align: center; font-weight: 900; font-size: 12px; text-transform: uppercase; }
         .pop-body { padding: 15px; display: flex; flex-direction: column; gap: 10px; background: #fff; }
         .pop-btn { background: #007AFF; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
 
-        /* ADMIN PANEL */
         #admin-panel { position: fixed; top: 0; left: 100%; width: 100%; height: 100%; background: #f0f2f5; z-index: 7000; transition: 0.3s cubic-bezier(0.1, 0.7, 1.0, 0.1); padding: 20px; display: flex; flex-direction: column; }
         #admin-panel.active { left: 0; }
         .admin-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
@@ -105,13 +100,14 @@
             <div class="live-board">
                 <div id="adm-teams-label" style="color:#007AFF; font-weight:900;">HOME VS AWAY</div>
                 <div class="main-score" id="adm-main-score">0 : 0</div>
+                <div id="adm-sub-display" style="font-size:16px; color:#ff3b30; font-weight:900;"></div>
                 <div id="match-status-label" style="font-size:11px; background:rgba(255,255,255,0.1); display:inline-block; padding:3px 10px; border-radius:20px; font-weight:900;">STATUS</div>
             </div>
             <div id="active-match-controls">
                 <div class="pro-controller-container">
                     <div class="team-ctrl">
                         <span id="label-t1" style="font-size:10px; font-weight:900;">TIM 1</span>
-                        <div style="display:flex; align-items:center; gap:10px;">
+                        <div id="step-ctrl-1" style="display:flex; align-items:center; gap:10px;">
                             <button class="step-btn" onclick="changeStep(1, -1)">-</button>
                             <div class="current-amt" id="step-h">1</div>
                             <button class="step-btn" onclick="changeStep(1, 1)">+</button>
@@ -123,7 +119,7 @@
                     </div>
                     <div class="team-ctrl">
                         <span id="label-t2" style="font-size:10px; font-weight:900;">TIM 2</span>
-                        <div style="display:flex; align-items:center; gap:10px;">
+                        <div id="step-ctrl-2" style="display:flex; align-items:center; gap:10px;">
                             <button class="step-btn" onclick="changeStep(2, -1)">-</button>
                             <div class="current-amt" id="step-a">1</div>
                             <button class="step-btn" onclick="changeStep(2, 1)">+</button>
@@ -172,9 +168,9 @@
 
         let map, currentLat, currentLon, currentAdminKey = null, allTereni = [];
         let steps = { 1: 1, 2: 1 }, userMarker, markersLayer = L.layerGroup();
-        const sportEmojis = { "FUDBAL": "⚽", "KOŠARKA": "🏀" };
+        const sportEmojis = { "FUDBAL": "⚽", "KOŠARKA": "🏀", "RUKOMET": "🤾", "ODBOJKA": "🏐", "TENIS": "🎾" };
+        const tennisPoints = ["0", "15", "30", "40", "Ad"];
 
-        // AUTOMATSKI LOGOUT PRI ZATVARANJU
         async function handleAuth() {
             const e = document.getElementById('email').value, p = document.getElementById('password').value;
             if(!e || !p) return;
@@ -198,7 +194,7 @@
             map.on('click', e => {
                 const moji = allTereni.filter(t => t.owner === auth.currentUser.uid);
                 if (moji.length >= 3) { alert("LIMIT: MAX 3 TERENA!"); return; }
-                const html = `<div class="pop-header">Novi Teren</div><div class="pop-body"><label>Sport</label><select id="p_sport"><option value="FUDBAL">FUDBAL ⚽</option><option value="KOŠARKA">KOŠARKA 🏀</option></select><label>Naziv</label><input type="text" id="p_name" placeholder="Lokacija..."><button class="pop-btn" onclick="saveTeren(${e.latlng.lat}, ${e.latlng.lng})">Kreiraj</button></div>`;
+                const html = `<div class="pop-header">Novi Teren</div><div class="pop-body"><label>Sport</label><select id="p_sport"><option value="FUDBAL">FUDBAL ⚽</option><option value="KOŠARKA">KOŠARKA 🏀</option><option value="RUKOMET">RUKOMET 🤾</option><option value="ODBOJKA">ODBOJKA 🏐</option><option value="TENIS">TENIS 🎾</option></select><label>Naziv</label><input type="text" id="p_name" placeholder="Lokacija..."><button class="pop-btn" onclick="saveTeren(${e.latlng.lat}, ${e.latlng.lng})">Kreiraj</button></div>`;
                 L.popup().setLatLng(e.latlng).setContent(html).openOn(map);
             });
             db.ref('tereni').on('value', snap => { 
@@ -214,20 +210,14 @@
             const center = map.getCenter();
             const zoom = map.getZoom();
             const isHide = zoom < 11;
-
             allTereni.forEach(d => {
                 const pos = L.latLng(d.lat, d.lng);
                 if (center.distanceTo(pos) > 20000) return;
-
                 let statusCls = d.status==='live' ? 'status-live-wrapper' : '';
                 let statusLabel = d.status==='live' ? `<span class="status-pill">LIVE</span>` : (d.status==='ended' ? `<span class="status-pill" style="background:#444;">KRAJ</span>` : "");
-                
-                // VREME I DATUM UVEK STOJE
-                let timeLabel = "";
-                if (d.scheduled_at) {
-                    const dt = new Date(d.scheduled_at);
-                    timeLabel = `<span class="time-label">${dt.toLocaleDateString('sr-RS',{day:'2-digit',month:'2-digit'})} ${dt.toLocaleTimeString('sr-RS',{hour:'2-digit',minute:'2-digit'})}</span>`;
-                }
+                let timeLabel = d.scheduled_at ? `<span class="time-label">${new Date(d.scheduled_at).toLocaleDateString('sr-RS',{day:'2-digit',month:'2-digit'})} ${new Date(d.scheduled_at).toLocaleTimeString('sr-RS',{hour:'2-digit',minute:'2-digit'})}</span>` : "";
+                let mainScore = `${d.score1}:${d.score2}`;
+                if(d.sport === "ODBOJKA" || d.sport === "TENIS") mainScore = `${d.score1}:${d.score2} (${d.pts1||0}:${d.pts2||0})`;
 
                 const icon = L.divIcon({ 
                     className: isHide ? 'zoom-hide' : '', 
@@ -238,7 +228,7 @@
                                     <span class="match-name-thin">${d.name} ${timeLabel}</span>
                                     <span class="match-teams-thin">${d.t1?d.t1+' - '+d.t2:'SLOBODNO'} ${statusLabel}</span>
                                 </div>
-                                <div class="match-score-thin">${d.score1}:${d.score2}${d.sub_string ? `<div class="periods-row">${d.sub_string}</div>` : ''}</div>
+                                <div class="match-score-thin">${mainScore}${d.sub_string ? `<div class="periods-row">${d.sub_string}</div>` : ''}</div>
                             </div>
                            </div>`, 
                     iconSize: [210, 48], iconAnchor: [12, 24] 
@@ -265,18 +255,21 @@
         }
 
         function goToMyLocation() { if(currentLat) map.flyTo([currentLat, currentLon], 17); }
+
         async function saveTeren(lat, lng) {
             const name = document.getElementById('p_name').value.toUpperCase();
             if(!name) return;
-            await db.ref('tereni').push({ name, lat, lng, owner: auth.currentUser.uid, sport: document.getElementById('p_sport').value, status: 'upcoming', expires: Date.now()+86400000, score1: 0, score2: 0 });
+            await db.ref('tereni').push({ name, lat, lng, owner: auth.currentUser.uid, sport: document.getElementById('p_sport').value, status: 'upcoming', expires: Date.now()+86400000, score1: 0, score2: 0, pts1: 0, pts2: 0 });
             map.closePopup();
         }
+
         function openAdmin(key) {
             const d = allTereni.find(x => x.key === key);
             if (!d || d.owner !== auth.currentUser.uid) return;
             currentAdminKey = key; refreshAdminPanel(key);
             document.getElementById('admin-panel').classList.add('active');
         }
+
         function refreshAdminPanel(key) {
             const d = allTereni.find(x => x.key === key); if(!d) return;
             document.getElementById('adm-name').innerText = d.name;
@@ -284,7 +277,17 @@
             if(d.t1) {
                 document.getElementById('adm-score-view').style.display = 'flex';
                 document.getElementById('match-setup').style.display = 'none';
-                document.getElementById('adm-main-score').innerText = `${d.score1} : ${d.score2}`;
+                let scoreText = `${d.score1} : ${d.score2}`;
+                let subText = "";
+                if(d.sport === "ODBOJKA" || d.sport === "TENIS") {
+                    subText = `TRENUTNI POENI: ${d.pts1} : ${d.pts2}`;
+                    if(d.sport === "TENIS") {
+                        const p1 = tennisPoints[d.pts1] || "0", p2 = tennisPoints[d.pts2] || "0";
+                        subText = `GEM POENI: ${p1} : ${p2}`;
+                    }
+                }
+                document.getElementById('adm-main-score').innerText = scoreText;
+                document.getElementById('adm-sub-display').innerText = subText;
                 document.getElementById('adm-teams-label').innerText = `${d.t1} VS ${d.t2}`;
                 document.getElementById('label-t1').innerText = d.t1; document.getElementById('label-t2').innerText = d.t2;
                 document.getElementById('match-status-label').innerText = d.status.toUpperCase();
@@ -292,23 +295,78 @@
                 document.getElementById('active-match-controls').style.display = isEnded ? 'none' : 'block';
                 document.getElementById('start-live-btn').style.display = d.status === 'upcoming' ? 'block' : 'none';
                 document.getElementById('end-match-btn').style.display = isLive ? 'block' : 'none';
+                
+                // Sakrij step kontrole za odbojku i tenis (idu po 1)
+                const showStep = (d.sport !== "ODBOJKA" && d.sport !== "TENIS");
+                document.getElementById('step-ctrl-1').style.visibility = showStep ? "visible" : "hidden";
+                document.getElementById('step-ctrl-2').style.visibility = showStep ? "visible" : "hidden";
+
             } else {
                 document.getElementById('adm-score-view').style.display = 'none';
                 document.getElementById('match-setup').style.display = 'flex';
             }
         }
+
         function changeStep(team, dir) { let s = steps[team] + dir; if(s<1) s=1; if(s>3) s=3; steps[team]=s; document.getElementById(team===1?'step-h':'step-a').innerText=s; }
-        function proScore(team, sign) { const d = allTereni.find(x => x.key === currentAdminKey); if(!d || d.status !== 'live') return; let ns = (d[`score${team}`] || 0) + (steps[team] * sign); db.ref(`tereni/${currentAdminKey}`).update({ [`score${team}`]: ns < 0 ? 0 : ns }); }
+
+        function proScore(team, sign) {
+            const d = allTereni.find(x => x.key === currentAdminKey);
+            if(!d || d.status !== 'live') return;
+
+            let upd = {};
+            if(d.sport === "ODBOJKA") {
+                let p1 = d.pts1 || 0, p2 = d.pts2 || 0, s1 = d.score1, s2 = d.score2;
+                if(team === 1) p1 += sign; else p2 += sign;
+                if(p1 < 0) p1 = 0; if(p2 < 0) p2 = 0;
+                
+                // Set dobijen na 25 (ili 15 u petom), uz 2 razlike
+                const target = (s1 + s2 === 4) ? 15 : 25;
+                if(p1 >= target && p1 - p2 >= 2) { s1++; p1 = 0; p2 = 0; }
+                if(p2 >= target && p2 - p1 >= 2) { s2++; p1 = 0; p2 = 0; }
+                upd = { pts1: p1, pts2: p2, score1: s1, score2: s2 };
+            } 
+            else if(d.sport === "TENIS") {
+                let p1 = d.pts1 || 0, p2 = d.pts2 || 0, g1 = d.games1 || 0, g2 = d.games2 || 0, s1 = d.score1, s2 = d.score2;
+                if(team === 1) p1 += sign; else p2 += sign;
+                if(p1 < 0) p1 = 0; if(p2 < 0) p2 = 0;
+
+                // Logika gema (0, 15, 30, 40, Ad)
+                if(p1 >= 4 && p1 - p2 >= 2) { g1++; p1 = 0; p2 = 0; }
+                else if(p2 >= 4 && p2 - p1 >= 2) { g2++; p1 = 0; p2 = 0; }
+                
+                // Logika seta (6 gemova, 2 razlike ili tie-break)
+                if(g1 >= 6 && g1 - g2 >= 2) { s1++; g1 = 0; g2 = 0; }
+                else if(g2 >= 6 && g2 - g1 >= 2) { s2++; g1 = 0; g2 = 0; }
+                
+                upd = { pts1: p1, pts2: p2, games1: g1, games2: g2, score1: s1, score2: s2, sub_string: `GEMS: ${g1}:${g2}` };
+            }
+            else {
+                let ns = (d[`score${team}`] || 0) + (steps[team] * sign);
+                upd = { [`score${team}`]: ns < 0 ? 0 : ns };
+            }
+            db.ref(`tereni/${currentAdminKey}`).update(upd);
+        }
+
         window.adminStatus = (s) => db.ref(`tereni/${currentAdminKey}`).update({ status: s });
+
         function autoCalculatePeriod() {
             const d = allTereni.find(x => x.key === currentAdminKey); if(!d || d.status !== 'live') return;
-            const labels = d.sport === "KOŠARKA" ? ["Q1", "Q2", "Q3", "Q4"] : ["HT"];
+            let labels = ["HT"];
+            if(d.sport === "KOŠARKA") labels = ["Q1", "Q2", "Q3", "Q4"];
+            if(d.sport === "ODBOJKA" || d.sport === "TENIS") labels = ["S1", "S2", "S3", "S4", "S5"];
+
             let p1 = 0, p2 = 0, target = null;
             if (d.sub_details) {
                 for (let l of labels) { if (!d.sub_details[l]) { target = l; break; } else { const p = d.sub_details[l].split(':'); p1 += parseInt(p[0]); p2 += parseInt(p[1]); } }
             } else { target = labels[0]; }
+            
             if (!target) return alert("POPUNJENO");
-            db.ref(`tereni/${currentAdminKey}/sub_details`).update({ [target]: `${d.score1 - p1}:${d.score2 - p2}` }).then(() => {
+            
+            let val = `${d.score1 - p1}:${d.score2 - p2}`;
+            if(d.sport === "ODBOJKA") val = `${d.pts1}:${d.pts2}`;
+            if(d.sport === "TENIS") val = `${d.games1}:${d.games2}`;
+
+            db.ref(`tereni/${currentAdminKey}/sub_details`).update({ [target]: val }).then(() => {
                 db.ref(`tereni/${currentAdminKey}`).once('value', s => {
                     let snap = s.val(), res = [];
                     labels.forEach(l => { if(snap.sub_details && snap.sub_details[l]) res.push(`${l} ${snap.sub_details[l]}`); });
@@ -316,11 +374,13 @@
                 });
             });
         }
+
         async function setupMatch() {
             const t1 = document.getElementById('adm-t1').value.toUpperCase(), t2 = document.getElementById('adm-t2').value.toUpperCase(), st = document.getElementById('adm-start-time-input').value;
             if(!t1 || !t2 || !st) return alert("SVE!");
-            await db.ref(`tereni/${currentAdminKey}`).update({ t1, t2, score1: 0, score2: 0, status: 'upcoming', scheduled_at: new Date(st).getTime(), sub_string: "", sub_details: null });
+            await db.ref(`tereni/${currentAdminKey}`).update({ t1, t2, score1: 0, score2: 0, pts1:0, pts2:0, games1:0, games2:0, status: 'upcoming', scheduled_at: new Date(st).getTime(), sub_string: "", sub_details: null });
         }
+
         window.adminDelete = () => { if(confirm("OBRISATI?")) { db.ref(`tereni/${currentAdminKey}`).remove(); closeAdmin(); } };
         window.closeAdmin = () => { document.getElementById('admin-panel').classList.remove('active'); currentAdminKey = null; };
     </script>
