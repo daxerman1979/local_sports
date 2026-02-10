@@ -22,7 +22,6 @@
 
         #search-container { position: absolute; top: 20px; left: 20px; z-index: 1000; width: calc(100% - 40px); max-width: 300px; }
         #city-search { width: 100%; padding: 12px 15px; border-radius: 25px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); color: white; font-weight: 600; font-size: 14px; }
-        #city-search::placeholder { color: rgba(255,255,255,0.7); }
 
         .location-btn { position: absolute; bottom: 30px; right: 20px; z-index: 1000; width: 45px; height: 45px; background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; }
         .location-btn img { filter: invert(1); opacity: 0.8; width: 22px; }
@@ -63,17 +62,16 @@
         .admin-title { font-family: 'Oswald', sans-serif; font-size: 20px; color: #111; text-transform: uppercase; }
         .live-board { background: #1a1a1a; color: #fff; border-radius: 15px; padding: 20px; text-align: center; margin-bottom: 15px; }
         .main-score { font-size: 60px; font-family: 'Oswald', sans-serif; color: #fff; margin: 10px 0; letter-spacing: 2px; }
+        
         .pro-controller-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
         .team-ctrl { background: #fff; border-radius: 15px; padding: 15px; display: flex; flex-direction: column; align-items: center; }
-        .current-amt { font-family: 'Oswald', sans-serif; font-size: 36px; color: #007AFF; }
-        .step-btn { background: #f0f0f0; border: none; width: 35px; height: 35px; border-radius: 50%; font-weight: bold; cursor: pointer; }
+        .team-name-label { font-size: 12px; font-weight: 900; color: #666; margin-bottom: 10px; text-transform: uppercase; }
+        .current-amt { font-family: 'Oswald', sans-serif; font-size: 36px; color: #007AFF; line-height: 1; }
+        .step-btn { background: #f0f0f0; border: none; width: 35px; height: 35px; border-radius: 50%; font-weight: bold; font-size: 18px; cursor: pointer; }
         .action-btn { width: 50px; height: 50px; border-radius: 12px; border: none; color: white; font-size: 24px; font-weight: 900; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .btn-plus { background: #28a745; }
         .btn-minus { background: #ff3b30; }
         .admin-btn { padding: 16px; border: none; font-weight: 900; color: white; text-transform: uppercase; width: 100%; border-radius: 12px; cursor: pointer; }
-        .btn-blue { background: #007AFF; }
-        .btn-green { background: #28a745; }
-        .btn-dark { background: #1a1a1a; }
     </style>
 </head>
 <body>
@@ -98,7 +96,7 @@
         </div>
         <div id="adm-score-view" style="display:none; flex-direction:column;">
             <div class="live-board">
-                <div id="adm-teams-label" style="color:#007AFF; font-weight:900;">HOME VS AWAY</div>
+                <div id="adm-teams-label" style="color:#007AFF; font-weight:900;">TIM A VS TIM B</div>
                 <div class="main-score" id="adm-main-score">0 : 0</div>
                 <div id="adm-sub-display" style="font-size:16px; color:#ff3b30; font-weight:900;"></div>
                 <div id="match-status-label" style="font-size:11px; background:rgba(255,255,255,0.1); display:inline-block; padding:3px 10px; border-radius:20px; font-weight:900;">STATUS</div>
@@ -106,7 +104,7 @@
             <div id="active-match-controls">
                 <div class="pro-controller-container">
                     <div class="team-ctrl">
-                        <span id="label-t1" style="font-size:10px; font-weight:900;">TIM 1</span>
+                        <span class="team-name-label" id="label-t1">DOMAĆI</span>
                         <div id="step-ctrl-1" style="display:flex; align-items:center; gap:10px;">
                             <button class="step-btn" onclick="changeStep(1, -1)">-</button>
                             <div class="current-amt" id="step-h">1</div>
@@ -118,7 +116,7 @@
                         </div>
                     </div>
                     <div class="team-ctrl">
-                        <span id="label-t2" style="font-size:10px; font-weight:900;">TIM 2</span>
+                        <span class="team-name-label" id="label-t2">GOSTI</span>
                         <div id="step-ctrl-2" style="display:flex; align-items:center; gap:10px;">
                             <button class="step-btn" onclick="changeStep(2, -1)">-</button>
                             <div class="current-amt" id="step-a">1</div>
@@ -130,11 +128,11 @@
                         </div>
                     </div>
                 </div>
-                <button id="calc-btn" class="admin-btn btn-green" style="margin-bottom:10px;" onclick="autoCalculatePeriod()">ZABELEŽI PERIOD</button>
-                <div id="sub-scores-display" style="background:#fff; padding:10px; border-radius:10px; margin-bottom:15px; font-size:12px; font-weight:700; text-align:center; border:1px dashed #ccc;"></div>
+                <button id="calc-btn" class="admin-btn" style="background:#28a745; margin-bottom:10px;" onclick="autoCalculatePeriod()">ZABELEŽI PERIOD</button>
+                <div id="sub-scores-display" style="background:#fff; padding:10px; border-radius:10px; margin-bottom:15px; font-size:12px; font-weight:700; text-align:center; color:#555; border:1px dashed #ccc;"></div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                    <button id="start-live-btn" class="admin-btn btn-blue" onclick="adminStatus('live')">POČNI LIVE</button>
-                    <button id="end-match-btn" class="admin-btn btn-dark" onclick="adminStatus('ended')">KRAJ MEČA</button>
+                    <button id="start-live-btn" class="admin-btn" style="background:#007AFF;" onclick="adminStatus('live')">POČNI LIVE</button>
+                    <button id="end-match-btn" class="admin-btn" style="background:#1a1a1a;" onclick="adminStatus('ended')">KRAJ MEČA</button>
                 </div>
             </div>
         </div>
@@ -142,7 +140,7 @@
             <input type="text" id="adm-t1" placeholder="IME DOMAĆEG TIMA">
             <input type="text" id="adm-t2" placeholder="IME GOSTUJUĆEG TIMA">
             <input type="datetime-local" id="adm-start-time-input">
-            <button class="admin-btn btn-blue" onclick="setupMatch()">ZAKAŽI</button>
+            <button class="admin-btn" style="background:#007AFF;" onclick="setupMatch()">ZAKAŽI</button>
         </div>
         <button style="margin-top:auto; background:none; color:#ff3b30; border:none; font-weight:900; cursor:pointer;" onclick="adminDelete()">OBRIŠI TEREN</button>
     </div>
@@ -254,16 +252,15 @@
         function trackGPS() {
             navigator.geolocation.watchPosition(pos => {
                 currentLat = pos.coords.latitude; currentLon = pos.coords.longitude;
-                const radius = pos.coords.accuracy;
                 if (!userMarker) {
-                    accCircle = L.circle([currentLat, currentLon], { radius: radius, color: '#007AFF', fillColor: '#007AFF', fillOpacity: 0.1, weight: 1 }).addTo(map);
+                    accCircle = L.circle([currentLat, currentLon], { radius: pos.coords.accuracy, color: '#007AFF', fillColor: '#007AFF', fillOpacity: 0.1, weight: 1 }).addTo(map);
                     userMarker = L.marker([currentLat, currentLon], { icon: L.divIcon({ className: 'user-location-dot', html: '<div class="pulse-core"></div>', iconAnchor: [7, 7] }), zIndexOffset: 10000 }).addTo(map);
                 } else {
                     userMarker.setLatLng([currentLat, currentLon]);
                     accCircle.setLatLng([currentLat, currentLon]);
-                    accCircle.setRadius(radius);
+                    accCircle.setRadius(pos.coords.accuracy);
                 }
-            }, null, { enableHighAccuracy: true, maximumAge: 0 });
+            }, null, { enableHighAccuracy: true });
         }
 
         function goToMyLocation() { if(currentLat) map.flyTo([currentLat, currentLon], 17); }
@@ -289,19 +286,15 @@
             if(d.t1) {
                 document.getElementById('adm-score-view').style.display = 'flex';
                 document.getElementById('match-setup').style.display = 'none';
-                let scoreText = `${d.score1} : ${d.score2}`;
                 let subText = "";
-                if(d.sport === "ODBOJKA" || d.sport === "TENIS") {
-                    subText = `POENI: ${d.pts1} : ${d.pts2}`;
-                    if(d.sport === "TENIS") {
-                        const p1 = tennisPoints[d.pts1] || "0", p2 = tennisPoints[d.pts2] || "0";
-                        subText = `POENI: ${p1} : ${p2}`;
-                    }
-                }
-                document.getElementById('adm-main-score').innerText = scoreText;
+                if(d.sport === "ODBOJKA") subText = `TRENUTNI POENI: ${d.pts1} : ${d.pts2}`;
+                if(d.sport === "TENIS") subText = `POENI: ${tennisPoints[d.pts1]||"0"} : ${tennisPoints[d.pts2]||"0"}`;
+                
+                document.getElementById('adm-main-score').innerText = `${d.score1} : ${d.score2}`;
                 document.getElementById('adm-sub-display').innerText = subText;
                 document.getElementById('adm-teams-label').innerText = `${d.t1} VS ${d.t2}`;
-                document.getElementById('label-t1').innerText = d.t1; document.getElementById('label-t2').innerText = d.t2;
+                document.getElementById('label-t1').innerText = d.t1; 
+                document.getElementById('label-t2').innerText = d.t2;
                 document.getElementById('match-status-label').innerText = d.status.toUpperCase();
                 document.getElementById('sub-scores-display').innerText = d.sub_string || "";
                 document.getElementById('active-match-controls').style.display = isEnded ? 'none' : 'block';
@@ -309,8 +302,8 @@
                 document.getElementById('end-match-btn').style.display = isLive ? 'block' : 'none';
                 
                 const showStep = (d.sport !== "ODBOJKA" && d.sport !== "TENIS");
-                document.getElementById('step-ctrl-1').style.visibility = showStep ? "visible" : "hidden";
-                document.getElementById('step-ctrl-2').style.visibility = showStep ? "visible" : "hidden";
+                document.getElementById('step-ctrl-1').style.display = showStep ? "flex" : "none";
+                document.getElementById('step-ctrl-2').style.display = showStep ? "flex" : "none";
             } else {
                 document.getElementById('adm-score-view').style.display = 'none';
                 document.getElementById('match-setup').style.display = 'flex';
