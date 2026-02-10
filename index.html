@@ -20,53 +20,52 @@
 
         #map { width: 100vw; height: 100vh; background: #111; display: none; }
 
-        /* GPS PLAVA TACKA */
-        .user-location-dot { width: 18px; height: 18px; background: #007AFF; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 10px rgba(0,122,255,0.8); animation: pulse-gps 2s infinite; }
-        @keyframes pulse-gps { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.2); opacity: 0.7; } 100% { transform: scale(1); opacity: 1; } }
+        /* PRECIZNI GPS DOT */
+        .user-location-dot { width: 14px; height: 14px; background: #007AFF; border: 2px solid white; border-radius: 50%; box-shadow: 0 0 15px rgba(0,122,255,1); animation: pulse-gps 1.5s infinite; }
+        @keyframes pulse-gps { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0,122,255,0.7); } 70% { transform: scale(1.2); box-shadow: 0 0 0 10px rgba(0,122,255,0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0,122,255,0); } }
         
-        /* MINI MODERNE KARTICE */
+        /* ULTRA PRO SLIM KARTICE */
         .sport-marker-wrapper { display: flex; align-items: center; white-space: nowrap; cursor: pointer; transition: 0.2s; }
-        .sport-ball { font-size: 24px; z-index: 20; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+        .sport-ball { font-size: 24px; z-index: 20; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); position: relative; }
         
         .live-card-thin {
-            background: rgba(255, 255, 255, 0.95); 
-            backdrop-filter: blur(4px);
+            background: #fff; 
             border: 2px solid #007AFF; 
-            border-radius: 30px;
-            padding: 2px 10px 2px 15px; 
-            margin-left: -12px;
+            border-radius: 8px;
+            padding: 0 8px; 
+            margin-left: -10px;
             display: flex; 
             align-items: center; 
-            gap: 6px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4); 
+            height: 36px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5); 
             z-index: 5; 
-            height: 42px;
         }
         
         .zoom-hide .live-card-thin { display: none; }
         .zoom-hide .sport-ball { font-size: 18px; }
 
-        .status-live-wrapper .live-card-thin { border-color: #ff3b30; animation: pulse-border 1.5s infinite; }
-        @keyframes pulse-border { 0% { box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.5); } 70% { box-shadow: 0 0 0 8px rgba(255, 59, 48, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 59, 48, 0); } }
+        .status-live-wrapper .live-card-thin { border-color: #ff3b30; border-width: 2px; }
+        .status-live-wrapper .sport-ball { animation: bounce-ball 0.5s ease infinite alternate; }
+        @keyframes bounce-ball { from { transform: translateY(0); } to { transform: translateY(-3px); } }
 
-        .match-details { display: flex; flex-direction: column; line-height: 1; }
-        .match-name-thin { font-size: 8px; font-weight: 800; color: #007AFF; text-transform: uppercase; }
-        .match-teams-thin { font-size: 12px; font-weight: 900; color: #000; text-transform: uppercase; }
-        .match-sub-info { font-size: 8px; color: #fff; font-weight: 900; background: #ff3b30; padding: 1px 3px; border-radius: 3px; margin-left: 4px; }
+        .match-details { display: flex; flex-direction: column; line-height: 1; padding-right: 8px; border-right: 1px solid #eee; }
+        .match-name-thin { font-size: 7px; font-weight: 900; color: #007AFF; text-transform: uppercase; margin-bottom: 2px; }
+        .match-teams-thin { font-size: 11px; font-weight: 800; color: #000; text-transform: uppercase; display: flex; align-items: center; gap: 4px; }
+        
+        .status-pill { font-size: 7px; color: #fff; background: #ff3b30; padding: 1px 4px; border-radius: 3px; font-weight: 900; margin-left: 4px; }
         .match-score-thin { 
-            font-size: 19px; 
+            font-size: 20px; 
             color: #000; 
             font-family: 'Oswald', sans-serif; 
-            min-width: 35px; 
+            min-width: 40px; 
             text-align: center; 
-            border-left: 1px solid #ddd; 
             padding-left: 8px; 
-            margin-left: 4px; 
             font-weight: 700; 
+            letter-spacing: 1px;
         }
 
-        /* KONTROLNI CENTAR */
-        #admin-panel { position: fixed; top: 0; left: 100%; width: 100%; height: 100%; background: #f4f7f6; z-index: 7000; transition: 0.3s ease-out; padding: 15px; display: flex; flex-direction: column; overflow: hidden; }
+        /* ADMIN PANEL */
+        #admin-panel { position: fixed; top: 0; left: 100%; width: 100%; height: 100%; background: #f4f7f6; z-index: 7000; transition: 0.3s ease-out; padding: 15px; display: flex; flex-direction: column; }
         #admin-panel.active { left: 0; }
         .admin-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; height: 40px; }
         .admin-title { font-family: 'Oswald', sans-serif; font-size: 18px; color: #333; text-transform: uppercase; }
@@ -193,15 +192,8 @@
             if (map) return;
             map = L.map('map', { zoomControl: false, tap: false, maxZoom: 19, minZoom: 3 }).setView([44.7866, 20.4489], 6);
             
-            // 1. SATELITSKA PODLOGA (ESRI World Imagery)
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
-            
-            // 2. GRANICE I LABELE (ESRI World Boundaries and Places)
-            // Ovaj sloj je ključan jer se iscrtava preko satelita i daje bele granice država
-            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
-                opacity: 0.9,
-                zIndex: 1000
-            }).addTo(map);
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', { opacity: 0.9, zIndex: 1000 }).addTo(map);
 
             markersLayer.addTo(map);
             map.on('zoomend moveend', renderMarkers);
@@ -229,10 +221,9 @@
                 if (center.distanceTo(pos) > 50000) return;
 
                 let statusCls = d.status==='live' ? 'status-live-wrapper' : '';
-                let info = "";
-                
-                if(d.status==='live') info = `<span class="match-sub-info">LIVE</span>`;
-                else if(d.status==='ended') info = `<span class="match-sub-info" style="background:#333;">KRAJ</span>`;
+                let statusLabel = "";
+                if(d.status==='live') statusLabel = `<span class="status-pill">LIVE</span>`;
+                else if(d.status==='ended') statusLabel = `<span class="status-pill" style="background:#444;">KRAJ</span>`;
                 
                 const icon = L.divIcon({ 
                     className: isHide ? 'zoom-hide' : '', 
@@ -240,29 +231,46 @@
                             <div class="sport-ball">${sportEmojis[d.sport]||'⚽'}</div>
                             <div class="live-card-thin">
                                 <div class="match-details">
-                                    <span class="match-name-thin">${d.name} ${info}</span>
-                                    <span class="match-teams-thin">${d.t1?d.t1+' - '+d.t2:'SLOBODNO'}</span>
+                                    <span class="match-name-thin">${d.name}</span>
+                                    <span class="match-teams-thin">${d.t1?d.t1+' - '+d.t2:'SLOBODNO'} ${statusLabel}</span>
                                 </div>
                                 <div class="match-score-thin">${d.score1}:${d.score2}</div>
                             </div>
                            </div>`, 
-                    iconSize: [180, 42], 
-                    iconAnchor: [12, 21] 
+                    iconSize: [160, 36], 
+                    iconAnchor: [10, 18] 
                 });
                 
-                L.marker([d.lat, d.lng], { icon }).addTo(markersLayer).on('click', e => { 
-                    L.DomEvent.stopPropagation(e); 
-                    openAdmin(d.key); 
-                });
+                L.marker([d.lat, d.lng], { icon }).addTo(markersLayer).on('click', e => { L.DomEvent.stopPropagation(e); openAdmin(d.key); });
+            });
+        }
+
+        function trackGPS() {
+            if (!navigator.geolocation) return;
+            navigator.geolocation.watchPosition(pos => {
+                currentLat = pos.coords.latitude;
+                currentLon = pos.coords.longitude;
+                const accuracy = pos.coords.accuracy;
+
+                if (!userMarker) {
+                    userMarker = L.marker([currentLat, currentLon], { 
+                        icon: L.divIcon({ className: 'user-location-dot', iconAnchor: [7, 7] }),
+                        zIndexOffset: 2000 
+                    }).addTo(map);
+                } else {
+                    userMarker.setLatLng([currentLat, currentLon]);
+                }
+            }, err => { console.log(err); }, { 
+                enableHighAccuracy: true, 
+                maximumAge: 1000, 
+                timeout: 5000 
             });
         }
 
         async function saveTeren(lat, lng) {
-            const nameInput = document.getElementById('p_name');
-            const name = nameInput.value.toUpperCase();
+            const name = document.getElementById('p_name').value.toUpperCase();
             if(!name) return;
-            const uid = auth.currentUser.uid;
-            await db.ref('tereni').push({ name, lat, lng, owner: uid, sport: document.getElementById('p_sport').value, status: 'upcoming', expires: Date.now()+86400000, score1: 0, score2: 0 });
+            await db.ref('tereni').push({ name, lat, lng, owner: auth.currentUser.uid, sport: document.getElementById('p_sport').value, status: 'upcoming', expires: Date.now()+86400000, score1: 0, score2: 0 });
             map.closePopup();
         }
 
@@ -330,7 +338,6 @@
 
         window.adminDelete = () => { if(confirm("OBRISATI?")) { db.ref(`tereni/${currentAdminKey}`).remove(); closeAdmin(); } };
         window.closeAdmin = () => { document.getElementById('admin-panel').classList.remove('active'); currentAdminKey = null; };
-        function trackGPS() { navigator.geolocation.watchPosition(pos => { currentLat = pos.coords.latitude; currentLon = pos.coords.longitude; if (!userMarker) userMarker = L.marker([currentLat, currentLon], { icon: L.divIcon({ className: 'user-location-dot', iconAnchor: [9, 9] }) }).addTo(map); else userMarker.setLatLng([currentLat, currentLon]); }, null, { enableHighAccuracy: true }); }
         function goToMyLocation() { if(currentLat) map.flyTo([currentLat, currentLon], 16); }
     </script>
 </body>
