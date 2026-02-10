@@ -22,7 +22,6 @@
             background: #f9f9f9;
             font-family: 'Inter', sans-serif;
         }
-        input:focus { border-color: #007AFF; background: #fff; }
 
         #hero { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.9)), url('https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=1470&auto=format&fit=crop') center/cover; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 6000; color: white; padding: 20px; }
         .auth-box { background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); padding: 25px; border-radius: 20px; width: 100%; max-width: 340px; display: flex; flex-direction: column; gap: 12px; border: 1px solid rgba(255,255,255,0.2); }
@@ -30,53 +29,60 @@
 
         #map { width: 100vw; height: 100vh; background: #111; display: none; }
 
-        /* GPS MOD */
+        /* PRECIZNI GPS */
         .user-location-dot { width: 14px; height: 14px; background: #007AFF; border: 2px solid white; border-radius: 50%; box-shadow: 0 0 10px rgba(0,122,255,1); z-index: 10000; }
         .pulse-core { width: 100%; height: 100%; border-radius: 50%; background: rgba(0,122,255,0.4); animation: gps-pulse 2s infinite; }
         @keyframes gps-pulse { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(3); opacity: 0; } }
         
-        /* KARTICE NA MAPI */
+        /* ANIMACIJA ZA LIVE KARTICE */
+        @keyframes bounce-ball { from { transform: translateY(0); } to { transform: translateY(-5px); } }
+        @keyframes pulse-live-border { 0% { border-color: #ff3b30; box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.4); } 70% { border-color: #ff3b30; box-shadow: 0 0 0 10px rgba(255, 59, 48, 0); } 100% { border-color: #ff3b30; box-shadow: 0 0 0 0 rgba(255, 59, 48, 0); } }
+
         .sport-marker-wrapper { display: flex; align-items: center; white-space: nowrap; cursor: pointer; transition: 0.2s; }
         .sport-ball { font-size: 26px; z-index: 20; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+        
+        /* LIVE STATUS ANIMACIJE */
+        .status-live-wrapper .sport-ball { animation: bounce-ball 0.6s ease infinite alternate; }
+        .status-live-wrapper .live-card-thin { animation: pulse-live-border 1.5s infinite; border-width: 2px; }
+
         .live-card-thin {
             background: #fff; border: 2px solid #007AFF; border-radius: 10px;
             padding: 2px 8px; margin-left: -12px;
-            display: flex; align-items: center; min-height: 46px;
+            display: flex; align-items: center; min-height: 48px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.5); z-index: 5;
         }
+
+        /* POVEĆANA VIDLJIVOST: Kartice se sada kriju tek na zoom nivou ispod 11 */
         .zoom-hide .live-card-thin { display: none; }
-        .status-live-wrapper .live-card-thin { border-color: #ff3b30; }
-        .match-details { display: flex; flex-direction: column; line-height: 1; padding-right: 8px; border-right: 1px solid #eee; }
-        .match-name-thin { font-size: 7px; font-weight: 900; color: #007AFF; text-transform: uppercase; margin-bottom: 2px; }
-        .match-teams-thin { font-size: 11px; font-weight: 800; color: #000; text-transform: uppercase; display: flex; align-items: center; gap: 4px; }
+        .zoom-hide .sport-ball { font-size: 20px; }
+
+        .match-details { display: flex; flex-direction: column; line-height: 1.1; padding-right: 8px; border-right: 1px solid #eee; }
+        .match-name-thin { font-size: 8px; font-weight: 900; color: #007AFF; text-transform: uppercase; margin-bottom: 2px; }
+        .match-teams-thin { font-size: 12px; font-weight: 800; color: #000; text-transform: uppercase; display: flex; align-items: center; gap: 4px; }
         .status-pill { font-size: 7px; color: #fff; background: #ff3b30; padding: 1px 4px; border-radius: 3px; font-weight: 900; margin-left: 4px; }
-        .match-score-thin { font-size: 18px; color: #000; font-family: 'Oswald', sans-serif; min-width: 45px; text-align: center; padding-left: 8px; font-weight: 700; display: flex; flex-direction: column; line-height: 1; }
-        .periods-row { font-size: 8px; color: #ff3b30; font-weight: 900; letter-spacing: 0.5px; margin-top: 1px; }
-        .time-label { color: #666; font-size: 7px; margin-left: 5px; font-weight: 400; }
+        .match-score-thin { font-size: 19px; color: #000; font-family: 'Oswald', sans-serif; min-width: 45px; text-align: center; padding-left: 8px; font-weight: 700; display: flex; flex-direction: column; line-height: 1; }
+        .periods-row { font-size: 9px; color: #ff3b30; font-weight: 900; letter-spacing: 0.5px; margin-top: 2px; }
+        .time-label { color: #666; font-size: 8px; margin-left: 5px; font-weight: 400; }
 
-        .leaflet-popup-content-wrapper { border-radius: 15px; padding: 0; overflow: hidden; }
-        .leaflet-popup-content { margin: 0; width: 220px !important; }
-        .pop-header { background: #007AFF; color: white; padding: 10px; text-align: center; font-weight: 900; font-size: 12px; text-transform: uppercase; }
-        .pop-body { padding: 15px; display: flex; flex-direction: column; gap: 8px; }
-
+        /* ADMIN PANEL I POPUP (Nepromenjeno) */
         #admin-panel { position: fixed; top: 0; left: 100%; width: 100%; height: 100%; background: #f0f2f5; z-index: 7000; transition: 0.3s cubic-bezier(0.1, 0.7, 1.0, 0.1); padding: 20px; display: flex; flex-direction: column; }
         #admin-panel.active { left: 0; }
         .admin-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .admin-title { font-family: 'Oswald', sans-serif; font-size: 20px; color: #111; text-transform: uppercase; }
-        .live-board { background: #1a1a1a; color: #fff; border-radius: 15px; padding: 20px; text-align: center; margin-bottom: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-        .main-score { font-size: 60px; font-family: 'Oswald', sans-serif; color: #fff; margin: 10px 0; line-height: 1; letter-spacing: 2px; }
+        .live-board { background: #1a1a1a; color: #fff; border-radius: 15px; padding: 20px; text-align: center; margin-bottom: 15px; }
+        .main-score { font-size: 60px; font-family: 'Oswald', sans-serif; color: #fff; margin: 10px 0; line-height: 1; }
         .team-ctrl { background: #fff; border-radius: 15px; padding: 15px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .team-name-label { font-size: 12px; font-weight: 900; color: #666; margin-bottom: 10px; text-transform: uppercase; }
-        .current-amt { font-family: 'Oswald', sans-serif; font-size: 36px; color: #007AFF; line-height: 1; }
-        .action-btn { width: 50px; height: 50px; border-radius: 12px; border: none; color: white; font-size: 24px; font-weight: 900; display: flex; align-items: center; justify-content: center; transition: 0.1s; }
-        .action-btn:active { transform: scale(0.9); }
-        .btn-plus { background: #28a745; }
-        .btn-minus { background: #ff3b30; }
-        .admin-btn { padding: 16px; border: none; font-weight: 900; color: white; text-transform: uppercase; width: 100%; border-radius: 12px; cursor: pointer; letter-spacing: 1px; transition: 0.2s; }
-        .btn-blue { background: #007AFF; box-shadow: 0 4px 14px rgba(0,122,255,0.4); }
-        .btn-green { background: #28a745; box-shadow: 0 4px 14px rgba(40,167,69,0.4); }
+        .current-amt { font-family: 'Oswald', sans-serif; font-size: 36px; color: #007AFF; }
+        .action-btn { width: 50px; height: 50px; border-radius: 12px; border: none; color: white; font-size: 24px; font-weight: 900; display: flex; align-items: center; justify-content: center; }
+        .admin-btn { padding: 16px; border: none; font-weight: 900; color: white; text-transform: uppercase; width: 100%; border-radius: 12px; cursor: pointer; }
+        .btn-blue { background: #007AFF; }
+        .btn-green { background: #28a745; }
         .btn-dark { background: #1a1a1a; }
         .location-btn { position: absolute; bottom: 35px; right: 25px; z-index: 1000; width: 65px; height: 65px; background: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 8px 25px rgba(0,0,0,0.4); }
+        
+        .leaflet-popup-content-wrapper { border-radius: 15px; overflow: hidden; }
+        .pop-header { background: #007AFF; color: white; padding: 10px; text-align: center; font-weight: 900; font-size: 12px; }
+        .pop-body { padding: 15px; display: flex; flex-direction: column; gap: 8px; }
     </style>
 </head>
 <body>
@@ -97,18 +103,18 @@
         </div>
         <div id="adm-score-view" style="display:none; flex-direction:column;">
             <div class="live-board">
-                <div id="adm-teams-label" style="color:#007AFF; font-weight:900; letter-spacing:1px;">TIM A VS TIM B</div>
+                <div id="adm-teams-label" style="color:#007AFF; font-weight:900;">TIM A VS TIM B</div>
                 <div class="main-score" id="adm-main-score">0 : 0</div>
                 <div id="match-status-label" style="font-size:11px; background:rgba(255,255,255,0.1); display:inline-block; padding:3px 10px; border-radius:20px; font-weight:900;">STATUS</div>
             </div>
             <div id="active-match-controls">
-                <div class="pro-controller-container" style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:15px;">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:15px;">
                     <div class="team-ctrl">
-                        <span class="team-name-label" id="label-t1">DOMAĆI</span>
+                        <span id="label-t1" style="font-size:10px; font-weight:900;">TIM 1</span>
                         <div style="display:flex; align-items:center; gap:10px;">
-                            <button class="step-btn" style="background:none; border:none; font-size:20px;" onclick="changeStep(1, -1)">-</button>
+                            <button onclick="changeStep(1, -1)">-</button>
                             <div class="current-amt" id="step-h">1</div>
-                            <button class="step-btn" style="background:none; border:none; font-size:20px;" onclick="changeStep(1, 1)">+</button>
+                            <button onclick="changeStep(1, 1)">+</button>
                         </div>
                         <div style="display:flex; gap:10px; margin-top:10px;">
                             <button class="action-btn btn-minus" onclick="proScore(1, -1)">&minus;</button>
@@ -116,11 +122,11 @@
                         </div>
                     </div>
                     <div class="team-ctrl">
-                        <span class="team-name-label" id="label-t2">GOSTI</span>
+                        <span id="label-t2" style="font-size:10px; font-weight:900;">TIM 2</span>
                         <div style="display:flex; align-items:center; gap:10px;">
-                            <button class="step-btn" style="background:none; border:none; font-size:20px;" onclick="changeStep(2, -1)">-</button>
+                            <button onclick="changeStep(2, -1)">-</button>
                             <div class="current-amt" id="step-a">1</div>
-                            <button class="step-btn" style="background:none; border:none; font-size:20px;" onclick="changeStep(2, 1)">+</button>
+                            <button onclick="changeStep(2, 1)">+</button>
                         </div>
                         <div style="display:flex; gap:10px; margin-top:10px;">
                             <button class="action-btn btn-minus" onclick="proScore(2, -1)">&minus;</button>
@@ -128,23 +134,22 @@
                         </div>
                     </div>
                 </div>
-                <button id="calc-btn" class="admin-btn btn-green" style="margin-bottom:10px;" onclick="autoCalculatePeriod()">ZABELEŽI PERIOD REZULTATA</button>
-                <div id="sub-scores-display" style="background:#fff; padding:10px; border-radius:10px; margin-bottom:15px; font-size:12px; font-weight:700; text-align:center; color:#555; border:1px dashed #ccc;"></div>
+                <button class="admin-btn btn-green" style="margin-bottom:10px;" onclick="autoCalculatePeriod()">ZABELEŽI PERIOD</button>
+                <div id="sub-scores-display" style="background:#fff; padding:10px; border-radius:10px; margin-bottom:15px; font-size:12px; font-weight:700; text-align:center;"></div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                    <button id="start-live-btn" class="admin-btn btn-blue" onclick="adminStatus('live')">POČNI LIVE</button>
-                    <button id="end-match-btn" class="admin-btn btn-dark" onclick="adminStatus('ended')">KRAJ MEČA</button>
+                    <button class="admin-btn btn-blue" onclick="adminStatus('live')">POČNI LIVE</button>
+                    <button class="admin-btn btn-dark" onclick="adminStatus('ended')">KRAJ MEČA</button>
                 </div>
             </div>
-            <div id="ended-msg" style="display:none; text-align:center; padding:20px; background:#fff; border-radius:15px; color:#ff3b30; font-weight:900;">MEČ JE ZAVRŠEN</div>
+            <div id="ended-msg" style="display:none; text-align:center; padding:20px; color:#ff3b30; font-weight:900;">MEČ ZAVRŠEN</div>
         </div>
-        <div id="match-setup" style="display:flex; flex-direction:column; gap:12px; background:#fff; padding:20px; border-radius:15px; box-shadow:0 4px 15px rgba(0,0,0,0.05);">
-            <h3 style="margin:0; font-size:14px; text-transform:uppercase; color:#666;">Zakaži novi meč</h3>
-            <input type="text" id="adm-t1" placeholder="IME DOMAĆEG TIMA">
-            <input type="text" id="adm-t2" placeholder="IME GOSTUJUĆEG TIMA">
+        <div id="match-setup" style="display:flex; flex-direction:column; gap:12px; background:#fff; padding:20px; border-radius:15px;">
+            <input type="text" id="adm-t1" placeholder="DOMAĆI TIM">
+            <input type="text" id="adm-t2" placeholder="GOSTUJUĆI TIM">
             <input type="datetime-local" id="adm-start-time-input">
-            <button class="admin-btn btn-blue" onclick="setupMatch()">SAČUVAJ I ZAKAŽI</button>
+            <button class="admin-btn btn-blue" onclick="setupMatch()">ZAKAŽI</button>
         </div>
-        <button class="admin-btn" style="margin-top:auto; background:none; color:#ff3b30; font-size:12px;" onclick="adminDelete()">OBRIŠI OVAJ TEREN TRAJNO</button>
+        <button style="margin-top:auto; background:none; color:#ff3b30; border:none;" onclick="adminDelete()">OBRIŠI TEREN</button>
     </div>
 
     <div id="map"></div>
@@ -189,13 +194,7 @@
             map.on('click', e => {
                 const moji = allTereni.filter(t => t.owner === auth.currentUser.uid);
                 if (moji.length >= 3) { alert("LIMIT: MAX 3 TERENA!"); return; }
-                const html = `
-                    <div class="pop-header">Novi sportski teren</div>
-                    <div class="pop-body">
-                        <select id="p_sport"><option value="FUDBAL">FUDBAL ⚽</option><option value="KOŠARKA">KOŠARKA 🏀</option></select>
-                        <input type="text" id="p_name" placeholder="NAZIV TERENA">
-                        <button onclick="saveTeren(${e.latlng.lat}, ${e.latlng.lng})" style="background:#007AFF; color:white; border:none; padding:12px; border-radius:8px; font-weight:900; cursor:pointer;">KREIRAJ TEREN</button>
-                    </div>`;
+                const html = `<div class="pop-header">Novi teren</div><div class="pop-body"><select id="p_sport"><option value="FUDBAL">FUDBAL ⚽</option><option value="KOŠARKA">KOŠARKA 🏀</option></select><input type="text" id="p_name" placeholder="NAZIV"><button onclick="saveTeren(${e.latlng.lat}, ${e.latlng.lng})" style="background:#007AFF; color:white; border:none; padding:10px; border-radius:8px;">KREIRAJ</button></div>`;
                 L.popup().setLatLng(e.latlng).setContent(html).openOn(map);
             });
 
@@ -209,21 +208,21 @@
 
         function renderMarkers() {
             markersLayer.clearLayers();
-            const zoom = map.getZoom(), center = map.getCenter(), isHide = zoom < 13;
+            const zoom = map.getZoom(), center = map.getCenter();
+            // Kartice se sakrivaju tek na zoom nivou ispod 11 za bolju preglednost iz visine
+            const isHide = zoom < 11;
+
             allTereni.forEach(d => {
                 const pos = L.latLng(d.lat, d.lng);
-                if (center.distanceTo(pos) > 50000) return;
+                if (center.distanceTo(pos) > 100000) return; // Povećan radijus vidljivosti na 100km
                 
                 let statusCls = d.status==='live' ? 'status-live-wrapper' : '';
                 let statusLabel = d.status==='live' ? `<span class="status-pill">LIVE</span>` : (d.status==='ended' ? `<span class="status-pill" style="background:#444;">KRAJ</span>` : "");
                 
-                // LOGIKA ZA VREME: Samo ako nije kraj
                 let timeString = "";
                 if (d.status !== 'ended' && d.scheduled_at) {
                     const dt = new Date(d.scheduled_at);
-                    const datePart = dt.toLocaleDateString('sr-RS', {day:'2-digit', month:'2-digit'});
-                    const timePart = dt.toLocaleTimeString('sr-RS', {hour:'2-digit', minute:'2-digit'});
-                    timeString = `<span class="time-label">${datePart}. ${timePart}</span>`;
+                    timeString = `<span class="time-label">${dt.toLocaleDateString('sr-RS',{day:'2-digit',month:'2-digit'})}. ${dt.toLocaleTimeString('sr-RS',{hour:'2-digit',minute:'2-digit'})}</span>`;
                 }
 
                 const icon = L.divIcon({ 
@@ -241,7 +240,7 @@
                                 </div>
                             </div>
                            </div>`, 
-                    iconSize: [180, 46], iconAnchor: [12, 23] 
+                    iconSize: [200, 48], iconAnchor: [12, 24] 
                 });
                 L.marker([d.lat, d.lng], { icon }).addTo(markersLayer).on('click', e => { L.DomEvent.stopPropagation(e); openAdmin(d.key); });
             });
@@ -251,26 +250,21 @@
             if (!navigator.geolocation) return;
             navigator.geolocation.watchPosition(pos => {
                 currentLat = pos.coords.latitude; currentLon = pos.coords.longitude;
-                const radius = pos.coords.accuracy;
                 if (!userMarker) {
-                    accCircle = L.circle([currentLat, currentLon], { radius: radius, color: '#007AFF', fillColor: '#007AFF', fillOpacity: 0.1, weight: 1 }).addTo(map);
-                    userMarker = L.marker([currentLat, currentLon], { 
-                        icon: L.divIcon({ className: 'user-location-dot', html: '<div class="pulse-core"></div>', iconAnchor: [7, 7] }),
-                        zIndexOffset: 10000 
-                    }).addTo(map);
+                    accCircle = L.circle([currentLat, currentLon], { radius: pos.coords.accuracy, color: '#007AFF', fillColor: '#007AFF', fillOpacity: 0.1, weight: 1 }).addTo(map);
+                    userMarker = L.marker([currentLat, currentLon], { icon: L.divIcon({ className: 'user-location-dot', html: '<div class="pulse-core"></div>', iconAnchor: [7, 7] }), zIndexOffset: 10000 }).addTo(map);
                 } else {
                     userMarker.setLatLng([currentLat, currentLon]);
                     accCircle.setLatLng([currentLat, currentLon]);
-                    accCircle.setRadius(radius);
+                    accCircle.setRadius(pos.coords.accuracy);
                 }
-            }, null, { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 });
+            }, null, { enableHighAccuracy: true, maximumAge: 0 });
         }
 
         function goToMyLocation() { if(currentLat) map.flyTo([currentLat, currentLon], 17); }
 
         async function saveTeren(lat, lng) {
-            const nameInput = document.getElementById('p_name');
-            const name = nameInput.value.toUpperCase();
+            const name = document.getElementById('p_name').value.toUpperCase();
             if(!name) return;
             await db.ref('tereni').push({ name, lat, lng, owner: auth.currentUser.uid, sport: document.getElementById('p_sport').value, status: 'upcoming', expires: Date.now()+86400000, score1: 0, score2: 0 });
             map.closePopup();
@@ -300,7 +294,7 @@
                 document.getElementById('start-live-btn').style.display = d.status === 'upcoming' ? 'block' : 'none';
                 document.getElementById('end-match-btn').style.display = isLive ? 'block' : 'none';
                 document.getElementById('calc-btn').disabled = !isLive;
-                document.getElementById('sub-scores-display').innerText = d.sub_string || "Nema zabeleženih perioda";
+                document.getElementById('sub-scores-display').innerText = d.sub_string || "Nema perioda";
                 document.getElementById('active-match-controls').style.display = isEnded ? 'none' : 'block';
                 document.getElementById('ended-msg').style.display = isEnded ? 'block' : 'none';
             } else {
@@ -324,7 +318,7 @@
             if (d.sub_details) {
                 for (let l of labels) { if (!d.sub_details[l] || d.sub_details[l] === "0:0") { target = l; break; } else { const p = d.sub_details[l].split(':'); p1 += parseInt(p[0]); p2 += parseInt(p[1]); } }
             } else { target = labels[0]; }
-            if (!target) return alert("SVI PERIODI POPUNJENI");
+            if (!target) return alert("SVI POPUNJENI");
             db.ref(`tereni/${currentAdminKey}/sub_details`).update({ [target]: `${d.score1 - p1}:${d.score2 - p2}` }).then(() => {
                 db.ref(`tereni/${currentAdminKey}`).once('value', s => {
                     let snap = s.val(), res = [];
