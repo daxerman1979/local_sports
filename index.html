@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>All Sports Local LIVE PRO</title>
+    <title>HOODLIVE PRO</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
@@ -14,18 +14,28 @@
         
         input, select { font-size: 14px !important; outline: none; border-radius: 8px; border: 1px solid #ddd; padding: 10px; width: 100%; background: #f9f9f9; }
 
-        #hero { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.9)), url('https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=1470&auto=format&fit=crop') center/cover; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 6000; color: white; padding: 20px; }
+        /* POČETNI EKRAN SA PRO SLIKOM */
+        #hero { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.8)), 
+            url('https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=1605&auto=format&fit=crop') center/cover; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; 
+            z-index: 6000; color: white; padding: 20px; 
+        }
         .auth-box { background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); padding: 25px; border-radius: 20px; width: 100%; max-width: 340px; display: flex; flex-direction: column; gap: 12px; border: 1px solid rgba(255,255,255,0.2); }
         .auth-btn { background: #007AFF; color: white; border: none; padding: 14px; font-weight: 900; cursor: pointer; text-transform: uppercase; border-radius: 12px; }
 
         #map { width: 100vw; height: 100vh; background: #111; display: none; }
 
+        /* SEARCH BAR */
         #search-container { position: absolute; top: 20px; left: 20px; z-index: 1000; width: calc(100% - 40px); max-width: 300px; }
         #city-search { width: 100%; padding: 12px 15px; border-radius: 25px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); color: white; font-weight: 600; font-size: 14px; }
 
+        /* LOKACIJA DUGME */
         .location-btn { position: absolute; bottom: 30px; right: 20px; z-index: 1000; width: 45px; height: 45px; background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; }
         .location-btn img { filter: invert(1); opacity: 0.8; width: 22px; }
 
+        /* GPS I ANIMACIJE */
         .user-location-dot { width: 14px; height: 14px; background: #007AFF; border: 2px solid white; border-radius: 50%; box-shadow: 0 0 10px rgba(0,122,255,1); z-index: 10000; }
         .pulse-core { width: 100%; height: 100%; border-radius: 50%; background: rgba(0,122,255,0.4); animation: gps-pulse 2s infinite; }
         @keyframes gps-pulse { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(3); opacity: 0; } }
@@ -40,8 +50,7 @@
 
         .live-card-thin { background: #fff; border: 2px solid #007AFF; border-radius: 10px; padding: 2px 8px; margin-left: -12px; display: flex; align-items: center; min-height: 48px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); z-index: 5; }
         .zoom-hide .live-card-thin { display: none; }
-        .zoom-hide .sport-ball { font-size: 20px; }
-
+        
         .match-details { display: flex; flex-direction: column; line-height: 1.1; padding-right: 8px; border-right: 1px solid #eee; }
         .match-name-thin { font-size: 8px; font-weight: 900; color: #007AFF; text-transform: uppercase; margin-bottom: 2px; }
         .match-teams-thin { font-size: 12px; font-weight: 800; color: #000; text-transform: uppercase; display: flex; align-items: center; gap: 4px; }
@@ -50,25 +59,21 @@
         .periods-row { font-size: 9px; color: #002d5f; font-weight: 900; letter-spacing: 0.5px; margin-top: 2px; }
         .time-label { color: #666; font-size: 8px; margin-left: 5px; font-weight: 500; }
 
-        .leaflet-popup-content-wrapper { border-radius: 15px; padding: 0; overflow: hidden; }
-        .leaflet-popup-content { margin: 0; width: 240px !important; }
+        /* POPUP I ADMIN */
+        .leaflet-popup-content-wrapper { border-radius: 15px; overflow: hidden; }
         .pop-header { background: #007AFF; color: white; padding: 12px; text-align: center; font-weight: 900; font-size: 12px; text-transform: uppercase; }
         .pop-body { padding: 15px; display: flex; flex-direction: column; gap: 10px; background: #fff; }
-        .pop-btn { background: #007AFF; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
 
         #admin-panel { position: fixed; top: 0; left: 100%; width: 100%; height: 100%; background: #f0f2f5; z-index: 7000; transition: 0.3s cubic-bezier(0.1, 0.7, 1.0, 0.1); padding: 20px; display: flex; flex-direction: column; }
         #admin-panel.active { left: 0; }
         .admin-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .admin-title { font-family: 'Oswald', sans-serif; font-size: 20px; color: #111; text-transform: uppercase; }
         .live-board { background: #1a1a1a; color: #fff; border-radius: 15px; padding: 20px; text-align: center; margin-bottom: 15px; }
-        .main-score { font-size: 60px; font-family: 'Oswald', sans-serif; color: #fff; margin: 10px 0; letter-spacing: 2px; }
-        
-        .pro-controller-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
+        .main-score { font-size: 60px; font-family: 'Oswald', sans-serif; color: #fff; margin: 10px 0; }
         .team-ctrl { background: #fff; border-radius: 15px; padding: 15px; display: flex; flex-direction: column; align-items: center; }
-        .team-name-label { font-size: 12px; font-weight: 900; color: #666; margin-bottom: 10px; text-transform: uppercase; }
-        .current-amt { font-family: 'Oswald', sans-serif; font-size: 36px; color: #007AFF; line-height: 1; }
-        .step-btn { background: #f0f0f0; border: none; width: 35px; height: 35px; border-radius: 50%; font-weight: bold; font-size: 18px; cursor: pointer; }
-        .action-btn { width: 50px; height: 50px; border-radius: 12px; border: none; color: white; font-size: 24px; font-weight: 900; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .current-amt { font-family: 'Oswald', sans-serif; font-size: 36px; color: #007AFF; }
+        .step-btn { background: #f0f0f0; border: none; width: 35px; height: 35px; border-radius: 50%; font-weight: bold; cursor: pointer; }
+        .action-btn { width: 50px; height: 50px; border-radius: 12px; border: none; color: white; font-size: 24px; font-weight: 900; display: flex; align-items: center; justify-content: center; }
         .btn-plus { background: #28a745; }
         .btn-minus { background: #ff3b30; }
         .admin-btn { padding: 16px; border: none; font-weight: 900; color: white; text-transform: uppercase; width: 100%; border-radius: 12px; cursor: pointer; }
@@ -77,21 +82,21 @@
 <body>
 
     <div id="hero">
-        <h1 style="font-family:'Oswald'; letter-spacing:3px;">ALL SPORTS LOCAL</h1>
+        <h1 style="font-family:'Oswald'; letter-spacing:4px; font-size: 40px;">HOODLIVE</h1>
         <div class="auth-box">
             <input type="email" id="email" placeholder="EMAIL" inputmode="email">
             <input type="password" id="password" placeholder="LOZINKA">
-            <button class="auth-btn" onclick="handleAuth()">PRISTUPI SISTEMU</button>
+            <button class="auth-btn" onclick="handleAuth()">PRISTUPI KRAJU</button>
         </div>
     </div>
 
     <div id="search-container">
-        <input type="text" id="city-search" placeholder="Pretraži grad..." onkeypress="handleSearch(event)">
+        <input type="text" id="city-search" placeholder="Pronađi kraj..." onkeypress="handleSearch(event)">
     </div>
 
     <div id="admin-panel">
         <div class="admin-nav">
-            <div class="admin-title" id="adm-name">KONTROLA TERENA</div>
+            <div class="admin-title" id="adm-name">HOODLIVE CONTROL</div>
             <div onclick="closeAdmin()" style="font-size:30px; font-weight:bold; cursor:pointer; color:#999;">&times;</div>
         </div>
         <div id="adm-score-view" style="display:none; flex-direction:column;">
@@ -102,9 +107,9 @@
                 <div id="match-status-label" style="font-size:11px; background:rgba(255,255,255,0.1); display:inline-block; padding:3px 10px; border-radius:20px; font-weight:900;">STATUS</div>
             </div>
             <div id="active-match-controls">
-                <div class="pro-controller-container">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:15px;">
                     <div class="team-ctrl">
-                        <span class="team-name-label" id="label-t1">DOMAĆI</span>
+                        <span id="label-t1" style="font-size:10px; font-weight:900;">DOMAĆI</span>
                         <div id="step-ctrl-1" style="display:flex; align-items:center; gap:10px;">
                             <button class="step-btn" onclick="changeStep(1, -1)">-</button>
                             <div class="current-amt" id="step-h">1</div>
@@ -116,7 +121,7 @@
                         </div>
                     </div>
                     <div class="team-ctrl">
-                        <span class="team-name-label" id="label-t2">GOSTI</span>
+                        <span id="label-t2" style="font-size:10px; font-weight:900;">GOSTI</span>
                         <div id="step-ctrl-2" style="display:flex; align-items:center; gap:10px;">
                             <button class="step-btn" onclick="changeStep(2, -1)">-</button>
                             <div class="current-amt" id="step-a">1</div>
@@ -128,21 +133,21 @@
                         </div>
                     </div>
                 </div>
-                <button id="calc-btn" class="admin-btn" style="background:#28a745; margin-bottom:10px;" onclick="autoCalculatePeriod()">ZABELEŽI PERIOD</button>
-                <div id="sub-scores-display" style="background:#fff; padding:10px; border-radius:10px; margin-bottom:15px; font-size:12px; font-weight:700; text-align:center; color:#555; border:1px dashed #ccc;"></div>
+                <button class="admin-btn" style="background:#28a745; margin-bottom:10px;" onclick="autoCalculatePeriod()">ZABELEŽI PERIOD</button>
+                <div id="sub-scores-display" style="background:#fff; padding:10px; border-radius:10px; margin-bottom:15px; font-size:12px; font-weight:700; text-align:center;"></div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                    <button id="start-live-btn" class="admin-btn" style="background:#007AFF;" onclick="adminStatus('live')">POČNI LIVE</button>
-                    <button id="end-match-btn" class="admin-btn" style="background:#1a1a1a;" onclick="adminStatus('ended')">KRAJ MEČA</button>
+                    <button class="admin-btn" style="background:#007AFF;" onclick="adminStatus('live')">POČNI LIVE</button>
+                    <button class="admin-btn" style="background:#1a1a1a;" onclick="adminStatus('ended')">KRAJ MEČA</button>
                 </div>
             </div>
         </div>
         <div id="match-setup" style="display:flex; flex-direction:column; gap:12px; background:#fff; padding:20px; border-radius:15px;">
-            <input type="text" id="adm-t1" placeholder="IME DOMAĆEG TIMA">
-            <input type="text" id="adm-t2" placeholder="IME GOSTUJUĆEG TIMA">
+            <input type="text" id="adm-t1" placeholder="DOMAĆI TIM">
+            <input type="text" id="adm-t2" placeholder="GOSTUJUĆI TIM">
             <input type="datetime-local" id="adm-start-time-input">
             <button class="admin-btn" style="background:#007AFF;" onclick="setupMatch()">ZAKAŽI</button>
         </div>
-        <button style="margin-top:auto; background:none; color:#ff3b30; border:none; font-weight:900; cursor:pointer;" onclick="adminDelete()">OBRIŠI TEREN</button>
+        <button style="margin-top:auto; background:none; color:#ff3b30; border:none; font-weight:900;" onclick="adminDelete()">OBRIŠI TEREN</button>
     </div>
 
     <div id="map"></div>
@@ -192,7 +197,7 @@
             map.on('click', e => {
                 const moji = allTereni.filter(t => t.owner === auth.currentUser.uid);
                 if (moji.length >= 3) { alert("LIMIT: MAX 3 TERENA!"); return; }
-                const html = `<div class="pop-header">Novi Teren</div><div class="pop-body"><label>Sport</label><select id="p_sport"><option value="FUDBAL">FUDBAL ⚽</option><option value="KOŠARKA">KOŠARKA 🏀</option><option value="RUKOMET">RUKOMET 🤾</option><option value="ODBOJKA">ODBOJKA 🏐</option><option value="TENIS">TENIS 🎾</option></select><label>Naziv</label><input type="text" id="p_name" placeholder="Lokacija..."><button class="pop-btn" onclick="saveTeren(${e.latlng.lat}, ${e.latlng.lng})">Kreiraj</button></div>`;
+                const html = `<div class="pop-header">Novi Hood Teren</div><div class="pop-body"><select id="p_sport"><option value="FUDBAL">FUDBAL ⚽</option><option value="KOŠARKA">KOŠARKA 🏀</option><option value="RUKOMET">RUKOMET 🤾</option><option value="ODBOJKA">ODBOJKA 🏐</option><option value="TENIS">TENIS 🎾</option></select><input type="text" id="p_name" placeholder="Lokacija..."><button class="pop-btn" onclick="saveTeren(${e.latlng.lat}, ${e.latlng.lng})">DODAJ</button></div>`;
                 L.popup().setLatLng(e.latlng).setContent(html).openOn(map);
             });
             db.ref('tereni').on('value', snap => { 
@@ -211,6 +216,7 @@
             allTereni.forEach(d => {
                 const pos = L.latLng(d.lat, d.lng);
                 if (center.distanceTo(pos) > 20000) return;
+
                 let statusCls = d.status==='live' ? 'status-live-wrapper' : '';
                 let statusLabel = d.status==='live' ? `<span class="status-pill">LIVE</span>` : (d.status==='ended' ? `<span class="status-pill" style="background:#444;">KRAJ</span>` : "");
                 let timeLabel = d.scheduled_at ? `<span class="time-label">${new Date(d.scheduled_at).toLocaleDateString('sr-RS',{day:'2-digit',month:'2-digit'})} ${new Date(d.scheduled_at).toLocaleTimeString('sr-RS',{hour:'2-digit',minute:'2-digit'})}</span>` : "";
@@ -287,14 +293,13 @@
                 document.getElementById('adm-score-view').style.display = 'flex';
                 document.getElementById('match-setup').style.display = 'none';
                 let subText = "";
-                if(d.sport === "ODBOJKA") subText = `TRENUTNI POENI: ${d.pts1} : ${d.pts2}`;
+                if(d.sport === "ODBOJKA") subText = `POENI: ${d.pts1} : ${d.pts2}`;
                 if(d.sport === "TENIS") subText = `POENI: ${tennisPoints[d.pts1]||"0"} : ${tennisPoints[d.pts2]||"0"}`;
                 
                 document.getElementById('adm-main-score').innerText = `${d.score1} : ${d.score2}`;
                 document.getElementById('adm-sub-display').innerText = subText;
                 document.getElementById('adm-teams-label').innerText = `${d.t1} VS ${d.t2}`;
-                document.getElementById('label-t1').innerText = d.t1; 
-                document.getElementById('label-t2').innerText = d.t2;
+                document.getElementById('label-t1').innerText = d.t1; document.getElementById('label-t2').innerText = d.t2;
                 document.getElementById('match-status-label').innerText = d.status.toUpperCase();
                 document.getElementById('sub-scores-display').innerText = d.sub_string || "";
                 document.getElementById('active-match-controls').style.display = isEnded ? 'none' : 'block';
