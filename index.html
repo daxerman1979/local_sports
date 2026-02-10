@@ -6,77 +6,82 @@
     <title>All Sports Local LIVE PRO</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-size: 16px; }
-        html, body { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background: #111; position: fixed; font-family: 'Segoe UI', Roboto, sans-serif; touch-action: pan-x pan-y; }
-        input, select, button { font-size: 16px !important; outline: none; border-radius: 12px; }
+        html, body { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background: #111; position: fixed; font-family: 'Inter', sans-serif; touch-action: pan-x pan-y; }
+        
+        /* INPUT STYLES */
+        input, select { 
+            font-size: 14px !important; 
+            outline: none; 
+            border-radius: 8px; 
+            border: 1px solid #ddd; 
+            padding: 10px; 
+            width: 100%;
+            background: #f9f9f9;
+            font-family: 'Inter', sans-serif;
+        }
+        input:focus { border-color: #007AFF; background: #fff; }
 
         #hero { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.9)), url('https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=1470&auto=format&fit=crop') center/cover; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 6000; color: white; padding: 20px; }
         .auth-box { background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); padding: 25px; border-radius: 20px; width: 100%; max-width: 340px; display: flex; flex-direction: column; gap: 12px; border: 1px solid rgba(255,255,255,0.2); }
-        .auth-box input { padding: 12px; border: none; background: white; color: #000; font-weight: bold; }
-        .auth-btn { background: #007AFF; color: white; border: none; padding: 14px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
+        .auth-btn { background: #007AFF; color: white; border: none; padding: 14px; font-weight: 900; cursor: pointer; text-transform: uppercase; border-radius: 12px; }
 
         #map { width: 100vw; height: 100vh; background: #111; display: none; }
 
-        /* PRECIZNI GPS MOD */
+        /* GPS MOD */
         .user-location-dot { width: 14px; height: 14px; background: #007AFF; border: 2px solid white; border-radius: 50%; box-shadow: 0 0 10px rgba(0,122,255,1); z-index: 10000; }
         .pulse-core { width: 100%; height: 100%; border-radius: 50%; background: rgba(0,122,255,0.4); animation: gps-pulse 2s infinite; }
         @keyframes gps-pulse { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(3); opacity: 0; } }
         
-        /* ULTRA PRO KARTICE */
+        /* KARTICE NA MAPI */
         .sport-marker-wrapper { display: flex; align-items: center; white-space: nowrap; cursor: pointer; transition: 0.2s; }
         .sport-ball { font-size: 26px; z-index: 20; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
-        
         .live-card-thin {
             background: #fff; border: 2px solid #007AFF; border-radius: 10px;
             padding: 2px 8px; margin-left: -12px;
             display: flex; align-items: center; min-height: 46px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.5); z-index: 5;
         }
-        
         .zoom-hide .live-card-thin { display: none; }
-        .zoom-hide .sport-ball { font-size: 18px; }
-
         .status-live-wrapper .live-card-thin { border-color: #ff3b30; }
-        .status-live-wrapper .sport-ball { animation: bounce-ball 0.5s ease infinite alternate; }
-        @keyframes bounce-ball { from { transform: translateY(0); } to { transform: translateY(-3px); } }
-
         .match-details { display: flex; flex-direction: column; line-height: 1; padding-right: 8px; border-right: 1px solid #eee; }
         .match-name-thin { font-size: 7px; font-weight: 900; color: #007AFF; text-transform: uppercase; margin-bottom: 2px; }
         .match-teams-thin { font-size: 11px; font-weight: 800; color: #000; text-transform: uppercase; display: flex; align-items: center; gap: 4px; }
-        
         .status-pill { font-size: 7px; color: #fff; background: #ff3b30; padding: 1px 4px; border-radius: 3px; font-weight: 900; margin-left: 4px; }
-        .match-score-thin { 
-            font-size: 18px; color: #000; font-family: 'Oswald', sans-serif; 
-            min-width: 45px; text-align: center; padding-left: 8px; font-weight: 700; display: flex; flex-direction: column; line-height: 1;
-        }
+        .match-score-thin { font-size: 18px; color: #000; font-family: 'Oswald', sans-serif; min-width: 45px; text-align: center; padding-left: 8px; font-weight: 700; display: flex; flex-direction: column; line-height: 1; }
         .periods-row { font-size: 8px; color: #ff3b30; font-weight: 900; letter-spacing: 0.5px; margin-top: 1px; }
 
-        #admin-panel { position: fixed; top: 0; left: 100%; width: 100%; height: 100%; background: #f4f7f6; z-index: 7000; transition: 0.3s ease-out; padding: 15px; display: flex; flex-direction: column; }
+        /* PRO LEAFLET POPUP STYLES */
+        .leaflet-popup-content-wrapper { border-radius: 15px; padding: 0; overflow: hidden; }
+        .leaflet-popup-content { margin: 0; width: 220px !important; }
+        .pop-header { background: #007AFF; color: white; padding: 10px; text-align: center; font-weight: 900; font-size: 12px; text-transform: uppercase; }
+        .pop-body { padding: 15px; display: flex; flex-direction: column; gap: 8px; }
+
+        /* ADMIN PANEL - REDIZAJN */
+        #admin-panel { position: fixed; top: 0; left: 100%; width: 100%; height: 100%; background: #f0f2f5; z-index: 7000; transition: 0.3s cubic-bezier(0.1, 0.7, 1.0, 0.1); padding: 20px; display: flex; flex-direction: column; }
         #admin-panel.active { left: 0; }
-        .admin-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; height: 40px; }
-        .admin-title { font-family: 'Oswald', sans-serif; font-size: 18px; color: #333; text-transform: uppercase; }
-        .live-board { background: #000; color: #fff; border-radius: 20px; padding: 12px; text-align: center; margin-bottom: 10px; }
-        .main-score { font-size: 45px; font-family: 'Oswald', sans-serif; color: #fff; margin: 2px 0; }
+        .admin-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .admin-title { font-family: 'Oswald', sans-serif; font-size: 20px; color: #111; text-transform: uppercase; }
         
-        .pro-controller-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-        .team-ctrl { background: #fff; border-radius: 20px; padding: 10px; display: flex; flex-direction: column; align-items: center; border-top: 4px solid #007AFF; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .team-ctrl.away { border-top-color: #333; }
-        .amount-selector { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-        .current-amt { font-family: 'Oswald', sans-serif; font-size: 32px; color: #007AFF; }
-        .step-btn { background: #f0f0f0; border: none; width: 30px; height: 30px; border-radius: 50%; font-weight: bold; }
-        .dial-system { display: flex; align-items: center; gap: 8px; width: 100%; justify-content: center; }
-        .action-btn { width: 42px; height: 42px; border-radius: 50%; border: none; color: white; font-size: 20px; font-weight: 900; display: flex; align-items: center; justify-content: center; }
+        .live-board { background: #1a1a1a; color: #fff; border-radius: 15px; padding: 20px; text-align: center; margin-bottom: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .main-score { font-size: 60px; font-family: 'Oswald', sans-serif; color: #fff; margin: 10px 0; line-height: 1; letter-spacing: 2px; }
+        
+        .team-ctrl { background: #fff; border-radius: 15px; padding: 15px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .team-name-label { font-size: 12px; font-weight: 900; color: #666; margin-bottom: 10px; text-transform: uppercase; }
+        
+        .current-amt { font-family: 'Oswald', sans-serif; font-size: 36px; color: #007AFF; line-height: 1; }
+        .action-btn { width: 50px; height: 50px; border-radius: 12px; border: none; color: white; font-size: 24px; font-weight: 900; display: flex; align-items: center; justify-content: center; transition: 0.1s; }
+        .action-btn:active { transform: scale(0.9); }
         .btn-plus { background: #28a745; }
         .btn-minus { background: #ff3b30; }
 
-        .admin-btn { padding: 12px; border: none; font-weight: 900; color: white; text-transform: uppercase; width: 100%; border-radius: 12px; cursor: pointer; }
-        .btn-green { background: #28a745; }
-        .btn-blue { background: #007AFF; }
-        .btn-dark { background: #000; }
-        .btn-grey { background: #8e8e93; }
+        .admin-btn { padding: 16px; border: none; font-weight: 900; color: white; text-transform: uppercase; width: 100%; border-radius: 12px; cursor: pointer; letter-spacing: 1px; transition: 0.2s; }
+        .btn-blue { background: #007AFF; box-shadow: 0 4px 14px rgba(0,122,255,0.4); }
+        .btn-green { background: #28a745; box-shadow: 0 4px 14px rgba(40,167,69,0.4); }
+        .btn-dark { background: #1a1a1a; }
 
         .location-btn { position: absolute; bottom: 35px; right: 25px; z-index: 1000; width: 65px; height: 65px; background: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 8px 25px rgba(0,0,0,0.4); }
     </style>
@@ -84,66 +89,73 @@
 <body>
 
     <div id="hero">
-        <h1>ALL SPORTS LOCAL</h1>
+        <h1 style="font-family:'Oswald'; letter-spacing:3px;">ALL SPORTS LOCAL</h1>
         <div class="auth-box">
             <input type="email" id="email" placeholder="EMAIL" inputmode="email">
             <input type="password" id="password" placeholder="LOZINKA">
-            <button class="auth-btn" onclick="handleAuth()">ULAZ</button>
+            <button class="auth-btn" onclick="handleAuth()">PRISTUPI SISTEMU</button>
         </div>
     </div>
 
     <div id="admin-panel">
         <div class="admin-nav">
-            <div class="admin-title" id="adm-name">TEREN</div>
-            <div onclick="closeAdmin()" style="font-size:35px; font-weight:bold; cursor:pointer;">&times;</div>
+            <div class="admin-title" id="adm-name">KONTROLA TERENA</div>
+            <div onclick="closeAdmin()" style="font-size:30px; font-weight:bold; cursor:pointer; color:#999;">&times;</div>
         </div>
+
         <div id="adm-score-view" style="display:none; flex-direction:column;">
             <div class="live-board">
-                <div id="adm-teams-label" style="color:#007AFF; font-weight:900; text-transform: uppercase;">HOME VS AWAY</div>
+                <div id="adm-teams-label" style="color:#007AFF; font-weight:900; letter-spacing:1px;">TIM A VS TIM B</div>
                 <div class="main-score" id="adm-main-score">0 : 0</div>
-                <div id="match-status-label" style="font-size:10px; letter-spacing:2px; font-weight: 900;">STATUS</div>
+                <div id="match-status-label" style="font-size:11px; background:rgba(255,255,255,0.1); display:inline-block; padding:3px 10px; border-radius:20px; font-weight:900;">STATUS</div>
             </div>
+
             <div id="active-match-controls">
-                <div class="pro-controller-container">
+                <div class="pro-controller-container" style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:15px;">
                     <div class="team-ctrl">
-                        <div class="amount-selector">
-                            <button class="step-btn" onclick="changeStep(1, 1)">▲</button>
+                        <span class="team-name-label" id="label-t1">DOMAĆI</span>
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <button class="step-btn" style="background:none; border:none; font-size:20px;" onclick="changeStep(1, -1)">-</button>
                             <div class="current-amt" id="step-h">1</div>
-                            <button class="step-btn" onclick="changeStep(1, -1)">▼</button>
+                            <button class="step-btn" style="background:none; border:none; font-size:20px;" onclick="changeStep(1, 1)">+</button>
                         </div>
-                        <div class="dial-system" style="margin-top:10px;">
+                        <div style="display:flex; gap:10px; margin-top:10px;">
                             <button class="action-btn btn-minus" onclick="proScore(1, -1)">&minus;</button>
                             <button class="action-btn btn-plus" onclick="proScore(1, 1)">&plus;</button>
                         </div>
                     </div>
-                    <div class="team-ctrl away">
-                        <div class="amount-selector">
-                            <button class="step-btn" onclick="changeStep(2, 1)">▲</button>
+                    <div class="team-ctrl">
+                        <span class="team-name-label" id="label-t2">GOSTI</span>
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <button class="step-btn" style="background:none; border:none; font-size:20px;" onclick="changeStep(2, -1)">-</button>
                             <div class="current-amt" id="step-a">1</div>
-                            <button class="step-btn" onclick="changeStep(2, -1)">▼</button>
+                            <button class="step-btn" style="background:none; border:none; font-size:20px;" onclick="changeStep(2, 1)">+</button>
                         </div>
-                        <div class="dial-system" style="margin-top:10px;">
+                        <div style="display:flex; gap:10px; margin-top:10px;">
                             <button class="action-btn btn-minus" onclick="proScore(2, -1)">&minus;</button>
                             <button class="action-btn btn-plus" onclick="proScore(2, 1)">&plus;</button>
                         </div>
                     </div>
                 </div>
-                <button id="calc-btn" class="admin-btn btn-green" onclick="autoCalculatePeriod()">ZABELEŽI PERIOD</button>
-                <div id="sub-scores-display" style="margin:8px 0; font-size:11px; font-weight:900; text-align:center; color:#555;"></div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
-                    <button id="start-live-btn" class="admin-btn btn-red" onclick="adminStatus('live')">LIVE</button>
-                    <button id="end-match-btn" class="admin-btn btn-dark" onclick="adminStatus('ended')">KRAJ</button>
+                <button id="calc-btn" class="admin-btn btn-green" style="margin-bottom:10px;" onclick="autoCalculatePeriod()">ZABELEŽI PERIOD REZULTATA</button>
+                <div id="sub-scores-display" style="background:#fff; padding:10px; border-radius:10px; margin-bottom:15px; font-size:12px; font-weight:700; text-align:center; color:#555; border:1px dashed #ccc;"></div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <button id="start-live-btn" class="admin-btn btn-blue" onclick="adminStatus('live')">POČNI LIVE</button>
+                    <button id="end-match-btn" class="admin-btn btn-dark" onclick="adminStatus('ended')">KRAJ MEČA</button>
                 </div>
             </div>
-            <div id="ended-msg" style="display:none; text-align:center; padding:15px; color:#ff3b30; font-weight:900;">ZAVRŠENO</div>
+            <div id="ended-msg" style="display:none; text-align:center; padding:20px; background:#fff; border-radius:15px; color:#ff3b30; font-weight:900;">MEČ JE ZAVRŠEN</div>
         </div>
-        <div id="match-setup" style="display:flex; flex-direction:column; gap:10px; background:#fff; padding:15px; border-radius:20px;">
-            <input type="text" id="adm-t1" placeholder="DOMAĆI TIM">
-            <input type="text" id="adm-t2" placeholder="GOSTUJUĆI TIM">
+
+        <div id="match-setup" style="display:flex; flex-direction:column; gap:12px; background:#fff; padding:20px; border-radius:15px; box-shadow:0 4px 15px rgba(0,0,0,0.05);">
+            <h3 style="margin:0; font-size:14px; text-transform:uppercase; color:#666;">Zakaži novi meč</h3>
+            <input type="text" id="adm-t1" placeholder="IME DOMAĆEG TIMA">
+            <input type="text" id="adm-t2" placeholder="IME GOSTUJUĆEG TIMA">
             <input type="datetime-local" id="adm-start-time-input">
-            <button class="admin-btn btn-blue" onclick="setupMatch()">ZAKAŽI</button>
+            <button class="admin-btn btn-blue" onclick="setupMatch()">SAČUVAJ I ZAKAŽI</button>
         </div>
-        <button class="admin-btn btn-grey" style="margin-top:auto; font-size:10px; background:transparent; color:#888;" onclick="adminDelete()">UKLONI TEREN</button>
+        
+        <button class="admin-btn" style="margin-top:auto; background:none; color:#ff3b30; font-size:12px;" onclick="adminDelete()">OBRIŠI OVAJ TEREN TRAJNO</button>
     </div>
 
     <div id="map"></div>
@@ -184,6 +196,24 @@
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', { opacity: 0.9, zIndex: 1000 }).addTo(map);
             markersLayer.addTo(map);
             map.on('zoomend moveend', renderMarkers);
+            
+            map.on('click', e => {
+                const moji = allTereni.filter(t => t.owner === auth.currentUser.uid);
+                if (moji.length >= 3) { alert("LIMIT: MAX 3 TERENA!"); return; }
+                
+                const html = `
+                    <div class="pop-header">Novi sportski teren</div>
+                    <div class="pop-body">
+                        <select id="p_sport">
+                            <option value="FUDBAL">FUDBAL ⚽</option>
+                            <option value="KOŠARKA">KOŠARKA 🏀</option>
+                        </select>
+                        <input type="text" id="p_name" placeholder="NAZIV TERENA (npr. GRADSKI STADION)">
+                        <button onclick="saveTeren(${e.latlng.lat}, ${e.latlng.lng})" style="background:#007AFF; color:white; border:none; padding:12px; border-radius:8px; font-weight:900; cursor:pointer;">KREIRAJ TEREN</button>
+                    </div>`;
+                L.popup().setLatLng(e.latlng).setContent(html).openOn(map);
+            });
+
             db.ref('tereni').on('value', snap => { 
                 allTereni = []; snap.forEach(c => { let d = c.val(); d.key = c.key; allTereni.push(d); }); 
                 renderMarkers(); 
@@ -228,9 +258,8 @@
                 currentLat = pos.coords.latitude;
                 currentLon = pos.coords.longitude;
                 const radius = pos.coords.accuracy;
-
                 if (!userMarker) {
-                    accCircle = L.circle([currentLat, currentLon], { radius: radius, color: '#007AFF', fillColor: '#007AFF', fillOpacity: 0.15, weight: 1 }).addTo(map);
+                    accCircle = L.circle([currentLat, currentLon], { radius: radius, color: '#007AFF', fillColor: '#007AFF', fillOpacity: 0.1, weight: 1 }).addTo(map);
                     userMarker = L.marker([currentLat, currentLon], { 
                         icon: L.divIcon({ className: 'user-location-dot', html: '<div class="pulse-core"></div>', iconAnchor: [7, 7] }),
                         zIndexOffset: 10000 
@@ -244,6 +273,13 @@
         }
 
         function goToMyLocation() { if(currentLat) map.flyTo([currentLat, currentLon], 17); }
+
+        async function saveTeren(lat, lng) {
+            const name = document.getElementById('p_name').value.toUpperCase();
+            if(!name) return;
+            await db.ref('tereni').push({ name, lat, lng, owner: auth.currentUser.uid, sport: document.getElementById('p_sport').value, status: 'upcoming', expires: Date.now()+86400000, score1: 0, score2: 0 });
+            map.closePopup();
+        }
 
         function openAdmin(key) {
             const d = allTereni.find(x => x.key === key);
@@ -263,11 +299,13 @@
                 document.getElementById('match-setup').style.display = 'none';
                 document.getElementById('adm-main-score').innerText = `${d.score1} : ${d.score2}`;
                 document.getElementById('adm-teams-label').innerText = `${d.t1} VS ${d.t2}`;
+                document.getElementById('label-t1').innerText = d.t1;
+                document.getElementById('label-t2').innerText = d.t2;
                 document.getElementById('match-status-label').innerText = d.status.toUpperCase();
                 document.getElementById('start-live-btn').style.display = d.status === 'upcoming' ? 'block' : 'none';
                 document.getElementById('end-match-btn').style.display = isLive ? 'block' : 'none';
                 document.getElementById('calc-btn').disabled = !isLive;
-                document.getElementById('sub-scores-display').innerText = d.sub_string || "";
+                document.getElementById('sub-scores-display').innerText = d.sub_string || "Nema zabeleženih perioda";
                 document.getElementById('active-match-controls').style.display = isEnded ? 'none' : 'block';
                 document.getElementById('ended-msg').style.display = isEnded ? 'block' : 'none';
             } else {
