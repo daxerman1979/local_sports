@@ -20,18 +20,19 @@
 
         #map { width: 100vw; height: 100vh; background: #111; display: none; }
 
-        /* PRECIZNI GPS */
-        .user-location-dot { width: 14px; height: 14px; background: #007AFF; border: 2px solid white; border-radius: 50%; box-shadow: 0 0 15px rgba(0,122,255,1); animation: pulse-gps 1.5s infinite; }
-        @keyframes pulse-gps { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0,122,255,0.7); } 70% { transform: scale(1.2); box-shadow: 0 0 0 10px rgba(0,122,255,0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0,122,255,0); } }
+        /* PRECIZNI GPS MOD */
+        .user-location-dot { width: 14px; height: 14px; background: #007AFF; border: 2px solid white; border-radius: 50%; box-shadow: 0 0 10px rgba(0,122,255,1); z-index: 10000; }
+        .pulse-core { width: 100%; height: 100%; border-radius: 50%; background: rgba(0,122,255,0.4); animation: gps-pulse 2s infinite; }
+        @keyframes gps-pulse { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(3); opacity: 0; } }
         
-        /* ULTRA PRO KARTICE SA PERIODIMA */
+        /* ULTRA PRO KARTICE */
         .sport-marker-wrapper { display: flex; align-items: center; white-space: nowrap; cursor: pointer; transition: 0.2s; }
-        .sport-ball { font-size: 26px; z-index: 20; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); position: relative; }
+        .sport-ball { font-size: 26px; z-index: 20; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
         
         .live-card-thin {
             background: #fff; border: 2px solid #007AFF; border-radius: 10px;
             padding: 2px 8px; margin-left: -12px;
-            display: flex; align-items: center; min-height: 44px;
+            display: flex; align-items: center; min-height: 46px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.5); z-index: 5;
         }
         
@@ -51,9 +52,8 @@
             font-size: 18px; color: #000; font-family: 'Oswald', sans-serif; 
             min-width: 45px; text-align: center; padding-left: 8px; font-weight: 700; display: flex; flex-direction: column; line-height: 1;
         }
-        .periods-row { font-size: 8px; color: #ff3b30; font-weight: 800; letter-spacing: 0.5px; margin-top: 1px; }
+        .periods-row { font-size: 8px; color: #ff3b30; font-weight: 900; letter-spacing: 0.5px; margin-top: 1px; }
 
-        /* ADMIN PANEL */
         #admin-panel { position: fixed; top: 0; left: 100%; width: 100%; height: 100%; background: #f4f7f6; z-index: 7000; transition: 0.3s ease-out; padding: 15px; display: flex; flex-direction: column; }
         #admin-panel.active { left: 0; }
         .admin-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; height: 40px; }
@@ -166,7 +166,7 @@
         const db = firebase.database();
 
         let map, currentLat, currentLon, currentAdminKey = null, allTereni = [];
-        let steps = { 1: 1, 2: 1 }, userMarker, markersLayer = L.layerGroup();
+        let steps = { 1: 1, 2: 1 }, userMarker, accCircle, markersLayer = L.layerGroup();
         const sportEmojis = { "FUDBAL": "⚽", "KOŠARKA": "🏀" };
 
         async function handleAuth() {
@@ -184,12 +184,6 @@
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', { opacity: 0.9, zIndex: 1000 }).addTo(map);
             markersLayer.addTo(map);
             map.on('zoomend moveend', renderMarkers);
-            map.on('click', e => {
-                const moji = allTereni.filter(t => t.owner === auth.currentUser.uid);
-                if (moji.length >= 3) { alert("LIMIT: MAX 3 TERENA!"); return; }
-                const html = `<div style="padding:10px;"><b>NOVI TEREN</b><br><select id="p_sport"><option value="FUDBAL">FUDBAL</option><option value="KOŠARKA">KOŠARKA</option></select><br><input type="text" id="p_name" placeholder="NAZIV" style="width:100%;margin:5px 0;"><br><button onclick="saveTeren(${e.latlng.lat}, ${e.latlng.lng})" style="width:100%;background:#007AFF;color:white;border:none;padding:5px;border-radius:5px;">SAČUVAJ</button></div>`;
-                L.popup().setLatLng(e.latlng).setContent(html).openOn(map);
-            });
             db.ref('tereni').on('value', snap => { 
                 allTereni = []; snap.forEach(c => { let d = c.val(); d.key = c.key; allTereni.push(d); }); 
                 renderMarkers(); 
@@ -222,8 +216,7 @@
                                 </div>
                             </div>
                            </div>`, 
-                    iconSize: [180, 44], 
-                    iconAnchor: [12, 22] 
+                    iconSize: [180, 46], iconAnchor: [12, 23] 
                 });
                 L.marker([d.lat, d.lng], { icon }).addTo(markersLayer).on('click', e => { L.DomEvent.stopPropagation(e); openAdmin(d.key); });
             });
@@ -231,31 +224,26 @@
 
         function trackGPS() {
             if (!navigator.geolocation) return;
-            // Forsiranje GPS senzora za maksimalnu preciznost
             navigator.geolocation.watchPosition(pos => {
                 currentLat = pos.coords.latitude;
                 currentLon = pos.coords.longitude;
+                const radius = pos.coords.accuracy;
+
                 if (!userMarker) {
+                    accCircle = L.circle([currentLat, currentLon], { radius: radius, color: '#007AFF', fillColor: '#007AFF', fillOpacity: 0.15, weight: 1 }).addTo(map);
                     userMarker = L.marker([currentLat, currentLon], { 
-                        icon: L.divIcon({ className: 'user-location-dot', iconAnchor: [7, 7] }),
-                        zIndexOffset: 2000 
+                        icon: L.divIcon({ className: 'user-location-dot', html: '<div class="pulse-core"></div>', iconAnchor: [7, 7] }),
+                        zIndexOffset: 10000 
                     }).addTo(map);
                 } else {
                     userMarker.setLatLng([currentLat, currentLon]);
+                    accCircle.setLatLng([currentLat, currentLon]);
+                    accCircle.setRadius(radius);
                 }
-            }, err => { console.error(err); }, { 
-                enableHighAccuracy: true, 
-                maximumAge: 0, 
-                timeout: 10000 
-            });
+            }, null, { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 });
         }
 
-        async function saveTeren(lat, lng) {
-            const name = document.getElementById('p_name').value.toUpperCase();
-            if(!name) return;
-            await db.ref('tereni').push({ name, lat, lng, owner: auth.currentUser.uid, sport: document.getElementById('p_sport').value, status: 'upcoming', expires: Date.now()+86400000, score1: 0, score2: 0 });
-            map.closePopup();
-        }
+        function goToMyLocation() { if(currentLat) map.flyTo([currentLat, currentLon], 17); }
 
         function openAdmin(key) {
             const d = allTereni.find(x => x.key === key);
@@ -279,7 +267,6 @@
                 document.getElementById('start-live-btn').style.display = d.status === 'upcoming' ? 'block' : 'none';
                 document.getElementById('end-match-btn').style.display = isLive ? 'block' : 'none';
                 document.getElementById('calc-btn').disabled = !isLive;
-                document.getElementById('calc-btn').style.opacity = isLive ? "1" : "0.3";
                 document.getElementById('sub-scores-display').innerText = d.sub_string || "";
                 document.getElementById('active-match-controls').style.display = isEnded ? 'none' : 'block';
                 document.getElementById('ended-msg').style.display = isEnded ? 'block' : 'none';
@@ -302,10 +289,7 @@
             const labels = d.sport === "KOŠARKA" ? ["Q1", "Q2", "Q3", "Q4"] : ["HT"];
             let p1 = 0, p2 = 0, target = null;
             if (d.sub_details) {
-                for (let l of labels) { 
-                    if (!d.sub_details[l] || d.sub_details[l] === "0:0") { target = l; break; } 
-                    else { const p = d.sub_details[l].split(':'); p1 += parseInt(p[0]); p2 += parseInt(p[1]); } 
-                }
+                for (let l of labels) { if (!d.sub_details[l] || d.sub_details[l] === "0:0") { target = l; break; } else { const p = d.sub_details[l].split(':'); p1 += parseInt(p[0]); p2 += parseInt(p[1]); } }
             } else { target = labels[0]; }
             if (!target) return alert("SVI PERIODI POPUNJENI");
             db.ref(`tereni/${currentAdminKey}/sub_details`).update({ [target]: `${d.score1 - p1}:${d.score2 - p2}` }).then(() => {
@@ -325,7 +309,6 @@
 
         window.adminDelete = () => { if(confirm("OBRISATI?")) { db.ref(`tereni/${currentAdminKey}`).remove(); closeAdmin(); } };
         window.closeAdmin = () => { document.getElementById('admin-panel').classList.remove('active'); currentAdminKey = null; };
-        function goToMyLocation() { if(currentLat) map.flyTo([currentLat, currentLon], 16); }
     </script>
 </body>
 </html>
