@@ -368,7 +368,13 @@
                 document.getElementById('active-match-controls').style.display = isEnded ? 'none' : 'block';
                 document.getElementById('start-live-btn').style.display = d.status === 'upcoming' ? 'block' : 'none';
                 document.getElementById('end-match-btn').style.display = isLive ? 'block' : 'none';
-                const showStep = (d.sport !== "ODBOJKA" && d.sport !== "TENIS");
+                
+                // SKRIVANJE DUGMADI ZA TENIS
+                const isTennis = d.sport === "TENIS";
+                const isVolleyball = d.sport === "ODBOJKA";
+                document.getElementById('calc-btn').style.display = isTennis ? 'none' : 'block';
+                
+                const showStep = (!isTennis && !isVolleyball);
                 document.getElementById('step-ctrl-1').style.visibility = showStep ? "visible" : "hidden";
                 document.getElementById('step-ctrl-2').style.visibility = showStep ? "visible" : "hidden";
             } else {
@@ -411,12 +417,12 @@
                 if (isTieBreak) {
                     if (p1 >= tbTarget && (p1 - p2) >= 2) { 
                         g1 = 7; 
-                        autoCalculatePeriod(g1, g2); // AUTO-UPIS SETA
+                        autoCalculatePeriod(g1, g2);
                         s1++; g1 = 0; g2 = 0; p1 = 0; p2 = 0; 
                     }
                     else if (p2 >= tbTarget && (p2 - p1) >= 2) { 
                         g2 = 7; 
-                        autoCalculatePeriod(g1, g2); // AUTO-UPIS SETA
+                        autoCalculatePeriod(g1, g2);
                         s2++; g1 = 0; g2 = 0; p1 = 0; p2 = 0; 
                     }
                 } else {
@@ -424,11 +430,11 @@
                     else if (p2 >= 4 && (p2 - p1) >= 2) { g2++; p1 = 0; p2 = 0; }
                     
                     if ((g1 >= 6 && (g1 - g2) >= 2) || (g1 === 7 && g2 === 5)) { 
-                        autoCalculatePeriod(g1, g2); // AUTO-UPIS SETA
+                        autoCalculatePeriod(g1, g2);
                         s1++; g1 = 0; g2 = 0; 
                     }
                     else if ((g2 >= 6 && (g2 - g1) >= 2) || (g2 === 7 && g1 === 5)) { 
-                        autoCalculatePeriod(g1, g2); // AUTO-UPIS SETA
+                        autoCalculatePeriod(g1, g2);
                         s2++; g1 = 0; g2 = 0; 
                     }
                 }
