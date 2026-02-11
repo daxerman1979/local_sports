@@ -389,13 +389,13 @@
                 
                 const target = (s1 + s2 === 4) ? 15 : 25;
                 
-                // POPRAVLJENO: Mora biti barem 25/15 I barem 2 razlike
                 if(p1 >= target && (p1 - p2) >= 2) { 
-                    autoCalculatePeriod(); 
+                    // PRVO UPISUJEMO POENE U MALI PRIKAZ, PA TEK ONDA RESETUJEMO NA 0
+                    autoCalculatePeriod(p1, p2); 
                     s1++; p1 = 0; p2 = 0; 
                 }
                 else if(p2 >= target && (p2 - p1) >= 2) { 
-                    autoCalculatePeriod(); 
+                    autoCalculatePeriod(p1, p2); 
                     s2++; p1 = 0; p2 = 0; 
                 }
                 upd = { pts1: p1, pts2: p2, score1: s1, score2: s2 };
@@ -419,7 +419,8 @@
 
         window.adminStatus = (s) => db.ref(`tereni/${currentAdminKey}`).update({ status: s });
 
-        function autoCalculatePeriod() {
+        // Dodata mogućnost primanja specifičnih vrednosti za odbojku
+        function autoCalculatePeriod(v1, v2) {
             const d = allTereni.find(x => x.key === currentAdminKey); if(!d || d.status !== 'live') return;
             let labels = ["HT"];
             if(d.sport === "KOŠARKA") labels = ["Q1", "Q2", "Q3", "Q4"];
@@ -429,9 +430,14 @@
                 for (let l of labels) { if (!d.sub_details[l]) { target = l; break; } else { const p = d.sub_details[l].split(':'); p1 += parseInt(p[0]); p2 += parseInt(p[1]); } }
             } else { target = labels[0]; }
             if (!target) return; 
+
+            // Za odbojku koristimo v1 i v2 koji su prosleđeni pre reseta
             let val = `${d.score1 - p1}:${d.score2 - p2}`;
-            if(d.sport === "ODBOJKA") val = `${d.pts1}:${d.pts2}`;
+            if(d.sport === "ODBOJKA" && v1 !== undefined) val = `${v1}:${v2}`;
+            else if(d.sport === "ODBOJKA") val = `${d.pts1}:${d.pts2}`;
+            
             if(d.sport === "TENIS") val = `${d.games1}:${d.games2}`;
+            
             db.ref(`tereni/${currentAdminKey}/sub_details`).update({ [target]: val }).then(() => {
                 db.ref(`tereni/${currentAdminKey}`).once('value', s => {
                     let snap = s.val(), res = [];
