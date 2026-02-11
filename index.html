@@ -226,7 +226,6 @@
             }
         }
 
-        // EXPLORE FUNKCIJA
         function exploreMap() {
             document.getElementById('hero').style.display='none'; 
             document.getElementById('map').style.display='block'; 
@@ -244,7 +243,7 @@
             markersLayer.addTo(map);
             map.on('zoomend moveend', renderMarkers);
             map.on('click', e => {
-                if (!auth.currentUser) return; // Zabrana kreiranja ako je gost
+                if (!auth.currentUser) return; 
                 const moji = allTereni.filter(t => t.owner === auth.currentUser.uid);
                 if (moji.length >= 3) { alert("LIMIT: MAX 3 TERENA!"); return; }
                 const html = `<div class="pop-header">NOVI TEREN</div><div class="pop-body"><label>Sport</label><select id="p_sport"><option value="FUDBAL">FUDBAL ⚽</option><option value="KOŠARKA">KOŠARKA 🏀</option><option value="RUKOMET">RUKOMET 🤾</option><option value="ODBOJKA">ODBOJKA 🏐</option><option value="TENIS">TENIS 🎾</option></select><label>Naziv</label><input type="text" id="p_name" placeholder="Lokacija..."><button class="pop-btn" onclick="saveTeren(${e.latlng.lat}, ${e.latlng.lng})">Kreiraj</button></div>`;
@@ -390,13 +389,13 @@
                 
                 const target = (s1 + s2 === 4) ? 15 : 25;
                 
-                // PROVERA KRAJA SETA I AUTO-SNIMANJE
-                if(p1 >= target && p1 - p2 >= 2) { 
-                    autoCalculatePeriod(); // Automatsko snimanje trenutnog poena u listu setova
+                // POPRAVLJENO: Mora biti barem 25/15 I barem 2 razlike
+                if(p1 >= target && (p1 - p2) >= 2) { 
+                    autoCalculatePeriod(); 
                     s1++; p1 = 0; p2 = 0; 
                 }
-                else if(p2 >= target && p2 - p1 >= 2) { 
-                    autoCalculatePeriod(); // Automatsko snimanje trenutnog poena u listu setova
+                else if(p2 >= target && (p2 - p1) >= 2) { 
+                    autoCalculatePeriod(); 
                     s2++; p1 = 0; p2 = 0; 
                 }
                 upd = { pts1: p1, pts2: p2, score1: s1, score2: s2 };
@@ -429,7 +428,7 @@
             if (d.sub_details) {
                 for (let l of labels) { if (!d.sub_details[l]) { target = l; break; } else { const p = d.sub_details[l].split(':'); p1 += parseInt(p[0]); p2 += parseInt(p[1]); } }
             } else { target = labels[0]; }
-            if (!target) return; // Da ne iskače alert kod automatske odbojke
+            if (!target) return; 
             let val = `${d.score1 - p1}:${d.score2 - p2}`;
             if(d.sport === "ODBOJKA") val = `${d.pts1}:${d.pts2}`;
             if(d.sport === "TENIS") val = `${d.games1}:${d.games2}`;
