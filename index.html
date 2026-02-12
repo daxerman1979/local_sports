@@ -76,7 +76,6 @@
         .btn-dark { background: #222; border: 1px solid #333; }
         #sub-scores-display { background: #111; color: #888; padding: 10px; border-radius: 10px; margin-bottom: 10px; font-size: 12px; font-weight: 700; text-align: center; border: 1px dashed #333; }
 
-        /* MODAL ZA LOGIKU MEČA */
         #logic-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 20px; }
         .modal-card { background: #111; border: 2px solid #ff3b30; border-radius: 25px; width: 100%; max-width: 320px; padding: 25px; text-align: center; }
         .modal-title { font-family: 'Oswald'; font-size: 20px; color: #fff; margin-bottom: 20px; text-transform: uppercase; }
@@ -161,11 +160,11 @@
 
                 <div id="sub-scores-display">PERIOD SCORES WILL BE HERE</div>
                 
-                <button id="calc-btn" class="admin-btn btn-green" onclick="autoCalculatePeriod()">RECORD PERIOD</button>
+                <button id="calc-btn" class="admin-btn btn-green" onclick="triggerLogic('period')">RECORD PERIOD</button>
                 
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                     <button id="start-live-btn" class="admin-btn btn-blue" onclick="adminStatus('live')">START LIVE</button>
-                    <button id="end-match-btn" class="admin-btn btn-dark" onclick="triggerLogic()">END MATCH</button>
+                    <button id="end-match-btn" class="admin-btn btn-dark" onclick="triggerLogic('end')">END MATCH</button>
                 </div>
             </div>
         </div>
@@ -245,40 +244,50 @@
             document.getElementById('logic-modal').style.display = 'flex';
         }
 
-        function triggerLogic() {
+        // --- GLAVNA LOGIKA MEČA ---
+        function triggerLogic(type) {
             const d = allTereni.find(x => x.key === currentAdminKey);
             const lang = langData[currentLang];
-            
-            // Logika bazirana na sportu i unetim periodima
+            const sub = d.sub_details || {};
+
             if (d.sport === "FUDBAL") {
-                const sub = d.sub_details || {};
-                if (!sub["HT"]) {
-                    autoCalculatePeriod(); // Prvo poluvreme (HT)
-                    return;
-                }
-                if (sub["FT"]) {
-                    // Već smo prošli FT, sada penali ili kraj?
+                if (type === 'period') {
+                    if (!sub["HT"]) { autoCalculatePeriod(undefined, undefined, "HT"); }
+                    else if (!sub["FT"]) { 
+                        // Kada treba da doda FT, otvaramo modal jer je to logičan kraj
+                        showModal(lang.end_q, [
+                            { text: lang.btn_et, cls: "btn-blue", fn: () => autoCalculatePeriod(undefined, undefined, "FT") },
+                            { text: lang.btn_end, cls: "btn-dark", fn: () => { autoCalculatePeriod(undefined, undefined, "FT"); adminStatus('ended'); } }
+                        ]);
+                    }
+                } else if (type === 'end') {
                     showModal(lang.end_q, [
+                        { text: lang.btn_et, cls: "btn-blue", fn: () => {} },
                         { text: lang.btn_pen, cls: "btn-blue", fn: () => autoCalculatePeriod(undefined, undefined, "PEN") },
                         { text: lang.btn_end, cls: "btn-dark", fn: () => adminStatus('ended') }
                     ]);
-                } else {
-                    showModal(lang.end_q, [
-                        { text: lang.btn_et, cls: "btn-blue", fn: () => autoCalculatePeriod(undefined, undefined, "ET") },
-                        { text: lang.btn_end, cls: "btn-dark", fn: () => { autoCalculatePeriod(undefined, undefined, "FT"); adminStatus('ended'); } }
-                    ]);
                 }
             } else if (d.sport === "KOŠARKA") {
-                showModal(lang.end_q, [
-                    { text: lang.btn_et, cls: "btn-blue", fn: () => { 
-                        let etCount = Object.keys(d.sub_details || {}).filter(k => k.includes("OT")).length + 1;
-                        autoCalculatePeriod(undefined, undefined, "OT" + etCount);
-                    }},
-                    { text: lang.btn_end, cls: "btn-dark", fn: () => adminStatus('ended') }
-                ]);
+                if (type === 'period') {
+                    autoCalculatePeriod();
+                } else {
+                    showModal(lang.end_q, [
+                        { text: lang.btn_et, cls: "btn-blue", fn: () => { 
+                            let etCount = Object.keys(sub).filter(k => k.includes("OT")).length + 1;
+                            autoCalculatePeriod(undefined, undefined, "OT" + etCount);
+                        }},
+                        { text: lang.btn_end, cls: "btn-dark", fn: () => adminStatus('ended') }
+                    ]);
+                }
+            } else if (d.sport === "RUKOMET") {
+                 if (type === 'period') {
+                    if (!sub["HT"]) autoCalculatePeriod(undefined, undefined, "HT");
+                    else if (!sub["FT"]) autoCalculatePeriod(undefined, undefined, "FT");
+                } else {
+                    adminStatus('ended');
+                }
             } else {
-                // Za ostale sportove standardan kraj
-                adminStatus('ended');
+                if (type === 'end') adminStatus('ended');
             }
         }
 
@@ -394,15 +403,6 @@
             });
         }
 
-        async function handleSearch(e) {
-            if (e.key === 'Enter') {
-                const q = document.getElementById('city-search').value;
-                const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${q}`);
-                const data = await res.json();
-                if (data.length > 0) map.flyTo([data[0].lat, data[0].lon], 13);
-            }
-        }
-
         function trackGPS() {
             navigator.geolocation.watchPosition(pos => {
                 currentLat = pos.coords.latitude; currentLon = pos.coords.longitude;
@@ -440,9 +440,11 @@
             document.getElementById('adm-name').innerText = d.name;
             const isLive = d.status === 'live', isEnded = d.status === 'ended';
             
-            // Blokada kontrola ako je meč završen
+            // ONEMOGUĆAVANJE AKO JE KRAJ
             document.getElementById('score-controllers').style.pointerEvents = isEnded ? 'none' : 'auto';
             document.getElementById('score-controllers').style.opacity = isEnded ? '0.3' : '1';
+            document.getElementById('calc-btn').disabled = isEnded;
+            document.getElementById('calc-btn').style.opacity = isEnded ? '0.3' : '1';
 
             if(d.t1) {
                 document.getElementById('adm-score-view').style.display = 'flex';
@@ -519,11 +521,11 @@
 
         function autoCalculatePeriod(v1, v2, forceTarget) {
             const d = allTereni.find(x => x.key === currentAdminKey); if(!d || d.status !== 'live') return;
-            const lang = langData[currentLang];
             let labels = ["HT"];
             if(d.sport === "KOŠARKA") labels = ["Q1", "Q2", "Q3", "Q4"];
             if(d.sport === "FUDBAL") labels = ["HT", "FT"];
             if(d.sport === "ODBOJKA" || d.sport === "TENIS") labels = ["S1", "S2", "S3", "S4", "S5"];
+            if(d.sport === "RUKOMET") labels = ["HT", "FT"];
             
             let p1 = 0, p2 = 0, target = forceTarget || null;
             if (!target) {
@@ -531,7 +533,6 @@
                     for (let l of labels) { if (!d.sub_details[l]) { target = l; break; } else { const p = d.sub_details[l].split(':'); p1 += parseInt(p[0]); p2 += parseInt(p[1]); } }
                 } else { target = labels[0]; }
             }
-
             if (!target) return;
 
             let val = `${d.score1 - p1}:${d.score2 - p2}`;
@@ -541,7 +542,11 @@
                 db.ref(`tereni/${currentAdminKey}`).once('value', s => {
                     let snap = s.val(), res = [];
                     if(snap.sub_details) {
-                        Object.keys(snap.sub_details).sort().forEach(k => { res.push(`${k} ${snap.sub_details[k]}`); });
+                        // Sortiranje da bi periodi išli logičnim redom
+                        const order = ["Q1", "Q2", "Q3", "Q4", "HT", "FT", "ET", "PEN", "S1", "S2", "S3", "S4", "S5", "OT1", "OT2"];
+                        Object.keys(snap.sub_details).sort((a,b) => order.indexOf(a) - order.indexOf(b)).forEach(k => { 
+                            res.push(`${k} ${snap.sub_details[k]}`); 
+                        });
                     }
                     db.ref(`tereni/${currentAdminKey}`).update({ sub_string: res.join(' | ') });
                 });
