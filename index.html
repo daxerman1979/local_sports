@@ -74,6 +74,7 @@
         .btn-blue { background: #007AFF; }
         .btn-green { background: #28a745; }
         .btn-dark { background: #222; border: 1px solid #333; }
+        .btn-orange { background: #ff9500; }
         #sub-scores-display { background: #111; color: #888; padding: 10px; border-radius: 10px; margin-bottom: 10px; font-size: 12px; font-weight: 700; text-align: center; border: 1px dashed #333; }
 
         #logic-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 20px; }
@@ -166,6 +167,7 @@
                     <button id="start-live-btn" class="admin-btn btn-blue" onclick="adminStatus('live')">START LIVE</button>
                     <button id="end-match-btn" class="admin-btn btn-dark" onclick="triggerLogic('end')">END MATCH</button>
                 </div>
+                <button id="reset-match-btn" class="admin-btn btn-orange" style="display:none;" onclick="resetMatchData()">NEW MATCH / RESET</button>
             </div>
         </div>
 
@@ -213,7 +215,8 @@
                 points: "POINTS", games: "GEMS", status: "STATUS", delete_conf: "DELETE?",
                 no_periods: "NO PERIODS", upcoming: "UPCOMING", live: "LIVE", ended: "ENDED",
                 create_court: "CREATE COURT", sport: "SPORT", loc_name: "LOCATION NAME", court_limit: "LIMIT: MAX 3 COURTS!",
-                end_q: "What is next?", btn_end: "END MATCH", btn_et: "EXTRA TIME", btn_pen: "PENALTIES"
+                end_q: "What is next?", btn_end: "END MATCH", btn_et: "EXTRA TIME", btn_pen: "PENALTIES",
+                btn_reset: "NEW MATCH / RESET"
             },
             SRB: {
                 hero_sub: "MREŽA ULIČNIH SPORTOVA", auth_btn: "ULAZ U SISTEM", explore_btn: "SAMO PREGLED",
@@ -223,7 +226,8 @@
                 points: "POENI", games: "GEMOVI", status: "STATUS", delete_conf: "OBRISATI?",
                 no_periods: "NEMA PERIODA", upcoming: "ZAKAZANO", live: "UŽIVO", ended: "ZAVRŠENO",
                 create_court: "KREIRAJ TEREN", sport: "SPORT", loc_name: "NAZIV LOKACIJE", court_limit: "LIMIT: MAX 3 TERENA!",
-                end_q: "Šta je sledeće?", btn_end: "KRAJ MEČA", btn_et: "PRODUŽECI", btn_pen: "PENALI"
+                end_q: "Šta je sledeće?", btn_end: "KRAJ MEČA", btn_et: "PRODUŽECI", btn_pen: "PENALI",
+                btn_reset: "NOVI MEČ / RESET"
             }
         };
 
@@ -244,7 +248,6 @@
             document.getElementById('logic-modal').style.display = 'flex';
         }
 
-        // --- GLAVNA LOGIKA MEČA ---
         function triggerLogic(type) {
             const d = allTereni.find(x => x.key === currentAdminKey);
             const lang = langData[currentLang];
@@ -255,23 +258,19 @@
                     if (!sub["HT"]) { 
                         autoCalculatePeriod(undefined, undefined, "HT"); 
                     } else if (!sub["FT"]) {
-                        // Regularni kraj (FT) nudi Produžetke ili Kraj
                         showModal(lang.end_q, [
                             { text: lang.btn_et, cls: "btn-blue", fn: () => autoCalculatePeriod(undefined, undefined, "FT") },
                             { text: lang.btn_end, cls: "btn-dark", fn: () => { autoCalculatePeriod(undefined, undefined, "FT"); adminStatus('ended'); } }
                         ]);
                     } else if (!sub["ET HT"]) {
-                        // Ako je počeo Extra Time, prvi klik je poluvreme produžetka
                         autoCalculatePeriod(undefined, undefined, "ET HT");
                     } else if (!sub["ET FT"]) {
-                        // Kraj produžetaka nudi Penale ili Kraj
                         showModal(lang.end_q, [
                             { text: lang.btn_pen, cls: "btn-blue", fn: () => autoCalculatePeriod(undefined, undefined, "ET FT") },
                             { text: lang.btn_end, cls: "btn-dark", fn: () => { autoCalculatePeriod(undefined, undefined, "ET FT"); adminStatus('ended'); } }
                         ]);
                     }
                 } else if (type === 'end') {
-                    // Manualni kraj uvek otvara modal sa svim logičnim opcijama
                     showModal(lang.end_q, [
                         { text: lang.btn_pen, cls: "btn-blue", fn: () => autoCalculatePeriod(undefined, undefined, "PEN") },
                         { text: lang.btn_end, cls: "btn-dark", fn: () => adminStatus('ended') }
@@ -301,6 +300,22 @@
             }
         }
 
+        async function resetMatchData() {
+            if(!currentAdminKey) return;
+            const d = allTereni.find(x => x.key === currentAdminKey);
+            await db.ref(`tereni/${currentAdminKey}`).update({
+                t1: null, t2: null, 
+                score1: 0, score2: 0, 
+                pts1: 0, pts2: 0, 
+                games1: 0, games2: 0, 
+                status: 'upcoming', 
+                scheduled_at: null, 
+                sub_string: "", 
+                sub_details: null
+            });
+            refreshAdminPanel(currentAdminKey);
+        }
+
         function toggleLang() {
             currentLang = currentLang === 'EN' ? 'SRB' : 'EN';
             document.getElementById('lang-btn').innerText = currentLang === 'EN' ? 'SRB' : 'ENG';
@@ -322,6 +337,7 @@
             document.getElementById('calc-btn').innerText = d.record_period;
             document.getElementById('start-live-btn').innerText = d.start_live;
             document.getElementById('end-match-btn').innerText = d.end_match;
+            document.getElementById('reset-match-btn').innerText = d.btn_reset;
         }
 
         async function handleAuth() {
@@ -454,6 +470,8 @@
             document.getElementById('score-controllers').style.opacity = isEnded ? '0.3' : '1';
             document.getElementById('calc-btn').disabled = isEnded;
             document.getElementById('calc-btn').style.opacity = isEnded ? '0.3' : '1';
+            
+            document.getElementById('reset-match-btn').style.display = isEnded ? 'block' : 'none';
 
             if(d.t1) {
                 document.getElementById('adm-score-view').style.display = 'flex';
@@ -474,7 +492,7 @@
                 document.getElementById('match-status-label').innerText = sTxt.toUpperCase();
                 document.getElementById('sub-scores-display').innerText = d.sub_string || lang.no_periods;
                 document.getElementById('start-live-btn').style.display = d.status === 'upcoming' ? 'block' : 'none';
-                document.getElementById('end-match-btn').style.display = isLive ? 'block' : 'none';
+                document.getElementById('end-match-btn').style.display = (isLive && !isEnded) ? 'block' : 'none';
                 
                 const isTennis = d.sport === "TENIS";
                 const isVolleyball = d.sport === "ODBOJKA";
