@@ -252,17 +252,27 @@
 
             if (d.sport === "FUDBAL") {
                 if (type === 'period') {
-                    if (!sub["HT"]) { autoCalculatePeriod(undefined, undefined, "HT"); }
-                    else if (!sub["FT"]) { 
-                        // Kada treba da doda FT, otvaramo modal jer je to logičan kraj
+                    if (!sub["HT"]) { 
+                        autoCalculatePeriod(undefined, undefined, "HT"); 
+                    } else if (!sub["FT"]) {
+                        // Regularni kraj (FT) nudi Produžetke ili Kraj
                         showModal(lang.end_q, [
                             { text: lang.btn_et, cls: "btn-blue", fn: () => autoCalculatePeriod(undefined, undefined, "FT") },
                             { text: lang.btn_end, cls: "btn-dark", fn: () => { autoCalculatePeriod(undefined, undefined, "FT"); adminStatus('ended'); } }
                         ]);
+                    } else if (!sub["ET HT"]) {
+                        // Ako je počeo Extra Time, prvi klik je poluvreme produžetka
+                        autoCalculatePeriod(undefined, undefined, "ET HT");
+                    } else if (!sub["ET FT"]) {
+                        // Kraj produžetaka nudi Penale ili Kraj
+                        showModal(lang.end_q, [
+                            { text: lang.btn_pen, cls: "btn-blue", fn: () => autoCalculatePeriod(undefined, undefined, "ET FT") },
+                            { text: lang.btn_end, cls: "btn-dark", fn: () => { autoCalculatePeriod(undefined, undefined, "ET FT"); adminStatus('ended'); } }
+                        ]);
                     }
                 } else if (type === 'end') {
+                    // Manualni kraj uvek otvara modal sa svim logičnim opcijama
                     showModal(lang.end_q, [
-                        { text: lang.btn_et, cls: "btn-blue", fn: () => {} },
                         { text: lang.btn_pen, cls: "btn-blue", fn: () => autoCalculatePeriod(undefined, undefined, "PEN") },
                         { text: lang.btn_end, cls: "btn-dark", fn: () => adminStatus('ended') }
                     ]);
@@ -440,7 +450,6 @@
             document.getElementById('adm-name').innerText = d.name;
             const isLive = d.status === 'live', isEnded = d.status === 'ended';
             
-            // ONEMOGUĆAVANJE AKO JE KRAJ
             document.getElementById('score-controllers').style.pointerEvents = isEnded ? 'none' : 'auto';
             document.getElementById('score-controllers').style.opacity = isEnded ? '0.3' : '1';
             document.getElementById('calc-btn').disabled = isEnded;
@@ -542,8 +551,7 @@
                 db.ref(`tereni/${currentAdminKey}`).once('value', s => {
                     let snap = s.val(), res = [];
                     if(snap.sub_details) {
-                        // Sortiranje da bi periodi išli logičnim redom
-                        const order = ["Q1", "Q2", "Q3", "Q4", "HT", "FT", "ET", "PEN", "S1", "S2", "S3", "S4", "S5", "OT1", "OT2"];
+                        const order = ["HT", "FT", "ET HT", "ET FT", "PEN", "Q1", "Q2", "Q3", "Q4", "OT1", "S1", "S2", "S3", "S4", "S5"];
                         Object.keys(snap.sub_details).sort((a,b) => order.indexOf(a) - order.indexOf(b)).forEach(k => { 
                             res.push(`${k} ${snap.sub_details[k]}`); 
                         });
