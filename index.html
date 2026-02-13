@@ -161,7 +161,7 @@
 
                 <div id="sub-scores-display">PERIOD SCORES WILL BE HERE</div>
                 
-                <button id="calc-btn" class="admin-btn btn-green" onclick="triggerLogic('period')">RECORD PERIOD</button>
+                <button id="calc-btn" class="admin-btn btn-green" onclick="triggerLogic('period')">NEXT PERIOD</button>
                 
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                     <button id="start-live-btn" class="admin-btn btn-blue" onclick="adminStatus('live')">START LIVE</button>
@@ -210,7 +210,7 @@
             EN: {
                 hero_sub: "STREET SPORTS NETWORK", auth_btn: "ENTER SYSTEM", explore_btn: "EXPLORE MAP",
                 search_placeholder: "Find city...", schedule_btn: "SCHEDULE MATCH", del_btn: "DELETE COURT",
-                free_court: "FREE COURT", record_period: "RECORD PERIOD", start_live: "START LIVE",
+                free_court: "FREE COURT", record_period: "NEXT PERIOD", start_live: "START LIVE",
                 end_match: "END MATCH", home_team: "HOME TEAM", away_team: "AWAY TEAM",
                 points: "POINTS", games: "GEMS", status: "STATUS", delete_conf: "DELETE?",
                 no_periods: "NO PERIODS", upcoming: "UPCOMING", live: "LIVE", ended: "ENDED",
@@ -221,7 +221,7 @@
             SRB: {
                 hero_sub: "MREŽA ULIČNIH SPORTOVA", auth_btn: "ULAZ U SISTEM", explore_btn: "SAMO PREGLED",
                 search_placeholder: "Pronađi grad...", schedule_btn: "ZAKAŽI MEČ", del_btn: "OBRIŠI TEREN",
-                free_court: "SLOBODAN TEREN", record_period: "ZABELEŽI PERIOD", start_live: "KRENI LIVE",
+                free_court: "SLOBODAN TEREN", record_period: "SLEDEĆI PERIOD", start_live: "KRENI LIVE",
                 end_match: "KRAJ MEČA", home_team: "DOMAĆI TIM", away_team: "GOSTUJUĆI TIM",
                 points: "POENI", games: "GEMOVI", status: "STATUS", delete_conf: "OBRISATI?",
                 no_periods: "NEMA PERIODA", upcoming: "ZAKAZANO", live: "UŽIVO", ended: "ZAVRŠENO",
@@ -255,26 +255,23 @@
 
             if (d.sport === "FUDBAL") {
                 if (type === 'period') {
-                    if (!sub["HT"]) { 
-                        autoCalculatePeriod(undefined, undefined, "HT"); 
+                    // Nova logika za fudbal: HT -> FT -> ET1 -> ET2 -> PEN
+                    if (!sub["HT"]) {
+                        autoCalculatePeriod(undefined, undefined, "HT");
                     } else if (!sub["FT"]) {
-                        showModal(lang.end_q, [
-                            { text: lang.btn_et, cls: "btn-blue", fn: () => autoCalculatePeriod(undefined, undefined, "FT") },
-                            { text: lang.btn_end, cls: "btn-dark", fn: () => { autoCalculatePeriod(undefined, undefined, "FT"); adminStatus('ended'); } }
-                        ]);
-                    } else if (!sub["ET HT"]) {
-                        autoCalculatePeriod(undefined, undefined, "ET HT");
-                    } else if (!sub["ET FT"]) {
-                        showModal(lang.end_q, [
-                            { text: lang.btn_pen, cls: "btn-blue", fn: () => autoCalculatePeriod(undefined, undefined, "ET FT") },
-                            { text: lang.btn_end, cls: "btn-dark", fn: () => { autoCalculatePeriod(undefined, undefined, "ET FT"); adminStatus('ended'); } }
-                        ]);
+                        autoCalculatePeriod(undefined, undefined, "FT");
+                    } else if (!sub["ET1"]) {
+                        autoCalculatePeriod(undefined, undefined, "ET1");
+                    } else if (!sub["ET2"]) {
+                        autoCalculatePeriod(undefined, undefined, "ET2");
+                    } else if (!sub["PEN"]) {
+                        autoCalculatePeriod(undefined, undefined, "PEN");
+                        // Onemogući dugme nakon penala
+                        document.getElementById('calc-btn').disabled = true;
+                        document.getElementById('calc-btn').style.opacity = '0.3';
                     }
                 } else if (type === 'end') {
-                    showModal(lang.end_q, [
-                        { text: lang.btn_pen, cls: "btn-blue", fn: () => autoCalculatePeriod(undefined, undefined, "PEN") },
-                        { text: lang.btn_end, cls: "btn-dark", fn: () => adminStatus('ended') }
-                    ]);
+                    adminStatus('ended');
                 }
             } else if (d.sport === "KOŠARKA") {
                 if (type === 'period') {
@@ -468,8 +465,13 @@
             
             document.getElementById('score-controllers').style.pointerEvents = isEnded ? 'none' : 'auto';
             document.getElementById('score-controllers').style.opacity = isEnded ? '0.3' : '1';
-            document.getElementById('calc-btn').disabled = isEnded;
-            document.getElementById('calc-btn').style.opacity = isEnded ? '0.3' : '1';
+            
+            // Provera da li su popunjeni svi periodi kod fudbala da onemogućimo dugme
+            const sub = d.sub_details || {};
+            const isFootballMax = d.sport === "FUDBAL" && sub["PEN"];
+            
+            document.getElementById('calc-btn').disabled = isEnded || isFootballMax;
+            document.getElementById('calc-btn').style.opacity = (isEnded || isFootballMax) ? '0.3' : '1';
             
             document.getElementById('reset-match-btn').style.display = isEnded ? 'block' : 'none';
 
@@ -550,7 +552,7 @@
             const d = allTereni.find(x => x.key === currentAdminKey); if(!d || d.status !== 'live') return;
             let labels = ["HT"];
             if(d.sport === "KOŠARKA") labels = ["Q1", "Q2", "Q3", "Q4"];
-            if(d.sport === "FUDBAL") labels = ["HT", "FT"];
+            if(d.sport === "FUDBAL") labels = ["HT", "FT", "ET1", "ET2", "PEN"];
             if(d.sport === "ODBOJKA" || d.sport === "TENIS") labels = ["S1", "S2", "S3", "S4", "S5"];
             if(d.sport === "RUKOMET") labels = ["HT", "FT"];
             
@@ -559,6 +561,13 @@
                 if (d.sub_details) {
                     for (let l of labels) { if (!d.sub_details[l]) { target = l; break; } else { const p = d.sub_details[l].split(':'); p1 += parseInt(p[0]); p2 += parseInt(p[1]); } }
                 } else { target = labels[0]; }
+            } else {
+                // Ako forsiramo target (npr. HT, FT...), moramo sabrati sve prethodne
+                if (d.sub_details) {
+                    Object.values(d.sub_details).forEach(val => {
+                        const p = val.split(':'); p1 += parseInt(p[0]); p2 += parseInt(p[1]);
+                    });
+                }
             }
             if (!target) return;
 
@@ -569,7 +578,7 @@
                 db.ref(`tereni/${currentAdminKey}`).once('value', s => {
                     let snap = s.val(), res = [];
                     if(snap.sub_details) {
-                        const order = ["HT", "FT", "ET HT", "ET FT", "PEN", "Q1", "Q2", "Q3", "Q4", "OT1", "S1", "S2", "S3", "S4", "S5"];
+                        const order = ["HT", "FT", "ET1", "ET2", "PEN", "Q1", "Q2", "Q3", "Q4", "OT1", "S1", "S2", "S3", "S4", "S5"];
                         Object.keys(snap.sub_details).sort((a,b) => order.indexOf(a) - order.indexOf(b)).forEach(k => { 
                             res.push(`${k} ${snap.sub_details[k]}`); 
                         });
