@@ -27,67 +27,39 @@
         .location-btn { position: absolute; bottom: 30px; right: 20px; z-index: 1000; width: 50px; height: 50px; background: #ff3b30; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; }
         .location-btn img { filter: brightness(0) invert(1); width: 24px; }
 
-        .user-location-dot { width: 16px; height: 16px; background: #ff3b30; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 15px #ff3b30; z-index: 10000; }
-        .pulse-core { width: 100%; height: 100%; border-radius: 50%; background: rgba(255,59,48,0.4); animation: gps-pulse 2s infinite; }
-        @keyframes gps-pulse { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(3); opacity: 0; } }
-        
-        @keyframes bounce-ball { from { transform: translateY(0); } to { transform: translateY(-8px); } }
-        @keyframes pulse-live-border { 0% { border-color: #ff3b30; box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.6); } 70% { border-color: #ff3b30; box-shadow: 0 0 0 12px rgba(255, 59, 48, 0); } 100% { border-color: #ff3b30; box-shadow: 0 0 0 0 rgba(255, 59, 48, 0); } }
-
         .sport-marker-wrapper { display: flex; align-items: center; white-space: nowrap; cursor: pointer; }
         .sport-ball { font-size: 32px; z-index: 20; }
         .status-live-wrapper .sport-ball { animation: bounce-ball 0.5s ease infinite alternate; }
-        .status-live-wrapper .live-card-thin { animation: pulse-live-border 1.5s infinite; border: 2px solid #ff3b30; }
+        @keyframes bounce-ball { from { transform: translateY(0); } to { transform: translateY(-8px); } }
 
         .live-card-thin { background: #000; border: 1px solid #333; border-radius: 12px; padding: 4px 12px; margin-left: -15px; display: flex; align-items: center; min-height: 54px; box-shadow: 0 8px 20px rgba(0,0,0,0.8); z-index: 5; color: white; }
-        .zoom-hide .live-card-thin { display: none; }
-        .zoom-hide .sport-ball { font-size: 24px; }
-
         .match-details { display: flex; flex-direction: column; line-height: 1.2; padding-right: 10px; border-right: 1px solid #333; }
-        .match-details.no-match { border-right: none; padding-right: 5px; }
-        .match-name-thin { font-size: 10px; font-weight: 900; color: #ff3b30; text-transform: uppercase; }
         .match-teams-thin { font-size: 13px; font-weight: 800; color: #fff; text-transform: uppercase; display: flex; align-items: center; gap: 4px; }
         .status-pill { font-size: 8px; color: #fff; background: #ff3b30; padding: 2px 6px; border-radius: 4px; font-weight: 900; margin-left: 5px; }
-        
-        .match-score-thin { font-size: 22px; color: #ff3b30; font-family: 'Oswald', sans-serif; min-width: 50px; text-align: center; padding-left: 10px; font-weight: 700; display: flex; flex-direction: column; line-height: 1; }
-        .periods-row { font-size: 10px; color: #888; font-weight: 900; margin-top: 3px; }
-        .time-label { color: #aaa; font-size: 9px; margin-left: 5px; font-weight: 500; }
+        .match-score-thin { font-size: 22px; color: #ff3b30; font-family: 'Oswald', sans-serif; min-width: 50px; text-align: center; padding-left: 10px; font-weight: 700; }
 
+        /* Admin Panel Styles */
         #admin-panel { position: fixed; top: 0; left: 100%; width: 100%; height: 100%; background: #080808; z-index: 7000; transition: 0.4s cubic-bezier(0.19, 1, 0.22, 1); padding: 15px; display: flex; flex-direction: column; overflow-y: auto; }
         #admin-panel.active { left: 0; }
-        .admin-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-shrink: 0; }
         .admin-title { font-family: 'Oswald', sans-serif; font-size: 20px; color: #fff; text-transform: uppercase; }
-        .lang-toggle { background: #222; border: 1px solid #444; color: white; border-radius: 20px; padding: 5px 10px; font-size: 12px; font-weight: 900; cursor: pointer; }
+        .live-board { background: #111; color: #fff; border-radius: 15px; padding: 15px; text-align: center; margin-bottom: 15px; border: 1px solid #ff3b30; }
+        .main-score { font-size: 50px; font-family: 'Oswald', sans-serif; color: #ff3b30; margin: 5px 0; letter-spacing: 2px; }
 
-        .live-board { background: #111; color: #fff; border-radius: 15px; padding: 15px; text-align: center; margin-bottom: 15px; border: 1px solid #ff3b30; flex-shrink: 0; }
-        .main-score { font-size: 50px; font-family: 'Oswald', sans-serif; color: #ff3b30; margin: 5px 0; letter-spacing: 2px; line-height: 1; }
         .pro-controller-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
         .team-ctrl { background: #151515; border-radius: 15px; padding: 12px; display: flex; flex-direction: column; align-items: center; border: 1px solid #222; }
-        .current-amt { font-family: 'Oswald', sans-serif; font-size: 32px; color: #fff; line-height: 1; margin: 5px 0; }
-        .step-btn { background: #333; border: none; width: 32px; height: 32px; border-radius: 50%; font-weight: bold; cursor: pointer; color: white; display: flex; align-items: center; justify-content: center; }
-        .action-btns-row { display: flex; gap: 8px; width: 100%; margin-top: 5px; }
-        .action-btn { flex: 1; height: 45px; border-radius: 10px; border: none; color: white; font-size: 22px; font-weight: 900; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .action-btns-row { display: flex; gap: 8px; width: 100%; }
+        .action-btn { flex: 1; height: 50px; border-radius: 10px; border: none; color: white; font-size: 24px; font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .btn-plus { background: #28a745; }
         .btn-minus { background: #ff3b30; }
-
+        
         .admin-btn { padding: 14px; border: none; font-weight: 900; color: white; text-transform: uppercase; width: 100%; border-radius: 12px; cursor: pointer; font-family: 'Oswald'; font-size: 15px; margin-bottom: 8px; }
         .btn-blue { background: #007AFF; }
         .btn-green { background: #28a745; }
         .btn-dark { background: #222; border: 1px solid #333; }
         .btn-orange { background: #ff9500; }
-        #sub-scores-display { background: #111; color: #888; padding: 10px; border-radius: 10px; margin-bottom: 10px; font-size: 12px; font-weight: 700; text-align: center; border: 1px dashed #333; }
 
         #logic-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 20px; }
         .modal-card { background: #111; border: 2px solid #ff3b30; border-radius: 25px; width: 100%; max-width: 320px; padding: 25px; text-align: center; }
-        .modal-title { font-family: 'Oswald'; font-size: 20px; color: #fff; margin-bottom: 20px; text-transform: uppercase; }
-        .modal-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
-
-        #match-setup { display: flex; flex-direction: column; gap: 10px; background: #111; padding: 20px; border-radius: 20px; border: 1px solid #222; }
-        .leaflet-popup-content-wrapper { border-radius: 20px; padding: 0; overflow: hidden; background: #111; color: white; border: 1px solid #ff3b30; }
-        .leaflet-popup-content { margin: 0; width: 260px !important; }
-        .pop-header { background: #ff3b30; color: white; padding: 12px; text-align: center; font-weight: 900; font-size: 14px; text-transform: uppercase; font-family: 'Oswald'; }
-        .pop-body { padding: 15px; display: flex; flex-direction: column; gap: 10px; background: #111; }
-        .pop-btn { background: #ff3b30; color: white; border: none; padding: 12px; border-radius: 10px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-family: 'Oswald'; }
     </style>
 </head>
 <body>
@@ -103,86 +75,71 @@
         </div>
     </div>
 
-    <div id="logic-modal">
-        <div class="modal-card">
-            <div class="modal-title" id="modal-q">KRAJ MEČA ILI PRODUŽETAK?</div>
-            <div class="modal-grid" id="modal-btns"></div>
-        </div>
-    </div>
-
     <div id="search-container">
         <input type="text" id="city-search" placeholder="Find city..." onkeypress="handleSearch(event)">
     </div>
+    <div id="map"></div>
+    <div class="location-btn" id="lBtn" style="display:none;" onclick="goToMyLocation()"><img src="https://cdn-icons-png.flaticon.com/512/1865/1865269.png"></div>
 
     <div id="admin-panel">
-        <div class="admin-nav">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
             <div class="admin-title" id="adm-name">ADMIN</div>
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <button class="lang-toggle" onclick="toggleLang()" id="lang-btn">SRB</button>
-                <div onclick="closeAdmin()" style="font-size:30px; font-weight:bold; cursor:pointer; color:#ff3b30; padding: 5px;">&times;</div>
-            </div>
+            <div onclick="closeAdmin()" style="font-size:30px; color:#ff3b30; cursor:pointer;">&times;</div>
         </div>
 
         <div id="adm-score-view" style="display:none; flex-direction:column;">
             <div class="live-board">
-                <div id="adm-teams-label" style="color:#aaa; font-size: 12px; font-weight:900; text-transform:uppercase; letter-spacing:1px;">TEAM A VS TEAM B</div>
+                <div id="adm-teams-label" style="color:#aaa; font-size: 12px; font-weight:900;">TEAM A VS TEAM B</div>
                 <div class="main-score" id="adm-main-score">0 : 0</div>
-                <div id="adm-sub-display" style="font-size:16px; color:#ff3b30; font-weight:900; font-family:'Oswald';"></div>
-                <div id="match-status-label" style="font-size:10px; background:rgba(255,59,48,0.2); color:#ff3b30; display:inline-block; padding:3px 12px; border-radius:20px; font-weight:900; margin-top:5px;">STATUS</div>
+                <div id="match-status-label" style="font-size:10px; background:rgba(255,59,48,0.2); color:#ff3b30; padding:3px 12px; border-radius:20px; display:inline-block;">UPCOMING</div>
             </div>
 
             <div id="active-match-controls">
-                <div class="pro-controller-container" id="score-controllers">
+                <div class="pro-controller-container">
                     <div class="team-ctrl">
-                        <span id="label-t1" style="font-size:10px; font-weight:900; color:#666; text-transform:uppercase; text-align: center;">TEAM 1</span>
-                        <div id="step-ctrl-1" style="display:flex; align-items:center; gap:8px;">
-                            <button class="step-btn" onclick="changeStep(1, -1)">-</button>
-                            <div class="current-amt" id="step-h">1</div>
-                            <button class="step-btn" onclick="changeStep(1, 1)">+</button>
-                        </div>
+                        <span id="label-t1" style="font-size:10px; font-weight:900; color:#666; margin-bottom:8px;">DOMAĆI</span>
                         <div class="action-btns-row">
-                            <button class="action-btn btn-minus" onclick="proScore(1, -1)">-</button>
-                            <button class="action-btn btn-plus" onclick="proScore(1, 1)">+</button>
+                            <button class="action-btn btn-minus score-ctrl" onclick="updateScore(1, -1)">-</button>
+                            <button class="action-btn btn-plus score-ctrl" onclick="updateScore(1, 1)">+</button>
                         </div>
                     </div>
                     <div class="team-ctrl">
-                        <span id="label-t2" style="font-size:10px; font-weight:900; color:#666; text-transform:uppercase; text-align: center;">TEAM 2</span>
-                        <div id="step-ctrl-2" style="display:flex; align-items:center; gap:8px;">
-                            <button class="step-btn" onclick="changeStep(2, -1)">-</button>
-                            <div class="current-amt" id="step-a">1</div>
-                            <button class="step-btn" onclick="changeStep(2, 1)">+</button>
-                        </div>
+                        <span id="label-t2" style="font-size:10px; font-weight:900; color:#666; margin-bottom:8px;">GOSTI</span>
                         <div class="action-btns-row">
-                            <button class="action-btn btn-minus" onclick="proScore(2, -1)">-</button>
-                            <button class="action-btn btn-plus" onclick="proScore(2, 1)">+</button>
+                            <button class="action-btn btn-minus score-ctrl" onclick="updateScore(2, -1)">-</button>
+                            <button class="action-btn btn-plus score-ctrl" onclick="updateScore(2, 1)">+</button>
                         </div>
                     </div>
                 </div>
 
-                <div id="sub-scores-display">PERIOD SCORES WILL BE HERE</div>
+                <div id="sub-scores-display" style="color:#888; font-size:12px; text-align:center; margin-bottom:15px; font-weight:700;">NEMA PERIODA</div>
                 
-                <button id="calc-btn" class="admin-btn btn-green" onclick="triggerLogic('period')">RECORD PERIOD</button>
+                <button id="calc-btn" class="admin-btn btn-green score-ctrl" onclick="triggerLogic('period')">ZABELEŽI PERIOD</button>
                 
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                    <button id="start-live-btn" class="admin-btn btn-blue" onclick="adminStatus('live')">START LIVE</button>
-                    <button id="end-match-btn" class="admin-btn btn-dark" onclick="triggerLogic('end')">END MATCH</button>
+                    <button id="start-live-btn" class="admin-btn btn-blue" onclick="activateLive()">GO LIVE</button>
+                    <button id="end-match-btn" class="admin-btn btn-dark score-ctrl" onclick="triggerLogic('end')">KRAJ MEČA</button>
                 </div>
-                <button id="reset-match-btn" class="admin-btn btn-orange" style="display:none;" onclick="resetMatchData()">NEW MATCH / RESET</button>
+                <button id="reset-match-btn" class="admin-btn btn-orange" style="display:none; margin-top:10px;" onclick="resetMatchData()">NOVI MEČ / RESET</button>
             </div>
         </div>
 
-        <div id="match-setup" style="display:none;">
+        <div id="match-setup" style="display:none; flex-direction:column; gap:10px;">
             <input type="text" id="adm-t1" placeholder="HOME TEAM">
             <input type="text" id="adm-t2" placeholder="AWAY TEAM">
             <input type="datetime-local" id="adm-start-time-input">
-            <button class="admin-btn btn-blue" id="schedule-btn" onclick="setupMatch()">SCHEDULE MATCH</button>
+            <button class="admin-btn btn-blue" onclick="setupMatch()">ZAKAŽI MEČ</button>
         </div>
-
-        <button id="del-btn" style="margin-top:20px; background:none; color:#444; border:none; font-weight:900; cursor:pointer; font-size: 12px;" onclick="adminDelete()">DELETE COURT</button>
+        
+        <button id="del-btn" style="margin-top:20px; background:none; color:#444; border:none; font-weight:900; cursor:pointer;" onclick="adminDelete()">OBRIŠI TEREN</button>
     </div>
 
-    <div id="map"></div>
-    <div class="location-btn" id="lBtn" style="display:none;" onclick="goToMyLocation()"><img src="https://cdn-icons-png.flaticon.com/512/1865/1865269.png"></div>
+    <div id="logic-modal">
+        <div class="modal-card">
+            <div id="modal-q" style="color:white; font-family:'Oswald'; margin-bottom:20px;">ŠTA DALJE?</div>
+            <div id="modal-btns" style="display:flex; flex-direction:column; gap:10px;"></div>
+        </div>
+    </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
@@ -200,393 +157,151 @@
         const auth = firebase.auth();
         const db = firebase.database();
 
-        let map, currentLat, currentLon, currentAdminKey = null, allTereni = [];
-        let steps = { 1: 1, 2: 1 }, userMarker, accCircle, markersLayer = L.layerGroup();
+        let map, currentAdminKey = null, allTereni = [];
         const sportEmojis = { "FUDBAL": "⚽", "KOŠARKA": "🏀", "RUKOMET": "🤾", "ODBOJKA": "🏐", "TENIS": "🎾" };
-        const tennisPoints = ["0", "15", "30", "40", "Ad"];
 
-        let currentLang = 'EN';
-        const langData = {
-            EN: {
-                hero_sub: "STREET SPORTS NETWORK", auth_btn: "ENTER SYSTEM", explore_btn: "EXPLORE MAP",
-                search_placeholder: "Find city...", schedule_btn: "SCHEDULE MATCH", del_btn: "DELETE COURT",
-                free_court: "FREE COURT", record_period: "RECORD PERIOD", start_live: "START LIVE",
-                end_match: "END MATCH", home_team: "HOME TEAM", away_team: "AWAY TEAM",
-                points: "POINTS", games: "GEMS", status: "STATUS", delete_conf: "DELETE?",
-                no_periods: "NO PERIODS", upcoming: "UPCOMING", live: "LIVE", ended: "ENDED",
-                create_court: "CREATE COURT", sport: "SPORT", loc_name: "LOCATION NAME", court_limit: "LIMIT: MAX 3 COURTS!",
-                end_q: "What is next?", btn_end: "END MATCH", btn_et: "EXTRA TIME", btn_pen: "PENALTIES",
-                btn_reset: "NEW MATCH / RESET"
-            },
-            SRB: {
-                hero_sub: "MREŽA ULIČNIH SPORTOVA", auth_btn: "ULAZ U SISTEM", explore_btn: "SAMO PREGLED",
-                search_placeholder: "Pronađi grad...", schedule_btn: "ZAKAŽI MEČ", del_btn: "OBRIŠI TEREN",
-                free_court: "SLOBODAN TEREN", record_period: "ZABELEŽI PERIOD", start_live: "KRENI LIVE",
-                end_match: "KRAJ MEČA", home_team: "DOMAĆI TIM", away_team: "GOSTUJUĆI TIM",
-                points: "POENI", games: "GEMOVI", status: "STATUS", delete_conf: "OBRISATI?",
-                no_periods: "NEMA PERIODA", upcoming: "ZAKAZANO", live: "UŽIVO", ended: "ZAVRŠENO",
-                create_court: "KREIRAJ TEREN", sport: "SPORT", loc_name: "NAZIV LOKACIJE", court_limit: "LIMIT: MAX 3 TERENA!",
-                end_q: "Šta je sledeće?", btn_end: "KRAJ MEČA", btn_et: "PRODUŽECI", btn_pen: "PENALI",
-                btn_reset: "NOVI MEČ / RESET"
-            }
-        };
-
-        function showModal(question, buttons) {
-            document.getElementById('modal-q').innerText = question;
-            const container = document.getElementById('modal-btns');
-            container.innerHTML = "";
-            buttons.forEach(btn => {
-                const b = document.createElement('button');
-                b.className = "admin-btn " + (btn.cls || "btn-blue");
-                b.innerText = btn.text;
-                b.onclick = () => { 
-                    document.getElementById('logic-modal').style.display = 'none';
-                    btn.fn(); 
-                };
-                container.appendChild(b);
-            });
-            document.getElementById('logic-modal').style.display = 'flex';
-        }
-
-        function triggerLogic(type) {
-            const d = allTereni.find(x => x.key === currentAdminKey);
-            const lang = langData[currentLang];
-            const sub = d.sub_details || {};
-
-            if (d.sport === "FUDBAL") {
-                if (type === 'period') {
-                    if (!sub["HT"]) { 
-                        autoCalculatePeriod(undefined, undefined, "HT"); 
-                    } else if (!sub["FT"]) {
-                        showModal(lang.end_q, [
-                            { text: lang.btn_et, cls: "btn-blue", fn: () => autoCalculatePeriod(undefined, undefined, "FT") },
-                            { text: lang.btn_end, cls: "btn-dark", fn: () => { autoCalculatePeriod(undefined, undefined, "FT"); adminStatus('ended'); } }
-                        ]);
-                    } else if (!sub["ET HT"]) {
-                        autoCalculatePeriod(undefined, undefined, "ET HT");
-                    } else if (!sub["ET FT"]) {
-                        showModal(lang.end_q, [
-                            { text: lang.btn_pen, cls: "btn-blue", fn: () => autoCalculatePeriod(undefined, undefined, "ET FT") },
-                            { text: lang.btn_end, cls: "btn-dark", fn: () => { autoCalculatePeriod(undefined, undefined, "ET FT"); adminStatus('ended'); } }
-                        ]);
-                    }
-                } else if (type === 'end') {
-                    showModal(lang.end_q, [
-                        { text: lang.btn_pen, cls: "btn-blue", fn: () => autoCalculatePeriod(undefined, undefined, "PEN") },
-                        { text: lang.btn_end, cls: "btn-dark", fn: () => adminStatus('ended') }
-                    ]);
-                }
-            } else if (d.sport === "KOŠARKA") {
-                if (type === 'period') {
-                    autoCalculatePeriod();
-                } else {
-                    showModal(lang.end_q, [
-                        { text: lang.btn_et, cls: "btn-blue", fn: () => { 
-                            let etCount = Object.keys(sub).filter(k => k.includes("OT")).length + 1;
-                            autoCalculatePeriod(undefined, undefined, "OT" + etCount);
-                        }},
-                        { text: lang.btn_end, cls: "btn-dark", fn: () => adminStatus('ended') }
-                    ]);
-                }
-            } else if (d.sport === "RUKOMET") {
-                 if (type === 'period') {
-                    if (!sub["HT"]) autoCalculatePeriod(undefined, undefined, "HT");
-                    else if (!sub["FT"]) autoCalculatePeriod(undefined, undefined, "FT");
-                } else {
-                    adminStatus('ended');
-                }
-            } else {
-                if (type === 'end') adminStatus('ended');
-            }
-        }
-
-        async function resetMatchData() {
-            if(!currentAdminKey) return;
-            const d = allTereni.find(x => x.key === currentAdminKey);
-            await db.ref(`tereni/${currentAdminKey}`).update({
-                t1: null, t2: null, 
-                score1: 0, score2: 0, 
-                pts1: 0, pts2: 0, 
-                games1: 0, games2: 0, 
-                status: 'upcoming', 
-                scheduled_at: null, 
-                sub_string: "", 
-                sub_details: null
-            });
-            refreshAdminPanel(currentAdminKey);
-        }
-
-        function toggleLang() {
-            currentLang = currentLang === 'EN' ? 'SRB' : 'EN';
-            document.getElementById('lang-btn').innerText = currentLang === 'EN' ? 'SRB' : 'ENG';
-            applyLang();
-            renderMarkers();
-            if(currentAdminKey) refreshAdminPanel(currentAdminKey);
-        }
-
-        function applyLang() {
-            const d = langData[currentLang];
-            document.getElementById('hero-sub').innerText = d.hero_sub;
-            document.getElementById('auth-btn').innerText = d.auth_btn;
-            document.getElementById('explore-btn').innerText = d.explore_btn;
-            document.getElementById('city-search').placeholder = d.search_placeholder;
-            document.getElementById('adm-t1').placeholder = d.home_team;
-            document.getElementById('adm-t2').placeholder = d.away_team;
-            document.getElementById('schedule-btn').innerText = d.schedule_btn;
-            document.getElementById('del-btn').innerText = d.del_btn;
-            document.getElementById('calc-btn').innerText = d.record_period;
-            document.getElementById('start-live-btn').innerText = d.start_live;
-            document.getElementById('end-match-btn').innerText = d.end_match;
-            document.getElementById('reset-match-btn').innerText = d.btn_reset;
-        }
-
+        // AUTH & INIT
         async function handleAuth() {
             const e = document.getElementById('email').value, p = document.getElementById('password').value;
             if(!e || !p) return;
-            try { 
-                await auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
-                await auth.signInWithEmailAndPassword(e, p); 
-            } catch { 
-                try { await auth.createUserWithEmailAndPassword(e, p); } catch(err) { alert(err.message); } 
-            }
-        }
-
-        function exploreMap() {
-            document.getElementById('hero').style.display='none'; 
-            document.getElementById('map').style.display='block'; 
-            document.getElementById('lBtn').style.display='flex'; 
-            initMap();
+            try { await auth.signInWithEmailAndPassword(e, p); } 
+            catch { try { await auth.createUserWithEmailAndPassword(e, p); } catch(err) { alert(err.message); } }
         }
 
         auth.onAuthStateChanged(user => { if (user) { document.getElementById('hero').style.display='none'; document.getElementById('map').style.display='block'; document.getElementById('lBtn').style.display='flex'; initMap(); } });
 
+        function exploreMap() { document.getElementById('hero').style.display='none'; document.getElementById('map').style.display='block'; initMap(); }
+
         function initMap() {
             if (map) return;
-            map = L.map('map', { zoomControl: false, tap: false, maxZoom: 19, minZoom: 3 }).setView([44.7866, 20.4489], 6);
+            map = L.map('map', { zoomControl: false }).setView([44.7866, 20.4489], 6);
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
-            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', { opacity: 0.9, zIndex: 1000 }).addTo(map);
-            markersLayer.addTo(map);
-            map.on('zoomend moveend', renderMarkers);
-            map.on('click', e => {
-                if (!auth.currentUser) return; 
-                const moji = allTereni.filter(t => t.owner === auth.currentUser.uid);
-                const d = langData[currentLang];
-                if (moji.length >= 3) { alert(d.court_limit); return; }
-                const html = `<div class="pop-header">${d.create_court}</div><div class="pop-body"><label>${d.sport}</label><select id="p_sport"><option value="FUDBAL">FUDBAL ⚽</option><option value="KOŠARKA">KOŠARKA 🏀</option><option value="RUKOMET">RUKOMET 🤾</option><option value="ODBOJKA">ODBOJKA 🏐</option><option value="TENIS">TENIS 🎾</option></select><label>${d.loc_name}</label><input type="text" id="p_name" placeholder="..."><button class="pop-btn" onclick="saveTeren(${e.latlng.lat}, ${e.latlng.lng})">${d.create_court}</button></div>`;
-                L.popup().setLatLng(e.latlng).setContent(html).openOn(map);
+            db.ref('tereni').on('value', snap => {
+                allTereni = []; snap.forEach(c => { let d = c.val(); d.key = c.key; allTereni.push(d); });
+                renderMarkers();
+                if(currentAdminKey) refreshAdminPanel(currentAdminKey);
             });
-            db.ref('tereni').on('value', snap => { 
-                allTereni = []; snap.forEach(c => { let d = c.val(); d.key = c.key; allTereni.push(d); }); 
-                renderMarkers(); 
-                if(currentAdminKey) refreshAdminPanel(currentAdminKey); 
-            });
-            trackGPS();
+            map.on('click', onMapClick);
         }
 
+        // MARKERS
         function renderMarkers() {
-            markersLayer.clearLayers();
-            const center = map.getCenter();
-            const zoom = map.getZoom();
-            const isHide = zoom < 11;
-            const lang = langData[currentLang];
+            map.eachLayer(l => { if(l instanceof L.Marker) map.removeLayer(l); });
             allTereni.forEach(d => {
-                const pos = L.latLng(d.lat, d.lng);
-                if (center.distanceTo(pos) > 20000) return;
-                let statusCls = d.status==='live' ? 'status-live-wrapper' : '';
-                let sTxt = d.status === 'live' ? lang.live : (d.status === 'ended' ? lang.ended : lang.upcoming);
-                let statusLabel = `<span class="status-pill" style="${d.status==='ended'?'background:#444':''}">${sTxt}</span>`;
-                let timeLabel = d.scheduled_at ? `<span class="time-label">${new Date(d.scheduled_at).toLocaleDateString('sr-RS',{day:'2-digit',month:'2-digit'})} ${new Date(d.scheduled_at).toLocaleTimeString('sr-RS',{hour:'2-digit',minute:'2-digit'})}</span>` : "";
-                let mainScore = `${d.score1}:${d.score2}`;
-                if(d.sport === "ODBOJKA") mainScore = `${d.score1}:${d.score2} (${d.pts1||0}:${d.pts2||0})`;
-                if(d.sport === "TENIS") {
-                    const isTB = (d.games1 === 6 && d.games2 === 6);
-                    const p1 = isTB ? (d.pts1 || 0) : (tennisPoints[d.pts1] || "0");
-                    const p2 = isTB ? (d.pts2 || 0) : (tennisPoints[d.pts2] || "0");
-                    mainScore = `${d.score1}:${d.score2} (${p1}:${p2})`;
-                }
-                const hasMatch = d.t1 && d.t2;
-                const scoreHTML = hasMatch ? `<div class="match-score-thin">${mainScore}${d.sub_string ? `<div class="periods-row">${d.sub_string}</div>` : ''}</div>` : "";
-                const icon = L.divIcon({ 
-                    className: isHide ? 'zoom-hide' : '', 
-                    html: `<div class="sport-marker-wrapper ${statusCls}">
+                const icon = L.divIcon({
+                    className: '',
+                    html: `<div class="sport-marker-wrapper ${d.status==='live'?'status-live-wrapper':''}">
                             <div class="sport-ball">${sportEmojis[d.sport]||'⚽'}</div>
                             <div class="live-card-thin">
-                                <div class="match-details ${!hasMatch ? 'no-match' : ''}">
-                                    <span class="match-name-thin">${d.name} ${timeLabel}</span>
-                                    <span class="match-teams-thin">${hasMatch ? d.t1+' - '+d.t2 : lang.free_court} ${statusLabel}</span>
+                                <div class="match-details">
+                                    <span class="match-teams-thin">${d.t1 ? d.t1+' - '+d.t2 : d.name}</span>
+                                    <span class="status-pill">${d.status.toUpperCase()}</span>
                                 </div>
-                                ${scoreHTML}
+                                <div class="match-score-thin">${d.score1}:${d.score2}</div>
                             </div>
-                           </div>`, 
-                    iconSize: [210, 48], iconAnchor: [12, 24] 
+                           </div>`,
+                    iconSize: [200, 50]
                 });
-                L.marker([d.lat, d.lng], { icon }).addTo(markersLayer).on('click', e => { 
-                    L.DomEvent.stopPropagation(e); 
-                    if (auth.currentUser && d.owner === auth.currentUser.uid) {
-                        openAdmin(d.key); 
-                    }
+                L.marker([d.lat, d.lng], { icon }).addTo(map).on('click', () => {
+                    if (auth.currentUser && d.owner === auth.currentUser.uid) openAdmin(d.key);
                 });
             });
         }
 
-        function trackGPS() {
-            navigator.geolocation.watchPosition(pos => {
-                currentLat = pos.coords.latitude; currentLon = pos.coords.longitude;
-                const radius = pos.coords.accuracy;
-                if (!userMarker) {
-                    accCircle = L.circle([currentLat, currentLon], { radius: radius, color: '#ff3b30', fillColor: '#ff3b30', fillOpacity: 0.1, weight: 1 }).addTo(map);
-                    userMarker = L.marker([currentLat, currentLon], { icon: L.divIcon({ className: 'user-location-dot', html: '<div class="pulse-core"></div>', iconAnchor: [8, 8] }), zIndexOffset: 10000 }).addTo(map);
-                } else {
-                    userMarker.setLatLng([currentLat, currentLon]);
-                    accCircle.setLatLng([currentLat, currentLon]);
-                    accCircle.setRadius(radius);
-                }
-            }, null, { enableHighAccuracy: true, maximumAge: 0 });
-        }
-
-        function goToMyLocation() { if(currentLat) map.flyTo([currentLat, currentLon], 17); }
-
-        async function saveTeren(lat, lng) {
-            const name = document.getElementById('p_name').value.toUpperCase();
+        function onMapClick(e) {
+            if (!auth.currentUser) return;
+            const name = prompt("NAZIV TERENA:");
             if(!name) return;
-            await db.ref('tereni').push({ name, lat, lng, owner: auth.currentUser.uid, sport: document.getElementById('p_sport').value, status: 'upcoming', expires: Date.now()+86400000, score1: 0, score2: 0, pts1: 0, pts2: 0 });
-            map.closePopup();
+            const sport = prompt("SPORT (FUDBAL, KOŠARKA, RUKOMET...):").toUpperCase();
+            db.ref('tereni').push({
+                name, lat: e.latlng.lat, lng: e.latlng.lng,
+                owner: auth.currentUser.uid, sport, status: 'upcoming',
+                score1: 0, score2: 0
+            });
         }
 
+        // ADMIN LOGIC
         function openAdmin(key) {
-            const d = allTereni.find(x => x.key === key);
-            if (!d || d.owner !== auth.currentUser.uid) return;
-            currentAdminKey = key; refreshAdminPanel(key);
+            currentAdminKey = key;
             document.getElementById('admin-panel').classList.add('active');
+            refreshAdminPanel(key);
         }
 
         function refreshAdminPanel(key) {
-            const d = allTereni.find(x => x.key === key); if(!d) return;
-            const lang = langData[currentLang];
-            document.getElementById('adm-name').innerText = d.name;
-            const isLive = d.status === 'live', isEnded = d.status === 'ended';
+            const d = allTereni.find(x => x.key === key);
+            if(!d) return;
+
+            const isLive = d.status === 'live';
+            const isEnded = d.status === 'ended';
             
-            document.getElementById('score-controllers').style.pointerEvents = isEnded ? 'none' : 'auto';
-            document.getElementById('score-controllers').style.opacity = isEnded ? '0.3' : '1';
-            document.getElementById('calc-btn').disabled = isEnded;
-            document.getElementById('calc-btn').style.opacity = isEnded ? '0.3' : '1';
-            
-            document.getElementById('reset-match-btn').style.display = isEnded ? 'block' : 'none';
+            // Onemogući kontrole ako nije LIVE
+            const ctrls = document.querySelectorAll('.score-ctrl');
+            ctrls.forEach(c => {
+                c.disabled = !isLive;
+                c.style.opacity = isLive ? "1" : "0.3";
+            });
 
             if(d.t1) {
                 document.getElementById('adm-score-view').style.display = 'flex';
                 document.getElementById('match-setup').style.display = 'none';
-                let scoreText = `${d.score1} : ${d.score2}`;
-                let subText = "";
-                if(d.sport === "ODBOJKA" || d.sport === "TENIS") {
-                    const isTB = d.sport === "TENIS" && (d.games1 === 6 && d.games2 === 6);
-                    const p1 = (d.sport === "TENIS" && !isTB) ? tennisPoints[d.pts1] : (d.pts1 || 0);
-                    const p2 = (d.sport === "TENIS" && !isTB) ? tennisPoints[d.pts2] : (d.pts2 || 0);
-                    subText = `${lang.points}: ${p1} : ${p2}`;
-                }
-                document.getElementById('adm-main-score').innerText = scoreText;
-                document.getElementById('adm-sub-display').innerText = subText;
+                document.getElementById('adm-main-score').innerText = `${d.score1} : ${d.score2}`;
                 document.getElementById('adm-teams-label').innerText = `${d.t1} VS ${d.t2}`;
-                document.getElementById('label-t1').innerText = d.t1; document.getElementById('label-t2').innerText = d.t2;
-                let sTxt = d.status === 'live' ? lang.live : (d.status === 'ended' ? lang.ended : lang.upcoming);
-                document.getElementById('match-status-label').innerText = sTxt.toUpperCase();
-                document.getElementById('sub-scores-display').innerText = d.sub_string || lang.no_periods;
+                document.getElementById('match-status-label').innerText = d.status.toUpperCase();
                 document.getElementById('start-live-btn').style.display = d.status === 'upcoming' ? 'block' : 'none';
-                document.getElementById('end-match-btn').style.display = (isLive && !isEnded) ? 'block' : 'none';
-                
-                const isTennis = d.sport === "TENIS";
-                const isVolleyball = d.sport === "ODBOJKA";
-                document.getElementById('calc-btn').style.display = (isTennis || isVolleyball) ? 'none' : 'block';
-                const showStep = (!isTennis && !isVolleyball);
-                document.getElementById('step-ctrl-1').style.visibility = showStep ? "visible" : "hidden";
-                document.getElementById('step-ctrl-2').style.visibility = showStep ? "visible" : "hidden";
+                document.getElementById('reset-match-btn').style.display = isEnded ? 'block' : 'none';
+                document.getElementById('sub-scores-display').innerText = d.sub_string || "NEMA PERIODA";
             } else {
                 document.getElementById('adm-score-view').style.display = 'none';
                 document.getElementById('match-setup').style.display = 'flex';
             }
         }
 
-        function changeStep(team, dir) { let s = steps[team] + dir; if(s<1) s=1; if(s>3) s=3; steps[team]=s; document.getElementById(team===1?'step-h':'step-a').innerText=s; }
-
-        function proScore(team, sign) {
-            const d = allTereni.find(x => x.key === currentAdminKey);
-            if(!d || d.status !== 'live') return;
-            let upd = {};
-            if(d.sport === "ODBOJKA") {
-                let p1 = d.pts1 || 0, p2 = d.pts2 || 0, s1 = d.score1, s2 = d.score2;
-                if(team === 1) p1 += sign; else p2 += sign;
-                if(p1 < 0) p1 = 0; if(p2 < 0) p2 = 0;
-                const target = (s1 + s2 === 4) ? 15 : 25;
-                if(p1 >= target && (p1 - p2) >= 2) { autoCalculatePeriod(p1, p2); s1++; p1 = 0; p2 = 0; if(s1 === 3 || s2 === 3) adminStatus('ended'); }
-                else if(p2 >= target && (p2 - p1) >= 2) { autoCalculatePeriod(p1, p2); s2++; p1 = 0; p2 = 0; if(s1 === 3 || s2 === 3) adminStatus('ended'); }
-                upd = { pts1: p1, pts2: p2, score1: s1, score2: s2 };
-            } else if(d.sport === "TENIS") {
-                let p1 = d.pts1 || 0, p2 = d.pts2 || 0, g1 = d.games1 || 0, g2 = d.games2 || 0, s1 = d.score1, s2 = d.score2;
-                if(team === 1) p1 += sign; else p2 += sign;
-                if(p1 < 0) p1 = 0; if(p2 < 0) p2 = 0;
-                const isTB = (g1 === 6 && g2 === 6);
-                const tbTarget = (s1 + s2 === 4) ? 10 : 7;
-                if (isTB) {
-                    if (p1 >= tbTarget && (p1 - p2) >= 2) { g1 = 7; autoCalculatePeriod(g1, g2); s1++; g1 = 0; g2 = 0; p1 = 0; p2 = 0; }
-                    else if (p2 >= tbTarget && (p2 - p1) >= 2) { g2 = 7; autoCalculatePeriod(g1, g2); s2++; g1 = 0; g2 = 0; p1 = 0; p2 = 0; }
-                } else {
-                    if (p1 >= 4 && (p1 - p2) >= 2) { g1++; p1 = 0; p2 = 0; }
-                    else if (p2 >= 4 && (p2 - p1) >= 2) { g2++; p1 = 0; p2 = 0; }
-                    if ((g1 >= 6 && (g1 - g2) >= 2) || (g1 === 7 && g2 === 5)) { autoCalculatePeriod(g1, g2); s1++; g1 = 0; g2 = 0; }
-                    else if ((g2 >= 6 && (g2 - g1) >= 2) || (g2 === 7 && g1 === 5)) { autoCalculatePeriod(g1, g2); s2++; g1 = 0; g2 = 0; }
-                }
-                if(s1 === 3 || s2 === 3) adminStatus('ended');
-                upd = { pts1: p1, pts2: p2, games1: g1, games2: g2, score1: s1, score2: s2, sub_string: isTB ? `TIE-BREAK (${p1}:${p2})` : `GEMS: ${g1}:${g2}` };
-            } else {
-                let ns = (d[`score${team}`] || 0) + (steps[team] * sign);
-                upd = { [`score${team}`]: ns < 0 ? 0 : ns };
-            }
-            db.ref(`tereni/${currentAdminKey}`).update(upd);
+        async function activateLive() {
+            await db.ref(`tereni/${currentAdminKey}`).update({ status: 'live' });
         }
 
-        window.adminStatus = (s) => db.ref(`tereni/${currentAdminKey}`).update({ status: s });
-
-        function autoCalculatePeriod(v1, v2, forceTarget) {
-            const d = allTereni.find(x => x.key === currentAdminKey); if(!d || d.status !== 'live') return;
-            let labels = ["HT"];
-            if(d.sport === "KOŠARKA") labels = ["Q1", "Q2", "Q3", "Q4"];
-            if(d.sport === "FUDBAL") labels = ["HT", "FT"];
-            if(d.sport === "ODBOJKA" || d.sport === "TENIS") labels = ["S1", "S2", "S3", "S4", "S5"];
-            if(d.sport === "RUKOMET") labels = ["HT", "FT"];
-            
-            let p1 = 0, p2 = 0, target = forceTarget || null;
-            if (!target) {
-                if (d.sub_details) {
-                    for (let l of labels) { if (!d.sub_details[l]) { target = l; break; } else { const p = d.sub_details[l].split(':'); p1 += parseInt(p[0]); p2 += parseInt(p[1]); } }
-                } else { target = labels[0]; }
-            }
-            if (!target) return;
-
-            let val = `${d.score1 - p1}:${d.score2 - p2}`;
-            if((d.sport === "ODBOJKA" || d.sport === "TENIS") && v1 !== undefined) val = `${v1}:${v2}`;
-            
-            db.ref(`tereni/${currentAdminKey}/sub_details`).update({ [target]: val }).then(() => {
-                db.ref(`tereni/${currentAdminKey}`).once('value', s => {
-                    let snap = s.val(), res = [];
-                    if(snap.sub_details) {
-                        const order = ["HT", "FT", "ET HT", "ET FT", "PEN", "Q1", "Q2", "Q3", "Q4", "OT1", "S1", "S2", "S3", "S4", "S5"];
-                        Object.keys(snap.sub_details).sort((a,b) => order.indexOf(a) - order.indexOf(b)).forEach(k => { 
-                            res.push(`${k} ${snap.sub_details[k]}`); 
-                        });
-                    }
-                    db.ref(`tereni/${currentAdminKey}`).update({ sub_string: res.join(' | ') });
-                });
-            });
+        function updateScore(team, val) {
+            const d = allTereni.find(x => x.key === currentAdminKey);
+            if(!d || d.status !== 'live') return;
+            let newScore = (d[`score${team}`] || 0) + val;
+            if(newScore < 0) newScore = 0;
+            db.ref(`tereni/${currentAdminKey}`).update({ [`score${team}`]: newScore });
         }
 
         async function setupMatch() {
-            const t1 = document.getElementById('adm-t1').value.toUpperCase(), t2 = document.getElementById('adm-t2').value.toUpperCase(), st = document.getElementById('adm-start-time-input').value;
-            if(!t1 || !t2 || !st) return;
-            await db.ref(`tereni/${currentAdminKey}`).update({ t1, t2, score1: 0, score2: 0, pts1:0, pts2:0, games1:0, games2:0, status: 'upcoming', scheduled_at: new Date(st).getTime(), sub_string: "", sub_details: null });
+            const t1 = document.getElementById('adm-t1').value, t2 = document.getElementById('adm-t2').value;
+            if(!t1 || !t2) return;
+            await db.ref(`tereni/${currentAdminKey}`).update({
+                t1, t2, status: 'upcoming', score1: 0, score2: 0, sub_string: "", sub_details: null
+            });
         }
 
-        window.adminDelete = () => { if(confirm(langData[currentLang].delete_conf)) { db.ref(`tereni/${currentAdminKey}`).remove(); closeAdmin(); } };
-        window.closeAdmin = () => { document.getElementById('admin-panel').classList.remove('active'); currentAdminKey = null; };
+        function triggerLogic(type) {
+            if(type === 'period') {
+                const d = allTereni.find(x => x.key === currentAdminKey);
+                const pName = prompt("NAZIV PERIODA (npr. Q1, HT, S1):");
+                if(!pName) return;
+                const score = `${d.score1}:${d.score2}`;
+                db.ref(`tereni/${currentAdminKey}/sub_details`).update({ [pName]: score }).then(() => {
+                    db.ref(`tereni/${currentAdminKey}/sub_details`).once('value', s => {
+                        let res = [];
+                        s.forEach(child => { res.push(`${child.key} ${child.val()}`); });
+                        db.ref(`tereni/${currentAdminKey}`).update({ sub_string: res.join(' | ') });
+                    });
+                });
+            } else if(type === 'end') {
+                if(confirm("ZAVRŠI MEČ?")) db.ref(`tereni/${currentAdminKey}`).update({ status: 'ended' });
+            }
+        }
+
+        async function resetMatchData() {
+            await db.ref(`tereni/${currentAdminKey}`).update({
+                t1: null, t2: null, score1: 0, score2: 0, status: 'upcoming', sub_string: "", sub_details: null
+            });
+        }
+
+        function closeAdmin() { document.getElementById('admin-panel').classList.remove('active'); currentAdminKey = null; }
+        function adminDelete() { if(confirm("OBRISATI TEREN?")) { db.ref(`tereni/${currentAdminKey}`).remove(); closeAdmin(); } }
     </script>
 </body>
 </html>
