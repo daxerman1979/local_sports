@@ -3,45 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>HoodLive - Street Sports Tracker</title>
+    <title>HoodLive - Full System</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;700;900&family=Permanent+Marker&display=swap" rel="stylesheet">
     
     <style>
+        /* OSNOVNI STIL I RESET */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-size: 16px; }
         html, body { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background: #000; position: fixed; font-family: 'Inter', sans-serif; touch-action: pan-x pan-y; }
         
         input, select { font-size: 14px !important; outline: none; border-radius: 8px; border: 1px solid #333; padding: 12px; width: 100%; background: #1a1a1a; color: white; }
 
+        /* HERO SEKCIJA */
         #hero { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.9)), url('https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1500&auto=format&fit=crop') center/cover; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 6000; color: white; padding: 20px; }
         .hero-logo { font-family: 'Permanent Marker', cursive; font-size: 56px; color: #ff3b30; text-shadow: 3px 3px 0px #000; margin-bottom: 5px; transform: rotate(-3deg); }
-        .hero-sub { font-family: 'Oswald', sans-serif; letter-spacing: 4px; font-weight: 700; margin-bottom: 30px; color: #eee; }
+        .hero-sub { font-family: 'Oswald', sans-serif; letter-spacing: 4px; font-weight: 700; margin-bottom: 30px; color: #eee; text-align: center; }
         .auth-box { background: rgba(0,0,0,0.7); backdrop-filter: blur(20px); padding: 30px; border-radius: 25px; width: 100%; max-width: 340px; display: flex; flex-direction: column; gap: 12px; border: 1px solid rgba(255,59,48,0.3); }
         .auth-btn { background: #ff3b30; color: white; border: none; padding: 16px; font-weight: 900; cursor: pointer; text-transform: uppercase; border-radius: 12px; font-family: 'Oswald'; font-size: 18px; }
         .explore-btn { background: transparent; color: #fff; border: 2px solid #fff; padding: 12px; font-weight: 700; cursor: pointer; text-transform: uppercase; border-radius: 12px; font-family: 'Oswald'; font-size: 14px; margin-top: 5px; opacity: 0.8; }
 
+        /* MAPA I PRETRAGA */
         #map { width: 100vw; height: 100vh; background: #000; display: none; }
         #search-container { position: absolute; top: 20px; left: 20px; z-index: 1000; width: calc(100% - 40px); max-width: 300px; }
         #city-search { width: 100%; padding: 14px 20px; border-radius: 30px; border: 2px solid rgba(255,59,48,0.5); background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); color: white; font-weight: 600; font-size: 14px; }
-        .location-btn { position: absolute; bottom: 30px; right: 20px; z-index: 1000; width: 50px; height: 50px; background: #ff3b30; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; }
+        
+        .location-btn { position: absolute; bottom: 30px; right: 20px; z-index: 1000; width: 50px; height: 50px; background: #ff3b30; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 15px rgba(255,59,48,0.4); }
         .location-btn img { filter: brightness(0) invert(1); width: 24px; }
 
+        /* MARKERI NA MAPI */
         .sport-marker-wrapper { display: flex; align-items: center; white-space: nowrap; cursor: pointer; }
-        .sport-ball { font-size: 32px; z-index: 20; }
+        .sport-ball { font-size: 32px; z-index: 20; filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.5)); }
         .status-live-wrapper .sport-ball { animation: bounce-ball 0.5s ease infinite alternate; }
         @keyframes bounce-ball { from { transform: translateY(0); } to { transform: translateY(-8px); } }
 
         .live-card-thin { background: #000; border: 1px solid #333; border-radius: 12px; padding: 4px 12px; margin-left: -15px; display: flex; align-items: center; min-height: 54px; box-shadow: 0 8px 20px rgba(0,0,0,0.8); z-index: 5; color: white; }
         .match-details { display: flex; flex-direction: column; line-height: 1.2; padding-right: 10px; border-right: 1px solid #333; }
-        .match-teams-thin { font-size: 13px; font-weight: 800; color: #fff; text-transform: uppercase; display: flex; align-items: center; gap: 4px; }
-        .status-pill { font-size: 8px; color: #fff; background: #ff3b30; padding: 2px 6px; border-radius: 4px; font-weight: 900; margin-left: 5px; }
+        .match-teams-thin { font-size: 13px; font-weight: 800; color: #fff; text-transform: uppercase; }
+        .status-pill { font-size: 8px; color: #fff; background: #ff3b30; padding: 2px 6px; border-radius: 4px; font-weight: 900; margin-top: 3px; display: inline-block; width: fit-content; }
         .match-score-thin { font-size: 22px; color: #ff3b30; font-family: 'Oswald', sans-serif; min-width: 50px; text-align: center; padding-left: 10px; font-weight: 700; }
 
-        /* Admin Panel Styles */
+        /* ADMIN PANEL */
         #admin-panel { position: fixed; top: 0; left: 100%; width: 100%; height: 100%; background: #080808; z-index: 7000; transition: 0.4s cubic-bezier(0.19, 1, 0.22, 1); padding: 15px; display: flex; flex-direction: column; overflow-y: auto; }
         #admin-panel.active { left: 0; }
+        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .admin-title { font-family: 'Oswald', sans-serif; font-size: 20px; color: #fff; text-transform: uppercase; }
+        
         .live-board { background: #111; color: #fff; border-radius: 15px; padding: 15px; text-align: center; margin-bottom: 15px; border: 1px solid #ff3b30; }
         .main-score { font-size: 50px; font-family: 'Oswald', sans-serif; color: #ff3b30; margin: 5px 0; letter-spacing: 2px; }
 
@@ -58,6 +65,7 @@
         .btn-dark { background: #222; border: 1px solid #333; }
         .btn-orange { background: #ff9500; }
 
+        /* DIALOG / MODAL */
         #logic-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 20px; }
         .modal-card { background: #111; border: 2px solid #ff3b30; border-radius: 25px; width: 100%; max-width: 320px; padding: 25px; text-align: center; }
     </style>
@@ -71,27 +79,27 @@
             <input type="email" id="email" placeholder="EMAIL" inputmode="email">
             <input type="password" id="password" placeholder="PASSWORD">
             <button class="auth-btn" id="auth-btn" onclick="handleAuth()">ENTER SYSTEM</button>
-            <button class="explore-btn" id="explore-btn" onclick="exploreMap()">EXPLORE MAP</button>
+            <button class="explore-btn" onclick="exploreMap()">EXPLORE MAP</button>
         </div>
     </div>
 
     <div id="search-container">
-        <input type="text" id="city-search" placeholder="Find city..." onkeypress="handleSearch(event)">
+        <input type="text" id="city-search" placeholder="Pretraži grad..." onkeypress="handleSearch(event)">
     </div>
     <div id="map"></div>
     <div class="location-btn" id="lBtn" style="display:none;" onclick="goToMyLocation()"><img src="https://cdn-icons-png.flaticon.com/512/1865/1865269.png"></div>
 
     <div id="admin-panel">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <div class="admin-title" id="adm-name">ADMIN</div>
-            <div onclick="closeAdmin()" style="font-size:30px; color:#ff3b30; cursor:pointer;">&times;</div>
+        <div class="admin-header">
+            <div class="admin-title" id="adm-name">PODEŠAVANJA TERENA</div>
+            <div onclick="closeAdmin()" style="font-size:35px; color:#ff3b30; cursor:pointer; font-weight:bold;">&times;</div>
         </div>
 
         <div id="adm-score-view" style="display:none; flex-direction:column;">
             <div class="live-board">
-                <div id="adm-teams-label" style="color:#aaa; font-size: 12px; font-weight:900;">TEAM A VS TEAM B</div>
+                <div id="adm-teams-label" style="color:#aaa; font-size: 12px; font-weight:900; text-transform:uppercase;">EKIPA A VS EKIPA B</div>
                 <div class="main-score" id="adm-main-score">0 : 0</div>
-                <div id="match-status-label" style="font-size:10px; background:rgba(255,59,48,0.2); color:#ff3b30; padding:3px 12px; border-radius:20px; display:inline-block;">UPCOMING</div>
+                <div id="match-status-label" style="font-size:10px; background:rgba(255,59,48,0.2); color:#ff3b30; padding:3px 12px; border-radius:20px; display:inline-block; font-weight:800;">UPCOMING</div>
             </div>
 
             <div id="active-match-controls">
@@ -114,31 +122,24 @@
 
                 <div id="sub-scores-display" style="color:#888; font-size:12px; text-align:center; margin-bottom:15px; font-weight:700;">NEMA PERIODA</div>
                 
-                <button id="calc-btn" class="admin-btn btn-green score-ctrl" onclick="triggerLogic('period')">ZABELEŽI PERIOD</button>
+                <button id="calc-btn" class="admin-btn btn-green score-ctrl" onclick="triggerLogic('period')">ZABELEŽI PERIOD (Q/HT)</button>
                 
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                     <button id="start-live-btn" class="admin-btn btn-blue" onclick="activateLive()">GO LIVE</button>
                     <button id="end-match-btn" class="admin-btn btn-dark score-ctrl" onclick="triggerLogic('end')">KRAJ MEČA</button>
                 </div>
-                <button id="reset-match-btn" class="admin-btn btn-orange" style="display:none; margin-top:10px;" onclick="resetMatchData()">NOVI MEČ / RESET</button>
+                <button id="reset-match-btn" class="admin-btn btn-orange" style="display:none; margin-top:10px;" onclick="resetMatchData()">NOVI MEČ / RESTART</button>
             </div>
         </div>
 
         <div id="match-setup" style="display:none; flex-direction:column; gap:10px;">
-            <input type="text" id="adm-t1" placeholder="HOME TEAM">
-            <input type="text" id="adm-t2" placeholder="AWAY TEAM">
-            <input type="datetime-local" id="adm-start-time-input">
+            <p style="color: #666; font-size: 12px; font-weight: bold;">KREIRAJ NOVI MEČ NA OVOM TERENU:</p>
+            <input type="text" id="adm-t1" placeholder="IME PRVE EKIPE">
+            <input type="text" id="adm-t2" placeholder="IME DRUGE EKIPE">
             <button class="admin-btn btn-blue" onclick="setupMatch()">ZAKAŽI MEČ</button>
         </div>
         
-        <button id="del-btn" style="margin-top:20px; background:none; color:#444; border:none; font-weight:900; cursor:pointer;" onclick="adminDelete()">OBRIŠI TEREN</button>
-    </div>
-
-    <div id="logic-modal">
-        <div class="modal-card">
-            <div id="modal-q" style="color:white; font-family:'Oswald'; margin-bottom:20px;">ŠTA DALJE?</div>
-            <div id="modal-btns" style="display:flex; flex-direction:column; gap:10px;"></div>
-        </div>
+        <button id="del-btn" style="margin-top:auto; background:none; color:#444; border:none; padding: 20px; font-weight:900; cursor:pointer;" onclick="adminDelete()">OBRIŠI OVAJ TEREN TRAJNO</button>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -160,31 +161,44 @@
         let map, currentAdminKey = null, allTereni = [];
         const sportEmojis = { "FUDBAL": "⚽", "KOŠARKA": "🏀", "RUKOMET": "🤾", "ODBOJKA": "🏐", "TENIS": "🎾" };
 
-        // AUTH & INIT
+        // AUTH
         async function handleAuth() {
             const e = document.getElementById('email').value, p = document.getElementById('password').value;
             if(!e || !p) return;
             try { await auth.signInWithEmailAndPassword(e, p); } 
-            catch { try { await auth.createUserWithEmailAndPassword(e, p); } catch(err) { alert(err.message); } }
+            catch { try { await auth.createUserWithEmailAndPassword(e, p); } catch(err) { alert("Greška: " + err.message); } }
         }
 
-        auth.onAuthStateChanged(user => { if (user) { document.getElementById('hero').style.display='none'; document.getElementById('map').style.display='block'; document.getElementById('lBtn').style.display='flex'; initMap(); } });
+        auth.onAuthStateChanged(user => { 
+            if (user) { 
+                document.getElementById('hero').style.display='none'; 
+                document.getElementById('map').style.display='block'; 
+                document.getElementById('lBtn').style.display='flex'; 
+                initMap(); 
+            } 
+        });
 
-        function exploreMap() { document.getElementById('hero').style.display='none'; document.getElementById('map').style.display='block'; initMap(); }
+        function exploreMap() { 
+            document.getElementById('hero').style.display='none'; 
+            document.getElementById('map').style.display='block'; 
+            initMap(); 
+        }
 
+        // MAPA
         function initMap() {
             if (map) return;
-            map = L.map('map', { zoomControl: false }).setView([44.7866, 20.4489], 6);
-            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
+            map = L.map('map', { zoomControl: false, attributionControl: false }).setView([44.7866, 20.4489], 7);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{y}/{x}.png').addTo(map);
+            
             db.ref('tereni').on('value', snap => {
-                allTereni = []; snap.forEach(c => { let d = c.val(); d.key = c.key; allTereni.push(d); });
+                allTereni = []; 
+                snap.forEach(c => { let d = c.val(); d.key = c.key; allTereni.push(d); });
                 renderMarkers();
                 if(currentAdminKey) refreshAdminPanel(currentAdminKey);
             });
             map.on('click', onMapClick);
         }
 
-        // MARKERS
         function renderMarkers() {
             map.eachLayer(l => { if(l instanceof L.Marker) map.removeLayer(l); });
             allTereni.forEach(d => {
@@ -200,9 +214,10 @@
                                 <div class="match-score-thin">${d.score1}:${d.score2}</div>
                             </div>
                            </div>`,
-                    iconSize: [200, 50]
+                    iconSize: [200, 50], iconAnchor: [15, 25]
                 });
-                L.marker([d.lat, d.lng], { icon }).addTo(map).on('click', () => {
+                L.marker([d.lat, d.lng], { icon }).addTo(map).on('click', (e) => {
+                    L.DomEvent.stopPropagation(e);
                     if (auth.currentUser && d.owner === auth.currentUser.uid) openAdmin(d.key);
                 });
             });
@@ -210,17 +225,31 @@
 
         function onMapClick(e) {
             if (!auth.currentUser) return;
-            const name = prompt("NAZIV TERENA:");
+            const name = prompt("NAZIV TERENA (npr. Školsko, Blok 45):");
             if(!name) return;
             const sport = prompt("SPORT (FUDBAL, KOŠARKA, RUKOMET...):").toUpperCase();
             db.ref('tereni').push({
                 name, lat: e.latlng.lat, lng: e.latlng.lng,
                 owner: auth.currentUser.uid, sport, status: 'upcoming',
-                score1: 0, score2: 0
+                score1: 0, score2: 0, t1: "", t2: ""
             });
         }
 
-        // ADMIN LOGIC
+        // PRETRAGA GRADRA
+        async function handleSearch(e) {
+            if(e.key === 'Enter') {
+                const city = e.target.value;
+                const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${city}`);
+                const data = await res.json();
+                if(data.length > 0) map.setView([data[0].lat, data[0].lon], 13);
+            }
+        }
+
+        function goToMyLocation() {
+            map.locate({setView: true, maxZoom: 15});
+        }
+
+        // ADMIN PANEL LOGIKA
         function openAdmin(key) {
             currentAdminKey = key;
             document.getElementById('admin-panel').classList.add('active');
@@ -234,14 +263,14 @@
             const isLive = d.status === 'live';
             const isEnded = d.status === 'ended';
             
-            // Onemogući kontrole ako nije LIVE
+            // Zaključaj/Otključaj kontrole
             const ctrls = document.querySelectorAll('.score-ctrl');
             ctrls.forEach(c => {
                 c.disabled = !isLive;
                 c.style.opacity = isLive ? "1" : "0.3";
             });
 
-            if(d.t1) {
+            if(d.t1 && d.t1 !== "") {
                 document.getElementById('adm-score-view').style.display = 'flex';
                 document.getElementById('match-setup').style.display = 'none';
                 document.getElementById('adm-main-score').innerText = `${d.score1} : ${d.score2}`;
@@ -270,7 +299,7 @@
 
         async function setupMatch() {
             const t1 = document.getElementById('adm-t1').value, t2 = document.getElementById('adm-t2').value;
-            if(!t1 || !t2) return;
+            if(!t1 || !t2) { alert("Unesi oba tima!"); return; }
             await db.ref(`tereni/${currentAdminKey}`).update({
                 t1, t2, status: 'upcoming', score1: 0, score2: 0, sub_string: "", sub_details: null
             });
@@ -279,29 +308,42 @@
         function triggerLogic(type) {
             if(type === 'period') {
                 const d = allTereni.find(x => x.key === currentAdminKey);
-                const pName = prompt("NAZIV PERIODA (npr. Q1, HT, S1):");
+                const pName = prompt("NAZIV PERIODA (npr. 1.Pol, Q1, S1):");
                 if(!pName) return;
                 const score = `${d.score1}:${d.score2}`;
                 db.ref(`tereni/${currentAdminKey}/sub_details`).update({ [pName]: score }).then(() => {
                     db.ref(`tereni/${currentAdminKey}/sub_details`).once('value', s => {
                         let res = [];
-                        s.forEach(child => { res.push(`${child.key} ${child.val()}`); });
+                        s.forEach(child => { res.push(`${child.key} (${child.val()})`); });
                         db.ref(`tereni/${currentAdminKey}`).update({ sub_string: res.join(' | ') });
                     });
                 });
             } else if(type === 'end') {
-                if(confirm("ZAVRŠI MEČ?")) db.ref(`tereni/${currentAdminKey}`).update({ status: 'ended' });
+                if(confirm("DA LI STE SIGURNI DA ŽELITE DA ZAVRŠITE MEČ?")) {
+                    db.ref(`tereni/${currentAdminKey}`).update({ status: 'ended' });
+                }
             }
         }
 
         async function resetMatchData() {
-            await db.ref(`tereni/${currentAdminKey}`).update({
-                t1: null, t2: null, score1: 0, score2: 0, status: 'upcoming', sub_string: "", sub_details: null
-            });
+            if(confirm("Ovo briše trenutni rezultat i timove. Spremni za novi meč?")) {
+                await db.ref(`tereni/${currentAdminKey}`).update({
+                    t1: "", t2: "", score1: 0, score2: 0, status: 'upcoming', sub_string: "", sub_details: null
+                });
+            }
         }
 
-        function closeAdmin() { document.getElementById('admin-panel').classList.remove('active'); currentAdminKey = null; }
-        function adminDelete() { if(confirm("OBRISATI TEREN?")) { db.ref(`tereni/${currentAdminKey}`).remove(); closeAdmin(); } }
+        function closeAdmin() { 
+            document.getElementById('admin-panel').classList.remove('active'); 
+            currentAdminKey = null; 
+        }
+
+        function adminDelete() { 
+            if(confirm("OBRISATI TEREN SA MAPE?")) { 
+                db.ref(`tereni/${currentAdminKey}`).remove(); 
+                closeAdmin(); 
+            } 
+        }
     </script>
 </body>
 </html>
