@@ -3,288 +3,220 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>HoodLive - Pro Tracker</title>
+    <title>HoodLive - Pro Scoreboard</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;700;900&family=Permanent+Marker&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     
     <style>
-        /* ORIGINALNI DIZAJN I VELIČINE */
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-size: 16px; }
-        html, body { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background: #000; position: fixed; font-family: 'Inter', sans-serif; touch-action: pan-x pan-y; }
-        input, select { font-size: 14px !important; outline: none; border-radius: 8px; border: 1px solid #333; padding: 12px; width: 100%; background: #1a1a1a; color: white; }
+        /* Integrisani CSS */
+        :root { --accent: #00e676; --bg: #000; --card: #111; --text: #f0f0f0; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html, body { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background: var(--bg); font-family: 'Inter', sans-serif; color: var(--text); }
         
-        #hero { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.9)), url('https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=1500&auto=format&fit=crop') center/cover; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 6000; color: white; padding: 20px; }
-        .hero-logo { font-family: 'Permanent Marker', cursive; font-size: 56px; color: #ff3b30; text-shadow: 3px 3px 0px #000; margin-bottom: 5px; transform: rotate(-3deg); }
-        .hero-sub { font-family: 'Oswald', sans-serif; letter-spacing: 4px; font-weight: 700; margin-bottom: 30px; color: #eee; }
+        #map { position: absolute; top: 0; bottom: 0; width: 100%; z-index: 1; }
         
-        .auth-box { background: rgba(0,0,0,0.7); backdrop-filter: blur(20px); padding: 30px; border-radius: 25px; width: 100%; max-width: 340px; display: flex; flex-direction: column; gap: 12px; border: 1px solid rgba(255,59,48,0.3); }
-        .auth-btn { background: #ff3b30; color: white; border: none; padding: 16px; font-weight: 900; cursor: pointer; text-transform: uppercase; border-radius: 12px; font-family: 'Oswald'; font-size: 18px; }
-        .explore-btn { background: transparent; color: #fff; border: 2px solid #fff; padding: 12px; font-weight: 700; cursor: pointer; text-transform: uppercase; border-radius: 12px; font-family: 'Oswald'; font-size: 14px; margin-top: 5px; opacity: 0.8; }
+        /* Novi Scoreboard Stilovi */
+        .scoreboard-container {
+            position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+            width: 95%; max-width: 500px; z-index: 1000;
+            background: var(--card); border-radius: 20px; padding: 15px;
+            border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            display: none; /* Prikazuje se samo kad je teren selektovan */
+        }
+        
+        .status-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: bold; margin-bottom: 8px; border: 1px solid #444; color: #888; text-transform: uppercase; }
+        .status-badge.live { color: var(--accent); border-color: var(--accent); animation: blink 1.5s infinite; }
+        
+        .main-display { display: flex; justify-content: space-between; align-items: center; }
+        .total-points { font-size: 3rem; font-weight: 900; font-family: 'Oswald', sans-serif; color: #fff; }
+        .sub-label { color: var(--accent); font-weight: bold; font-size: 1.2rem; height: 1.5rem; }
+        .team-name { font-size: 0.9rem; text-transform: uppercase; opacity: 0.8; }
 
-        #map { width: 100vw; height: 100vh; background: #000; display: none; }
-        #search-container { position: absolute; top: 20px; left: 20px; z-index: 1000; width: calc(100% - 40px); max-width: 300px; }
-        #city-search { width: 100%; padding: 14px 20px; border-radius: 30px; border: 2px solid rgba(255,59,48,0.5); background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); color: white; font-weight: 600; font-size: 14px; }
-        
-        .location-btn { position: absolute; bottom: 30px; right: 20px; z-index: 1000; width: 50px; height: 50px; background: #ff3b30; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; }
-        .location-btn img { filter: brightness(0) invert(1); width: 24px; }
+        .score-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.8rem; }
+        .score-table td { border: 1px solid #2a2a2a; padding: 8px; text-align: center; font-weight: bold; }
+        .active-p { background: rgba(0, 230, 118, 0.2); color: var(--accent); }
 
-        /* KARTICE NA MAPI - ORIGINALNA VELIČINA */
-        .sport-marker-wrapper { display: flex; align-items: center; white-space: nowrap; cursor: pointer; }
-        .sport-ball { font-size: 32px; z-index: 20; }
-        .live-card-thin { background: #000; border: 1px solid #333; border-radius: 12px; padding: 4px 12px; margin-left: -15px; display: flex; align-items: center; min-height: 54px; box-shadow: 0 8px 20px rgba(0,0,0,0.8); z-index: 5; color: white; }
-        .match-details { display: flex; flex-direction: column; line-height: 1.2; padding-right: 10px; border-right: 1px solid #333; }
-        .match-name-thin { font-size: 10px; font-weight: 900; color: #ff3b30; text-transform: uppercase; }
-        .match-teams-thin { font-size: 13px; font-weight: 800; color: #fff; text-transform: uppercase; display: flex; align-items: center; gap: 4px; }
-        .status-pill { font-size: 8px; color: #fff; background: #ff3b30; padding: 2px 6px; border-radius: 4px; font-weight: 900; margin-left: 5px; }
-        .match-score-thin { font-size: 22px; color: #ff3b30; font-family: 'Oswald', sans-serif; min-width: 50px; text-align: center; padding-left: 10px; font-weight: 700; display: flex; flex-direction: column; line-height: 1; }
-        .periods-row { font-size: 10px; color: #888; font-weight: 900; margin-top: 3px; }
+        /* Admin Panel Modifikacija */
+        .admin-controls {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px;
+        }
+        .btn-plus { background: #1b5e20; color: white; padding: 15px; border-radius: 8px; font-weight: bold; border: none; }
+        .btn-minus { background: #b71c1c; color: white; padding: 8px; border-radius: 8px; border: none; font-size: 0.7rem; }
+        
+        .sport-selector { display: flex; gap: 5px; overflow-x: auto; padding-bottom: 10px; }
+        .sport-btn { padding: 5px 10px; background: #222; border: 1px solid #444; color: white; border-radius: 5px; font-size: 10px; white-space: nowrap; }
+        .sport-btn.active { background: var(--accent); color: #000; }
 
-        /* ADMIN PANEL */
-        #admin-panel { position: fixed; top: 0; left: 100%; width: 100%; height: 100%; background: #080808; z-index: 7000; transition: 0.4s cubic-bezier(0.19, 1, 0.22, 1); padding: 15px; display: flex; flex-direction: column; overflow-y: auto; }
-        #admin-panel.active { left: 0; }
-        .admin-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .admin-title { font-family: 'Oswald', sans-serif; font-size: 20px; color: #fff; text-transform: uppercase; }
-        
-        .live-board { background: #111; color: #fff; border-radius: 15px; padding: 15px; text-align: center; margin-bottom: 15px; border: 1px solid #ff3b30; }
-        .main-score { font-size: 50px; font-family: 'Oswald', sans-serif; color: #ff3b30; margin: 5px 0; letter-spacing: 2px; line-height: 1; }
-        
-        .pro-controller-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-        .team-ctrl { background: #151515; border-radius: 15px; padding: 12px; display: flex; flex-direction: column; align-items: center; border: 1px solid #222; }
-        .action-btns-row { display: flex; gap: 8px; width: 100%; margin-top: 5px; }
-        .action-btn { flex: 1; height: 45px; border-radius: 10px; border: none; color: white; font-size: 22px; font-weight: 900; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .btn-plus { background: #28a745; }
-        .btn-minus { background: #ff3b30; }
-        
-        .admin-btn { padding: 14px; border: none; font-weight: 900; color: white; text-transform: uppercase; width: 100%; border-radius: 12px; cursor: pointer; font-family: 'Oswald'; font-size: 15px; margin-bottom: 8px; }
-        .btn-blue { background: #007AFF; }
-        .btn-dark { background: #222; border: 1px solid #333; }
-
-        /* POPUPS */
-        .leaflet-popup-content-wrapper { border-radius: 20px; padding: 0; overflow: hidden; background: #111; color: white; border: 1px solid #ff3b30; }
-        .pop-header { background: #ff3b30; color: white; padding: 12px; text-align: center; font-weight: 900; font-family: 'Oswald'; }
-        .pop-body { padding: 15px; display: flex; flex-direction: column; gap: 10px; }
-        .pop-btn { background: #ff3b30; color: white; border: none; padding: 12px; border-radius: 10px; font-weight: 900; text-transform: uppercase; font-family: 'Oswald'; }
+        @keyframes blink { 50% { opacity: 0.4; } }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <div id="hero">
-        <div class="hero-logo">HoodLive</div>
-        <div class="hero-sub">STREET SPORTS NETWORK</div>
-        <div class="auth-box">
-            <input type="email" id="email" placeholder="EMAIL">
-            <input type="password" id="password" placeholder="PASSWORD">
-            <button class="auth-btn" onclick="handleAuth()">ENTER SYSTEM</button>
-            <button class="explore-btn" onclick="exploreMap()">EXPLORE MAP</button>
-        </div>
-    </div>
-
-    <div id="admin-panel">
-        <div class="admin-nav">
-            <div class="admin-title" id="adm-name">ADMIN</div>
-            <div onclick="closeAdmin()" style="font-size:30px; font-weight:bold; cursor:pointer; color:#ff3b30; padding: 5px;">&times;</div>
-        </div>
-
-        <div id="adm-score-view" style="display:none; flex-direction:column;">
-            <div class="live-board">
-                <div id="adm-teams-label" style="color:#aaa; font-size: 12px; font-weight:900; text-transform:uppercase;">TEAM A VS TEAM B</div>
-                <div class="main-score" id="adm-main-score">0 : 0</div>
-                <div id="adm-sub-display" style="font-size:16px; color:#ff3b30; font-weight:900; font-family:'Oswald';"></div>
-            </div>
-
-            <div class="pro-controller-container">
-                <div class="team-ctrl">
-                    <span id="label-t1" style="font-size:10px; font-weight:900; color:#666;">TEAM 1</span>
-                    <div class="action-btns-row">
-                        <button class="action-btn btn-minus" onclick="proScore(1, -1)">-</button>
-                        <button class="action-btn btn-plus" onclick="proScore(1, 1)">+</button>
-                    </div>
-                </div>
-                <div class="team-ctrl">
-                    <span id="label-t2" style="font-size:10px; font-weight:900; color:#666;">TEAM 2</span>
-                    <div class="action-btns-row">
-                        <button class="action-btn btn-minus" onclick="proScore(2, -1)">-</button>
-                        <button class="action-btn btn-plus" onclick="proScore(2, 1)">+</button>
-                    </div>
-                </div>
-            </div>
-
-            <div id="sub-scores-display" style="background:#111; color:#888; padding:10px; border-radius:10px; margin-bottom:10px; font-size:12px; text-align:center; border:1px dashed #333;">NEMA PERIODA</div>
-            <button class="admin-btn btn-blue" id="start-live-btn" onclick="adminStatus('live')">KRENI UŽIVO</button>
-            <button class="admin-btn btn-dark" onclick="adminStatus('ended')">ZAVRŠI MEČ</button>
-            <button class="admin-btn btn-dark" style="background:#ff9500; display:none;" id="reset-btn" onclick="resetMatchData()">NOVI MEČ</button>
-        </div>
-
-        <div id="match-setup" style="display:none; flex-direction:column; gap:10px;">
-            <input type="text" id="adm-t1" placeholder="DOMAĆIN">
-            <input type="text" id="adm-t2" placeholder="GOST">
-            <button class="admin-btn btn-blue" onclick="setupMatch()">ZAKAŽI MEČ</button>
-        </div>
-        <button id="del-btn" style="margin-top:20px; background:none; color:#444; border:none; font-weight:900; cursor:pointer; font-size: 12px;" onclick="adminDelete()">OBRIŠI TEREN</button>
-    </div>
-
     <div id="map"></div>
-    <div class="location-btn" id="lBtn" style="display:none;" onclick="goToMyLocation()"><img src="https://cdn-icons-png.flaticon.com/512/1865/1865269.png"></div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <div id="main-scoreboard" class="scoreboard-container">
+        <div class="sport-selector" id="admin-sport-select">
+            <button class="sport-btn active" onclick="changeSport('fudbal', this)">Fudbal</button>
+            <button class="sport-btn" onclick="changeSport('kosarka', this)">Košarka</button>
+            <button class="sport-btn" onclick="changeSport('tenis', this)">Tenis</button>
+            <button class="sport-btn" onclick="changeSport('odbojka', this)">Odbojka</button>
+        </div>
+
+        <div id="status-tag" class="status-badge">Priprema</div>
+        
+        <div class="main-display">
+            <div style="text-align: left; flex: 1;">
+                <div id="disp-name-h" class="team-name">DOMAĆIN</div>
+                <div id="sub-h" class="sub-label"></div>
+            </div>
+            <div class="total-points"><span id="main-h">0</span>:<span id="main-a">0</span></div>
+            <div style="text-align: right; flex: 1;">
+                <div id="disp-name-a" class="team-name">GOST</div>
+                <div id="sub-a" class="sub-label"></div>
+            </div>
+        </div>
+
+        <table class="score-table" id="period-table">
+            <tr id="tr-h"></tr>
+            <tr id="tr-a"></tr>
+        </table>
+
+        <div id="admin-only-tools" class="hidden">
+            <div class="admin-controls">
+                <button class="btn-plus" onclick="adjustScore(1, 'h')">DOM +1</button>
+                <button class="btn-plus" onclick="adjustScore(1, 'a')">GOS +1</button>
+                <button class="btn-minus" onclick="adjustScore(-1, 'h')">-1</button>
+                <button class="btn-minus" onclick="adjustScore(-1, 'a')">-1</button>
+                <button id="next-period-btn" style="grid-column: span 2; background: #333; color: white; padding: 10px; border: none; border-radius: 8px;" onclick="goNext()">Sledeći Period</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script>
-        const firebaseConfig = { 
-            apiKey: "AIzaSyCyyqnqeS-9jurBX-6VIRp8CiPTMbXkXgw",
-            authDomain: "allsportslocal-ea1d4.firebaseapp.com",
-            databaseURL: "https://allsportslocal-ea1d4-default-rtdb.europe-west1.firebasedatabase.app/",
-            projectId: "allsportslocal-ea1d4"
-        };
+        // --- TVOJA KONFIGURACIJA (Popuni svojim podacima iz starog fajla) ---
+        const firebaseConfig = { /* TVOJI PODACI OVDE */ };
         firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
         const db = firebase.database();
-
-        let map, currentLat, currentLon, currentAdminKey = null, allTereni = [];
-        const sportEmojis = { "FUDBAL": "⚽", "KOŠARKA": "🏀", "RUKOMET": "🤾", "ODBOJKA": "🏐", "TENIS": "🎾" };
-        const tennisPoints = ["0", "15", "30", "40", "Ad"];
-
-        function exploreMap() { document.getElementById('hero').style.display='none'; document.getElementById('map').style.display='block'; document.getElementById('lBtn').style.display='flex'; initMap(); }
-        async function handleAuth() {
-            const e = document.getElementById('email').value, p = document.getElementById('password').value;
-            try { await auth.signInWithEmailAndPassword(e, p); } catch { await auth.createUserWithEmailAndPassword(e, p); }
-        }
-        auth.onAuthStateChanged(user => { if(user) exploreMap(); });
-
-        function initMap() {
-            if (map) return;
-            map = L.map('map', { zoomControl: false, tap: false }).setView([44.7866, 20.4489], 6);
-            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
-            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}').addTo(map);
-
-            map.on('click', e => {
-                if(!auth.currentUser) return;
-                const html = `<div class="pop-header">KREIRAJ TEREN</div><div class="pop-body">
-                    <select id="p_sport"><option value="FUDBAL">FUDBAL</option><option value="KOŠARKA">KOŠARKA</option><option value="RUKOMET">RUKOMET</option><option value="ODBOJKA">ODBOJKA</option><option value="TENIS">TENIS</option></select>
-                    <input type="text" id="p_name" placeholder="NAZIV LOKACIJE">
-                    <button class="pop-btn" onclick="saveTeren(${e.latlng.lat}, ${e.latlng.lng})">POSTAVI</button></div>`;
-                L.popup().setLatLng(e.latlng).setContent(html).openOn(map);
-            });
-
-            db.ref('tereni').on('value', snap => {
-                allTereni = []; snap.forEach(c => { let d = c.val(); d.key = c.key; allTereni.push(d); });
-                renderMarkers();
-                if(currentAdminKey) refreshAdminPanel(currentAdminKey);
-            });
-            trackGPS();
-        }
-
-        function renderMarkers() {
-            map.eachLayer(l => { if(l instanceof L.Marker && l.options.icon.options.className !== 'user-location-dot') map.removeLayer(l); });
-            allTereni.forEach(d => {
-                let mainScore = `${d.score1}:${d.score2}`;
-                if(d.sport === "TENIS") {
-                    const isTB = (d.games1 === 6 && d.games2 === 6);
-                    mainScore = `${d.score1}:${d.score2} (${isTB ? (d.pts1||0) : (tennisPoints[d.pts1]||'0')}:${isTB ? (d.pts2||0) : (tennisPoints[d.pts2]||'0')})`;
-                }
-                if(d.sport === "ODBOJKA") mainScore = `${d.score1}:${d.score2} (${d.pts1||0}:${d.pts2||0})`;
-
-                const icon = L.divIcon({
-                    className: '',
-                    html: `<div class="sport-marker-wrapper">
-                        <div class="sport-ball">${sportEmojis[d.sport]||'⚽'}</div>
-                        <div class="live-card-thin">
-                            <div class="match-details">
-                                <span class="match-name-thin">${d.name}</span>
-                                <span class="match-teams-thin">${d.t1?d.t1+' - '+d.t2:'SLOBODAN'} <span class="status-pill">${d.status.toUpperCase()}</span></span>
-                            </div>
-                            ${d.t1?`<div class="match-score-thin">${mainScore}<div class="periods-row">${d.sub_string||''}</div></div>`:''}
-                        </div>
-                    </div>`,
-                    iconSize: [210, 48], iconAnchor: [12, 24]
-                });
-                L.marker([d.lat, d.lng], { icon }).addTo(map).on('click', (e) => {
-                    L.DomEvent.stopPropagation(e);
-                    if(auth.currentUser && d.owner === auth.currentUser.uid) openAdmin(d.key);
-                });
-            });
-        }
-
-        function proScore(team, sign) {
-            const d = allTereni.find(x => x.key === currentAdminKey);
-            if(!d || d.status !== 'live') return;
-            const other = team === 1 ? 2 : 1;
-            let upd = {};
-
-            if(d.sport === "ODBOJKA") {
-                let p1 = d.pts1||0, p2 = d.pts2||0, s1 = d.score1, s2 = d.score2;
-                if(team === 1) p1 += sign; else p2 += sign;
-                let target = (s1 + s2 === 4) ? 15 : 25;
-                if(p1 >= target && (p1 - p2) >= 2) { s1++; p1=0; p2=0; }
-                else if(p2 >= target && (p2 - p1) >= 2) { s2++; p1=0; p2=0; }
-                upd = { pts1: Math.max(0, p1), pts2: Math.max(0, p2), score1: s1, score2: s2 };
-            } 
-            else if(d.sport === "TENIS") {
-                let p1 = d.pts1||0, p2 = d.pts2||0, g1 = d.games1||0, g2 = d.games2||0, s1 = d.score1, s2 = d.score2;
-                const isTB = (g1 === 6 && g2 === 6);
-                if(sign === 1) {
-                    if(isTB) {
-                        if(team === 1) p1++; else p2++;
-                        let limit = (s1 + s2 === 4) ? 10 : 7;
-                        if(p1 >= limit && (p1 - p2) >= 2) { s1++; g1=0; g2=0; p1=0; p2=0; }
-                        else if(p2 >= limit && (p2 - p1) >= 2) { s2++; g1=0; g2=0; p1=0; p2=0; }
-                    } else {
-                        let pt = (team === 1) ? p1 : p2, po = (team === 1) ? p2 : p1;
-                        if(pt === 3 && po === 4) { if(team === 1) p2 = 3; else p1 = 3; }
-                        else if(pt === 3 && po === 3) { if(team === 1) p1 = 4; else p2 = 4; }
-                        else if(pt === 4 || (pt === 3 && po < 3)) { if(team === 1) g1++; else g2++; p1=0; p2=0; }
-                        else { if(team === 1) p1++; else p2++; }
-                    }
-                } else { if(team === 1) p1 = Math.max(0, p1-1); else p2 = Math.max(0, p2-1); }
-                if(!isTB) {
-                    if((g1 >= 6 && (g1-g2) >= 2) || (g1 === 7 && g2 === 5)) { s1++; g1=0; g2=0; }
-                    else if((g2 >= 6 && (g2-g1) >= 2) || (g2 === 7 && g1 === 5)) { s2++; g1=0; g2=0; }
-                }
-                upd = { pts1: p1, pts2: p2, games1: g1, games2: g2, score1: s1, score2: s2 };
-            } 
-            else { upd = { [`score${team}`]: Math.max(0, (d[`score${team}`]||0) + sign) }; }
-            db.ref(`tereni/${currentAdminKey}`).update(upd);
-        }
-
-        function openAdmin(key) { currentAdminKey = key; refreshAdminPanel(key); document.getElementById('admin-panel').classList.add('active'); }
-        function closeAdmin() { document.getElementById('admin-panel').classList.remove('active'); currentAdminKey = null; }
         
-        function refreshAdminPanel(key) {
-            const d = allTereni.find(x => x.key === key); if(!d) return;
-            document.getElementById('adm-name').innerText = d.name;
-            if(d.t1) {
-                document.getElementById('adm-score-view').style.display = 'flex'; document.getElementById('match-setup').style.display = 'none';
-                document.getElementById('adm-main-score').innerText = `${d.score1} : ${d.score2}`;
-                document.getElementById('adm-teams-label').innerText = `${d.t1} VS ${d.t2}`;
-                document.getElementById('label-t1').innerText = d.t1; document.getElementById('label-t2').innerText = d.t2;
-                document.getElementById('sub-scores-display').innerText = d.sub_string || "NEMA PERIODA";
-                document.getElementById('start-live-btn').style.display = d.status==='upcoming'?'block':'none';
-                document.getElementById('end-match-btn').style.display = d.status==='live'?'block':'none';
-                document.getElementById('reset-btn').style.display = d.status==='ended'?'block':'none';
-                if(d.sport === "TENIS") document.getElementById('adm-sub-display').innerText = `G: ${d.games1}:${d.games2} | P: ${tennisPoints[d.pts1]||d.pts1}:${tennisPoints[d.pts2]||d.pts2}`;
-                else if(d.sport === "ODBOJKA") document.getElementById('adm-sub-display').innerText = `P: ${d.pts1}:${d.pts2}`;
-                else document.getElementById('adm-sub-display').innerText = "";
-            } else { document.getElementById('adm-score-view').style.display = 'none'; document.getElementById('match-setup').style.display = 'flex'; }
+        const config = {
+            fudbal: { p: ['1H', '2H'], mode: 'sum' },
+            kosarka: { p: ['Q1', 'Q2', 'Q3', 'Q4'], mode: 'sum' },
+            tenis: { p: ['S1', 'S2', 'S3', 'S4', 'S5'], mode: 'sets' },
+            odbojka: { p: ['S1', 'S2', 'S3', 'S4', 'S5'], mode: 'sets' }
+        };
+
+        let currentSport = 'fudbal';
+        let currentP = 0;
+        let localData = { h: {}, a: {} };
+        let tennisPts = ["0", "15", "30", "40", "AD"];
+        let tIdx = { h: 0, a: 0 };
+        let currentAdminKey = null; // Postaje ključ kad admin klikne na svoj teren
+
+        // Funkcija za promenu sporta (Admin strana)
+        function changeSport(s, btn) {
+            currentSport = s;
+            document.querySelectorAll('.sport-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            initLocalData();
+            updateFirebase();
         }
 
-        function setupMatch() {
-            const t1 = document.getElementById('adm-t1').value.toUpperCase(), t2 = document.getElementById('adm-t2').value.toUpperCase();
-            if(!t1 || !t2) return;
-            db.ref(`tereni/${currentAdminKey}`).update({ t1, t2, status: 'upcoming', score1: 0, score2: 0, pts1: 0, pts2: 0, games1: 0, games2: 0, sub_string: "" });
+        function initLocalData() {
+            localData.h = {}; localData.a = {};
+            config[currentSport].p.forEach(p => { localData.h[p] = 0; localData.a[p] = 0; });
+            currentP = 0;
+            tIdx = { h: 0, a: 0 };
         }
-        function adminStatus(s) { db.ref(`tereni/${currentAdminKey}`).update({ status: s }); }
-        function adminDelete() { if(confirm("OBRISATI?")) { db.ref(`tereni/${currentAdminKey}`).remove(); closeAdmin(); } }
-        function resetMatchData() { db.ref(`tereni/${currentAdminKey}`).update({ t1: null, t2: null, status: 'upcoming', score1: 0, score2: 0, pts1: 0, pts2: 0, games1: 0, games2: 0, sub_string: "" }); }
-        function saveTeren(lat, lng) {
-            const name = document.getElementById('p_name').value.toUpperCase(); if(!name) return;
-            db.ref('tereni').push({ name, lat, lng, owner: auth.currentUser.uid, sport: document.getElementById('p_sport').value, status: 'upcoming', score1: 0, score2: 0, pts1:0, pts2:0, games1:0, games2:0 });
-            map.closePopup();
+
+        // Glavna funkcija za promenu rezultata
+        async function adjustScore(val, team) {
+            if(!currentAdminKey) return;
+            const pName = config[currentSport].p[currentP];
+            
+            if(currentSport === 'tenis') {
+                // Tenis logika (pojednostavljena za demo)
+                tIdx[team] = Math.max(0, tIdx[team] + val);
+                if(tIdx[team] > 4) { // Gem dobijen
+                    localData[team][pName]++;
+                    tIdx = { h: 0, a: 0 };
+                }
+            } else {
+                localData[team][pName] = Math.max(0, localData[team][pName] + val);
+            }
+            
+            updateFirebase();
         }
-        function trackGPS() { navigator.geolocation.watchPosition(pos => { currentLat = pos.coords.latitude; currentLon = pos.coords.longitude; if(!userMarker) userMarker = L.marker([currentLat, currentLon], { icon: L.divIcon({ className: 'user-location-dot', html: '<div class="pulse-core"></div>' }) }).addTo(map); else userMarker.setLatLng([currentLat, currentLon]); }, null, { enableHighAccuracy: true }); }
-        function goToMyLocation() { if(currentLat) map.flyTo([currentLat, currentLon], 17); }
+
+        function updateFirebase() {
+            if(!currentAdminKey) return;
+            
+            // Kalkulacija glavnog rezultata
+            let mH = 0, mA = 0;
+            if(config[currentSport].mode === 'sum') {
+                Object.values(localData.h).forEach(v => mH += v);
+                Object.values(localData.a).forEach(v => mA += v);
+            } else {
+                config[currentSport].p.forEach((p, idx) => {
+                    if(idx < currentP) {
+                        if(localData.h[p] > localData.a[p]) mH++; else if(localData.h[p] < localData.a[p]) mA++;
+                    }
+                });
+            }
+
+            // Kreiranje sub_stringa za tabelu (npr. "1H 2 | 2H 1")
+            let res = [];
+            config[currentSport].p.forEach(p => {
+                res.push(`${p} ${localData.h[p]}:${localData.a[p]}`);
+            });
+
+            db.ref(`tereni/${currentAdminKey}`).update({
+                score1: mH,
+                score2: mA,
+                pts1: (currentSport === 'tenis') ? tennisPts[tIdx.h] : "",
+                pts2: (currentSport === 'tenis') ? tennisPts[tIdx.a] : "",
+                sub_string: res.join(' | '),
+                status: 'live'
+            });
+        }
+
+        // Slušanje promena iz baze (Za sve korisnike)
+        function watchTeren(key) {
+            db.ref(`tereni/${key}`).on('value', snap => {
+                const d = snap.val();
+                if(!d) return;
+                
+                document.getElementById('main-scoreboard').style.display = 'block';
+                document.getElementById('disp-name-h').innerText = d.t1 || "DOM";
+                document.getElementById('disp-name-a').innerText = d.t2 || "GOS";
+                document.getElementById('main-h').innerText = d.score1 || 0;
+                document.getElementById('main-a').innerText = d.score2 || 0;
+                document.getElementById('sub-h').innerText = d.pts1 || "";
+                document.getElementById('sub-a').innerText = d.pts2 || "";
+                
+                // Render male tabele iz sub_string-a
+                if(d.sub_string) {
+                    const parts = d.sub_string.split(' | ');
+                    document.getElementById('tr-h').innerHTML = parts.map(p => `<td>${p.split(' ')[1].split(':')[0]}</td>`).join('');
+                    document.getElementById('tr-a').innerHTML = parts.map(p => `<td>${p.split(' ')[1].split(':')[1]}</td>`).join('');
+                }
+            });
+        }
+
+        function goNext() {
+            if(currentP < config[currentSport].p.length - 1) {
+                currentP++;
+                updateFirebase();
+            }
+        }
+
+        // Map inicijalizacija (ovde ide tvoj Leaflet kod iz originalnog fajla)
+        // ... (Zadrži funkcije onMapClick, renderMarkers, itd.)
     </script>
 </body>
 </html>
