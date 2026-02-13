@@ -3,50 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>HoodLive - Pro Scoreboard</title>
+    <title>HoodLive - Ultimate Scoreboard</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     
     <style>
-        /* Integrisani CSS */
-        :root { --accent: #00e676; --bg: #000; --card: #111; --text: #f0f0f0; }
+        /* OSNOVNI HOODLIVE STIL (Tvoj originalni CSS) */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        html, body { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background: var(--bg); font-family: 'Inter', sans-serif; color: var(--text); }
-        
+        html, body { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background: #000; font-family: 'Inter', sans-serif; color: white; }
         #map { position: absolute; top: 0; bottom: 0; width: 100%; z-index: 1; }
         
-        /* Novi Scoreboard Stilovi */
-        .scoreboard-container {
+        /* NOVI SISTEM ZA REZULTATE - STIL */
+        :root { --accent: #00e676; --card: #121212; }
+        
+        #score-overlay {
             position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
-            width: 95%; max-width: 500px; z-index: 1000;
+            width: 95%; max-width: 450px; z-index: 1000;
             background: var(--card); border-radius: 20px; padding: 15px;
             border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            display: none; /* Prikazuje se samo kad je teren selektovan */
+            display: none;
         }
-        
-        .status-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: bold; margin-bottom: 8px; border: 1px solid #444; color: #888; text-transform: uppercase; }
+
+        .sport-selector { display: flex; gap: 5px; overflow-x: auto; margin-bottom: 10px; padding-bottom: 5px; }
+        .sport-btn { 
+            padding: 6px 12px; background: #222; border: 1px solid #444; color: #888; 
+            border-radius: 6px; font-size: 11px; cursor: pointer; white-space: nowrap;
+        }
+        .sport-btn.active { background: var(--accent); color: #000; font-weight: bold; }
+
+        .status-badge { display: inline-block; padding: 3px 10px; border-radius: 10px; font-size: 10px; font-weight: bold; border: 1px solid #444; color: #888; text-transform: uppercase; margin-bottom: 10px; }
         .status-badge.live { color: var(--accent); border-color: var(--accent); animation: blink 1.5s infinite; }
-        
-        .main-display { display: flex; justify-content: space-between; align-items: center; }
-        .total-points { font-size: 3rem; font-weight: 900; font-family: 'Oswald', sans-serif; color: #fff; }
-        .sub-label { color: var(--accent); font-weight: bold; font-size: 1.2rem; height: 1.5rem; }
-        .team-name { font-size: 0.9rem; text-transform: uppercase; opacity: 0.8; }
 
-        .score-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.8rem; }
-        .score-table td { border: 1px solid #2a2a2a; padding: 8px; text-align: center; font-weight: bold; }
-        .active-p { background: rgba(0, 230, 118, 0.2); color: var(--accent); }
+        .main-display { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .team-info { flex: 1; }
+        .team-name { font-size: 1rem; font-weight: 900; color: #fff; text-transform: uppercase; }
+        .sub-points { color: var(--accent); font-weight: bold; font-size: 1.4rem; height: 1.8rem; font-family: 'Oswald', sans-serif; }
+        .total-score { font-size: 3.5rem; font-weight: 900; font-family: 'Oswald', sans-serif; line-height: 1; margin: 0 15px; }
 
-        /* Admin Panel Modifikacija */
-        .admin-controls {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px;
-        }
-        .btn-plus { background: #1b5e20; color: white; padding: 15px; border-radius: 8px; font-weight: bold; border: none; }
-        .btn-minus { background: #b71c1c; color: white; padding: 8px; border-radius: 8px; border: none; font-size: 0.7rem; }
-        
-        .sport-selector { display: flex; gap: 5px; overflow-x: auto; padding-bottom: 10px; }
-        .sport-btn { padding: 5px 10px; background: #222; border: 1px solid #444; color: white; border-radius: 5px; font-size: 10px; white-space: nowrap; }
-        .sport-btn.active { background: var(--accent); color: #000; }
+        .score-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; margin-top: 10px; }
+        .score-table td { border: 1px solid #2a2a2a; padding: 8px; text-align: center; font-weight: bold; width: 20%; }
+        .active-p { background: rgba(0, 230, 118, 0.15); color: var(--accent); border: 1px solid var(--accent) !important; }
+
+        /* ADMIN KOMANDE */
+        .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 15px; border-top: 1px solid #333; padding-top: 15px; }
+        .btn-plus { background: #1b5e20; color: white; padding: 15px; border-radius: 10px; border: none; font-weight: bold; font-size: 1.1rem; }
+        .btn-minus { background: #b71c1c; color: white; padding: 8px; border-radius: 10px; border: none; font-size: 0.8rem; }
+        .btn-action { grid-column: span 2; background: #333; color: white; padding: 12px; border: none; border-radius: 10px; margin-top: 5px; font-weight: bold; }
 
         @keyframes blink { 50% { opacity: 0.4; } }
         .hidden { display: none !important; }
@@ -56,40 +59,41 @@
 
     <div id="map"></div>
 
-    <div id="main-scoreboard" class="scoreboard-container">
-        <div class="sport-selector" id="admin-sport-select">
-            <button class="sport-btn active" onclick="changeSport('fudbal', this)">Fudbal</button>
-            <button class="sport-btn" onclick="changeSport('kosarka', this)">Košarka</button>
-            <button class="sport-btn" onclick="changeSport('tenis', this)">Tenis</button>
-            <button class="sport-btn" onclick="changeSport('odbojka', this)">Odbojka</button>
+    <div id="score-overlay">
+        <div id="admin-sports" class="sport-selector hidden">
+            <button class="sport-btn active" onclick="setSport('fudbal', this)">Fudbal</button>
+            <button class="sport-btn" onclick="setSport('kosarka', this)">Košarka</button>
+            <button class="sport-btn" onclick="setSport('tenis', this)">Tenis</button>
+            <button class="sport-btn" onclick="setSport('odbojka', this)">Odbojka</button>
         </div>
 
         <div id="status-tag" class="status-badge">Priprema</div>
-        
+
         <div class="main-display">
-            <div style="text-align: left; flex: 1;">
-                <div id="disp-name-h" class="team-name">DOMAĆIN</div>
-                <div id="sub-h" class="sub-label"></div>
+            <div class="team-info" style="text-align: left;">
+                <div id="disp-t1" class="team-name">DOMAĆIN</div>
+                <div id="sub-h" class="sub-points"></div>
             </div>
-            <div class="total-points"><span id="main-h">0</span>:<span id="main-a">0</span></div>
-            <div style="text-align: right; flex: 1;">
-                <div id="disp-name-a" class="team-name">GOST</div>
-                <div id="sub-a" class="sub-label"></div>
+            <div class="total-score"><span id="res-1">0</span>:<span id="res-2">0</span></div>
+            <div class="team-info" style="text-align: right;">
+                <div id="disp-t2" class="team-name">GOST</div>
+                <div id="sub-a" class="sub-points"></div>
             </div>
         </div>
 
-        <table class="score-table" id="period-table">
-            <tr id="tr-h"></tr>
-            <tr id="tr-a"></tr>
+        <table class="score-table">
+            <tr id="row-h"></tr>
+            <tr id="row-a"></tr>
         </table>
 
-        <div id="admin-only-tools" class="hidden">
-            <div class="admin-controls">
-                <button class="btn-plus" onclick="adjustScore(1, 'h')">DOM +1</button>
-                <button class="btn-plus" onclick="adjustScore(1, 'a')">GOS +1</button>
-                <button class="btn-minus" onclick="adjustScore(-1, 'h')">-1</button>
-                <button class="btn-minus" onclick="adjustScore(-1, 'a')">-1</button>
-                <button id="next-period-btn" style="grid-column: span 2; background: #333; color: white; padding: 10px; border: none; border-radius: 8px;" onclick="goNext()">Sledeći Period</button>
+        <div id="admin-controls" class="hidden">
+            <div class="admin-grid">
+                <button class="btn-plus" onclick="adjust(1, 1)">T1 +1</button>
+                <button class="btn-plus" onclick="adjust(1, 2)">T2 +1</button>
+                <button class="btn-minus" onclick="adjust(-1, 1)">-1</button>
+                <button class="btn-minus" onclick="adjust(-1, 2)">-1</button>
+                <button class="btn-action" id="next-p-btn" onclick="nextPeriod()">Sledeći Period</button>
+                <button class="btn-action" style="color: #ff4d4d;" onclick="finishMatch()">Kraj Utakmice</button>
             </div>
         </div>
     </div>
@@ -99,11 +103,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script>
-        // --- TVOJA KONFIGURACIJA (Popuni svojim podacima iz starog fajla) ---
-        const firebaseConfig = { /* TVOJI PODACI OVDE */ };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-        
+        // --- KONFIGURACIJA ---
         const config = {
             fudbal: { p: ['1H', '2H'], mode: 'sum' },
             kosarka: { p: ['Q1', 'Q2', 'Q3', 'Q4'], mode: 'sum' },
@@ -111,112 +111,141 @@
             odbojka: { p: ['S1', 'S2', 'S3', 'S4', 'S5'], mode: 'sets' }
         };
 
+        let currentAdminKey = null; 
         let currentSport = 'fudbal';
-        let currentP = 0;
-        let localData = { h: {}, a: {} };
-        let tennisPts = ["0", "15", "30", "40", "AD"];
-        let tIdx = { h: 0, a: 0 };
-        let currentAdminKey = null; // Postaje ključ kad admin klikne na svoj teren
+        let currentPeriodIdx = 0;
+        let localDetails = {}; 
+        let tennisPoints = ["0", "15", "30", "40", "AD"];
+        let tIdx = { 1: 0, 2: 0 };
 
-        // Funkcija za promenu sporta (Admin strana)
-        function changeSport(s, btn) {
+        // FIREBASE INITIALIZE (Ovde idu tvoji ključevi)
+        const firebaseConfig = { /* Ubaci svoje ključeve ovde */ };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // MAPA
+        const map = L.map('map', { zoomControl: false, attributionControl: false }).setView([44.0165, 20.9114], 13);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
+
+        // PRACENJE TERENA
+        db.ref('tereni').on('value', snapshot => {
+            const data = snapshot.val();
+            // Ovde ide tvoja renderMarkers logika iz originalnog fajla
+            // Za potrebe integracije, fokusiramo se na UI rezultata:
+        });
+
+        // ADMIN FUNKCIJE
+        function setSport(s, btn) {
             currentSport = s;
             document.querySelectorAll('.sport-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            initLocalData();
-            updateFirebase();
+            currentPeriodIdx = 0;
+            localDetails = {};
+            config[currentSport].p.forEach(p => localDetails[p] = "0:0");
+            tIdx = { 1: 0, 2: 0 };
+            sync();
         }
 
-        function initLocalData() {
-            localData.h = {}; localData.a = {};
-            config[currentSport].p.forEach(p => { localData.h[p] = 0; localData.a[p] = 0; });
-            currentP = 0;
-            tIdx = { h: 0, a: 0 };
-        }
-
-        // Glavna funkcija za promenu rezultata
-        async function adjustScore(val, team) {
+        function adjust(val, team) {
             if(!currentAdminKey) return;
-            const pName = config[currentSport].p[currentP];
+            const pName = config[currentSport].p[currentPeriodIdx];
+            let scores = localDetails[pName].split(':').map(Number);
             
             if(currentSport === 'tenis') {
-                // Tenis logika (pojednostavljena za demo)
                 tIdx[team] = Math.max(0, tIdx[team] + val);
                 if(tIdx[team] > 4) { // Gem dobijen
-                    localData[team][pName]++;
-                    tIdx = { h: 0, a: 0 };
+                    scores[team-1]++;
+                    tIdx = { 1: 0, 2: 0 };
                 }
             } else {
-                localData[team][pName] = Math.max(0, localData[team][pName] + val);
+                scores[team-1] = Math.max(0, scores[team-1] + val);
             }
             
-            updateFirebase();
+            localDetails[pName] = scores.join(':');
+            sync();
         }
 
-        function updateFirebase() {
-            if(!currentAdminKey) return;
-            
+        function sync() {
             // Kalkulacija glavnog rezultata
-            let mH = 0, mA = 0;
+            let m1 = 0, m2 = 0;
+            const periods = config[currentSport].p;
+
             if(config[currentSport].mode === 'sum') {
-                Object.values(localData.h).forEach(v => mH += v);
-                Object.values(localData.a).forEach(v => mA += v);
+                Object.values(localDetails).forEach(v => {
+                    const s = v.split(':').map(Number);
+                    m1 += s[0]; m2 += s[1];
+                });
             } else {
-                config[currentSport].p.forEach((p, idx) => {
-                    if(idx < currentP) {
-                        if(localData.h[p] > localData.a[p]) mH++; else if(localData.h[p] < localData.a[p]) mA++;
+                // Set mode (Tenis/Odbojka)
+                periods.forEach((p, i) => {
+                    if(i < currentPeriodIdx) {
+                        const s = localDetails[p].split(':').map(Number);
+                        if(s[0] > s[1]) m1++; else if(s[1] > s[0]) m2++;
                     }
                 });
             }
 
-            // Kreiranje sub_stringa za tabelu (npr. "1H 2 | 2H 1")
-            let res = [];
-            config[currentSport].p.forEach(p => {
-                res.push(`${p} ${localData.h[p]}:${localData.a[p]}`);
-            });
+            // Generisanje sub_string-a za bazu (kompatibilno sa tvojim starim kodom)
+            let subString = periods.map(p => `${p} ${localDetails[p]}`).join(' | ');
 
             db.ref(`tereni/${currentAdminKey}`).update({
-                score1: mH,
-                score2: mA,
-                pts1: (currentSport === 'tenis') ? tennisPts[tIdx.h] : "",
-                pts2: (currentSport === 'tenis') ? tennisPts[tIdx.a] : "",
-                sub_string: res.join(' | '),
+                score1: m1,
+                score2: m2,
+                pts1: currentSport === 'tenis' ? tennisPoints[tIdx[1]] : "",
+                pts2: currentSport === 'tenis' ? tennisPoints[tIdx[2]] : "",
+                sub_string: subString,
                 status: 'live'
             });
         }
 
-        // Slušanje promena iz baze (Za sve korisnike)
-        function watchTeren(key) {
+        // KORISNIČKI VIEW (Slušanje promena za selektovani teren)
+        function selectTeren(key) {
             db.ref(`tereni/${key}`).on('value', snap => {
                 const d = snap.val();
                 if(!d) return;
-                
-                document.getElementById('main-scoreboard').style.display = 'block';
-                document.getElementById('disp-name-h').innerText = d.t1 || "DOM";
-                document.getElementById('disp-name-a').innerText = d.t2 || "GOS";
-                document.getElementById('main-h').innerText = d.score1 || 0;
-                document.getElementById('main-a').innerText = d.score2 || 0;
+
+                document.getElementById('score-overlay').style.display = 'block';
+                document.getElementById('disp-t1').innerText = d.t1 || "TIM 1";
+                document.getElementById('disp-t2').innerText = d.t2 || "TIM 2";
+                document.getElementById('res-1').innerText = d.score1;
+                document.getElementById('res-2').innerText = d.score2;
                 document.getElementById('sub-h').innerText = d.pts1 || "";
                 document.getElementById('sub-a').innerText = d.pts2 || "";
                 
-                // Render male tabele iz sub_string-a
+                // Status badge
+                const tag = document.getElementById('status-tag');
+                tag.innerText = d.status;
+                d.status === 'live' ? tag.classList.add('live') : tag.classList.remove('live');
+
+                // Tabela perioda
                 if(d.sub_string) {
                     const parts = d.sub_string.split(' | ');
-                    document.getElementById('tr-h').innerHTML = parts.map(p => `<td>${p.split(' ')[1].split(':')[0]}</td>`).join('');
-                    document.getElementById('tr-a').innerHTML = parts.map(p => `<td>${p.split(' ')[1].split(':')[1]}</td>`).join('');
+                    document.getElementById('row-h').innerHTML = parts.map(p => `<td>${p.split(' ')[1].split(':')[0]}</td>`).join('');
+                    document.getElementById('row-a').innerHTML = parts.map(p => `<td>${p.split(' ')[1].split(':')[1]}</td>`).join('');
                 }
             });
         }
 
-        function goNext() {
-            if(currentP < config[currentSport].p.length - 1) {
-                currentP++;
-                updateFirebase();
+        function nextPeriod() {
+            if(currentPeriodIdx < config[currentSport].p.length - 1) {
+                currentPeriodIdx++;
+                sync();
             }
         }
 
-        // Map inicijalizacija (ovde ide tvoj Leaflet kod iz originalnog fajla)
-        // ... (Zadrži funkcije onMapClick, renderMarkers, itd.)
+        function finishMatch() {
+            db.ref(`tereni/${currentAdminKey}`).update({ status: 'završeno' });
+            location.reload();
+        }
+
+        // DETEKCIJA ADMINA (Integracija sa tvojim sistemom)
+        // Kada admin klikne na svoj teren, poziva se:
+        function activateAdminMode(key) {
+            currentAdminKey = key;
+            document.getElementById('admin-sports').classList.remove('hidden');
+            document.getElementById('admin-controls').classList.remove('hidden');
+            selectTeren(key);
+        }
     </script>
 </body>
 </html>
