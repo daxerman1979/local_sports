@@ -8,6 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
     <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
@@ -17,63 +18,70 @@
         
         input { font-size: 16px !important; }
 
-        /* SUPER SEARCH */
+        /* VRAĆEN SUPER SEARCH - Skoro providan i širi se */
         .leaflet-control-geocoder {
             background: rgba(255, 255, 255, 0.1) !important;
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(10px);
             border: 1px solid rgba(255,255,255,0.15) !important;
             border-radius: 50px !important;
+            margin-top: 12px !important;
         }
-        .leaflet-control-geocoder-form input { background: transparent !important; color: white !important; }
+        .leaflet-control-geocoder-icon { background-color: transparent !important; opacity: 0.7; }
+        .leaflet-control-geocoder-form input {
+            background: transparent !important;
+            color: white !important;
+            font-size: 16px !important;
+            padding-left: 10px;
+        }
 
-        /* DONJI JEZIČAK (Handle) */
+        /* DONJI JEZIČAK */
         #bottom-trigger {
             position: fixed;
             bottom: 0;
             left: 50%;
             transform: translateX(-50%);
-            width: 80px;
-            height: 12px;
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(5px);
-            border-radius: 10px 10px 0 0;
+            width: 100px;
+            height: 14px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            border-radius: 12px 12px 0 0;
             z-index: 2001;
             border: 1px solid rgba(255,255,255,0.1);
             border-bottom: none;
         }
 
-        /* DONJI MENI (Bottom Sheet) */
+        /* BOTTOM SHEET */
         #sidebar { 
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            height: 50vh;
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(20px);
+            height: 60vh;
+            background: rgba(15, 23, 42, 0.98);
+            backdrop-filter: blur(25px);
             z-index: 2005;
             transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             border-top: 1px solid rgba(255,255,255,0.1);
-            border-radius: 25px 25px 0 0;
+            border-radius: 30px 30px 0 0;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
         }
         .sidebar-closed { transform: translateY(100%); }
 
         /* GPS DUGME */
         #gps-button {
             position: fixed;
-            bottom: 30px;
+            bottom: 40px;
             right: 20px;
-            width: 50px;
-            height: 50px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 15px;
+            width: 55px;
+            height: 55px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 18px;
             z-index: 2000;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
 
         /* PULS LOPTICA */
@@ -95,31 +103,36 @@
         <div class="w-full max-w-sm space-y-4">
             <input id="email" type="email" placeholder="Email" class="w-full p-4 bg-slate-800 rounded-2xl border border-slate-700 outline-none">
             <input id="password" type="password" placeholder="Lozinka" class="w-full p-4 bg-slate-800 rounded-2xl border border-slate-700 outline-none">
-            <button onclick="handleAuth()" class="w-full py-4 bg-blue-600 rounded-2xl font-bold">Uđi na mapu</button>
+            <button onclick="handleAuth()" class="w-full py-4 bg-blue-600 rounded-2xl font-bold hover:bg-blue-500">Uđi na mapu</button>
         </div>
     </div>
 
     <div id="map"></div>
 
     <button id="gps-button" class="hidden" onclick="findMe()">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
         </svg>
     </button>
 
     <button id="bottom-trigger" class="hidden" onclick="toggleSidebar()"></button>
 
-    <div id="sidebar" class="sidebar-closed p-8 flex flex-col">
-        <div class="w-12 h-1.5 bg-gray-600 rounded-full mx-auto mb-8 cursor-pointer" onclick="toggleSidebar()"></div>
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="font-bold text-2xl text-blue-500">HoodSport</h2>
-            <button onclick="logout()" class="text-red-500 font-bold">Odjavi se</button>
+    <div id="sidebar" class="sidebar-closed p-6 flex flex-col">
+        <div class="w-16 h-1.5 bg-white/20 rounded-full mx-auto mb-6 cursor-pointer" onclick="toggleSidebar()"></div>
+        
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="font-bold text-3xl text-blue-500 italic">HoodSport</h2>
+            <button onclick="toggleSidebar()" class="bg-white/10 w-10 h-10 rounded-full flex items-center justify-center text-2xl">&times;</button>
         </div>
-        <div class="space-y-4">
-            <button class="w-full text-left p-5 bg-white/5 rounded-2xl flex items-center gap-4 text-lg">📍 Moji Tereni</button>
-            <button class="w-full text-left p-5 bg-white/5 rounded-2xl flex items-center gap-4 text-lg">⭐ Favoriti</button>
+        
+        <div class="flex-grow space-y-4">
+            <button class="w-full text-left p-5 bg-white/5 rounded-2xl flex items-center gap-4 text-xl">📍 Moji Tereni</button>
+            <button class="w-full text-left p-5 bg-white/5 rounded-2xl flex items-center gap-4 text-xl">⭐ Favoriti</button>
         </div>
+        
+        <button onclick="logout()" class="w-full py-5 bg-red-600/10 text-red-500 border border-red-500/20 rounded-2xl font-bold mt-auto mb-4">
+            Odjavi se
+        </button>
     </div>
 
     <script type="module">
@@ -140,18 +153,27 @@
         function initMap() {
             if (map) return;
             map = L.map('map', { zoomControl: false, attributionControl: false }).setView([44.81, 20.46], 13);
+            
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}').addTo(map);
 
-            L.Control.geocoder({ defaultMarkGeocode: false, collapsed: true, placeholder: "Pretraži..." })
-            .on('markgeocode', e => map.fitBounds(e.geocode.bbox)).addTo(map);
+            // SUPER SEARCH LOGIKA
+            L.Control.geocoder({
+                defaultMarkGeocode: false,
+                collapsed: true,
+                placeholder: "Pretraži lokaciju..."
+            })
+            .on('markgeocode', e => {
+                map.fitBounds(e.geocode.bbox);
+            })
+            .addTo(map);
 
             findMe();
         }
 
         window.findMe = () => {
             map.locate({setView: true, maxZoom: 16});
-            map.on('locationfound', (e) => {
+            map.once('locationfound', (e) => {
                 const pulseIcon = L.divIcon({
                     className: 'custom-div-icon',
                     html: "<div class='pulse-marker'></div>",
@@ -162,11 +184,13 @@
         };
 
         window.toggleSidebar = () => document.getElementById('sidebar').classList.toggle('sidebar-closed');
+
         window.handleAuth = async () => {
             const email = document.getElementById('email').value;
             const pass = document.getElementById('password').value;
-            try { await signInWithEmailAndPassword(auth, email, pass); } catch (e) { alert("Greška"); }
+            try { await signInWithEmailAndPassword(auth, email, pass); } catch (e) { alert("Pogrešni podaci"); }
         };
+
         window.logout = () => signOut(auth);
 
         onAuthStateChanged(auth, (user) => {
@@ -178,7 +202,10 @@
                 initMap();
                 setTimeout(() => map.invalidateSize(), 400);
             } else {
-                location.reload();
+                document.getElementById('auth-screen').classList.remove('hidden');
+                document.getElementById('map').style.display = 'none';
+                document.getElementById('bottom-trigger').classList.add('hidden');
+                document.getElementById('gps-button').classList.add('hidden');
             }
         });
     </script>
