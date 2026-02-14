@@ -8,80 +8,73 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    
     <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
     <style>
         body, html { height: 100%; margin: 0; overflow: hidden; background: #0f172a; touch-action: manipulation; }
         #map { height: 100vh; width: 100vw; display: none; }
-        
         input { font-size: 16px !important; }
 
-        /* VRAĆEN SUPER SEARCH - Skoro providan i širi se */
+        /* SUPER SEARCH & WHITE RESULTS */
         .leaflet-control-geocoder {
             background: rgba(255, 255, 255, 0.1) !important;
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255,255,255,0.15) !important;
             border-radius: 50px !important;
-            margin-top: 12px !important;
         }
-        .leaflet-control-geocoder-icon { background-color: transparent !important; opacity: 0.7; }
-        .leaflet-control-geocoder-form input {
-            background: transparent !important;
-            color: white !important;
-            font-size: 16px !important;
-            padding-left: 10px;
+        .leaflet-control-geocoder-form input { background: transparent !important; color: white !important; }
+        /* Rezultati pretrage - BELI */
+        .leaflet-control-geocoder-alternatives {
+            background: white !important;
+            color: black !important;
+            border-radius: 12px;
+            margin-top: 10px;
+            overflow: hidden;
         }
+        .leaflet-control-geocoder-alternatives li { border-bottom: 1px solid #eee; padding: 8px !important; }
+        .leaflet-control-geocoder-alternatives li:hover { background: #f0f0f0 !important; }
 
-        /* DONJI JEZIČAK */
+        /* VIDLJIVIJI DONJI JEZIČAK */
         #bottom-trigger {
             position: fixed;
             bottom: 0;
             left: 50%;
             transform: translateX(-50%);
-            width: 100px;
-            height: 14px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(8px);
-            border-radius: 12px 12px 0 0;
+            width: 120px;
+            height: 18px;
+            background: rgba(59, 130, 246, 0.4); /* Plavičasta prozirnost */
+            backdrop-filter: blur(10px);
+            border-radius: 15px 15px 0 0;
             z-index: 2001;
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.3);
             border-bottom: none;
+            box-shadow: 0 -2px 10px rgba(59, 130, 246, 0.3); /* Neon efekat */
+        }
+        #bottom-trigger::after {
+            content: "";
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px; height: 4px;
+            background: white; border-radius: 2px; opacity: 0.8;
         }
 
         /* BOTTOM SHEET */
         #sidebar { 
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 60vh;
-            background: rgba(15, 23, 42, 0.98);
-            backdrop-filter: blur(25px);
-            z-index: 2005;
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            border-top: 1px solid rgba(255,255,255,0.1);
-            border-radius: 30px 30px 0 0;
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+            position: fixed; bottom: 0; left: 0; right: 0; height: 60vh;
+            background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(25px);
+            z-index: 2005; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-top: 1px solid rgba(255,255,255,0.1); border-radius: 30px 30px 0 0;
         }
         .sidebar-closed { transform: translateY(100%); }
 
-        /* GPS DUGME */
+        /* BRZO GPS DUGME */
         #gps-button {
-            position: fixed;
-            bottom: 40px;
-            right: 20px;
-            width: 55px;
-            height: 55px;
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 18px;
-            z-index: 2000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            position: fixed; bottom: 40px; right: 20px; width: 55px; height: 55px;
+            background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 18px;
+            z-index: 2000; display: flex; align-items: center; justify-content: center;
         }
 
         /* PULS LOPTICA */
@@ -98,12 +91,12 @@
 </head>
 <body class="text-white">
 
-    <div id="auth-screen" class="h-screen flex flex-col justify-center items-center px-6">
+    <div id="auth-screen" class="h-screen flex flex-col justify-center items-center px-6 text-center">
         <h1 class="text-5xl font-black text-blue-500 mb-8 italic tracking-tighter">HOODSPORT</h1>
         <div class="w-full max-w-sm space-y-4">
             <input id="email" type="email" placeholder="Email" class="w-full p-4 bg-slate-800 rounded-2xl border border-slate-700 outline-none">
             <input id="password" type="password" placeholder="Lozinka" class="w-full p-4 bg-slate-800 rounded-2xl border border-slate-700 outline-none">
-            <button onclick="handleAuth()" class="w-full py-4 bg-blue-600 rounded-2xl font-bold hover:bg-blue-500">Uđi na mapu</button>
+            <button onclick="handleAuth()" class="w-full py-4 bg-blue-600 rounded-2xl font-bold">Uđi na mapu</button>
         </div>
     </div>
 
@@ -119,20 +112,15 @@
 
     <div id="sidebar" class="sidebar-closed p-6 flex flex-col">
         <div class="w-16 h-1.5 bg-white/20 rounded-full mx-auto mb-6 cursor-pointer" onclick="toggleSidebar()"></div>
-        
         <div class="flex justify-between items-center mb-8">
             <h2 class="font-bold text-3xl text-blue-500 italic">HoodSport</h2>
             <button onclick="toggleSidebar()" class="bg-white/10 w-10 h-10 rounded-full flex items-center justify-center text-2xl">&times;</button>
         </div>
-        
         <div class="flex-grow space-y-4">
             <button class="w-full text-left p-5 bg-white/5 rounded-2xl flex items-center gap-4 text-xl">📍 Moji Tereni</button>
             <button class="w-full text-left p-5 bg-white/5 rounded-2xl flex items-center gap-4 text-xl">⭐ Favoriti</button>
         </div>
-        
-        <button onclick="logout()" class="w-full py-5 bg-red-600/10 text-red-500 border border-red-500/20 rounded-2xl font-bold mt-auto mb-4">
-            Odjavi se
-        </button>
+        <button onclick="logout()" class="w-full py-5 bg-red-600/10 text-red-500 border border-red-500/20 rounded-2xl font-bold mt-auto mb-4">Odjavi se</button>
     </div>
 
     <script type="module">
@@ -149,48 +137,40 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         let map;
+        let userMarker;
 
         function initMap() {
             if (map) return;
             map = L.map('map', { zoomControl: false, attributionControl: false }).setView([44.81, 20.46], 13);
-            
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}').addTo(map);
 
-            // SUPER SEARCH LOGIKA
-            L.Control.geocoder({
-                defaultMarkGeocode: false,
-                collapsed: true,
-                placeholder: "Pretraži lokaciju..."
-            })
-            .on('markgeocode', e => {
-                map.fitBounds(e.geocode.bbox);
-            })
-            .addTo(map);
+            L.Control.geocoder({ defaultMarkGeocode: false, collapsed: true, placeholder: "Pretraži..." })
+            .on('markgeocode', e => map.fitBounds(e.geocode.bbox)).addTo(map);
 
             findMe();
         }
 
         window.findMe = () => {
-            map.locate({setView: true, maxZoom: 16});
+            // Brzo lociranje sa visokom preciznošću
+            map.locate({setView: true, maxZoom: 16, enableHighAccuracy: true});
             map.once('locationfound', (e) => {
+                if (userMarker) map.removeLayer(userMarker);
                 const pulseIcon = L.divIcon({
                     className: 'custom-div-icon',
                     html: "<div class='pulse-marker'></div>",
                     iconSize: [14, 14], iconAnchor: [7, 7]
                 });
-                L.marker(e.latlng, {icon: pulseIcon}).addTo(map);
+                userMarker = L.marker(e.latlng, {icon: pulseIcon}).addTo(map);
             });
         };
 
         window.toggleSidebar = () => document.getElementById('sidebar').classList.toggle('sidebar-closed');
-
         window.handleAuth = async () => {
             const email = document.getElementById('email').value;
             const pass = document.getElementById('password').value;
-            try { await signInWithEmailAndPassword(auth, email, pass); } catch (e) { alert("Pogrešni podaci"); }
+            try { await signInWithEmailAndPassword(auth, email, pass); } catch (e) { alert("Greška"); }
         };
-
         window.logout = () => signOut(auth);
 
         onAuthStateChanged(auth, (user) => {
@@ -204,8 +184,6 @@
             } else {
                 document.getElementById('auth-screen').classList.remove('hidden');
                 document.getElementById('map').style.display = 'none';
-                document.getElementById('bottom-trigger').classList.add('hidden');
-                document.getElementById('gps-button').classList.add('hidden');
             }
         });
     </script>
