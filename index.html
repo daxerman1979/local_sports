@@ -27,65 +27,42 @@
         .location-btn { position: absolute; bottom: 30px; right: 20px; z-index: 1000; width: 50px; height: 50px; background: #ff3b30; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; }
         .location-btn img { filter: brightness(0) invert(1); width: 24px; }
 
-        .user-location-dot { width: 16px; height: 16px; background: #ff3b30; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 15px #ff3b30; z-index: 10000; }
-        .pulse-core { width: 100%; height: 100%; border-radius: 50%; background: rgba(255,59,48,0.4); animation: gps-pulse 2s infinite; }
-        @keyframes gps-pulse { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(3); opacity: 0; } }
-        
-        @keyframes bounce-ball { from { transform: translateY(0); } to { transform: translateY(-8px); } }
-        @keyframes pulse-live-border { 0% { border-color: #ff3b30; box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.6); } 70% { border-color: #ff3b30; box-shadow: 0 0 0 12px rgba(255, 59, 48, 0); } 100% { border-color: #ff3b30; box-shadow: 0 0 0 0 rgba(255, 59, 48, 0); } }
-
+        /* KARTICE I MARKERI */
         .sport-marker-wrapper { display: flex; align-items: center; white-space: nowrap; cursor: pointer; }
-        .sport-ball { font-size: 32px; z-index: 20; }
+        .sport-ball { font-size: 32px; z-index: 20; transition: all 0.3s ease; }
         .status-live-wrapper .sport-ball { animation: bounce-ball 0.5s ease infinite alternate; }
         .status-live-wrapper .live-card-thin { animation: pulse-live-border 1.5s infinite; border: 2px solid #ff3b30; }
 
-        .live-card-thin { background: #000; border: 1px solid #333; border-radius: 12px; padding: 4px 12px; margin-left: -15px; display: flex; align-items: center; min-height: 54px; box-shadow: 0 8px 20px rgba(0,0,0,0.8); z-index: 5; color: white; }
-        .zoom-hide .live-card-thin { display: none; }
-        .zoom-hide .sport-ball { font-size: 24px; }
+        .live-card-thin { background: #000; border: 1px solid #333; border-radius: 12px; padding: 4px 12px; margin-left: -15px; display: flex; align-items: center; min-height: 54px; box-shadow: 0 8px 20px rgba(0,0,0,0.8); z-index: 5; color: white; transition: all 0.3s ease; }
+
+        /* LOGIKA ZA SKALIRANJE (MALE LOPTICE) */
+        .zoom-hide .live-card-thin { display: none !important; opacity: 0; }
+        .zoom-hide .sport-ball { font-size: 20px !important; margin-left: 0; }
 
         .match-details { display: flex; flex-direction: column; line-height: 1.2; padding-right: 10px; border-right: 1px solid #333; }
         .match-details.no-match { border-right: none; padding-right: 5px; }
         .match-name-thin { font-size: 10px; font-weight: 900; color: #ff3b30; text-transform: uppercase; }
         .match-teams-thin { font-size: 13px; font-weight: 800; color: #fff; text-transform: uppercase; display: flex; align-items: center; gap: 4px; }
-        .status-pill { font-size: 8px; color: #fff; background: #ff3b30; padding: 2px 6px; border-radius: 4px; font-weight: 900; margin-left: 5px; }
         
         .match-score-thin { font-size: 22px; color: #ff3b30; font-family: 'Oswald', sans-serif; min-width: 50px; text-align: center; padding-left: 10px; font-weight: 700; display: flex; flex-direction: column; line-height: 1; }
         .periods-row { font-size: 10px; color: #888; font-weight: 900; margin-top: 3px; }
 
+        /* ADMIN PANEL */
         #admin-panel { position: fixed; top: 0; left: 100%; width: 100%; height: 100%; background: #080808; z-index: 7000; transition: 0.4s cubic-bezier(0.19, 1, 0.22, 1); padding: 15px; display: flex; flex-direction: column; overflow-y: auto; }
         #admin-panel.active { left: 0; }
-        .admin-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-shrink: 0; }
+        .admin-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .admin-title { font-family: 'Oswald', sans-serif; font-size: 20px; color: #fff; text-transform: uppercase; }
-        .lang-toggle { background: #222; border: 1px solid #444; color: white; border-radius: 20px; padding: 5px 10px; font-size: 12px; font-weight: 900; cursor: pointer; }
-
-        .live-board { background: #111; color: #fff; border-radius: 15px; padding: 15px; text-align: center; margin-bottom: 15px; border: 1px solid #ff3b30; flex-shrink: 0; }
+        .live-board { background: #111; color: #fff; border-radius: 15px; padding: 15px; text-align: center; margin-bottom: 15px; border: 1px solid #ff3b30; }
         .main-score { font-size: 50px; font-family: 'Oswald', sans-serif; color: #ff3b30; margin: 5px 0; letter-spacing: 2px; line-height: 1; }
-        .pro-controller-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
         .team-ctrl { background: #151515; border-radius: 15px; padding: 12px; display: flex; flex-direction: column; align-items: center; border: 1px solid #222; }
-        .current-amt { font-family: 'Oswald', sans-serif; font-size: 32px; color: #fff; line-height: 1; margin: 5px 0; }
-        .step-btn { background: #333; border: none; width: 32px; height: 32px; border-radius: 50%; font-weight: bold; cursor: pointer; color: white; display: flex; align-items: center; justify-content: center; }
-        .action-btns-row { display: flex; gap: 8px; width: 100%; margin-top: 5px; }
-        .action-btn { flex: 1; height: 45px; border-radius: 10px; border: none; color: white; font-size: 22px; font-weight: 900; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .action-btn { flex: 1; height: 45px; border-radius: 10px; border: none; color: white; font-size: 22px; font-weight: 900; cursor: pointer; }
         .btn-plus { background: #28a745; }
         .btn-minus { background: #ff3b30; }
-
         .admin-btn { padding: 14px; border: none; font-weight: 900; color: white; text-transform: uppercase; width: 100%; border-radius: 12px; cursor: pointer; font-family: 'Oswald'; font-size: 15px; margin-bottom: 8px; }
-        .btn-blue { background: #007AFF; }
-        .btn-green { background: #28a745; }
-        .btn-dark { background: #222; border: 1px solid #333; }
-        .btn-orange { background: #ff9500; }
-        #sub-scores-display { background: #111; color: #888; padding: 10px; border-radius: 10px; margin-bottom: 10px; font-size: 12px; font-weight: 700; text-align: center; border: 1px dashed #333; }
 
-        #logic-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 20px; }
-        .modal-card { background: #111; border: 2px solid #ff3b30; border-radius: 25px; width: 100%; max-width: 320px; padding: 25px; text-align: center; }
-        .modal-title { font-family: 'Oswald'; font-size: 20px; color: #fff; margin-bottom: 20px; text-transform: uppercase; }
-
-        #match-setup { display: flex; flex-direction: column; gap: 10px; background: #111; padding: 20px; border-radius: 20px; border: 1px solid #222; }
-        .leaflet-popup-content-wrapper { border-radius: 20px; padding: 0; overflow: hidden; background: #111; color: white; border: 1px solid #ff3b30; }
-        .leaflet-popup-content { margin: 0; width: 260px !important; }
-        .pop-header { background: #ff3b30; color: white; padding: 12px; text-align: center; font-weight: 900; font-size: 14px; text-transform: uppercase; font-family: 'Oswald'; }
-        .pop-body { padding: 15px; display: flex; flex-direction: column; gap: 10px; background: #111; }
-        .pop-btn { background: #ff3b30; color: white; border: none; padding: 12px; border-radius: 10px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-family: 'Oswald'; }
+        @keyframes gps-pulse { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(3); opacity: 0; } }
+        @keyframes bounce-ball { from { transform: translateY(0); } to { transform: translateY(-8px); } }
+        @keyframes pulse-live-border { 0% { border-color: #ff3b30; box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.6); } 70% { border-color: #ff3b30; box-shadow: 0 0 0 12px rgba(255, 59, 48, 0); } 100% { border-color: #ff3b30; box-shadow: 0 0 0 0 rgba(255, 59, 48, 0); } }
     </style>
 </head>
 <body>
@@ -94,17 +71,17 @@
         <div class="hero-logo">HoodLive</div>
         <div class="hero-sub" id="hero-sub">STREET SPORTS NETWORK</div>
         <div class="auth-box">
-            <input type="email" id="email" placeholder="EMAIL" inputmode="email">
+            <input type="email" id="email" placeholder="EMAIL">
             <input type="password" id="password" placeholder="PASSWORD">
-            <button class="auth-btn" id="auth-btn" onclick="handleAuth()">ENTER SYSTEM</button>
-            <button class="explore-btn" id="explore-btn" onclick="exploreMap()">EXPLORE MAP</button>
+            <button class="auth-btn" onclick="handleAuth()">ENTER SYSTEM</button>
+            <button class="explore-btn" onclick="exploreMap()">EXPLORE MAP</button>
         </div>
     </div>
 
-    <div id="logic-modal">
+    <div id="logic-modal" style="display:none;">
         <div class="modal-card">
-            <div class="modal-title" id="modal-q">KRAJ MEČA ILI PRODUŽETAK?</div>
-            <div id="modal-btns" class="modal-grid"></div>
+            <div id="modal-q" class="admin-title" style="margin-bottom:20px;">KRAJ?</div>
+            <div id="modal-btns"></div>
         </div>
     </div>
 
@@ -116,64 +93,59 @@
         <div class="admin-nav">
             <div class="admin-title" id="adm-name">ADMIN</div>
             <div style="display: flex; align-items: center; gap: 10px;">
-                <button class="lang-toggle" onclick="toggleLang()" id="lang-btn">SRB</button>
-                <div onclick="closeAdmin()" style="font-size:30px; font-weight:bold; cursor:pointer; color:#ff3b30; padding: 5px;">&times;</div>
+                <button class="auth-btn" style="padding:5px 10px; font-size:12px;" onclick="toggleLang()" id="lang-btn">SRB</button>
+                <div onclick="closeAdmin()" style="font-size:30px; font-weight:bold; cursor:pointer; color:#ff3b30;">&times;</div>
             </div>
         </div>
-
         <div id="adm-score-view" style="display:none; flex-direction:column;">
             <div class="live-board">
-                <div id="adm-teams-label" style="color:#aaa; font-size: 12px; font-weight:900; text-transform:uppercase; letter-spacing:1px;">TEAM A VS TEAM B</div>
+                <div id="adm-teams-label" style="color:#aaa; font-size: 12px; font-weight:900; text-transform:uppercase;">TEAMS</div>
                 <div class="main-score" id="adm-main-score">0 : 0</div>
                 <div id="adm-sub-display" style="font-size:16px; color:#ff3b30; font-weight:900; font-family:'Oswald';"></div>
-                <div id="match-status-label" style="font-size:10px; background:rgba(255,59,48,0.2); color:#ff3b30; display:inline-block; padding:3px 12px; border-radius:20px; font-weight:900; margin-top:5px;">STATUS</div>
             </div>
-
             <div id="active-match-controls">
-                <div class="pro-controller-container" id="score-controllers">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
                     <div class="team-ctrl">
-                        <span id="label-t1" style="font-size:10px; font-weight:900; color:#666; text-transform:uppercase;">TEAM 1</span>
-                        <div style="display:flex; align-items:center; gap:8px;">
-                            <button class="step-btn" onclick="changeStep(1, -1)">-</button>
-                            <div class="current-amt" id="step-h">1</div>
-                            <button class="step-btn" onclick="changeStep(1, 1)">+</button>
+                        <span id="label-t1" style="font-size:10px;">TEAM 1</span>
+                        <div style="display:flex; align-items:center; gap:8px; margin:5px 0;">
+                            <button onclick="changeStep(1, -1)" style="width:25px;height:25px;background:#333;color:white;border:none;border-radius:50%;">-</button>
+                            <span id="step-h" style="font-size:24px; font-family:Oswald;">1</span>
+                            <button onclick="changeStep(1, 1)" style="width:25px;height:25px;background:#333;color:white;border:none;border-radius:50%;">+</button>
                         </div>
-                        <div class="action-btns-row">
+                        <div style="display:flex; gap:5px; width:100%;">
                             <button class="action-btn btn-minus" onclick="proScore(1, -1)">-</button>
                             <button class="action-btn btn-plus" onclick="proScore(1, 1)">+</button>
                         </div>
                     </div>
                     <div class="team-ctrl">
-                        <span id="label-t2" style="font-size:10px; font-weight:900; color:#666; text-transform:uppercase;">TEAM 2</span>
-                        <div style="display:flex; align-items:center; gap:8px;">
-                            <button class="step-btn" onclick="changeStep(2, -1)">-</button>
-                            <div class="current-amt" id="step-a">1</div>
-                            <button class="step-btn" onclick="changeStep(2, 1)">+</button>
+                        <span id="label-t2" style="font-size:10px;">TEAM 2</span>
+                        <div style="display:flex; align-items:center; gap:8px; margin:5px 0;">
+                            <button onclick="changeStep(2, -1)" style="width:25px;height:25px;background:#333;color:white;border:none;border-radius:50%;">-</button>
+                            <span id="step-a" style="font-size:24px; font-family:Oswald;">1</span>
+                            <button onclick="changeStep(2, 1)" style="width:25px;height:25px;background:#333;color:white;border:none;border-radius:50%;">+</button>
                         </div>
-                        <div class="action-btns-row">
+                        <div style="display:flex; gap:5px; width:100%;">
                             <button class="action-btn btn-minus" onclick="proScore(2, -1)">-</button>
                             <button class="action-btn btn-plus" onclick="proScore(2, 1)">+</button>
                         </div>
                     </div>
                 </div>
-
-                <div id="sub-scores-display">PERIOD SCORES</div>
-                <button id="calc-btn" class="admin-btn btn-green" onclick="triggerLogic('period')">RECORD PERIOD</button>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                    <button id="start-live-btn" class="admin-btn btn-blue" onclick="adminStatus('live')">START LIVE</button>
-                    <button id="end-match-btn" class="admin-btn btn-dark" onclick="triggerLogic('end')">END MATCH</button>
+                <div id="sub-scores-display" style="background:#111; padding:10px; border-radius:10px; text-align:center; color:#888; font-size:12px; margin-bottom:10px; border:1px dashed #333;"></div>
+                <button class="admin-btn" style="background:#28a745;" onclick="triggerLogic('period')">RECORD PERIOD</button>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                    <button class="admin-btn" style="background:#007AFF;" onclick="adminStatus('live')">START LIVE</button>
+                    <button class="admin-btn" style="background:#222;" onclick="triggerLogic('end')">END MATCH</button>
                 </div>
-                <button id="reset-match-btn" class="admin-btn btn-orange" style="display:none;" onclick="resetMatchData()">NEW MATCH / RESET</button>
+                <button id="reset-match-btn" class="admin-btn" style="background:#ff9500; display:none;" onclick="resetMatchData()">NEW MATCH / RESET</button>
             </div>
         </div>
-
         <div id="match-setup" style="display:none; flex-direction:column; gap:10px;">
             <input type="text" id="adm-t1" placeholder="HOME TEAM">
             <input type="text" id="adm-t2" placeholder="AWAY TEAM">
             <input type="datetime-local" id="adm-start-time-input">
-            <button class="admin-btn btn-blue" onclick="setupMatch()">SCHEDULE MATCH</button>
+            <button class="admin-btn" style="background:#007AFF;" onclick="setupMatch()">SCHEDULE MATCH</button>
         </div>
-        <button id="del-btn" style="background:none; border:none; color:#444; margin-top:20px; font-weight:bold;" onclick="adminDelete()">DELETE COURT</button>
+        <button id="del-btn" style="background:none; border:none; color:#444; margin-top:20px; font-weight:bold; cursor:pointer;" onclick="adminDelete()">DELETE COURT</button>
     </div>
 
     <div id="map"></div>
@@ -192,8 +164,7 @@
             projectId: "allsportslocal-ea1d4"
         };
         firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.database();
+        const auth = firebase.auth(), db = firebase.database();
 
         let map, currentLat, currentLon, currentAdminKey = null, allTereni = [];
         let steps = { 1: 1, 2: 1 }, userMarker, accCircle, markersLayer = L.layerGroup(), zoneLayer = L.layerGroup();
@@ -202,8 +173,8 @@
 
         let currentLang = 'EN';
         const langData = {
-            EN: { free_court: "FREE COURT", record_period: "RECORD PERIOD", live: "LIVE", ended: "ENDED", upcoming: "UPCOMING", points: "POINTS", games: "GAMES", too_close: "Too close to another court!" },
-            SRB: { free_court: "SLOBODAN TEREN", record_period: "ZABELEŽI PERIOD", live: "UŽIVO", ended: "ZAVRŠENO", upcoming: "ZAKAZANO", points: "POENI", games: "GEMOVI", too_close: "Preblizu drugom terenu!" }
+            EN: { free_court: "FREE COURT", too_close: "Too close! (Min 150m)", live: "LIVE", ended: "ENDED", upcoming: "UPCOMING", points: "PTS", games: "GEMS" },
+            SRB: { free_court: "SLOBODAN TEREN", too_close: "Preblizu! (Min 150m)", live: "UŽIVO", ended: "ZAVRŠENO", upcoming: "ZAKAZANO", points: "POENI", games: "GEMOVI" }
         };
 
         function exploreMap() { document.getElementById('hero').style.display='none'; document.getElementById('map').style.display='block'; document.getElementById('lBtn').style.display='flex'; initMap(); }
@@ -214,12 +185,13 @@
             map = L.map('map', { zoomControl: false, tap: false }).setView([44.7866, 20.4489], 6);
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', { opacity: 0.8, zIndex: 1000 }).addTo(map);
-            zoneLayer.addTo(map);
-            markersLayer.addTo(map);
+            zoneLayer.addTo(map); markersLayer.addTo(map);
+            map.on('zoomend moveend', renderMarkers);
             map.on('click', e => {
                 if (!auth.currentUser) return;
-                if (allTereni.some(t => map.distance(e.latlng, L.latLng(t.lat, t.lng)) < 30)) { alert(langData[currentLang].too_close); return; }
-                const html = `<div class="pop-header">CREATE</div><div class="pop-body"><select id="p_sport"><option value="FUDBAL">FUDBAL ⚽</option><option value="KOŠARKA">KOŠARKA 🏀</option><option value="ODBOJKA">ODBOJKA 🏐</option><option value="TENIS">TENIS 🎾</option></select><input type="text" id="p_name" placeholder="NAME"><button class="pop-btn" onclick="saveTeren(${e.latlng.lat}, ${e.latlng.lng})">SAVE</button></div>`;
+                // OGRANIČENJE 150m
+                if (allTereni.some(t => map.distance(e.latlng, L.latLng(t.lat, t.lng)) < 150)) { alert(langData[currentLang].too_close); return; }
+                const html = `<div class="pop-header">CREATE</div><div class="pop-body"><select id="p_sport"><option value="FUDBAL">FUDBAL</option><option value="KOŠARKA">KOŠARKA</option><option value="ODBOJKA">ODBOJKA</option><option value="TENIS">TENIS</option></select><input type="text" id="p_name" placeholder="NAME"><button class="pop-btn" onclick="saveTeren(${e.latlng.lat}, ${e.latlng.lng})">SAVE</button></div>`;
                 L.popup().setLatLng(e.latlng).setContent(html).openOn(map);
             });
             db.ref('tereni').on('value', snap => { 
@@ -231,21 +203,25 @@
 
         function renderMarkers() {
             markersLayer.clearLayers(); zoneLayer.clearLayers();
+            const zoom = map.getZoom();
+            const isSmall = zoom < 14; // Granica za male loptice
             const lang = langData[currentLang];
+
             allTereni.forEach(d => {
                 const pos = L.latLng(d.lat, d.lng);
-                L.circle(pos, { radius: 25, color: '#ff3b30', weight: 1, fillOpacity: 0.1, interactive: false }).addTo(zoneLayer);
+                L.circle(pos, { radius: 150, color: '#ff3b30', weight: 1, fillOpacity: 0.05, interactive: false }).addTo(zoneLayer);
                 
-                let scoreDisplay = `${d.score1}:${d.score2}`;
-                if(d.sport === "ODBOJKA") scoreDisplay = `${d.score1}:${d.score2} (${d.pts1||0}:${d.pts2||0})`;
+                let scoreText = `${d.score1}:${d.score2}`;
+                if(d.sport === "ODBOJKA") scoreText = `${d.score1}:${d.score2} (${d.pts1||0}:${d.pts2||0})`;
                 if(d.sport === "TENIS") {
                     const isTB = (d.games1 === 6 && d.games2 === 6);
                     const p1 = isTB ? (d.pts1 || 0) : (tennisPoints[d.pts1] || "0");
                     const p2 = isTB ? (d.pts2 || 0) : (tennisPoints[d.pts2] || "0");
-                    scoreDisplay = `${d.score1}:${d.score2} (${p1}:${p2})`;
+                    scoreText = `${d.score1}:${d.score2} (${p1}:${p2})`;
                 }
 
                 const icon = L.divIcon({ 
+                    className: isSmall ? 'zoom-hide' : '', 
                     html: `<div class="sport-marker-wrapper ${d.status==='live'?'status-live-wrapper':''}">
                             <div class="sport-ball">${sportEmojis[d.sport]||'⚽'}</div>
                             <div class="live-card-thin">
@@ -253,7 +229,7 @@
                                     <span class="match-name-thin">${d.name}</span>
                                     <span class="match-teams-thin">${(d.t1&&d.t2)?d.t1+' - '+d.t2:lang.free_court}</span>
                                 </div>
-                                ${(d.t1&&d.t2)?`<div class="match-score-thin">${scoreDisplay}<div class="periods-row">${d.sub_string||''}</div></div>`:''}
+                                ${(d.t1&&d.t2)?`<div class="match-score-thin">${scoreText}<div class="periods-row">${d.sub_string||''}</div></div>`:''}
                             </div>
                            </div>`, 
                     iconSize: [210, 48], iconAnchor: [12, 24] 
@@ -264,40 +240,32 @@
             });
         }
 
-        function openAdmin(key) { currentAdminKey = key; refreshAdminPanel(key); document.getElementById('admin-panel').classList.add('active'); }
-        function closeAdmin() { document.getElementById('admin-panel').classList.remove('active'); currentAdminKey = null; }
-
         function refreshAdminPanel(key) {
             const d = allTereni.find(x => x.key === key); if(!d) return;
             const lang = langData[currentLang];
             document.getElementById('adm-name').innerText = d.name;
             
-            // --- SINHRONIZACIJA ADMIN PANELA SA REZULTATOM NA MAPI ---
-            let mainScoreText = `${d.score1} : ${d.score2}`;
-            let subScoreText = d.sub_string || "";
-            
-            if(d.sport === "ODBOJKA") {
-                subScoreText = `${lang.points}: ${d.pts1||0} : ${d.pts2||0} | ${d.sub_string||''}`;
-            } else if(d.sport === "TENIS") {
-                const isTB = (d.games1 === 6 && d.games2 === 6);
-                const p1 = isTB ? (d.pts1 || 0) : (tennisPoints[d.pts1] || "0");
-                const p2 = isTB ? (d.pts2 || 0) : (tennisPoints[d.pts2] || "0");
-                subScoreText = `${isTB?'TB':lang.games}: ${d.games1||0}:${d.games2||0} (${p1}:${p2}) | ${d.sub_string||''}`;
+            let mainS = `${d.score1} : ${d.score2}`;
+            let subS = d.sub_string || "";
+            if(d.sport === "ODBOJKA") subS = `${lang.points}: ${d.pts1||0}:${d.pts2||0} | ${d.sub_string||''}`;
+            if(d.sport === "TENIS") {
+                const isTB = (d.games1===6 && d.games2===6);
+                const p1 = isTB ? (d.pts1||0) : (tennisPoints[d.pts1]||"0");
+                const p2 = isTB ? (d.pts2||0) : (tennisPoints[d.pts2]||"0");
+                subS = `${isTB?'TB':lang.games}: ${d.games1||0}:${d.games2||0} (${p1}:${p2}) | ${d.sub_string||''}`;
             }
 
-            document.getElementById('adm-main-score').innerText = mainScoreText;
-            document.getElementById('adm-sub-display').innerText = subScoreText;
+            document.getElementById('adm-main-score').innerText = mainS;
+            document.getElementById('adm-sub-display').innerText = subS;
             document.getElementById('adm-teams-label').innerText = d.t1 ? `${d.t1} VS ${d.t2}` : "NO MATCH";
-            document.getElementById('match-status-label').innerText = (d.status==='live'?lang.live:(d.status==='ended'?lang.ended:lang.upcoming)).toUpperCase();
-            document.getElementById('sub-scores-display').innerText = d.sub_string || "";
-
+            
             if(d.t1) {
-                document.getElementById('adm-score-view').style.display = 'flex'; document.getElementById('match-setup').style.display = 'none';
+                document.getElementById('adm-score-view').style.display='flex'; document.getElementById('match-setup').style.display='none';
                 document.getElementById('label-t1').innerText = d.t1; document.getElementById('label-t2').innerText = d.t2;
-                document.getElementById('start-live-btn').style.display = d.status === 'upcoming' ? 'block' : 'none';
-                document.getElementById('end-match-btn').style.display = (d.status === 'live') ? 'block' : 'none';
-                document.getElementById('reset-match-btn').style.display = d.status === 'ended' ? 'block' : 'none';
-            } else { document.getElementById('adm-score-view').style.display = 'none'; document.getElementById('match-setup').style.display = 'flex'; }
+                document.getElementById('start-live-btn').style.display = d.status==='upcoming'?'block':'none';
+                document.getElementById('end-match-btn').style.display = d.status==='live'?'block':'none';
+                document.getElementById('reset-match-btn').style.display = d.status==='ended'?'block':'none';
+            } else { document.getElementById('adm-score-view').style.display='none'; document.getElementById('match-setup').style.display='flex'; }
         }
 
         function proScore(team, sign) {
@@ -324,9 +292,9 @@
             db.ref(`tereni/${currentAdminKey}`).update(upd);
         }
 
-        function autoCalculatePeriod(v1, v2, force) {
+        function autoCalculatePeriod(v1, v2) {
             const d = allTereni.find(x => x.key === currentAdminKey); if(!d) return;
-            let target = force || "P" + (Object.keys(d.sub_details||{}).length + 1);
+            let target = "P" + (Object.keys(d.sub_details||{}).length + 1);
             let val = (v1 !== undefined) ? `${v1}:${v2}` : `${d.score1}:${d.score2}`;
             db.ref(`tereni/${currentAdminKey}/sub_details`).update({ [target]: val }).then(() => {
                 db.ref(`tereni/${currentAdminKey}`).once('value', s => {
@@ -337,11 +305,17 @@
             });
         }
 
-        function triggerLogic(type) {
-            const d = allTereni.find(x => x.key === currentAdminKey); if(!d) return;
-            if(type==='period') autoCalculatePeriod(); else adminStatus('ended');
+        function trackGPS() {
+            navigator.geolocation.watchPosition(pos => {
+                currentLat = pos.coords.latitude; currentLon = pos.coords.longitude;
+                if (!userMarker) {
+                    userMarker = L.marker([currentLat, currentLon], { icon: L.divIcon({ className: 'user-location-dot', html: '<div class="pulse-core"></div>', iconAnchor: [8, 8] }) }).addTo(map);
+                } else { userMarker.setLatLng([currentLat, currentLon]); }
+            });
         }
-
+        function openAdmin(key) { currentAdminKey = key; refreshAdminPanel(key); document.getElementById('admin-panel').classList.add('active'); }
+        function closeAdmin() { document.getElementById('admin-panel').classList.remove('active'); currentAdminKey = null; }
+        function toggleLang() { currentLang = currentLang==='EN'?'SRB':'EN'; document.getElementById('lang-btn').innerText=currentLang==='EN'?'SRB':'ENG'; renderMarkers(); }
         function changeStep(t, d) { steps[t] = Math.max(1, Math.min(3, steps[t]+d)); document.getElementById(t===1?'step-h':'step-a').innerText=steps[t]; }
         async function saveTeren(lat, lng) {
             const n = document.getElementById('p_name').value.toUpperCase(); if(!n) return;
@@ -351,14 +325,6 @@
         async function setupMatch() {
             const t1 = document.getElementById('adm-t1').value.toUpperCase(), t2 = document.getElementById('adm-t2').value.toUpperCase();
             await db.ref(`tereni/${currentAdminKey}`).update({ t1, t2, status: 'upcoming', score1: 0, score2: 0, pts1: 0, pts2: 0, games1: 0, games2: 0, sub_string: "", sub_details: null });
-        }
-        function trackGPS() {
-            navigator.geolocation.watchPosition(pos => {
-                currentLat = pos.coords.latitude; currentLon = pos.coords.longitude;
-                if (!userMarker) {
-                    userMarker = L.marker([currentLat, currentLon], { icon: L.divIcon({ className: 'user-location-dot', html: '<div class="pulse-core"></div>', iconAnchor: [8, 8] }) }).addTo(map);
-                } else { userMarker.setLatLng([currentLat, currentLon]); }
-            });
         }
         function handleSearch(e) { if(e.key==="Enter") { fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${e.target.value}`).then(r=>r.json()).then(d=>{if(d[0]) map.flyTo([d[0].lat,d[0].lon],14);});}}
         window.adminStatus = s => db.ref(`tereni/${currentAdminKey}`).update({ status: s });
