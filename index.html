@@ -16,7 +16,7 @@
         #map { height: 100vh; width: 100vw; display: none; }
         input { font-size: 16px !important; }
 
-        /* SUPER SEARCH (NE MENJA SE) */
+        /* SUPER SEARCH */
         .leaflet-control-geocoder {
             background: rgba(255, 255, 255, 0.1) !important;
             backdrop-filter: blur(10px);
@@ -26,7 +26,7 @@
         .leaflet-control-geocoder-form input { background: transparent !important; color: white !important; }
         .leaflet-control-geocoder-alternatives { background: white !important; color: black !important; border-radius: 12px; margin-top: 10px; }
 
-        /* VIDLJIVIJI JEZIČAK */
+        /* JEZIČAK NA DNU */
         #bottom-trigger {
             position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
             width: 100px; height: 18px; background: rgba(59, 130, 246, 0.4);
@@ -44,28 +44,21 @@
         }
         .sidebar-closed { transform: translateY(100%); }
 
-        /* BRZO GPS DUGME */
+        /* GPS DUGME */
         #gps-button {
             position: fixed; bottom: 35px; right: 20px; width: 55px; height: 55px;
             background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.25); border-radius: 18px; z-index: 2000;
         }
 
-        /* PULS LOPTICA (TVOJA POZICIJA) */
+        /* PULS LOPTICA */
         .pulse-marker { width: 14px; height: 14px; background: #3b82f6; border-radius: 50%; border: 2px solid white; animation: pulse 2s infinite; }
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(59, 130, 246, 0); } 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); } }
 
-        /* MARKER TERENA: LOPTICA + HORIZONTALNI TAB */
+        /* MARKER TERENA */
         .court-marker { display: flex; align-items: center; white-space: nowrap; }
-        .court-icon-bg { 
-            font-size: 18px; background: white; border-radius: 50%; width: 32px; height: 32px; 
-            display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.4); z-index: 10;
-        }
-        .court-tab {
-            background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(8px); color: white;
-            padding: 5px 15px 5px 22px; border-radius: 0 20px 20px 0; margin-left: -18px;
-            font-weight: 600; font-size: 13px; border: 1px solid rgba(255,255,255,0.1); z-index: 5;
-        }
+        .court-icon-bg { font-size: 18px; background: white; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.4); z-index: 10; }
+        .court-tab { background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(8px); color: white; padding: 5px 15px 5px 22px; border-radius: 0 20px 20px 0; margin-left: -18px; font-weight: 600; font-size: 13px; border: 1px solid rgba(255,255,255,0.1); z-index: 5; }
     </style>
 </head>
 <body class="text-white">
@@ -83,42 +76,40 @@
 
     <button id="gps-button" class="hidden flex items-center justify-center" onclick="findMe()">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
         </svg>
     </button>
 
     <button id="bottom-trigger" class="hidden" onclick="toggleSidebar()"></button>
 
-    <div id="sidebar" class="sidebar-closed p-6 flex flex-col">
+    <div id="sidebar" class="sidebar-closed p-6 flex flex-col relative">
+        <button onclick="toggleSidebar(false)" class="absolute top-6 right-6 bg-white/10 w-10 h-10 rounded-full flex items-center justify-center text-2xl z-[2010]">&times;</button>
+        
         <div class="w-16 h-1.5 bg-white/20 rounded-full mx-auto mb-6 cursor-pointer" onclick="toggleSidebar()"></div>
         
         <div id="step-main" class="flex-grow flex flex-col gap-4">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="font-bold text-3xl text-blue-500 italic">HoodSport</h2>
-                <button onclick="toggleSidebar()" class="text-3xl text-slate-500">&times;</button>
-            </div>
-            <button onclick="goToStep('step-sports')" class="w-full py-6 bg-blue-600 rounded-2xl font-black text-xl shadow-lg shadow-blue-500/20">➕ DODAJ TEREN</button>
+            <h2 class="font-bold text-3xl text-blue-500 italic mb-4">HoodSport</h2>
+            <button onclick="goToStep('step-sports')" class="w-full py-6 bg-blue-600 rounded-2xl font-black text-xl">➕ DODAJ TEREN</button>
             <button onclick="logout()" class="w-full py-4 bg-red-600/10 text-red-500 border border-red-500/20 rounded-2xl font-bold mt-auto">Odjavi se</button>
         </div>
 
         <div id="step-sports" class="hidden flex-grow flex flex-col">
             <h3 class="text-xl font-bold mb-6">Izaberi sport:</h3>
             <div class="grid grid-cols-2 gap-3">
-                <button onclick="pickSport('⚽', 'Fudbal')" class="p-5 bg-white/5 rounded-2xl text-lg flex items-center gap-3">⚽ Fudbal</button>
-                <button onclick="pickSport('🏀', 'Kosarka')" class="p-5 bg-white/5 rounded-2xl text-lg flex items-center gap-3">🏀 Košarka</button>
-                <button onclick="pickSport('🏐', 'Odbojka')" class="p-5 bg-white/5 rounded-2xl text-lg flex items-center gap-3">🏐 Odbojka</button>
-                <button onclick="pickSport('🤾', 'Rukomet')" class="p-5 bg-white/5 rounded-2xl text-lg flex items-center gap-3">🤾 Rukomet</button>
-                <button onclick="pickSport('🎾', 'Tenis')" class="p-5 bg-white/5 rounded-2xl text-lg flex items-center gap-3 col-span-2">🎾 Tenis</button>
+                <button onclick="pickSport('⚽', 'Fudbal')" class="p-5 bg-white/5 rounded-2xl flex items-center gap-3">⚽ Fudbal</button>
+                <button onclick="pickSport('🏀', 'Kosarka')" class="p-5 bg-white/5 rounded-2xl flex items-center gap-3">🏀 Košarka</button>
+                <button onclick="pickSport('🏐', 'Odbojka')" class="p-5 bg-white/5 rounded-2xl flex items-center gap-3">🏐 Odbojka</button>
+                <button onclick="pickSport('🤾', 'Rukomet')" class="p-5 bg-white/5 rounded-2xl flex items-center gap-3">🤾 Rukomet</button>
+                <button onclick="pickSport('🎾', 'Tenis')" class="p-5 bg-white/5 rounded-2xl flex items-center gap-3 col-span-2">🎾 Tenis</button>
             </div>
             <button onclick="goToStep('step-main')" class="mt-auto py-4 text-slate-400">Poništi</button>
         </div>
 
         <div id="step-confirm" class="hidden flex-grow flex flex-col gap-4">
             <h3 id="confirm-title" class="text-2xl font-bold text-blue-400"></h3>
-            <p class="text-slate-400 text-sm">Upiši naziv terena koji će biti vidljiv svima na mapi.</p>
-            <input id="new-court-name" type="text" placeholder="Ime terena..." class="w-full p-5 bg-slate-800 rounded-2xl border border-blue-500/30 outline-none text-xl">
-            <button onclick="finalSave()" class="w-full py-6 bg-green-600 rounded-2xl font-black text-xl shadow-lg shadow-green-500/20">POSTAVITE TEREN</button>
-            <button onclick="goToStep('step-sports')" class="mt-auto py-4 text-slate-400">Nazad na sportove</button>
+            <input id="new-court-name" type="text" placeholder="Ime terena..." class="w-full p-5 bg-slate-800 rounded-2xl border border-blue-500/30 outline-none">
+            <button onclick="finalSave()" class="w-full py-6 bg-green-600 rounded-2xl font-black text-xl uppercase">POSTAVITE TEREN</button>
+            <button onclick="goToStep('step-sports')" class="mt-auto py-4 text-slate-400">Nazad</button>
         </div>
     </div>
 
@@ -137,8 +128,7 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getDatabase(app);
-        let map, userMarker, clickLatLng;
-        let selectedIcon, selectedSport;
+        let map, userMarker, clickLatLng, selectedIcon, selectedSport;
 
         function initMap() {
             if (map) return;
@@ -149,23 +139,15 @@
             L.Control.geocoder({ defaultMarkGeocode: false, collapsed: true, placeholder: "Pretraži..." })
             .on('markgeocode', e => map.fitBounds(e.geocode.bbox)).addTo(map);
 
-            // KLIK NA MAPU -> OTVARA MENI
-            map.on('click', (e) => {
-                clickLatLng = e.latlng;
-                toggleSidebar(true);
-            });
-
+            map.on('click', (e) => { clickLatLng = e.latlng; toggleSidebar(true); });
             loadCourts();
             findMe();
         }
 
-        // Prikaz svih terena iz baze
         function loadCourts() {
             onValue(ref(db, 'tereni'), (snap) => {
                 const courts = snap.val();
                 if (!courts) return;
-                
-                // Očisti stare markere ako je potrebno (ovde dodajemo nove)
                 Object.values(courts).forEach(c => {
                     const icon = L.divIcon({
                         className: 'court-marker',
@@ -182,19 +164,15 @@
             if (show === true) s.classList.remove('sidebar-closed');
             else if (show === false) s.classList.add('sidebar-closed');
             else s.classList.toggle('sidebar-closed');
-            if (s.classList.contains('sidebar-closed')) goToStep('step-main');
         };
 
-        window.goToStep = (stepId) => {
-            ['step-main', 'step-sports', 'step-confirm'].forEach(id => {
-                document.getElementById(id).classList.add('hidden');
-            });
-            document.getElementById(stepId).classList.remove('hidden');
+        window.goToStep = (id) => {
+            ['step-main', 'step-sports', 'step-confirm'].forEach(s => document.getElementById(s).classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
         };
 
         window.pickSport = (icon, name) => {
-            selectedIcon = icon;
-            selectedSport = name;
+            selectedIcon = icon; selectedSport = name;
             document.getElementById('confirm-title').innerText = icon + " " + name;
             goToStep('step-confirm');
         };
@@ -202,38 +180,24 @@
         window.finalSave = async () => {
             const name = document.getElementById('new-court-name').value;
             if (!name) return alert("Upiši ime!");
-            if (!clickLatLng) return alert("Klikni na mapu prvo!");
-
-            const user = auth.currentUser;
-            const newRef = push(ref(db, 'tereni'));
-            
-            await set(newRef, {
-                name: name,
-                icon: selectedIcon,
-                sport: selectedSport,
-                lat: clickLatLng.lat,
-                lng: clickLatLng.lng,
-                owner: user.uid
+            await set(push(ref(db, 'tereni')), {
+                name: name, icon: selectedIcon, sport: selectedSport, lat: clickLatLng.lat, lng: clickLatLng.lng, owner: auth.currentUser.uid
             });
-
             document.getElementById('new-court-name').value = "";
-            toggleSidebar(false);
-            alert("Teren je na mapi!");
+            toggleSidebar(false); // ZATVARA JEZIČAK
+            alert("Teren postavljen!");
         };
 
         window.findMe = () => {
             map.locate({setView: true, maxZoom: 16, enableHighAccuracy: true});
             map.once('locationfound', (e) => {
                 if (userMarker) map.removeLayer(userMarker);
-                const pulse = L.divIcon({ className: 'custom-div-icon', html: "<div class='pulse-marker'></div>", iconSize: [14, 14], iconAnchor: [7, 7] });
-                userMarker = L.marker(e.latlng, {icon: pulse}).addTo(map);
+                userMarker = L.marker(e.latlng, {icon: L.divIcon({ className: 'custom-div-icon', html: "<div class='pulse-marker'></div>", iconSize: [14, 14], iconAnchor: [7, 7] })}).addTo(map);
             });
         };
 
         window.handleAuth = async () => {
-            const email = document.getElementById('email').value;
-            const pass = document.getElementById('password').value;
-            try { await signInWithEmailAndPassword(auth, email, pass); } catch (e) { alert("Greška pri prijavi"); }
+            try { await signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value); } catch (e) { alert("Greška"); }
         };
         window.logout = () => signOut(auth);
 
@@ -245,9 +209,7 @@
                 document.getElementById('gps-button').classList.remove('hidden');
                 initMap();
                 setTimeout(() => map.invalidateSize(), 400);
-            } else {
-                location.reload();
-            }
+            } else { location.reload(); }
         });
     </script>
 </body>
