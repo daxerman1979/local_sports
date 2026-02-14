@@ -8,57 +8,72 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
     <style>
         body, html { height: 100%; margin: 0; overflow: hidden; background: #0f172a; touch-action: manipulation; }
         #map { height: 100vh; width: 100vw; display: none; }
         
+        /* Stop Zoom na svim mobilnim browserima */
         input { font-size: 16px !important; }
 
-        /* Diskretna pretraga */
+        /* SUPER SEARCH - Skoro providan i moderan */
         .leaflet-control-geocoder {
-            background: rgba(255, 255, 255, 0.05) !important;
-            backdrop-filter: blur(4px);
-            border: 1px solid rgba(255,255,255,0.1) !important;
+            background: rgba(255, 255, 255, 0.1) !important;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.15) !important;
             border-radius: 50px !important;
-            margin-top: 15px !important;
+            box-shadow: none !important;
+        }
+        .leaflet-control-geocoder-icon {
+            background-color: transparent !important;
+            opacity: 0.7;
+        }
+        .leaflet-control-geocoder-form input {
+            background: transparent !important;
+            color: white !important;
+            font-size: 16px !important;
+            padding-left: 10px;
         }
 
-        /* SKORO NEVIDLJIV JEZIČAK */
+        /* PROZIRNI JEZIČAK (Kao pre, ali glassmorphism) */
         #sidebar-trigger {
             position: fixed;
             left: 0;
-            top: 40%;
-            height: 60px;
-            width: 8px; /* Vrlo tanko */
-            background: rgba(59, 130, 246, 0.2); /* Jedva primetno plava */
-            backdrop-filter: blur(2px);
-            border-radius: 0 10px 10px 0;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.05); /* Skoro potpuno providno */
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-left: none;
+            padding: 15px 6px;
+            border-radius: 0 15px 15px 0;
             z-index: 2001;
-            border: none;
-            transition: width 0.3s;
+            transition: all 0.3s ease;
         }
-        #sidebar-trigger:active { width: 15px; background: rgba(59, 130, 246, 0.5); }
+        #sidebar-trigger svg { opacity: 0.3; color: white; }
+        #sidebar-trigger:active { background: rgba(59, 130, 246, 0.3); }
 
         /* PULSIRAJUĆA LOPTICA */
         .pulse-marker {
-            width: 15px;
-            height: 15px;
+            width: 14px;
+            height: 14px;
             background: #3b82f6;
             border-radius: 50%;
             border: 2px solid white;
             box-shadow: 0 0 0 rgba(59, 130, 246, 0.7);
             animation: pulse 2s infinite;
         }
-
         @keyframes pulse {
             0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); }
             70% { box-shadow: 0 0 0 15px rgba(59, 130, 246, 0); }
             100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
         }
 
-        #sidebar { transition: transform 0.4s ease; z-index: 2005; }
+        /* Sidebar */
+        #sidebar { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 2005; }
         .sidebar-closed { transform: translateX(-100%); }
     </style>
 </head>
@@ -75,17 +90,28 @@
 
     <div id="map"></div>
 
-    <button id="sidebar-trigger" onclick="toggleSidebar()" class="hidden"></button>
+    <button id="sidebar-trigger" onclick="toggleSidebar()" class="hidden">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path d="M9 5l7 7-7 7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </button>
 
-    <div id="sidebar" class="sidebar-closed fixed inset-y-0 left-0 w-72 bg-slate-900/95 backdrop-blur-xl p-6 flex flex-col">
-        <div class="flex justify-between items-center mb-10">
+    <div id="sidebar" class="sidebar-closed fixed inset-y-0 left-0 w-72 bg-slate-900/95 backdrop-blur-2xl p-6 flex flex-col shadow-2xl">
+        <div class="flex justify-between items-center mb-10 border-b border-white/5 pb-4">
             <h2 class="font-bold text-2xl text-blue-500">HoodSport</h2>
             <button onclick="toggleSidebar()" class="text-3xl text-slate-500">&times;</button>
         </div>
-        <div class="flex-grow space-y-2">
-            <button class="w-full text-left p-4 bg-white/5 rounded-xl">📍 Moji Tereni</button>
+        <div class="flex-grow space-y-3">
+            <button class="w-full text-left p-4 bg-white/5 rounded-2xl flex items-center gap-3">
+                <span>📍</span> Moji Tereni
+            </button>
+            <button class="w-full text-left p-4 bg-white/5 rounded-2xl flex items-center gap-3">
+                <span>⭐</span> Favoriti
+            </button>
         </div>
-        <button onclick="logout()" class="w-full py-4 bg-red-600/20 text-red-500 border border-red-500/30 rounded-2xl font-bold mt-auto">Odjavi se</button>
+        <button onclick="logout()" class="w-full py-4 bg-red-600/10 text-red-500 border border-red-500/20 rounded-2xl font-bold mt-auto hover:bg-red-600 hover:text-white transition">
+            Odjavi se
+        </button>
     </div>
 
     <script type="module">
@@ -105,37 +131,41 @@
 
         function initMap() {
             if (map) return;
-            map = L.map('map', { zoomControl: false }).setView([44.81, 20.46], 13);
+            map = L.map('map', { zoomControl: false, attributionControl: false }).setView([44.81, 20.46], 13);
 
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}').addTo(map);
 
-            // Pretraga
-            L.Control.geocoder({ defaultMarkGeocode: false, collapsed: true, placeholder: "Traži..." })
-            .on('markgeocode', function(e) { map.fitBounds(e.geocode.bbox); })
+            // VRAĆEN SUPER SEARCH
+            const geocoder = L.Control.geocoder({
+                defaultMarkGeocode: false,
+                collapsed: true,
+                placeholder: "Pretraži grad ili ulicu..."
+            })
+            .on('markgeocode', function(e) {
+                map.fitBounds(e.geocode.bbox);
+            })
             .addTo(map);
 
-            // GPS sa pulsirajućom lopticom
+            // GPS + PULSIRAJUĆA LOPTICA
             map.locate({setView: true, maxZoom: 16});
             map.on('locationfound', (e) => {
                 const pulseIcon = L.divIcon({
                     className: 'custom-div-icon',
                     html: "<div class='pulse-marker'></div>",
-                    iconSize: [15, 15],
+                    iconSize: [14, 14],
                     iconAnchor: [7, 7]
                 });
                 L.marker(e.latlng, {icon: pulseIcon}).addTo(map);
             });
         }
 
-        window.toggleSidebar = () => {
-            document.getElementById('sidebar').classList.toggle('sidebar-closed');
-        };
+        window.toggleSidebar = () => document.getElementById('sidebar').classList.toggle('sidebar-closed');
 
         window.handleAuth = async () => {
             const email = document.getElementById('email').value;
             const pass = document.getElementById('password').value;
-            try { await signInWithEmailAndPassword(auth, email, pass); } catch (e) { alert("Greška"); }
+            try { await signInWithEmailAndPassword(auth, email, pass); } catch (e) { alert("Prijava nije uspela"); }
         };
 
         window.logout = () => signOut(auth);
