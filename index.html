@@ -24,34 +24,47 @@
         #map { width: 100vw; height: 100vh; background: #000; display: none; }
         #search-container { position: absolute; top: 20px; left: 20px; z-index: 1000; width: calc(100% - 40px); max-width: 300px; }
         #city-search { width: 100%; padding: 14px 20px; border-radius: 30px; border: 2px solid rgba(255,59,48,0.5); background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); color: white; font-weight: 600; font-size: 14px; }
+        
         .location-btn { position: absolute; bottom: 30px; right: 20px; z-index: 1000; width: 50px; height: 50px; background: #ff3b30; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; }
         .location-btn img { filter: brightness(0) invert(1); width: 24px; }
 
-        .user-location-dot { width: 16px; height: 16px; background: #ff3b30; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 15px #ff3b30; z-index: 10000; }
-        .pulse-core { width: 100%; height: 100%; border-radius: 50%; background: rgba(255,59,48,0.4); animation: gps-pulse 2s infinite; }
-        @keyframes gps-pulse { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(3); opacity: 0; } }
+        /* --- NOVI DIZAJN KARTICA --- */
+        .sport-marker-wrapper { display: flex; flex-direction: column; align-items: center; cursor: pointer; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.6)); }
+        .sport-ball { font-size: 30px; z-index: 20; margin-bottom: -4px; transition: transform 0.2s; }
         
-        @keyframes bounce-ball { from { transform: translateY(0); } to { transform: translateY(-8px); } }
-        @keyframes pulse-live-border { 0% { border-color: #ff3b30; box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.6); } 70% { border-color: #ff3b30; box-shadow: 0 0 0 12px rgba(255, 59, 48, 0); } 100% { border-color: #ff3b30; box-shadow: 0 0 0 0 rgba(255, 59, 48, 0); } }
+        .live-card-thin { 
+            background: #000; 
+            border: 2px solid #333; 
+            border-radius: 12px; 
+            padding: 8px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            width: 130px; /* Kompaktna širina sprečava preklapanje */
+            text-align: center;
+            color: white;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
 
-        .sport-marker-wrapper { display: flex; align-items: center; white-space: nowrap; cursor: pointer; }
-        .sport-ball { font-size: 32px; z-index: 20; }
         .status-live-wrapper .sport-ball { animation: bounce-ball 0.5s ease infinite alternate; }
-        .status-live-wrapper .live-card-thin { animation: pulse-live-border 1.5s infinite; border: 2px solid #ff3b30; }
+        .status-live-wrapper .live-card-thin { border-color: #ff3b30; animation: pulse-live-border 1.5s infinite; }
 
-        .live-card-thin { background: #000; border: 1px solid #333; border-radius: 12px; padding: 4px 12px; margin-left: -15px; display: flex; align-items: center; min-height: 54px; box-shadow: 0 8px 20px rgba(0,0,0,0.8); z-index: 5; color: white; }
-        .zoom-hide .live-card-thin { display: none; }
-        .zoom-hide .sport-ball { font-size: 24px; }
-
-        .match-details { display: flex; flex-direction: column; line-height: 1.2; padding-right: 10px; border-right: 1px solid #333; }
-        .match-details.no-match { border-right: none; padding-right: 5px; }
-        .match-name-thin { font-size: 10px; font-weight: 900; color: #ff3b30; text-transform: uppercase; }
-        .match-teams-thin { font-size: 13px; font-weight: 800; color: #fff; text-transform: uppercase; display: flex; align-items: center; gap: 4px; }
-        .status-pill { font-size: 8px; color: #fff; background: #ff3b30; padding: 2px 6px; border-radius: 4px; font-weight: 900; margin-left: 5px; }
+        .match-details { width: 100%; border-bottom: 1px solid #222; padding-bottom: 5px; margin-bottom: 5px; }
+        .match-name-thin { font-size: 9px; font-weight: 900; color: #ff3b30; text-transform: uppercase; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .match-teams-thin { font-size: 12px; font-weight: 800; color: #fff; text-transform: uppercase; line-height: 1.2; display: block; margin: 2px 0; }
         
-        .match-score-thin { font-size: 22px; color: #ff3b30; font-family: 'Oswald', sans-serif; min-width: 50px; text-align: center; padding-left: 10px; font-weight: 700; display: flex; flex-direction: column; line-height: 1; }
-        .periods-row { font-size: 10px; color: #888; font-weight: 900; margin-top: 3px; }
-        .time-label { color: #aaa; font-size: 9px; margin-left: 5px; font-weight: 500; }
+        .match-score-thin { font-size: 20px; color: #ff3b30; font-family: 'Oswald', sans-serif; font-weight: 700; line-height: 1; }
+        .periods-row { font-size: 9px; color: #888; font-weight: 700; margin-top: 2px; }
+        .status-pill { font-size: 8px; color: #fff; background: #ff3b30; padding: 2px 6px; border-radius: 4px; font-weight: 900; display: inline-block; margin-top: 2px; }
+        .time-label { color: #aaa; font-size: 9px; font-weight: 500; display: block; }
+
+        /* --- OSTALI STILOVI (Admin, Modal, GPS) --- */
+        .user-location-dot { width: 16px; height: 16px; background: #007AFF; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 15px #007AFF; z-index: 10000; }
+        .pulse-core { width: 100%; height: 100%; border-radius: 50%; background: rgba(0,122,255,0.4); animation: gps-pulse 2s infinite; }
+        
+        @keyframes gps-pulse { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(3); opacity: 0; } }
+        @keyframes bounce-ball { from { transform: translateY(0); } to { transform: translateY(-8px); } }
+        @keyframes pulse-live-border { 0% { border-color: #ff3b30; box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.6); } 70% { border-color: #ff3b30; box-shadow: 0 0 0 10px rgba(255, 59, 48, 0); } 100% { border-color: #ff3b30; box-shadow: 0 0 0 0 rgba(255, 59, 48, 0); } }
 
         #admin-panel { position: fixed; top: 0; left: 100%; width: 100%; height: 100%; background: #080808; z-index: 7000; transition: 0.4s cubic-bezier(0.19, 1, 0.22, 1); padding: 15px; display: flex; flex-direction: column; overflow-y: auto; }
         #admin-panel.active { left: 0; }
@@ -88,6 +101,10 @@
         .pop-header { background: #ff3b30; color: white; padding: 12px; text-align: center; font-weight: 900; font-size: 14px; text-transform: uppercase; font-family: 'Oswald'; }
         .pop-body { padding: 15px; display: flex; flex-direction: column; gap: 10px; background: #111; }
         .pop-btn { background: #ff3b30; color: white; border: none; padding: 12px; border-radius: 10px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-family: 'Oswald'; }
+        
+        /* Zoom hide logic */
+        .zoom-hide .live-card-thin { display: none; }
+        .zoom-hide .sport-ball { font-size: 22px; }
     </style>
 </head>
 <body>
@@ -389,13 +406,16 @@
             const zoom = map.getZoom();
             const isHide = zoom < 11;
             const lang = langData[currentLang];
+            
             allTereni.forEach(d => {
                 const pos = L.latLng(d.lat, d.lng);
                 if (center.distanceTo(pos) > 20000) return;
+                
                 let statusCls = d.status==='live' ? 'status-live-wrapper' : '';
                 let sTxt = d.status === 'live' ? lang.live : (d.status === 'ended' ? lang.ended : lang.upcoming);
                 let statusLabel = `<span class="status-pill" style="${d.status==='ended'?'background:#444':''}">${sTxt}</span>`;
                 let timeLabel = d.scheduled_at ? `<span class="time-label">${new Date(d.scheduled_at).toLocaleDateString('sr-RS',{day:'2-digit',month:'2-digit'})} ${new Date(d.scheduled_at).toLocaleTimeString('sr-RS',{hour:'2-digit',minute:'2-digit'})}</span>` : "";
+                
                 let mainScore = `${d.score1}:${d.score2}`;
                 if(d.sport === "ODBOJKA") mainScore = `${d.score1}:${d.score2} (${d.pts1||0}:${d.pts2||0})`;
                 if(d.sport === "TENIS") {
@@ -404,23 +424,35 @@
                     const p2 = isTB ? (d.pts2 || 0) : (tennisPoints[d.pts2] || "0");
                     mainScore = `${d.score1}:${d.score2} (${p1}:${p2})`;
                 }
+                
                 const hasMatch = d.t1 && d.t2;
-                const scoreHTML = hasMatch ? `<div class="match-score-thin">${mainScore}${d.sub_string ? `<div class="periods-row">${d.sub_string}</div>` : ''}</div>` : "";
+                
                 const icon = L.divIcon({ 
                     className: isHide ? 'zoom-hide' : '', 
                     html: `<div class="sport-marker-wrapper ${statusCls}">
                             <div class="sport-ball">${sportEmojis[d.sport]||'⚽'}</div>
                             <div class="live-card-thin">
-                                <div class="match-details ${!hasMatch ? 'no-match' : ''}">
-                                    <span class="match-name-thin">${d.name} ${timeLabel}</span>
-                                    <span class="match-teams-thin">${hasMatch ? d.t1+' - '+d.t2 : lang.free_court} ${statusLabel}</span>
+                                <div class="match-details">
+                                    <span class="match-name-thin">${d.name}</span>
+                                    ${timeLabel}
+                                    <span class="match-teams-thin">${hasMatch ? d.t1 + '<br>' + d.t2 : lang.free_court}</span>
+                                    ${statusLabel}
                                 </div>
-                                ${scoreHTML}
+                                ${hasMatch ? `
+                                <div class="match-score-thin">
+                                    ${mainScore}
+                                    ${d.sub_string ? `<div class="periods-row">${d.sub_string}</div>` : ''}
+                                </div>` : ''}
                             </div>
                            </div>`, 
-                    iconSize: [210, 48], iconAnchor: [12, 24] 
+                    iconSize: [130, 110], 
+                    iconAnchor: [65, 30] 
                 });
-                L.marker([d.lat, d.lng], { icon }).addTo(markersLayer).on('click', e => { 
+
+                L.marker([d.lat, d.lng], { 
+                    icon,
+                    zIndexOffset: d.status === 'live' ? 1000 : 0 
+                }).addTo(markersLayer).on('click', e => { 
                     L.DomEvent.stopPropagation(e); 
                     if (auth.currentUser && d.owner === auth.currentUser.uid) {
                         openAdmin(d.key); 
@@ -434,7 +466,7 @@
                 currentLat = pos.coords.latitude; currentLon = pos.coords.longitude;
                 const radius = pos.coords.accuracy;
                 if (!userMarker) {
-                    accCircle = L.circle([currentLat, currentLon], { radius: radius, color: '#ff3b30', fillColor: '#ff3b30', fillOpacity: 0.1, weight: 1 }).addTo(map);
+                    accCircle = L.circle([currentLat, currentLon], { radius: radius, color: '#007AFF', fillColor: '#007AFF', fillOpacity: 0.1, weight: 1 }).addTo(map);
                     userMarker = L.marker([currentLat, currentLon], { icon: L.divIcon({ className: 'user-location-dot', html: '<div class="pulse-core"></div>', iconAnchor: [8, 8] }), zIndexOffset: 10000 }).addTo(map);
                 } else {
                     userMarker.setLatLng([currentLat, currentLon]);
@@ -583,6 +615,18 @@
             const t1 = document.getElementById('adm-t1').value.toUpperCase(), t2 = document.getElementById('adm-t2').value.toUpperCase(), st = document.getElementById('adm-start-time-input').value;
             if(!t1 || !t2 || !st) return;
             await db.ref(`tereni/${currentAdminKey}`).update({ t1, t2, score1: 0, score2: 0, pts1:0, pts2:0, games1:0, games2:0, status: 'upcoming', scheduled_at: new Date(st).getTime(), sub_string: "", sub_details: null });
+        }
+
+        function handleSearch(event) {
+            if (event.key === "Enter") {
+                const city = document.getElementById('city-search').value;
+                if (!city) return;
+                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${city}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.length > 0) map.flyTo([data[0].lat, data[0].lon], 13);
+                    });
+            }
         }
 
         window.adminDelete = () => { if(confirm(langData[currentLang].delete_conf)) { db.ref(`tereni/${currentAdminKey}`).remove(); closeAdmin(); } };
