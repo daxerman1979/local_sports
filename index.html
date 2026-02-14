@@ -8,7 +8,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    
     <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
@@ -16,54 +15,70 @@
         body, html { height: 100%; margin: 0; overflow: hidden; background: #0f172a; touch-action: manipulation; }
         #map { height: 100vh; width: 100vw; display: none; }
         
-        /* Stop Zoom na svim mobilnim browserima */
         input { font-size: 16px !important; }
 
-        /* SUPER SEARCH - Skoro providan i moderan */
+        /* SUPER SEARCH */
         .leaflet-control-geocoder {
             background: rgba(255, 255, 255, 0.1) !important;
             backdrop-filter: blur(8px);
             border: 1px solid rgba(255,255,255,0.15) !important;
             border-radius: 50px !important;
-            box-shadow: none !important;
         }
-        .leaflet-control-geocoder-icon {
-            background-color: transparent !important;
-            opacity: 0.7;
-        }
-        .leaflet-control-geocoder-form input {
-            background: transparent !important;
-            color: white !important;
-            font-size: 16px !important;
-            padding-left: 10px;
-        }
+        .leaflet-control-geocoder-form input { background: transparent !important; color: white !important; }
 
-        /* PROZIRNI JEZIČAK (Kao pre, ali glassmorphism) */
-        #sidebar-trigger {
+        /* DONJI JEZIČAK (Handle) */
+        #bottom-trigger {
             position: fixed;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(255, 255, 255, 0.05); /* Skoro potpuno providno */
-            backdrop-filter: blur(4px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-left: none;
-            padding: 15px 6px;
-            border-radius: 0 15px 15px 0;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(5px);
+            border-radius: 10px 10px 0 0;
             z-index: 2001;
-            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-bottom: none;
         }
-        #sidebar-trigger svg { opacity: 0.3; color: white; }
-        #sidebar-trigger:active { background: rgba(59, 130, 246, 0.3); }
 
-        /* PULSIRAJUĆA LOPTICA */
+        /* DONJI MENI (Bottom Sheet) */
+        #sidebar { 
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 50vh;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            z-index: 2005;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            border-radius: 25px 25px 0 0;
+        }
+        .sidebar-closed { transform: translateY(100%); }
+
+        /* GPS DUGME */
+        #gps-button {
+            position: fixed;
+            bottom: 30px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        /* PULS LOPTICA */
         .pulse-marker {
-            width: 14px;
-            height: 14px;
-            background: #3b82f6;
-            border-radius: 50%;
-            border: 2px solid white;
-            box-shadow: 0 0 0 rgba(59, 130, 246, 0.7);
+            width: 14px; height: 14px; background: #3b82f6; border-radius: 50%; border: 2px solid white;
             animation: pulse 2s infinite;
         }
         @keyframes pulse {
@@ -71,10 +86,6 @@
             70% { box-shadow: 0 0 0 15px rgba(59, 130, 246, 0); }
             100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
         }
-
-        /* Sidebar */
-        #sidebar { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 2005; }
-        .sidebar-closed { transform: translateX(-100%); }
     </style>
 </head>
 <body class="text-white">
@@ -84,34 +95,31 @@
         <div class="w-full max-w-sm space-y-4">
             <input id="email" type="email" placeholder="Email" class="w-full p-4 bg-slate-800 rounded-2xl border border-slate-700 outline-none">
             <input id="password" type="password" placeholder="Lozinka" class="w-full p-4 bg-slate-800 rounded-2xl border border-slate-700 outline-none">
-            <button onclick="handleAuth('login')" class="w-full py-4 bg-blue-600 rounded-2xl font-bold">Uđi na mapu</button>
+            <button onclick="handleAuth()" class="w-full py-4 bg-blue-600 rounded-2xl font-bold">Uđi na mapu</button>
         </div>
     </div>
 
     <div id="map"></div>
 
-    <button id="sidebar-trigger" onclick="toggleSidebar()" class="hidden">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path d="M9 5l7 7-7 7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <button id="gps-button" class="hidden" onclick="findMe()">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
         </svg>
     </button>
 
-    <div id="sidebar" class="sidebar-closed fixed inset-y-0 left-0 w-72 bg-slate-900/95 backdrop-blur-2xl p-6 flex flex-col shadow-2xl">
-        <div class="flex justify-between items-center mb-10 border-b border-white/5 pb-4">
+    <button id="bottom-trigger" class="hidden" onclick="toggleSidebar()"></button>
+
+    <div id="sidebar" class="sidebar-closed p-8 flex flex-col">
+        <div class="w-12 h-1.5 bg-gray-600 rounded-full mx-auto mb-8 cursor-pointer" onclick="toggleSidebar()"></div>
+        <div class="flex justify-between items-center mb-6">
             <h2 class="font-bold text-2xl text-blue-500">HoodSport</h2>
-            <button onclick="toggleSidebar()" class="text-3xl text-slate-500">&times;</button>
+            <button onclick="logout()" class="text-red-500 font-bold">Odjavi se</button>
         </div>
-        <div class="flex-grow space-y-3">
-            <button class="w-full text-left p-4 bg-white/5 rounded-2xl flex items-center gap-3">
-                <span>📍</span> Moji Tereni
-            </button>
-            <button class="w-full text-left p-4 bg-white/5 rounded-2xl flex items-center gap-3">
-                <span>⭐</span> Favoriti
-            </button>
+        <div class="space-y-4">
+            <button class="w-full text-left p-5 bg-white/5 rounded-2xl flex items-center gap-4 text-lg">📍 Moji Tereni</button>
+            <button class="w-full text-left p-5 bg-white/5 rounded-2xl flex items-center gap-4 text-lg">⭐ Favoriti</button>
         </div>
-        <button onclick="logout()" class="w-full py-4 bg-red-600/10 text-red-500 border border-red-500/20 rounded-2xl font-bold mt-auto hover:bg-red-600 hover:text-white transition">
-            Odjavi se
-        </button>
     </div>
 
     <script type="module">
@@ -132,55 +140,45 @@
         function initMap() {
             if (map) return;
             map = L.map('map', { zoomControl: false, attributionControl: false }).setView([44.81, 20.46], 13);
-
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}').addTo(map);
 
-            // VRAĆEN SUPER SEARCH
-            const geocoder = L.Control.geocoder({
-                defaultMarkGeocode: false,
-                collapsed: true,
-                placeholder: "Pretraži grad ili ulicu..."
-            })
-            .on('markgeocode', function(e) {
-                map.fitBounds(e.geocode.bbox);
-            })
-            .addTo(map);
+            L.Control.geocoder({ defaultMarkGeocode: false, collapsed: true, placeholder: "Pretraži..." })
+            .on('markgeocode', e => map.fitBounds(e.geocode.bbox)).addTo(map);
 
-            // GPS + PULSIRAJUĆA LOPTICA
+            findMe();
+        }
+
+        window.findMe = () => {
             map.locate({setView: true, maxZoom: 16});
             map.on('locationfound', (e) => {
                 const pulseIcon = L.divIcon({
                     className: 'custom-div-icon',
                     html: "<div class='pulse-marker'></div>",
-                    iconSize: [14, 14],
-                    iconAnchor: [7, 7]
+                    iconSize: [14, 14], iconAnchor: [7, 7]
                 });
                 L.marker(e.latlng, {icon: pulseIcon}).addTo(map);
             });
-        }
+        };
 
         window.toggleSidebar = () => document.getElementById('sidebar').classList.toggle('sidebar-closed');
-
         window.handleAuth = async () => {
             const email = document.getElementById('email').value;
             const pass = document.getElementById('password').value;
-            try { await signInWithEmailAndPassword(auth, email, pass); } catch (e) { alert("Prijava nije uspela"); }
+            try { await signInWithEmailAndPassword(auth, email, pass); } catch (e) { alert("Greška"); }
         };
-
         window.logout = () => signOut(auth);
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 document.getElementById('auth-screen').classList.add('hidden');
                 document.getElementById('map').style.display = 'block';
-                document.getElementById('sidebar-trigger').classList.remove('hidden');
+                document.getElementById('bottom-trigger').classList.remove('hidden');
+                document.getElementById('gps-button').classList.remove('hidden');
                 initMap();
                 setTimeout(() => map.invalidateSize(), 400);
             } else {
-                document.getElementById('auth-screen').classList.remove('hidden');
-                document.getElementById('map').style.display = 'none';
-                document.getElementById('sidebar-trigger').classList.add('hidden');
+                location.reload();
             }
         });
     </script>
