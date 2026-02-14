@@ -13,72 +13,73 @@
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
     <style>
-        body, html { height: 100%; margin: 0; overflow: hidden; background: #0f172a; }
+        body, html { height: 100%; margin: 0; overflow: hidden; background: #0f172a; touch-action: manipulation; }
         #map { height: 100vh; width: 100vw; display: none; }
         
-        /* Stil za diskretnu pretragu */
-        .leaflet-control-geocoder {
-            border: none !important;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3) !important;
-            border-radius: 50px !important;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-        .leaflet-control-geocoder-icon {
-            background-color: #1e293b !important;
-            border-radius: 50% !important;
-            width: 40px !important;
-            height: 40px !important;
+        /* Onemogućavanje zumiranja na mobilnim uređajima za sve inpute */
+        input, select, textarea {
+            font-size: 16px !important; 
         }
 
-        /* Bočni meni (Drawer) */
+        /* Diskretna i skoro providna pretraga */
+        .leaflet-control-geocoder {
+            background: rgba(255, 255, 255, 0.1) !important;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.2) !important;
+            border-radius: 50px !important;
+        }
+        .leaflet-control-geocoder-icon {
+            background-color: transparent !important;
+            opacity: 0.6;
+        }
+        .leaflet-control-geocoder-form input {
+            background: transparent !important;
+            color: white !important;
+            font-size: 16px !important;
+        }
+
+        /* Bočni meni */
         #sidebar {
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 2000;
         }
         .sidebar-closed { transform: translateX(-100%); }
-        .sidebar-open { transform: translateX(0); }
     </style>
 </head>
 <body class="text-white">
 
     <div id="auth-screen" class="h-screen flex flex-col justify-center items-center px-6">
         <h1 class="text-5xl font-black text-blue-500 mb-8 italic tracking-tighter">HOODSPORT</h1>
-        <div class="w-full max-w-sm space-y-3">
-            <input id="email" type="email" placeholder="Email" class="w-full p-4 bg-slate-800 rounded-2xl border border-slate-700 outline-none">
-            <input id="password" type="password" placeholder="Lozinka" class="w-full p-4 bg-slate-800 rounded-2xl border border-slate-700 outline-none">
-            <button onclick="handleAuth('login')" class="w-full py-4 bg-blue-600 rounded-2xl font-bold shadow-lg shadow-blue-500/20">Uđi na mapu</button>
-            <button onclick="handleAuth('register')" class="w-full py-2 text-slate-400 text-sm">Nemaš nalog? Registruj se</button>
+        <div class="w-full max-w-sm space-y-4">
+            <input id="email" type="email" placeholder="Email" class="w-full p-4 bg-slate-800 rounded-2xl border border-slate-700 outline-none text-[16px]">
+            <input id="password" type="password" placeholder="Lozinka" class="w-full p-4 bg-slate-800 rounded-2xl border border-slate-700 outline-none text-[16px]">
+            <button onclick="handleAuth('login')" class="w-full py-4 bg-blue-600 rounded-2xl font-bold">Uđi na mapu</button>
         </div>
     </div>
 
     <div id="map"></div>
 
-    <button id="sidebar-trigger" onclick="toggleSidebar()" class="hidden fixed left-0 top-1/2 -translate-y-1/2 bg-blue-600 p-2 rounded-r-xl z-[2001] shadow-xl">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+    <button id="sidebar-trigger" onclick="toggleSidebar()" class="hidden fixed left-0 top-1/2 -translate-y-1/2 bg-blue-600/50 backdrop-blur-md p-3 rounded-r-2xl z-[2001]">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path d="M9 5l7 7-7 7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
     </button>
 
-    <div id="sidebar" class="sidebar-closed fixed inset-y-0 left-0 w-64 bg-slate-900 shadow-2xl border-r border-white/10 p-6 flex flex-col">
+    <div id="sidebar" class="sidebar-closed fixed inset-y-0 left-0 w-72 bg-slate-900/95 backdrop-blur-lg p-6 flex flex-col">
         <div class="flex justify-between items-center mb-10">
-            <h2 class="font-bold text-xl text-blue-400">HoodSport</h2>
-            <button onclick="toggleSidebar()" class="text-slate-400">&times;</button>
+            <h2 class="font-bold text-2xl text-blue-500">HoodSport</h2>
+            <button onclick="toggleSidebar()" class="text-3xl">&times;</button>
         </div>
-        
-        <nav class="flex-grow space-y-4">
-            <button class="w-full text-left p-3 hover:bg-slate-800 rounded-lg">Moji Tereni</button>
-            <button class="w-full text-left p-3 hover:bg-slate-800 rounded-lg">Podešavanja</button>
-        </nav>
-
-        <button onclick="logout()" class="w-full py-3 bg-red-500/20 text-red-400 rounded-xl font-bold border border-red-500/20 hover:bg-red-500 hover:text-white transition">
-            Odjavi se
-        </button>
+        <div class="flex-grow space-y-2">
+            <button class="w-full text-left p-4 bg-white/5 rounded-xl">📍 Moji Tereni</button>
+            <button class="w-full text-left p-4 bg-white/5 rounded-xl">🏆 Rang Lista</button>
+        </div>
+        <button onclick="logout()" class="w-full py-4 bg-red-600 rounded-2xl font-bold mt-auto">Odjavi se</button>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCyyqnqeS-9jurBX-6VIRp8CiPTMbXkXgw",
@@ -93,70 +94,55 @@
 
         function initMap() {
             if (map) return;
-
             map = L.map('map', { zoomControl: false }).setView([44.81, 20.46], 13);
 
-            // Satelitski sloj
+            // Slojevi (Satelit + Labels)
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
-            
-            // Sloj sa imenima gradova i granicama
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}').addTo(map);
 
-            // Dodavanje diskretne pretrage (Lupa)
+            // Poboljšana pretraga (Nominatim OSM)
             const geocoder = L.Control.geocoder({
-                defaultMarkGeocode: true,
-                placeholder: "Traži grad...",
-                collapsed: true // Ovo pravi "diskretnu lupu" dok se ne klikne
-            }).addTo(map);
+                defaultMarkGeocode: false,
+                collapsed: true,
+                placeholder: "Pretraži..."
+            })
+            .on('markgeocode', function(e) {
+                var bbox = e.geocode.bbox;
+                var poly = L.polygon([
+                    bbox.getSouthEast(), bbox.getNorthEast(), bbox.getNorthWest(), bbox.getSouthWest()
+                ]);
+                map.fitBounds(poly.getBounds());
+            })
+            .addTo(map);
 
-            // GPS Pozicioniranje
+            // GPS
             map.locate({setView: true, maxZoom: 16});
-            
             map.on('locationfound', (e) => {
-                L.circle(e.latlng, { radius: e.accuracy / 2, color: '#3b82f6' }).addTo(map);
-                L.marker(e.latlng).addTo(map).bindPopup("Ti si ovde").openPopup();
-            });
-
-            map.on('locationerror', () => {
-                console.log("GPS pristup odbijen.");
+                L.circle(e.latlng, {radius: 20, color: '#3b82f6', fillOpacity: 0.5}).addTo(map);
             });
         }
 
-        // Sidebar funkcije
         window.toggleSidebar = () => {
-            const sb = document.getElementById('sidebar');
-            sb.classList.toggle('sidebar-closed');
-            sb.classList.toggle('sidebar-open');
+            document.getElementById('sidebar').classList.toggle('sidebar-closed');
         };
 
-        // Auth Logika
         window.handleAuth = async (type) => {
             const email = document.getElementById('email').value;
             const pass = document.getElementById('password').value;
-            try {
-                if (type === 'register') await createUserWithEmailAndPassword(auth, email, pass);
-                else await signInWithEmailAndPassword(auth, email, pass);
-            } catch (e) { alert(e.message); }
+            try { await signInWithEmailAndPassword(auth, email, pass); } catch (e) { alert("Greška pri prijavi"); }
         };
 
         window.logout = () => signOut(auth);
 
         onAuthStateChanged(auth, (user) => {
-            const authScreen = document.getElementById('auth-screen');
-            const mapDiv = document.getElementById('map');
-            const trigger = document.getElementById('sidebar-trigger');
-
             if (user) {
-                authScreen.classList.add('hidden');
-                mapDiv.style.display = 'block';
-                trigger.classList.remove('hidden');
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('map').style.display = 'block';
+                document.getElementById('sidebar-trigger').classList.remove('hidden');
                 initMap();
-                setTimeout(() => map.invalidateSize(), 300);
+                setTimeout(() => map.invalidateSize(), 400);
             } else {
-                authScreen.classList.remove('hidden');
-                mapDiv.style.display = 'none';
-                trigger.classList.add('hidden');
-                document.getElementById('sidebar').classList.add('sidebar-closed');
+                location.reload(); // Najsigurniji način za resetovanje stanja
             }
         });
     </script>
