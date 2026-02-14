@@ -26,12 +26,18 @@
         .location-btn { position: absolute; bottom: 30px; right: 20px; z-index: 1000; width: 50px; height: 50px; background: #ff3b30; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; }
         .location-btn img { filter: brightness(0) invert(1); width: 24px; }
 
-        /* NOVA VEĆA HORIZONTALNA KARTICA */
-        .sport-marker-wrapper { display: flex; align-items: center; cursor: pointer; filter: drop-shadow(0 6px 12px rgba(0,0,0,0.6)); }
-        .sport-ball { font-size: 36px; z-index: 20; margin-right: -10px; transition: transform 0.3s; }
+        /* DINAMIČKI MARKERI */
+        .sport-marker-wrapper { display: flex; align-items: center; cursor: pointer; transition: all 0.3s ease; }
         
+        /* Stanje 1: Samo loptice (Visok Zoom) */
+        .zoom-far .live-card-horizontal { display: none; }
+        .zoom-far .sport-ball { font-size: 24px; filter: drop-shadow(0 0 5px rgba(255,59,48,0.8)); }
+
+        /* Stanje 2: Puna kartica (Normalan Zoom) */
+        .sport-ball { font-size: 36px; z-index: 20; margin-right: -10px; }
         .live-card-horizontal { 
-            background: #000; 
+            background: rgba(0,0,0,0.85); 
+            backdrop-filter: blur(8px);
             border: 1px solid #333; 
             border-radius: 14px; 
             padding: 8px 16px; 
@@ -42,8 +48,11 @@
             max-width: 320px;
             color: white;
             gap: 12px;
+            transition: transform 0.2s;
         }
 
+        /* Rešavanje preklapanja - kartica iznad svih kad se klikne ili je LIVE */
+        .status-live-wrapper { z-index: 1000 !important; }
         .status-live-wrapper .sport-ball { animation: bounce-ball 0.5s ease infinite alternate; }
         .status-live-wrapper .live-card-horizontal { border: 2px solid #ff3b30; box-shadow: 0 0 15px rgba(255,59,48,0.4); }
 
@@ -57,8 +66,7 @@
         .sub-score-text { font-size: 10px; color: #888; font-weight: 700; margin-top: 4px; text-align: center; line-height: 1; }
 
         @keyframes bounce-ball { from { transform: translateY(0); } to { transform: translateY(-8px); } }
-        
-        /* ADMIN PANEL I OSTALO OSTALO ISTO */
+
         #admin-panel { position: fixed; top: 0; left: 100%; width: 100%; height: 100%; background: #080808; z-index: 7000; transition: 0.4s cubic-bezier(0.19, 1, 0.22, 1); padding: 15px; display: flex; flex-direction: column; overflow-y: auto; }
         #admin-panel.active { left: 0; }
         .admin-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-shrink: 0; }
@@ -335,7 +343,10 @@
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', { opacity: 0.9, zIndex: 1000 }).addTo(map);
             markersLayer.addTo(map);
+            
+            // Re-render markers na svaki pokret ili zoom
             map.on('zoomend moveend', renderMarkers);
+            
             map.on('click', e => {
                 if (!auth.currentUser) return; 
                 const moji = allTereni.filter(t => t.owner === auth.currentUser.uid);
@@ -356,13 +367,19 @@
             markersLayer.clearLayers();
             const center = map.getCenter();
             const zoom = map.getZoom();
-            const isHide = zoom < 10;
+            
+            // LOGIKA ZA VISINU: Na zoom nivou manjem od 13, vidimo samo loptice
+            const isTooFar = zoom < 13;
             const lang = langData[currentLang];
+            
             allTereni.forEach(d => {
                 const pos = L.latLng(d.lat, d.lng);
-                if (center.distanceTo(pos) > 20000) return;
+                
+                // Optimizacija: Ne crtaj markere koji su jako daleko od trenutnog pogleda
+                if (center.distanceTo(pos) > 50000) return;
                 
                 let statusCls = d.status==='live' ? 'status-live-wrapper' : '';
+                let zoomCls = isTooFar ? 'zoom-far' : '';
                 let sTxt = d.status === 'live' ? lang.live : (d.status === 'ended' ? lang.ended : lang.upcoming);
                 
                 let mainScoreHTML = "";
@@ -376,7 +393,6 @@
                     const p1 = isTB ? (d.pts1 || 0) : (tennisPoints[d.pts1] || "0");
                     const p2 = isTB ? (d.pts2 || 0) : (tennisPoints[d.pts2] || "0");
                     mainScoreHTML = `${d.score1}:${d.score2}`;
-                    // DODATI GEMOVI NA KARTICU ZA TENIS
                     subScoreHTML = `GEMS: ${d.games1||0}:${d.games2||0} (${p1}:${p2}) ${d.sub_string ? ' | ' + d.sub_string : ''}`;
                 } else {
                     mainScoreHTML = `${d.score1}:${d.score2}`;
@@ -385,8 +401,8 @@
                 const hasMatch = d.t1 && d.t2;
                 
                 const icon = L.divIcon({ 
-                    className: isHide ? 'zoom-hide' : '', 
-                    html: `<div class="sport-marker-wrapper ${statusCls}">
+                    className: '', 
+                    html: `<div class="sport-marker-wrapper ${statusCls} ${zoomCls}">
                             <div class="sport-ball">${sportEmojis[d.sport]||'⚽'}</div>
                             <div class="live-card-horizontal">
                                 <div class="match-details-box">
@@ -400,12 +416,22 @@
                                 </div>
                             </div>
                            </div>`, 
-                    iconSize: [300, 70], iconAnchor: [40, 35] 
+                    // Širi anchor za bolji raspored
+                    iconSize: isTooFar ? [30, 30] : [300, 70], 
+                    iconAnchor: isTooFar ? [15, 15] : [40, 35] 
                 });
                 
-                L.marker([d.lat, d.lng], { icon }).addTo(markersLayer).on('click', e => { 
+                L.marker([d.lat, d.lng], { 
+                    icon,
+                    // Live mečevi su uvek na vrhu (z-index)
+                    zIndexOffset: d.status === 'live' ? 2000 : 0 
+                }).addTo(markersLayer).on('click', e => { 
                     L.DomEvent.stopPropagation(e); 
                     if (auth.currentUser && d.owner === auth.currentUser.uid) { openAdmin(d.key); }
+                    else {
+                        // Ako nije moj teren, centriraj ga lepo
+                        map.flyTo(e.target.getLatLng(), 16);
+                    }
                 });
             });
         }
