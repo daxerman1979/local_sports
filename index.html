@@ -12,6 +12,9 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         html, body { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background: #000; font-family: 'Inter', sans-serif; }
         
+        /* FIKS ZA ZUMIRANJE: Svi inputi MORAJU biti bar 16px */
+        input, select, textarea { font-size: 16px !important; }
+
         /* SEARCH BAR - DISKRETNA LUPA */
         #search-container { 
             position: absolute; top: 20px; left: 20px; z-index: 5000; 
@@ -135,7 +138,6 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script>
-        // FIREBASE INICIJALIZACIJA
         const firebaseConfig = { 
             apiKey: "AIzaSyCyyqnqeS-9jurBX-6VIRp8CiPTMbXkXgw",
             authDomain: "allsportslocal-ea1d4.firebaseapp.com",
@@ -160,18 +162,9 @@
 
         function initMap() {
             if (map) return;
-            // Inicijalizacija mape
             map = L.map('map', { zoomControl: false, tap: false }).setView([44.7866, 20.4489], 13);
-            
-            // SATELITSKI SLOJ (Esri World Imagery)
-            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-                attribution: 'Esri'
-            }).addTo(map);
-
-            // HIBRIDNI SLOJ (Granice, gradovi i ulice)
-            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
-                opacity: 0.8
-            }).addTo(map);
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', { opacity: 0.8 }).addTo(map);
             
             map.on('click', handleMapClick);
             db.ref('tereni').on('value', snap => {
