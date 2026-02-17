@@ -39,7 +39,7 @@
         .status-live-wrapper .sport-ball { animation: bounce-ball 0.5s ease infinite alternate; }
         .live-card-thin { background: rgba(0,0,0,0.85); border: 1px solid #444; border-radius: 12px; padding: 6px 14px; margin-left: -15px; display: flex; align-items: center; min-height: 54px; color: white; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
         .status-live-wrapper .live-card-thin { border: 2px solid #ff3b30; animation: pulse-live 1.5s infinite; }
-        .sub-score-line { font-size: 9px; color: #888; font-weight: 700; margin-top: 2px; letter-spacing: 0.5px; }
+        .sub-score-line { font-size: 9px; color: #ff3b30; font-weight: 900; margin-top: 2px; letter-spacing: 0.5px; }
 
         #admin-panel { position: fixed; top: 0; left: 100%; width: 100%; height: 100%; background: #0a0a0a; z-index: 7000; transition: 0.4s cubic-bezier(0.19, 1, 0.22, 1); padding: 25px; display: flex; flex-direction: column; overflow-y: auto; }
         #admin-panel.active { left: 0; }
@@ -83,7 +83,7 @@
         <div id="adm-score-view" style="display:none; flex-direction:column;">
             <div style="background:#151515; border:1px solid #ff3b30; border-radius:20px; padding:25px; text-align:center; margin-bottom:25px;">
                 <div id="adm-main-score" style="font-size:65px; font-family:'Oswald'; color:#ff3b30; margin:15px 0;">0 : 0</div>
-                <div id="adm-sub-display" style="color:#ff3b30; font-weight:900; font-family:'Oswald';"></div>
+                <div id="adm-sub-display" style="color:#eee; font-weight:900; font-family:'Oswald';"></div>
             </div>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:20px;">
                 <div style="background:#1a1a1a; padding:15px; border-radius:15px; text-align:center;">
@@ -101,7 +101,6 @@
                     </div>
                 </div>
             </div>
-            <button class="admin-btn" style="background:#444;" id="period-btn" onclick="triggerLogic('period')">SAČUVAJ SET / PERIOD</button>
             <button id="start-live-btn" class="admin-btn" style="background:#007AFF;" onclick="adminStatus('live')">KRENI UŽIVO</button>
             <button id="end-match-btn" class="admin-btn" style="background:#ff3b30; display:none;" onclick="triggerLogic('end')">ZAVRŠI MEČ</button>
             <button id="reset-match-btn" class="admin-btn" style="background:#ff9500; display:none;" onclick="resetMatch()">RESETUJ / NOVI MEČ</button>
@@ -132,7 +131,6 @@
 
         let map, userMarker, currentLat, currentLon, currentAdminKey = null, allTereni = [];
         const sportEmojis = { "FUDBAL": "⚽", "KOŠARKA": "🏀", "ODBOJKA": "🏐", "TENIS": "🎾" };
-        const tennisPoints = ["0", "15", "30", "40", "Ad"];
 
         function exploreMap() { 
             document.getElementById('hero').style.display = 'none';
@@ -192,14 +190,8 @@
             map.eachLayer(l => { if(l instanceof L.Marker && l !== userMarker) map.removeLayer(l); });
             allTereni.forEach(d => {
                 let scoreDisplay = d.t1 ? `${d.score1}:${d.score2}` : "FREE";
-                // Za odbojku i tenis, glavni skor su setovi
-                let currentPoints = "";
-                if(d.sport === "ODBOJKA" && d.t1) currentPoints = `(${d.p1 || 0}:${d.p2 || 0})`;
-                if(d.sport === "TENIS" && d.t1) {
-                   const p1 = tennisPoints[d.p1] || "0";
-                   const p2 = tennisPoints[d.p2] || "0";
-                   currentPoints = `(${p1}:${p2})`;
-                }
+                let pointsDisplay = "";
+                if(d.sport === "ODBOJKA" && d.t1) pointsDisplay = `(${d.p1 || 0}:${d.p2 || 0})`;
 
                 const icon = L.divIcon({
                     className: '',
@@ -211,7 +203,7 @@
                                 <span style="font-size:13px; font-weight:800; text-transform:uppercase;">${d.t1 ? d.t1+' - '+d.t2 : 'SLOBODAN'}</span>
                                 ${d.sub_string ? `<div class="sub-score-line">${d.sub_string}</div>` : ''}
                             </div>
-                            ${d.t1 ? `<div style="margin-left:12px; border-left:1px solid #444; padding-left:12px; font-family:'Oswald'; font-size:20px; color:#ff3b30; font-weight:700;">${scoreDisplay} <span style="font-size:14px; color:#fff;">${currentPoints}</span></div>` : ''}
+                            ${d.t1 ? `<div style="margin-left:12px; border-left:1px solid #444; padding-left:12px; font-family:'Oswald'; font-size:20px; color:#ff3b30; font-weight:700;">${scoreDisplay} <span style="font-size:14px; color:#fff;">${pointsDisplay}</span></div>` : ''}
                         </div>
                     </div>`,
                     iconSize: [230, 60], iconAnchor: [25, 30]
@@ -230,20 +222,12 @@
             const d = allTereni.find(x => x.key === key); if(!d) return;
             document.getElementById('adm-name').innerText = d.name;
             
-            // UI za admin panel
-            let mainScoreStr = `${d.score1} : ${d.score2}`;
-            let subScoreStr = d.sub_string || "";
-            
-            if(d.sport === "ODBOJKA") {
-                subScoreStr = `TRENUTNI SET: ${d.p1 || 0}:${d.p2 || 0} | ${d.sub_string || ""}`;
-            } else if(d.sport === "TENIS") {
-                const p1 = tennisPoints[d.p1] || "0";
-                const p2 = tennisPoints[d.p2] || "0";
-                subScoreStr = `GEM: ${p1}:${p2} | SETOVI: ${d.sub_string || ""}`;
-            }
+            let mainS = `${d.score1} : ${d.score2}`;
+            let subS = d.sub_string || "";
+            if(d.sport === "ODBOJKA") subS = `POENI U SETU: ${d.p1 || 0}:${d.p2 || 0} | ${d.sub_string || ""}`;
 
-            document.getElementById('adm-main-score').innerText = mainScoreStr;
-            document.getElementById('adm-sub-display').innerText = subScoreStr;
+            document.getElementById('adm-main-score').innerText = mainS;
+            document.getElementById('adm-sub-display').innerText = subS;
             
             if(d.t1) {
                 document.getElementById('adm-score-view').style.display = 'flex';
@@ -264,56 +248,51 @@
             if(!d || d.status !== 'live') return;
 
             let upd = {};
-            // LOGIKA ZA ODBOJKU I TENIS (Reset poena na kraju seta)
-            if(d.sport === "ODBOJKA" || d.sport === "TENIS") {
-                let pKey = team === 1 ? 'p1' : 'p2';
-                let currentVal = d[pKey] || 0;
-                upd[pKey] = Math.max(0, currentVal + sign);
+            if(d.sport === "ODBOJKA") {
+                let p1 = d.p1 || 0, p2 = d.p2 || 0;
+                if(team === 1) p1 = Math.max(0, p1 + sign); else p2 = Math.max(0, p2 + sign);
+                
+                // ODREĐIVANJE GRANICE (5. set je do 15, ostali do 25)
+                let totalSets = (d.score1 || 0) + (d.score2 || 0);
+                let target = (totalSets === 4) ? 15 : 25;
+
+                // AUTOMATSKI KRAJ SETA
+                if((p1 >= target && (p1 - p2) >= 2)) {
+                    autoSaveSet(d, p1, p2, 1);
+                    return; // autoSaveSet radi update
+                } else if ((p2 >= target && (p2 - p1) >= 2)) {
+                    autoSaveSet(d, p1, p2, 2);
+                    return;
+                }
+                upd = { p1, p2 };
             } else {
-                // LOGIKA ZA FUDBAL/KOŠARKU (Kumulativno)
-                let sKey = team === 1 ? 'score1' : 'score2';
-                upd[sKey] = Math.max(0, (d[sKey] || 0) + sign);
+                upd = { [`score${team}`]: Math.max(0, (d[`score${team}`] || 0) + sign) };
             }
+            db.ref(`tereni/${currentAdminKey}`).update(upd);
+        }
+
+        function autoSaveSet(d, p1, p2, winner) {
+            let sub = d.sub_details || {};
+            let pNum = Object.keys(sub).length + 1;
+            sub["S"+pNum] = `${p1}:${p2}`;
+            
+            let upd = {
+                p1: 0, p2: 0,
+                score1: winner === 1 ? (d.score1 + 1) : d.score1,
+                score2: winner === 2 ? (d.score2 + 1) : d.score2,
+                sub_details: sub,
+                sub_string: Object.keys(sub).map(k => sub[k]).join(' | ')
+            };
+            
+            // Provera pobednika meča (do 3 dobijena seta)
+            if(upd.score1 === 3 || upd.score2 === 3) upd.status = 'ended';
+
             db.ref(`tereni/${currentAdminKey}`).update(upd);
         }
 
         function triggerLogic(type) {
             const d = allTereni.find(x => x.key === currentAdminKey);
-            if(type === 'period') {
-                let sub = d.sub_details || {};
-                let pNum = Object.keys(sub).length + 1;
-                
-                let setScore = "";
-                let upd = {};
-
-                if(d.sport === "ODBOJKA") {
-                    setScore = `${d.p1 || 0}:${d.p2 || 0}`;
-                    // Pobednik seta dobija +1 u glavnom skoru
-                    if(d.p1 > d.p2) upd.score1 = (d.score1 || 0) + 1;
-                    else if(d.p2 > d.p1) upd.score2 = (d.score2 || 0) + 1;
-                    // RESET POENA SETA
-                    upd.p1 = 0; upd.p2 = 0;
-                } else if(d.sport === "TENIS") {
-                    const p1 = tennisPoints[d.p1] || "0";
-                    const p2 = tennisPoints[d.p2] || "0";
-                    setScore = `${p1}:${p2}`;
-                    if(d.p1 > d.p2) upd.score1 = (d.score1 || 0) + 1;
-                    else if(d.p2 > d.p1) upd.score2 = (d.score2 || 0) + 1;
-                    // RESET POENA GEMA
-                    upd.p1 = 0; upd.p2 = 0;
-                } else {
-                    // Fudbal/Košarka samo beleže presek
-                    setScore = `${d.score1}:${d.score2}`;
-                }
-
-                sub["P"+pNum] = setScore;
-                upd.sub_details = sub;
-                upd.sub_string = Object.keys(sub).map(k => sub[k]).join(' | ');
-                
-                db.ref(`tereni/${currentAdminKey}`).update(upd);
-            } else { 
-                db.ref(`tereni/${currentAdminKey}`).update({ status: 'ended' }); 
-            }
+            if(type === 'end') { db.ref(`tereni/${currentAdminKey}`).update({ status: 'ended' }); }
         }
 
         function trackGPS() {
