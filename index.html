@@ -194,7 +194,6 @@
                 let pointsDisplay = "";
                 if(d.sport === "ODBOJKA" && d.t1) pointsDisplay = `(${d.p1 || 0}:${d.p2 || 0})`;
                 if(d.sport === "TENIS" && d.t1) {
-                    // Ako je tie-break (gemovi 6:6), prikazuju se direktni poeni (1,2,3...), inače teniski (15,30...)
                     const isTB = (d.g1 === 6 && d.g2 === 6);
                     const p1 = isTB ? (d.p1 || 0) : (tennisPoints[d.p1] || "0");
                     const p2 = isTB ? (d.p2 || 0) : (tennisPoints[d.p2] || "0");
@@ -229,7 +228,6 @@
         function refreshAdminPanel(key) {
             const d = allTereni.find(x => x.key === key); if(!d) return;
             document.getElementById('adm-name').innerText = d.name;
-            
             let mainS = `${d.score1} : ${d.score2}`;
             let subS = d.sub_string || "";
             if(d.sport === "ODBOJKA") subS = `POENI U SETU: ${d.p1 || 0}:${d.p2 || 0} | ${d.sub_string || ""}`;
@@ -239,10 +237,8 @@
                 const p2 = isTB ? (d.p2 || 0) : (tennisPoints[d.p2] || "0");
                 subS = `GEMOVI: ${d.g1 || 0}:${d.g2 || 0} (POENI: ${p1}:${p2}) | ${d.sub_string || ""}`;
             }
-
             document.getElementById('adm-main-score').innerText = mainS;
             document.getElementById('adm-sub-display').innerText = subS;
-            
             if(d.t1) {
                 document.getElementById('adm-score-view').style.display = 'flex';
                 document.getElementById('match-setup').style.display = 'none';
@@ -273,19 +269,36 @@
             } 
             else if(d.sport === "TENIS") {
                 let p1 = d.p1 || 0, p2 = d.p2 || 0, g1 = d.g1 || 0, g2 = d.g2 || 0;
-                if(team === 1) p1 = Math.max(0, p1 + sign); else p2 = Math.max(0, p2 + sign);
-
                 const isTB = (g1 === 6 && g2 === 6);
+
                 if(isTB) {
-                    // Tie-break do 7
+                    // TIE-BREAK LOGIKA (1, 2, 3...)
+                    if(team === 1) p1 = Math.max(0, p1 + sign); else p2 = Math.max(0, p2 + sign);
                     if(p1 >= 7 && (p1 - p2) >= 2) { autoSaveTennisSet(d, 7, 6, 1); return; }
                     else if(p2 >= 7 && (p2 - p1) >= 2) { autoSaveTennisSet(d, 6, 7, 2); return; }
                 } else {
-                    // Regularni teniski poeni (0, 15, 30, 40, Ad) -> u bazi su (0, 1, 2, 3, 4)
-                    if(p1 >= 4 && (p1 - p2) >= 2) { g1++; p1 = 0; p2 = 0; }
-                    else if(p2 >= 4 && (p2 - p1) >= 2) { g2++; p1 = 0; p2 = 0; }
-                    
-                    // Provera kraja seta
+                    // REGULARNI GEM (0, 15, 30, 40, Ad)
+                    // Indexi: 0=0, 1=15, 2=30, 3=40, 4=Advantage
+                    if(sign === 1) {
+                        if(team === 1) {
+                            if(p1 === 3 && p2 < 3) { g1++; p1=0; p2=0; } // 40:0-30 -> Gem
+                            else if(p1 === 3 && p2 === 3) { p1 = 4; } // 40:40 -> Ad:40
+                            else if(p1 === 3 && p2 === 4) { p2 = 3; } // 40:Ad -> 40:40
+                            else if(p1 === 4) { g1++; p1=0; p2=0; } // Ad:40 -> Gem
+                            else { p1++; }
+                        } else {
+                            if(p2 === 3 && p1 < 3) { g2++; p1=0; p2=0; }
+                            else if(p2 === 3 && p1 === 3) { p2 = 4; }
+                            else if(p2 === 3 && p1 === 4) { p1 = 3; }
+                            else if(p2 === 4) { g2++; p1=0; p2=0; }
+                            else { p2++; }
+                        }
+                    } else {
+                        // Smanjivanje poena
+                        if(team === 1) p1 = Math.max(0, p1 - 1); else p2 = Math.max(0, p2 - 1);
+                    }
+
+                    // Provera kraja seta nakon gema
                     if((g1 >= 6 && (g1 - g2) >= 2) || g1 === 7) { autoSaveTennisSet(d, g1, g2, 1); return; }
                     else if((g2 >= 6 && (g2 - g1) >= 2) || g2 === 7) { autoSaveTennisSet(d, g1, g2, 2); return; }
                 }
@@ -323,21 +336,18 @@
                 sub_details: sub,
                 sub_string: Object.keys(sub).map(k => sub[k]).join(' | ')
             };
-            // Meč se obično igra u 2 dobijena seta na lokalu
             if(upd.score1 === 2 || upd.score2 === 2) upd.status = 'ended';
             db.ref(`tereni/${currentAdminKey}`).update(upd);
         }
 
         function triggerLogic(type) {
-            const d = allTereni.find(x => x.key === currentAdminKey);
             if(type === 'end') { db.ref(`tereni/${currentAdminKey}`).update({ status: 'ended' }); }
         }
 
         function trackGPS() {
             if(!navigator.geolocation) return;
             navigator.geolocation.watchPosition(pos => {
-                currentLat = pos.coords.latitude;
-                currentLon = pos.coords.longitude;
+                currentLat = pos.coords.latitude; currentLon = pos.coords.longitude;
                 if(!userMarker) {
                     userMarker = L.marker([currentLat, currentLon], { icon: L.divIcon({ className: 'user-location-dot', iconSize: [16, 16] }) }).addTo(map);
                 } else { userMarker.setLatLng([currentLat, currentLon]); }
