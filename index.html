@@ -34,52 +34,49 @@
         .location-btn img { filter: brightness(0) invert(1); width: 24px; }
         .back-btn { position: absolute; top: 20px; right: 20px; z-index: 5500; width: 40px; height: 40px; background: rgba(0,0,0,0.5); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); color: white; font-weight: bold; }
 
-        /* DINAMIČKE KARTICE */
+        /* MALE KARTICE I PAMETNI ZOOM */
         .sport-marker-wrapper { display: flex; align-items: center; transition: all 0.3s ease; }
-        .sport-ball { font-size: 18px; z-index: 20; transition: font-size 0.3s; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+        .sport-ball { font-size: 20px; z-index: 20; transition: font-size 0.3s; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
         .status-live-wrapper .sport-ball { animation: bounce-ball 0.6s ease infinite alternate; }
         
-        /* Kartica se vidi samo na zoom > 14 */
         .live-card-thin { 
             background: rgba(10, 10, 10, 0.95); 
             border: 1px solid rgba(255,255,255,0.15); 
-            border-radius: 10px; 
-            padding: 4px 10px; 
-            margin-left: -12px; 
-            display: none; /* Inicijalno sakriveno za visoki zoom */
+            border-radius: 8px; 
+            padding: 4px 8px; 
+            margin-left: -10px; 
+            display: none; 
             align-items: center; 
-            min-height: 36px; 
+            min-height: 32px; 
             color: white; 
             backdrop-filter: blur(10px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
         }
 
-        /* Prikaz kartice na bliskom zoomu */
         .zoom-near .live-card-thin { display: flex; }
-        .zoom-near .sport-ball { font-size: 26px; }
+        .zoom-near .sport-ball { font-size: 24px; }
 
-        .status-live-wrapper .live-card-thin { border: 1px solid #ff3b30; box-shadow: 0 0 12px rgba(255,59,48,0.3); }
+        .status-live-wrapper .live-card-thin { border: 1px solid #ff3b30; box-shadow: 0 0 10px rgba(255,59,48,0.3); }
         
-        .card-info { display: flex; flex-direction: column; min-width: 60px; max-width: 120px; }
-        .card-title { font-size: 7px; color: #ff3b30; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; }
-        .card-teams { font-size: 10px; font-weight: 800; text-transform: uppercase; line-height: 1.1; }
-        .card-sub { font-size: 6px; color: #aaa; font-weight: 700; margin-top: 1px; }
+        .card-info { display: flex; flex-direction: column; min-width: 55px; max-width: 100px; }
+        .card-title { font-size: 6px; color: #ff3b30; font-weight: 900; text-transform: uppercase; margin-bottom: 0px; }
+        .card-teams { font-size: 8px; font-weight: 800; text-transform: uppercase; line-height: 1; }
+        .card-sub { font-size: 5.5px; color: #aaa; font-weight: 700; margin-top: 1px; }
         
         .card-score-box { 
-            margin-left: 10px; 
+            margin-left: 8px; 
             border-left: 1px solid rgba(255,255,255,0.1); 
-            padding-left: 10px; 
+            padding-left: 8px; 
             text-align: center;
         }
-        .score-main { font-family: 'Oswald'; font-size: 16px; color: #ff3b30; font-weight: 700; line-height: 1; }
-        .score-points { font-size: 8px; color: #fff; font-weight: 900; margin-top: 1px; }
+        .score-main { font-family: 'Oswald'; font-size: 14px; color: #ff3b30; font-weight: 700; line-height: 1; }
+        .score-points { font-size: 7px; color: #fff; font-weight: 900; margin-top: 1px; }
 
         #admin-panel { position: fixed; top: 0; left: 100%; width: 100%; height: 100%; background: #0a0a0a; z-index: 7000; transition: 0.4s cubic-bezier(0.19, 1, 0.22, 1); padding: 25px; display: flex; flex-direction: column; overflow-y: auto; }
         #admin-panel.active { left: 0; }
         .admin-btn { padding: 15px; border: none; font-weight: 900; color: white; text-transform: uppercase; width: 100%; border-radius: 12px; cursor: pointer; font-family: 'Oswald'; margin-bottom: 10px; }
 
         .user-location-dot { background: #007AFF; width: 12px; height: 12px; border: 2px solid white; border-radius: 50%; box-shadow: 0 0 15px #007AFF; }
-        @keyframes bounce-ball { from { transform: translateY(0); } to { transform: translateY(-8px); } }
+        @keyframes bounce-ball { from { transform: translateY(0); } to { transform: translateY(-7px); } }
     </style>
 </head>
 <body>
@@ -132,6 +129,7 @@
                     </div>
                 </div>
             </div>
+            <button class="admin-btn" style="background:#444;" onclick="triggerLogic('period')">SAČUVAJ PERIOD / SET</button>
             <button id="start-live-btn" class="admin-btn" style="background:#007AFF;" onclick="adminStatus('live')">KRENI UŽIVO</button>
             <button id="end-match-btn" class="admin-btn" style="background:#ff3b30; display:none;" onclick="triggerLogic('end')">ZAVRŠI MEČ</button>
             <button id="reset-match-btn" class="admin-btn" style="background:#ff9500; display:none;" onclick="resetMatch()">RESETUJ / NOVI MEČ</button>
@@ -184,10 +182,8 @@
             map = L.map('map', { zoomControl: false, tap: false, bounceAtZoomLimits: false }).setView([44.7866, 20.4489], 13);
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', { opacity: 0.8 }).addTo(map);
-            
             map.on('click', handleMapClick);
-            map.on('moveend zoomend', renderMarkers); // Re-render na pomeranje
-
+            map.on('moveend zoomend', renderMarkers);
             db.ref('tereni').on('value', snap => {
                 allTereni = [];
                 snap.forEach(c => { let d = c.val(); d.key = c.key; allTereni.push(d); });
@@ -222,14 +218,13 @@
         function renderMarkers() {
             if (!map) return;
             map.eachLayer(l => { if(l instanceof L.Marker && l !== userMarker) map.removeLayer(l); });
-            
             const center = map.getCenter();
             const zoom = map.getZoom();
             const zoomClass = zoom > 14 ? 'zoom-near' : '';
 
             allTereni.forEach(d => {
                 const dist = map.distance(center, L.latLng(d.lat, d.lng));
-                if (dist > 20000) return; // LIMIT 20KM
+                if (dist > 20000) return;
 
                 let scoreDisplay = d.t1 ? `${d.score1}:${d.score2}` : "FREE";
                 let pointsDisplay = "";
@@ -257,7 +252,7 @@
                             </div>` : ''}
                         </div>
                     </div>`,
-                    iconSize: [zoom > 14 ? 180 : 25, 30], iconAnchor: [zoom > 14 ? 15 : 12, 15]
+                    iconSize: [zoom > 14 ? 140 : 25, 30], iconAnchor: [zoom > 14 ? 15 : 12, 15]
                 });
                 L.marker([d.lat, d.lng], { icon }).addTo(map).on('click', (e) => {
                     L.DomEvent.stopPropagation(e);
@@ -352,6 +347,17 @@
             db.ref(`tereni/${currentAdminKey}`).update(upd);
         }
 
+        function triggerLogic(type) {
+            const d = allTereni.find(x => x.key === currentAdminKey);
+            if(type === 'period') {
+                let sub = d.sub_details || {};
+                let pNum = Object.keys(sub).length + 1;
+                sub["P"+pNum] = `${d.score1}:${d.score2}`;
+                let str = Object.keys(sub).map(k => sub[k]).join(' | ');
+                db.ref(`tereni/${currentAdminKey}`).update({ sub_details: sub, sub_string: str });
+            } else if(type === 'end') { db.ref(`tereni/${currentAdminKey}`).update({ status: 'ended' }); }
+        }
+
         function trackGPS() {
             if(!navigator.geolocation) return;
             navigator.geolocation.watchPosition(pos => {
@@ -360,34 +366,28 @@
                 else { userMarker.setLatLng([currentLat, currentLon]); }
             }, null, { enableHighAccuracy: true });
         }
-
         function goToMyLocation() { if(currentLat) map.flyTo([currentLat, currentLon], 18); }
-
         function handleSearch(e) {
             if(e.key === "Enter") {
                 fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${e.target.value}`)
                     .then(r => r.json()).then(data => { if(data[0]) { map.flyTo([data[0].lat, data[0].lon], 15); toggleSearch(); } });
             }
         }
-
         async function handleAuth() {
             const e = document.getElementById('email').value, p = document.getElementById('password').value;
             if(!e || !p) return;
             try { await auth.signInWithEmailAndPassword(e, p); } catch { try { await auth.createUserWithEmailAndPassword(e, p); } catch(err) { alert(err.message); } }
         }
-
         async function saveTeren(lat, lng) {
             const n = document.getElementById('p_name').value.toUpperCase(); if(!n) return;
             await db.ref('tereni').push({ name: n, lat, lng, owner: auth.currentUser.uid, sport: document.getElementById('p_sport').value, status: 'upcoming', score1: 0, score2: 0, p1: 0, p2: 0, g1: 0, g2: 0 });
             map.closePopup();
         }
-
         async function setupMatch() {
             const t1 = document.getElementById('adm-t1').value.toUpperCase(), t2 = document.getElementById('adm-t2').value.toUpperCase();
             if(!t1 || !t2) return;
             await db.ref(`tereni/${currentAdminKey}`).update({ t1, t2, status: 'upcoming', score1: 0, score2: 0, p1: 0, p2: 0, g1: 0, g2: 0, sub_string: "", sub_details: null });
         }
-
         function resetMatch() { db.ref(`tereni/${currentAdminKey}`).update({ t1: null, t2: null, status: 'upcoming', score1: 0, score2: 0, p1: 0, p2: 0, g1: 0, g2: 0, sub_string: "", sub_details: null }); }
         function adminStatus(s) { db.ref(`tereni/${currentAdminKey}`).update({ status: s }); }
         function adminDelete() { if(confirm("Trajno?")) { db.ref(`tereni/${currentAdminKey}`).remove(); closeAdmin(); } }
