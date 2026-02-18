@@ -40,6 +40,7 @@
         .sport-ball { font-size: 22px; z-index: 20; transition: font-size 0.3s; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8)); }
         .status-live-wrapper .sport-ball { animation: bounce-ball 0.6s ease infinite alternate; }
         
+        /* SCOREBOARD KARTICA */
         .live-card-thin { 
             background: rgba(20, 20, 20, 0.95); 
             border: 1px solid #444; 
@@ -48,7 +49,7 @@
             margin-left: -12px; 
             display: none; 
             flex-direction: column;
-            min-width: 160px;
+            min-width: 180px;
             color: white; 
             backdrop-filter: blur(15px); 
             box-shadow: 0 8px 24px rgba(0,0,0,0.7); 
@@ -61,10 +62,13 @@
         
         .score-row { display: flex; justify-content: space-between; align-items: center; width: 100%; margin: 2px 0; }
         .team-name-col { font-size: 13px; font-weight: 800; text-transform: uppercase; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
-        .score-val-col { font-family: 'Oswald'; font-size: 18px; color: #ff3b30; font-weight: 700; width: 35px; text-align: right; }
-        .pts-val-col { font-size: 10px; color: #aaa; font-weight: 900; width: 45px; text-align: right; }
+        
+        /* Kolone rezultata */
+        .score-val-col { font-family: 'Oswald'; font-size: 18px; color: #ff3b30; font-weight: 700; width: 30px; text-align: center; } /* Setovi */
+        .gem-val-col { font-size: 12px; color: #fff; font-weight: 800; width: 35px; text-align: center; } /* Gemovi u zagradi */
+        .pts-val-col { font-size: 11px; color: #ff9500; font-weight: 900; width: 40px; text-align: right; } /* Poeni (15-30-Ad) */
 
-        .card-sub-info { font-size: 8px; color: #ff9500; font-weight: 800; margin-top: 4px; border-top: 1px solid #333; padding-top: 4px; text-align: center; }
+        .card-sub-info { font-size: 8px; color: #aaa; font-weight: 800; margin-top: 4px; border-top: 1px solid #333; padding-top: 4px; text-align: center; }
 
         #admin-panel { position: fixed; top: 0; left: 100%; width: 100%; height: 100%; background: #0a0a0a; z-index: 7000; transition: 0.4s cubic-bezier(0.19, 1, 0.22, 1); padding: 25px; display: flex; flex-direction: column; overflow-y: auto; }
         #admin-panel.active { left: 0; }
@@ -132,7 +136,7 @@
         <div id="match-setup" style="display:none; flex-direction:column; gap:12px;">
             <input type="text" id="adm-t1" placeholder="TIM 1">
             <input type="text" id="adm-t2" placeholder="TIM 2">
-            <input type="datetime-local" id="adm-time" style="padding:10px; background:#111; color:white; border:1px solid #333; border-radius:8px;">
+            <input type="datetime-local" id="adm-time">
             <button class="admin-btn" style="background:#007AFF;" onclick="setupMatch()">ZAKAŽI MEČ</button>
         </div>
         <button style="background:none; border:none; color:#333; margin-top:auto; padding:20px; font-weight:bold;" onclick="adminDelete()">OBRIŠI TEREN</button>
@@ -203,14 +207,18 @@
                 if (isLive || isEnded || isUpcoming) {
                     let s1 = (isLive || isEnded) ? (d.score1 || 0) : "";
                     let s2 = (isLive || isEnded) ? (d.score2 || 0) : "";
-                    let p1 = "", p2 = "";
+                    let g1 = "", g2 = "", p1 = "", p2 = "";
 
-                    if (isLive) {
-                        if(d.sport === "ODBOJKA") { p1 = d.p1||0; p2 = d.p2||0; }
+                    if (isLive || isEnded) {
                         if(d.sport === "TENIS") {
-                            const isTB = (d.g1 === 6 && d.g2 === 6);
-                            p1 = isTB ? (d.p1||0) : (tennisPoints[d.p1]||"0");
-                            p2 = isTB ? (d.p2||0) : (tennisPoints[d.p2]||"0");
+                            g1 = `(${d.g1||0})`; g2 = `(${d.g2||0})`;
+                            if (isLive) {
+                                const isTB = (d.g1 === 6 && d.g2 === 6);
+                                p1 = isTB ? (d.p1||0) : (tennisPoints[d.p1]||"0");
+                                p2 = isTB ? (d.p2||0) : (tennisPoints[d.p2]||"0");
+                            }
+                        } else if(d.sport === "ODBOJKA" && isLive) {
+                            p1 = d.p1||0; p2 = d.p2||0;
                         }
                     }
 
@@ -224,11 +232,13 @@
                             <div class="score-row">
                                 <span class="team-name-col">${d.t1}</span>
                                 <span class="score-val-col">${s1}</span>
+                                <span class="gem-val-col">${g1}</span>
                                 <span class="pts-val-col">${p1}</span>
                             </div>
                             <div class="score-row">
                                 <span class="team-name-col">${d.t2}</span>
                                 <span class="score-val-col">${s2}</span>
+                                <span class="gem-val-col">${g2}</span>
                                 <span class="pts-val-col">${p2}</span>
                             </div>
                             ${bottomInfo ? `<div class="card-sub-info">${bottomInfo}</div>` : ''}
@@ -243,7 +253,7 @@
                              <div class="sport-ball">${sportEmojis[d.sport]||'⚽'}</div>
                              ${cardHtml}
                            </div>`,
-                    iconSize: [zoom > 14 ? 200 : 30, 60], iconAnchor: [zoom > 14 ? 15 : 15, 30]
+                    iconSize: [zoom > 14 ? 220 : 30, 60], iconAnchor: [zoom > 14 ? 15 : 15, 30]
                 });
                 L.marker([d.lat, d.lng], { icon }).addTo(map).on('click', (e) => { L.DomEvent.stopPropagation(e); if (auth.currentUser && d.owner === auth.currentUser.uid) openAdmin(d.key); });
             });
