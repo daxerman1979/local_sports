@@ -45,7 +45,7 @@
         
         .card-info { display: flex; flex-direction: column; min-width: 80px; max-width: 140px; }
         .card-title { font-size: 8px; color: #ff3b30; font-weight: 900; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 2px; }
-        .card-teams { font-size: 11px; font-weight: 800; text-transform: uppercase; line-height: 1.2; color: #fff; text-shadow: 0 1px 2px #000; }
+        .card-teams { font-size: 12px; font-weight: 800; text-transform: uppercase; line-height: 1.2; color: #fff; text-shadow: 0 1px 2px #000; }
         .card-sub { font-size: 7px; color: #ff9500; font-weight: 800; margin-top: 2px; letter-spacing: 0.3px; }
         
         .card-score-box { margin-left: 12px; border-left: 1px solid #333; padding-left: 12px; text-align: center; display: flex; flex-direction: column; justify-content: center; }
@@ -165,10 +165,10 @@
         function handleMapClick(e) {
             if (!auth.currentUser) return;
             const myTereniCount = allTereni.filter(t => t.owner === auth.currentUser.uid).length;
-            if (myTereniCount >= 3) { alert("Limit postignut! Svaki admin može imati maksimalno 3 terena."); return; }
+            if (myTereniCount >= 3) { alert("Limit od 3 terena popunjen!"); return; }
             const isTooClose = allTereni.some(t => map.distance(e.latlng, L.latLng(t.lat, t.lng)) < 200);
-            if (isTooClose) { alert("Preblizu! Min 200m."); return; }
-            const html = `<div style="padding:10px; background:#111; color:white; border-radius:10px;"><select id="p_sport" style="width:100%; padding:10px; margin-bottom:10px; background:#222; color:white; border:1px solid #444; border-radius:8px;"><option value="FUDBAL">FUDBAL</option><option value="KOŠARKA">KOŠARKA</option><option value="ODBOJKA">ODBOJKA</option><option value="TENIS">TENIS</option></select><input type="text" id="p_name" placeholder="NAZIV" style="width:100%; padding:10px; margin-bottom:10px; background:#222; color:white; border:1px solid #444; border-radius:8px;"><button onclick="saveTeren(${e.latlng.lat}, ${e.latlng.lng})" style="width:100%; background:#ff3b30; color:white; border:none; padding:10px; font-weight:bold; border-radius:8px;">KREIRAJ</button></div>`;
+            if (isTooClose) { alert("Min 200m razmaka."); return; }
+            const html = `<div style="padding:10px; background:#111; color:white; border-radius:10px;"><select id="p_sport" style="width:100%; padding:10px; margin-bottom:10px; background:#222; color:white; border:1px solid #444; border-radius:8px;"><option value="FUDBAL">FUDBAL</option><option value="KOŠARKA">KOŠARKA</option><option value="ODBOJKA">ODBOJKA</option><option value="TENIS">TENIS</option></select><input type="text" id="p_name" placeholder="IME TERENA" style="width:100%; padding:10px; margin-bottom:10px; background:#222; color:white; border:1px solid #444; border-radius:8px;"><button onclick="saveTeren(${e.latlng.lat}, ${e.latlng.lng})" style="width:100%; background:#ff3b30; color:white; border:none; padding:10px; font-weight:bold; border-radius:8px;">KREIRAJ</button></div>`;
             L.popup().setLatLng(e.latlng).setContent(html).openOn(map);
         }
 
@@ -179,16 +179,33 @@
             allTereni.forEach(d => {
                 const dist = map.distance(center, L.latLng(d.lat, d.lng));
                 if (dist > 20000) return;
-                let scoreDisplay = d.t1 ? `${d.score1}:${d.score2}` : "FREE";
-                let pointsDisplay = "";
-                if(d.sport === "ODBOJKA" && d.t1) pointsDisplay = `${d.p1 || 0}:${d.p2 || 0}`;
-                if(d.sport === "TENIS" && d.t1) {
-                    const isTB = (d.g1 === 6 && d.g2 === 6);
-                    const p1 = isTB ? (d.p1 || 0) : (tennisPoints[d.p1] || "0");
-                    const p2 = isTB ? (d.p2 || 0) : (tennisPoints[d.p2] || "0");
-                    pointsDisplay = `${d.g1 || 0}:${d.g2 || 0} (${p1}:${p2})`;
+
+                // Dinamički prikaz teksta na kartici
+                let titleText = "";
+                let mainText = "";
+                const isLiveOrEnded = (d.status === 'live' || d.status === 'ended');
+
+                if (isLiveOrEnded && d.t1) {
+                    titleText = d.name; // Ime terena ide gore u mali font
+                    mainText = `${d.t1} - ${d.t2}`; // Timovi idu u glavni font
+                } else {
+                    titleText = ""; 
+                    mainText = d.name; // Samo ime terena kad nema utakmice
                 }
-                const icon = L.divIcon({ className: '', html: `<div class="sport-marker-wrapper ${d.status==='live'?'status-live-wrapper':''} ${zoomClass}"><div class="sport-ball">${sportEmojis[d.sport]||'⚽'}</div><div class="live-card-thin"><div class="card-info"><span class="card-title">${d.name}</span><span class="card-teams">${d.t1 ? d.t1+' - '+d.t2 : 'SLOBODAN'}</span>${d.sub_string ? `<div class="card-sub">${d.sub_string}</div>` : ''}</div>${d.t1 ? `<div class="card-score-box"><div class="score-main">${scoreDisplay}</div>${pointsDisplay ? `<div class="score-points">${pointsDisplay}</div>` : ''}</div>` : ''}</div></div>`, iconSize: [zoom > 14 ? 180 : 30, 48], iconAnchor: [zoom > 14 ? 15 : 15, 24] });
+
+                let scoreDisplay = (isLiveOrEnded && d.t1) ? `${d.score1}:${d.score2}` : "";
+                let pointsDisplay = "";
+                if(d.status === 'live' && d.t1) {
+                    if(d.sport === "ODBOJKA") pointsDisplay = `${d.p1 || 0}:${d.p2 || 0}`;
+                    if(d.sport === "TENIS") {
+                        const isTB = (d.g1 === 6 && d.g2 === 6);
+                        const p1 = isTB ? (d.p1 || 0) : (tennisPoints[d.p1] || "0");
+                        const p2 = isTB ? (d.p2 || 0) : (tennisPoints[d.p2] || "0");
+                        pointsDisplay = `${d.g1 || 0}:${d.g2 || 0} (${p1}:${p2})`;
+                    }
+                }
+
+                const icon = L.divIcon({ className: '', html: `<div class="sport-marker-wrapper ${d.status==='live'?'status-live-wrapper':''} ${zoomClass}"><div class="sport-ball">${sportEmojis[d.sport]||'⚽'}</div><div class="live-card-thin"><div class="card-info"><span class="card-title">${titleText}</span><span class="card-teams">${mainText}</span>${d.sub_string ? `<div class="card-sub">${d.sub_string}</div>` : ''}</div>${scoreDisplay ? `<div class="card-score-box"><div class="score-main">${scoreDisplay}</div>${pointsDisplay ? `<div class="score-points">${pointsDisplay}</div>` : ''}</div>` : ''}</div></div>`, iconSize: [zoom > 14 ? 180 : 30, 48], iconAnchor: [zoom > 14 ? 15 : 15, 24] });
                 L.marker([d.lat, d.lng], { icon }).addTo(map).on('click', (e) => { L.DomEvent.stopPropagation(e); if (auth.currentUser && d.owner === auth.currentUser.uid) openAdmin(d.key); });
             });
         }
@@ -250,7 +267,6 @@
             const d = allTereni.find(x => x.key === currentAdminKey);
             if(type === 'period') {
                 let sub = d.sub_details || {}; let pNum = Object.keys(sub).length + 1;
-                // Računanje čiste razlike za period
                 let prevH = 0, prevA = 0;
                 Object.values(sub).forEach(val => { let parts = val.split(':'); prevH += parseInt(parts[0]); prevA += parseInt(parts[1]); });
                 let diffH = (d.score1 || 0) - prevH; let diffA = (d.score2 || 0) - prevA;
