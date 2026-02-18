@@ -40,7 +40,7 @@
         .sport-ball { font-size: 22px; z-index: 20; transition: font-size 0.3s; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8)); }
         .status-live-wrapper .sport-ball { animation: bounce-ball 0.6s ease infinite alternate; }
         
-        /* PROFESIONALNA SCOREBOARD KARTICA */
+        /* DINAMIČKA KARTICA - ŠIRI SE PREMA TEKSTU */
         .live-card-thin { 
             background: rgba(15, 15, 15, 0.98); 
             border: 1px solid #444; 
@@ -49,8 +49,8 @@
             margin-left: -12px; 
             display: none; 
             flex-direction: column;
-            min-width: 180px; 
-            max-width: 240px;
+            width: auto; 
+            white-space: nowrap;
             color: white; 
             backdrop-filter: blur(15px); 
             box-shadow: 0 10px 30px rgba(0,0,0,0.8); 
@@ -59,17 +59,17 @@
         .zoom-near .sport-ball { font-size: 32px; }
         .status-live-wrapper .live-card-thin { border: 2px solid #ff3b30; }
 
-        .card-header-name { font-size: 9px; color: #ff3b30; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; border-bottom: 1px solid #333; padding-bottom: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .card-header-name { font-size: 9px; color: #ff3b30; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; border-bottom: 1px solid #333; padding-bottom: 3px; }
         
-        /* Grid sistem za rezultate */
-        .score-grid { display: grid; grid-template-columns: 1fr auto auto auto; align-items: center; gap: 8px; width: 100%; }
+        /* Grid sa auto širinama kolona */
+        .score-grid { display: grid; grid-template-columns: auto auto auto auto; align-items: center; gap: 10px; width: 100%; }
         
-        .team-name-col { font-size: 11px; font-weight: 800; text-transform: uppercase; color: #fff; white-space: nowrap; overflow: hidden; }
-        .score-val-col { font-family: 'Oswald'; font-size: 18px; color: #ff3b30; font-weight: 700; min-width: 22px; text-align: center; line-height: 1; } 
-        .gem-val-col { font-size: 11px; color: #eee; font-weight: 800; min-width: 28px; text-align: center; opacity: 0.9; } 
-        .pts-val-col { font-size: 11px; color: #ff9500; font-weight: 900; min-width: 30px; text-align: right; } 
+        .team-name-col { font-size: 11px; font-weight: 800; text-transform: uppercase; color: #fff; min-width: 70px; }
+        .score-val-col { font-family: 'Oswald'; font-size: 18px; color: #ff3b30; font-weight: 700; text-align: center; min-width: 20px; } 
+        .gem-val-col { font-size: 11px; color: #eee; font-weight: 800; text-align: center; min-width: 25px; } 
+        .pts-val-col { font-size: 11px; color: #ff9500; font-weight: 900; text-align: right; min-width: 30px; } 
 
-        .card-sub-info { font-size: 8px; color: #aaa; font-weight: 800; margin-top: 6px; border-top: 1px solid #333; padding-top: 5px; text-align: center; line-height: 1.2; }
+        .card-sub-info { font-size: 8px; color: #aaa; font-weight: 800; margin-top: 6px; border-top: 1px solid #333; padding-top: 5px; text-align: center; }
 
         #admin-panel { position: fixed; top: 0; left: 100%; width: 100%; height: 100%; background: #0a0a0a; z-index: 7000; transition: 0.4s cubic-bezier(0.19, 1, 0.22, 1); padding: 25px; display: flex; flex-direction: column; overflow-y: auto; }
         #admin-panel.active { left: 0; }
@@ -254,13 +254,13 @@
                              <div class="sport-ball">${sportEmojis[d.sport]||'⚽'}</div>
                              ${cardHtml}
                            </div>`,
-                    iconSize: [zoom > 14 ? 200 : 30, 60], iconAnchor: [zoom > 14 ? 15 : 15, 30]
+                    iconSize: [zoom > 14 ? 1 : 30, 60], // Icon size auto
+                    iconAnchor: [15, 30]
                 });
                 L.marker([d.lat, d.lng], { icon }).addTo(map).on('click', (e) => { L.DomEvent.stopPropagation(e); if (auth.currentUser && d.owner === auth.currentUser.uid) openAdmin(d.key); });
             });
         }
 
-        // --- OSTALE FUNKCIJE (NETAKNUTE) ---
         function openAdmin(key) { currentAdminKey = key; refreshAdminPanel(key); document.getElementById('admin-panel').classList.add('active'); }
         function closeAdmin() { document.getElementById('admin-panel').classList.remove('active'); currentAdminKey = null; }
 
