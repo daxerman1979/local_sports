@@ -60,10 +60,11 @@
 
         .card-header-name { font-size: 9px; color: #ff3b30; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; border-bottom: 1px solid #333; padding-bottom: 3px; }
         
-        .score-grid { display: grid; grid-template-columns: auto auto auto auto; align-items: center; gap: 10px; width: 100%; }
+        .score-grid { display: grid; grid-template-columns: auto auto auto auto auto; align-items: center; gap: 10px; width: 100%; }
         
         .team-name-col { font-size: 11px; font-weight: 800; text-transform: uppercase; color: #fff; min-width: 70px; }
         .score-val-col { font-family: 'Oswald'; font-size: 18px; color: #ff3b30; font-weight: 700; text-align: center; min-width: 20px; } 
+        .periods-col { font-size: 10px; color: #888; font-weight: 700; text-align: left; letter-spacing: 1px; } /* Kolona za periode u zagradama */
         .gem-val-col { font-size: 11px; color: #eee; font-weight: 800; text-align: center; min-width: 25px; } 
         .pts-val-col { font-size: 11px; color: #ff9500; font-weight: 900; text-align: right; min-width: 30px; } 
 
@@ -207,6 +208,18 @@
                     let s1 = (isLive || isEnded) ? (d.score1 || 0) : "";
                     let s2 = (isLive || isEnded) ? (d.score2 || 0) : "";
                     let g1 = "", g2 = "", p1 = "", p2 = "";
+                    let per1 = "", per2 = "";
+
+                    // LOGIKA ZA PRIKAZ PERIODA U ZAGRADAMA NAKON ZAVRŠETKA
+                    if (isEnded && d.sub_details) {
+                        let hArr = [], aArr = [];
+                        Object.values(d.sub_details).forEach(val => {
+                            let parts = val.split(':');
+                            hArr.push(parts[0]); aArr.push(parts[1]);
+                        });
+                        per1 = `(${hArr.join(',')})`;
+                        per2 = `(${aArr.join(',')})`;
+                    }
 
                     if (isLive || isEnded) {
                         if(d.sport === "TENIS") {
@@ -221,9 +234,9 @@
                         }
                     }
 
-                    let bottomInfo = d.sub_string || "";
+                    let bottomInfo = isLive ? "UŽIVO" : (d.sub_string || "");
                     if (isUpcoming) bottomInfo = d.match_time ? new Date(d.match_time).toLocaleString('sr-RS', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'}).toUpperCase() : "ZAKAZANO";
-                    if (isEnded) bottomInfo = d.match_time ? "ZAVRŠENO " + new Date(d.match_time).toLocaleDateString('sr-RS').toUpperCase() : "ZAVRŠENO";
+                    if (isEnded) bottomInfo = d.match_time ? "ODIGRANO: " + new Date(d.match_time).toLocaleDateString('sr-RS').toUpperCase() : "ZAVRŠENO";
 
                     cardHtml = `
                         <div class="live-card-thin">
@@ -231,12 +244,14 @@
                             <div class="score-grid">
                                 <span class="team-name-col">${d.t1}</span>
                                 <span class="score-val-col">${s1}</span>
+                                <span class="periods-col">${per1}</span>
                                 <span class="gem-val-col">${g1}</span>
                                 <span class="pts-val-col">${p1}</span>
                             </div>
                             <div class="score-grid">
                                 <span class="team-name-col">${d.t2}</span>
                                 <span class="score-val-col">${s2}</span>
+                                <span class="periods-col">${per2}</span>
                                 <span class="gem-val-col">${g2}</span>
                                 <span class="pts-val-col">${p2}</span>
                             </div>
