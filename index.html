@@ -40,6 +40,7 @@
         .sport-ball { font-size: 22px; z-index: 20; transition: font-size 0.3s; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8)); }
         .status-live-wrapper .sport-ball { animation: bounce-ball 0.6s ease infinite alternate; }
         
+        /* SCOREBOARD KARTICA */
         .live-card-thin { 
             background: rgba(15, 15, 15, 0.98); 
             border: 1px solid #444; 
@@ -53,14 +54,40 @@
             color: white; 
             backdrop-filter: blur(15px); 
             box-shadow: 0 10px 30px rgba(0,0,0,0.8); 
+            position: relative;
+            overflow: hidden; /* Neophodno za presijavanje */
         }
         .zoom-near .live-card-thin { display: flex; }
         .zoom-near .sport-ball { font-size: 32px; }
+        
+        /* EFEKAT PRESIJAVANJA (SHINE) */
         .status-live-wrapper .live-card-thin { border: 2px solid #ff3b30; }
+        .status-live-wrapper .live-card-thin::after {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -150%;
+            width: 50%;
+            height: 200%;
+            background: linear-gradient(
+                to right, 
+                rgba(255, 59, 48, 0) 0%, 
+                rgba(255, 59, 48, 0.2) 50%, 
+                rgba(255, 59, 48, 0) 100%
+            );
+            transform: rotate(25deg);
+            animation: shine 3s infinite linear;
+        }
+
+        @keyframes shine {
+            0% { left: -150%; }
+            30% { left: 150%; }
+            100% { left: 150%; }
+        }
 
         .card-header-name { font-size: 9px; color: #ff3b30; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; border-bottom: 1px solid #333; padding-bottom: 3px; }
         
-        .score-grid { display: grid; grid-template-columns: auto auto auto auto auto; align-items: center; gap: 10px; width: 100%; }
+        .score-grid { display: grid; grid-template-columns: auto auto auto auto auto; align-items: center; gap: 10px; width: 100%; position: relative; z-index: 2; }
         
         .team-name-col { font-size: 11px; font-weight: 800; text-transform: uppercase; color: #fff; min-width: 70px; }
         .score-val-col { font-family: 'Oswald'; font-size: 18px; color: #ff3b30; font-weight: 700; text-align: center; min-width: 20px; } 
@@ -68,7 +95,7 @@
         .gem-val-col { font-size: 11px; color: #eee; font-weight: 800; text-align: center; min-width: 25px; } 
         .pts-val-col { font-size: 11px; color: #ff9500; font-weight: 900; text-align: right; min-width: 30px; } 
 
-        .card-sub-info { font-size: 8px; color: #aaa; font-weight: 800; margin-top: 6px; border-top: 1px solid #333; padding-top: 5px; text-align: center; }
+        .card-sub-info { font-size: 8px; color: #aaa; font-weight: 800; margin-top: 6px; border-top: 1px solid #333; padding-top: 5px; text-align: center; position: relative; z-index: 2; }
 
         #admin-panel { position: fixed; top: 0; left: 100%; width: 100%; height: 100%; background: #0a0a0a; z-index: 7000; transition: 0.4s cubic-bezier(0.19, 1, 0.22, 1); padding: 25px; display: flex; flex-direction: column; overflow-y: auto; }
         #admin-panel.active { left: 0; }
@@ -210,17 +237,13 @@
                     let g1 = "", g2 = "", p1 = "", p2 = "";
                     let per1 = "", per2 = "";
 
-                    // LOGIKA ZA PERIODI (UŽIVO I ZAVRŠENO)
                     if (d.sub_details) {
                         let hArr = [], aArr = [];
                         Object.values(d.sub_details).forEach(val => {
                             let parts = val.split(':');
                             hArr.push(parts[0]); aArr.push(parts[1]);
                         });
-                        if(hArr.length > 0) {
-                            per1 = `(${hArr.join(' ')})`;
-                            per2 = `(${aArr.join(' ')})`;
-                        }
+                        if(hArr.length > 0) { per1 = `(${hArr.join(' ')})`; per2 = `(${aArr.join(' ')})`; }
                     }
 
                     if (isLive || isEnded) {
@@ -231,9 +254,7 @@
                                 p1 = isTB ? (d.p1||0) : (tennisPoints[d.p1]||"0");
                                 p2 = isTB ? (d.p2||0) : (tennisPoints[d.p2]||"0");
                             }
-                        } else if(d.sport === "ODBOJKA" && isLive) {
-                            p1 = d.p1||0; p2 = d.p2||0;
-                        }
+                        } else if(d.sport === "ODBOJKA" && isLive) { p1 = d.p1||0; p2 = d.p2||0; }
                     }
 
                     let bottomInfo = isLive ? "UŽIVO" : (d.sub_string || "");
