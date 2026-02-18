@@ -210,14 +210,17 @@
                     let g1 = "", g2 = "", p1 = "", p2 = "";
                     let per1 = "", per2 = "";
 
-                    if (isEnded && d.sub_details) {
+                    // LOGIKA ZA PERIODI (UŽIVO I ZAVRŠENO)
+                    if (d.sub_details) {
                         let hArr = [], aArr = [];
                         Object.values(d.sub_details).forEach(val => {
                             let parts = val.split(':');
                             hArr.push(parts[0]); aArr.push(parts[1]);
                         });
-                        per1 = `(${hArr.join(' ')})`; // Razmak umesto zareza
-                        per2 = `(${aArr.join(' ')})`; 
+                        if(hArr.length > 0) {
+                            per1 = `(${hArr.join(' ')})`;
+                            per2 = `(${aArr.join(' ')})`;
+                        }
                     }
 
                     if (isLive || isEnded) {
