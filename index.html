@@ -40,7 +40,6 @@
         .sport-ball { font-size: 22px; z-index: 20; transition: font-size 0.3s; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8)); }
         .status-live-wrapper .sport-ball { animation: bounce-ball 0.6s ease infinite alternate; }
         
-        /* DINAMIČKA KARTICA - ŠIRI SE PREMA TEKSTU */
         .live-card-thin { 
             background: rgba(15, 15, 15, 0.98); 
             border: 1px solid #444; 
@@ -61,7 +60,6 @@
 
         .card-header-name { font-size: 9px; color: #ff3b30; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; border-bottom: 1px solid #333; padding-bottom: 3px; }
         
-        /* Grid sa auto širinama kolona */
         .score-grid { display: grid; grid-template-columns: auto auto auto auto; align-items: center; gap: 10px; width: 100%; }
         
         .team-name-col { font-size: 11px; font-weight: 800; text-transform: uppercase; color: #fff; min-width: 70px; }
@@ -159,7 +157,7 @@
         const auth = firebase.auth(), db = firebase.database();
 
         let map, userMarker, currentLat, currentLon, currentAdminKey = null, allTereni = [];
-        const sportEmojis = { "FUDBAL": "⚽", "KOŠARKA": "🏀", "ODBOJKA": "🏐", "TENIS": "🎾" };
+        const sportEmojis = { "FUDBAL": "⚽", "KOŠARKA": "🏀", "ODBOJKA": "🏐", "TENIS": "🎾", "RUKOMET": "🤾" };
         const tennisPoints = ["0", "15", "30", "40", "AD"];
 
         function exploreMap() { document.getElementById('hero').style.display = 'none'; document.getElementById('map').style.display = 'block'; document.getElementById('ui-controls').style.display = 'block'; initMap(); }
@@ -188,7 +186,7 @@
             if (myTereniCount >= 3) { alert("LIMIT 3 TERENA!"); return; }
             const isTooClose = allTereni.some(t => map.distance(e.latlng, L.latLng(t.lat, t.lng)) < 200);
             if (isTooClose) { alert("MIN 200M."); return; }
-            const html = `<div style="padding:10px; background:#111; color:white; border-radius:10px;"><select id="p_sport" style="width:100%; padding:10px; margin-bottom:10px; background:#222; color:white; border:1px solid #444; border-radius:8px;"><option value="FUDBAL">FUDBAL</option><option value="KOŠARKA">KOŠARKA</option><option value="ODBOJKA">ODBOJKA</option><option value="TENIS">TENIS</option></select><input type="text" id="p_name" placeholder="NAZIV TERENA" maxlength="10" style="width:100%; padding:10px; margin-bottom:10px; background:#222; color:white; border:1px solid #444; border-radius:8px;"><button onclick="saveTeren(${e.latlng.lat}, ${e.latlng.lng})" style="width:100%; background:#ff3b30; color:white; border:none; padding:10px; font-weight:bold; border-radius:8px;">KREIRAJ</button></div>`;
+            const html = `<div style="padding:10px; background:#111; color:white; border-radius:10px;"><select id="p_sport" style="width:100%; padding:10px; margin-bottom:10px; background:#222; color:white; border:1px solid #444; border-radius:8px;"><option value="FUDBAL">FUDBAL</option><option value="KOŠARKA">KOŠARKA</option><option value="ODBOJKA">ODBOJKA</option><option value="TENIS">TENIS</option><option value="RUKOMET">RUKOMET</option></select><input type="text" id="p_name" placeholder="NAZIV TERENA" maxlength="10" style="width:100%; padding:10px; margin-bottom:10px; background:#222; color:white; border:1px solid #444; border-radius:8px;"><button onclick="saveTeren(${e.latlng.lat}, ${e.latlng.lng})" style="width:100%; background:#ff3b30; color:white; border:none; padding:10px; font-weight:bold; border-radius:8px;">KREIRAJ</button></div>`;
             L.popup().setLatLng(e.latlng).setContent(html).openOn(map);
         }
 
@@ -254,7 +252,7 @@
                              <div class="sport-ball">${sportEmojis[d.sport]||'⚽'}</div>
                              ${cardHtml}
                            </div>`,
-                    iconSize: [zoom > 14 ? 1 : 30, 60], // Icon size auto
+                    iconSize: [zoom > 14 ? 1 : 30, 60],
                     iconAnchor: [15, 30]
                 });
                 L.marker([d.lat, d.lng], { icon }).addTo(map).on('click', (e) => { L.DomEvent.stopPropagation(e); if (auth.currentUser && d.owner === auth.currentUser.uid) openAdmin(d.key); });
