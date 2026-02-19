@@ -44,6 +44,9 @@
         .settings-btn { position: absolute; top: 70px; right: 20px; z-index: 5500; width: 40px; height: 40px; background: rgba(0,0,0,0.5); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); }
         .settings-btn img { width: 20px; filter: invert(1); }
 
+        /* Logged in indicator */
+        #user-indicator { position: absolute; bottom: 15px; left: 15px; z-index: 5500; color: rgba(255,255,255,0.4); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; pointer-events: none; }
+
         .sport-marker-wrapper { display: flex; align-items: center; width: max-content; }
         .sport-ball { font-size: 20px; z-index: 20; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8)); flex-shrink: 0; }
         .status-live-wrapper .sport-ball { animation: bounce-ball 0.6s ease infinite alternate; }
@@ -85,6 +88,11 @@
         /* Language Modal */
         #lang-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; display: none; justify-content: center; align-items: center; backdrop-filter: blur(10px); }
         .lang-box { background: #111; padding: 30px; border-radius: 20px; border: 1px solid #ff3b30; text-align: center; }
+
+        /* Home Language Switcher */
+        .home-lang-switch { display: flex; gap: 15px; justify-content: center; margin-top: 10px; }
+        .home-lang-btn { background: none; border: 1px solid rgba(255,255,255,0.2); color: #aaa; padding: 5px 12px; border-radius: 15px; font-size: 10px; font-weight: 900; cursor: pointer; }
+        .home-lang-btn.active { border-color: #ff3b30; color: white; }
     </style>
 </head>
 <body>
@@ -96,6 +104,10 @@
             <input type="password" id="password" placeholder="PASSWORD">
             <button class="auth-btn" id="btn-login" onclick="handleAuth()">ULAZ U SISTEM</button>
             <button id="btn-explore" onclick="exploreMap()" style="background:none; border:none; color:#aaa; cursor:pointer; font-weight:bold; margin-top:10px; text-decoration: underline;">SAMO EXPLORE</button>
+            <div class="home-lang-switch">
+                <div class="home-lang-btn" id="h-lang-sr" onclick="setLanguage('sr')">SRB</div>
+                <div class="home-lang-btn" id="h-lang-en" onclick="setLanguage('en')">ENG</div>
+            </div>
         </div>
     </div>
 
@@ -105,6 +117,7 @@
         <div class="back-btn" onclick="goBackToLogin()">&#10006;</div>
         <div class="settings-btn" onclick="toggleLangModal()"><img src="https://cdn-icons-png.flaticon.com/512/126/126472.png"></div>
         <div class="location-btn" onclick="goToMyLocation()"><img src="https://cdn-icons-png.flaticon.com/512/1865/1865269.png"></div>
+        <div id="user-indicator"></div>
     </div>
 
     <div id="lang-modal" onclick="toggleLangModal()">
@@ -183,7 +196,8 @@
                 adminTitle: "ADMIN TABLA", savePeriod: "SAČUVAJ PERIOD / SET",
                 goLive: "KRENI UŽIVO", endMatch: "ZAVRŠI MEČ", resetMatch: "RESET / NOVI MEČ",
                 schedule: "ZAKAŽI MEČ", deleteCourt: "OBRIŠI TEREN", zoneOccupied: "ZONA ZAUZETA!",
-                create: "KRENI", courtName: "NAZIV TERENA", player: "IME IGRAČA", team: "TIM"
+                create: "KRENI", courtName: "NAZIV TERENA", player: "IME IGRAČA", team: "TIM",
+                loggedAs: "ULOGOVAN KAO:"
             },
             en: {
                 login: "ENTER SYSTEM", explore: "JUST EXPLORE", search: "Search...", 
@@ -191,7 +205,8 @@
                 adminTitle: "ADMIN PANEL", savePeriod: "SAVE PERIOD / SET",
                 goLive: "GO LIVE", endMatch: "END MATCH", resetMatch: "RESET / NEW MATCH",
                 schedule: "SCHEDULE MATCH", deleteCourt: "DELETE COURT", zoneOccupied: "ZONE OCCUPIED!",
-                create: "CREATE", courtName: "COURT NAME", player: "PLAYER NAME", team: "TEAM"
+                create: "CREATE", courtName: "COURT NAME", player: "PLAYER NAME", team: "TEAM",
+                loggedAs: "LOGGED AS:"
             }
         };
 
@@ -199,7 +214,7 @@
             currentLang = lang;
             localStorage.setItem('lang', lang);
             updateUILanguage();
-            toggleLangModal();
+            if(document.getElementById('lang-modal').style.display === 'flex') toggleLangModal();
         }
 
         function updateUILanguage() {
@@ -216,6 +231,15 @@
             document.getElementById('reset-match-btn').innerText = t.resetMatch;
             document.getElementById('btn-schedule').innerText = t.schedule;
             document.getElementById('btn-delete-court').innerText = t.deleteCourt;
+            
+            // Home buttons active state
+            document.getElementById('h-lang-sr').classList.toggle('active', currentLang === 'sr');
+            document.getElementById('h-lang-en').classList.toggle('active', currentLang === 'en');
+            
+            // Update indicator if user exists
+            if(auth.currentUser) {
+                document.getElementById('user-indicator').innerText = `${t.loggedAs} ${auth.currentUser.email}`;
+            }
         }
 
         function toggleLangModal() {
@@ -225,7 +249,16 @@
 
         function exploreMap() { document.getElementById('hero').style.display = 'none'; document.getElementById('map').style.display = 'block'; document.getElementById('ui-controls').style.display = 'block'; initMap(); updateUILanguage(); }
         function goBackToLogin() { auth.signOut(); location.reload(); }
-        auth.onAuthStateChanged(user => { if (user) exploreMap(); });
+        
+        auth.onAuthStateChanged(user => { 
+            if (user) {
+                exploreMap();
+                const t = translations[currentLang];
+                document.getElementById('user-indicator').innerText = `${t.loggedAs} ${user.email}`;
+            } else {
+                updateUILanguage();
+            }
+        });
 
         function initMap() {
             if (map) return;
