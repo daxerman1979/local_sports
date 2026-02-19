@@ -35,15 +35,21 @@
         .sport-ball { font-size: 20px; z-index: 20; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8)); flex-shrink: 0; }
         .status-live-wrapper .sport-ball { animation: bounce-ball 0.6s ease infinite alternate; }
         
-        .live-card-thin { background: rgba(10, 10, 10, 0.98); border: 1px solid #333; border-radius: 6px; padding: 6px 10px; margin-left: 6px; display: none; flex-direction: column; width: max-content; color: white; backdrop-filter: blur(15px); box-shadow: 0 4px 15px rgba(0,0,0,0.8); position: relative; overflow: hidden; z-index: 25; }
+        /* DINAMIČKA I PORAVNATA KARTICA NA MAPI */
+        .live-card-thin { 
+            background: rgba(10, 10, 10, 0.98); border: 1px solid #333; border-radius: 6px; padding: 6px 10px; margin-left: 6px; display: none; flex-direction: column; width: auto; min-width: 140px; color: white; backdrop-filter: blur(15px); box-shadow: 0 4px 15px rgba(0,0,0,0.8); position: relative; overflow: hidden; z-index: 25;
+        }
         .zoom-near .live-card-thin { display: flex; }
         .status-live-wrapper .live-card-thin { border: 1.5px solid #ff3b30; }
         .status-live-wrapper .live-card-thin::after { content: ""; position: absolute; top: -50%; left: -150%; width: 40%; height: 200%; background: linear-gradient(to right, transparent 0%, rgba(255, 59, 48, 0.15) 50%, transparent 100%); transform: rotate(20deg); animation: shine 4s infinite linear; z-index: 1; }
+        @keyframes shine { 0% { left: -150%; } 30% { left: 150%; } 100% { left: 150%; } }
 
-        .score-row { display: grid; grid-template-columns: 80px 25px 60px; align-items: center; gap: 8px; position: relative; z-index: 2; margin-bottom: 2px; }
-        .team-name-col { font-size: 13px; font-weight: 900; text-transform: uppercase; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        /* GRID ZA SAVRŠENE KOLONE */
+        .score-row { display: grid; grid-template-columns: minmax(60px, auto) 25px auto auto; align-items: center; gap: 8px; position: relative; z-index: 2; margin-bottom: 2px; }
+        .team-name-col { font-size: 13px; font-weight: 900; text-transform: uppercase; color: #fff; white-space: nowrap; }
         .score-val-col { font-family: 'Oswald'; font-size: 18px; color: #ff3b30; font-weight: 700; text-align: center; }
         .periods-tag-mini { color: #ffcc00; font-weight: 900; font-size: 10px; letter-spacing: 1px; }
+        .live-pts-mini { color: #ff9500; font-weight: 900; font-size: 11px; margin-left: 4px; } /* Tenis poeni */
 
         #match-details-view { position: fixed; bottom: -100%; left: 0; width: 100%; max-height: 85vh; background: #0a0a0a; z-index: 8000; border-top: 2px solid #ff3b30; border-radius: 25px 25px 0 0; padding: 25px; transition: 0.5s; overflow-y: auto; color: white; }
         #match-details-view.active { bottom: 0; }
@@ -53,6 +59,7 @@
         #admin-panel.active { left: 0; }
         .admin-btn { padding: 12px; border: none; font-weight: 900; color: white; text-transform: uppercase; width: 100%; border-radius: 12px; cursor: pointer; font-family: 'Oswald'; margin-bottom: 8px; }
         .user-location-dot { background: #007AFF; width: 14px; height: 14px; border: 2px solid white; border-radius: 50%; box-shadow: 0 0 20px #007AFF; }
+        @keyframes bounce-ball { from { transform: translateY(0); } to { transform: translateY(-10px); } }
     </style>
 </head>
 <body>
@@ -68,8 +75,12 @@
     </div>
 
     <div id="map"></div>
+    
     <div id="ui-controls" style="display:none;">
-        <div id="search-container"><img src="https://cdn-icons-png.flaticon.com/512/622/622669.png" class="search-icon" onclick="toggleSearch()"><input type="text" id="city-search" placeholder="Pretraži..." onkeypress="handleSearch(event)"></div>
+        <div id="search-container">
+            <img src="https://cdn-icons-png.flaticon.com/512/622/622669.png" class="search-icon" onclick="toggleSearch()">
+            <input type="text" id="city-search" placeholder="Pretraži..." onkeypress="handleSearch(event)">
+        </div>
         <div class="back-btn" onclick="goBackToLogin()">&#10006;</div>
         <div class="location-btn" onclick="goToMyLocation()"><img src="https://cdn-icons-png.flaticon.com/512/1865/1865269.png"></div>
     </div>
@@ -82,12 +93,22 @@
             <div id="det-score" style="font-size:45px; font-family:'Oswald'; color:#ff3b30; padding:0 10px;"></div>
             <div id="det-t2" style="font-size:22px; font-weight:900; text-transform:uppercase; text-align:right;"></div>
         </div>
-        <div style="margin-bottom:30px;"><div style="color:#888; font-size:10px; margin-bottom:10px; font-weight:bold;">REZULTAT PO PERIODIMA</div><div id="det-periods" style="display:flex; flex-wrap:wrap;"></div></div>
-        <div id="det-stats-container" style="border-top: 1px solid #333; padding-top:20px; display:none;"><h4 style="font-family:'Oswald'; color:#888; margin-bottom:15px;">DOGAĐAJI NA MEČU</h4><div id="det-events-list"></div></div>
+        <div style="margin-bottom:30px;">
+            <div style="color:#888; font-size:10px; margin-bottom:10px; font-weight:bold;">REZULTAT PO PERIODIMA</div>
+            <div id="det-periods" style="display:flex; flex-wrap:wrap;"></div>
+        </div>
+        <div id="det-stats-container" style="border-top: 1px solid #333; padding-top:20px; display:none;">
+            <h4 style="font-family:'Oswald'; color:#888; margin-bottom:15px;">DOGAĐAJI NA MEČU</h4>
+            <div id="det-events-list"></div>
+        </div>
     </div>
 
     <div id="admin-panel">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;"><div id="adm-name" style="font-family:'Oswald'; font-size:24px; color:#fff;">ADMIN TABLA</div><div onclick="closeAdmin()" style="font-size:40px; color:#ff3b30; cursor:pointer;">&times;</div></div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
+            <div id="adm-name" style="font-family:'Oswald'; font-size:24px; color:#fff;">ADMIN TABLA</div>
+            <div onclick="closeAdmin()" style="font-size:40px; color:#ff3b30; cursor:pointer;">&times;</div>
+        </div>
+        
         <div id="adm-score-view" style="display:none; flex-direction:column;">
             <div style="background:#151515; border:1px solid #ff3b30; border-radius:20px; padding:20px; text-align:center; margin-bottom:15px;">
                 <div id="adm-main-score" style="font-size:55px; font-family:'Oswald'; color:#ff3b30;">0 : 0</div>
@@ -104,8 +125,10 @@
 
         <div id="match-setup" style="display:none; flex-direction:column; gap:12px;">
             <input type="text" id="adm-league-input" placeholder="LIGA (NOVA)" list="league-list"><datalist id="league-list"></datalist>
-            <input type="text" id="adm-t1" placeholder="TIM 1" maxlength="10"><input type="text" id="adm-t2" placeholder="TIM 2" maxlength="10">
-            <input type="datetime-local" id="adm-time"><button class="admin-btn" style="background:#007AFF;" onclick="setupMatch()">ZAKAŽI MEČ</button>
+            <input type="text" id="adm-t1" placeholder="TIM 1" maxlength="10">
+            <input type="text" id="adm-t2" placeholder="TIM 2" maxlength="10">
+            <input type="datetime-local" id="adm-time">
+            <button class="admin-btn" style="background:#007AFF;" onclick="setupMatch()">ZAKAŽI MEČ</button>
         </div>
         <button style="background:none; border:none; color:#333; margin-top:auto; padding:20px; font-weight:bold;" onclick="adminDelete()">OBRIŠI TEREN</button>
     </div>
@@ -142,7 +165,6 @@
             map.on('moveend', () => { const center = map.getCenter(); localStorage.setItem('lastLat', center.lat); localStorage.setItem('lastLng', center.lng); localStorage.setItem('lastZoom', map.getZoom()); renderMarkers(); });
             map.on('click', handleMapClick);
             db.ref('tereni').on('value', snap => { allTereni = []; snap.forEach(c => { let d = c.val(); d.key = c.key; allTereni.push(d); }); renderMarkers(); if(currentAdminKey) refreshAdminPanel(currentAdminKey); });
-            db.ref('leagues').on('value', snap => { const list = document.getElementById('league-list'); list.innerHTML = ""; snap.forEach(l => { let opt = document.createElement('option'); opt.value = l.val(); list.appendChild(opt); }); });
             trackGPS();
         }
 
@@ -164,12 +186,24 @@
                 let cardHtml = "";
                 if (isLive || isEnded || isUpcoming) {
                     let s1 = (isLive || isEnded) ? (d.score1 || 0) : "?", s2 = (isLive || isEnded) ? (d.score2 || 0) : "?";
-                    let per1 = "", per2 = "";
+                    let per1 = "", per2 = "", livePts1 = "", livePts2 = "";
+                    
                     if (d.sub_details) {
                         let hArr = [], aArr = []; Object.values(d.sub_details).forEach(val => { let parts = val.split(':'); hArr.push(parts[0]); aArr.push(parts[1]); });
                         if(hArr.length > 0) { per1 = `<span class="periods-tag-mini">(${hArr.join(' ')})</span>`; per2 = `<span class="periods-tag-mini">(${aArr.join(' ')})</span>`; }
                     }
-                    cardHtml = `<div class="live-card-thin"><div class="score-row"><span class="team-name-col">${d.t1}</span><span class="score-val-col">${s1}</span>${per1}</div><div class="score-row"><span class="team-name-col">${d.t2}</span><span class="score-val-col">${s2}</span>${per2}</div></div>`;
+
+                    // TRENUTNI POENI U TENISU (SAMO UŽIVO)
+                    if (isLive && d.sport === "TENIS") {
+                        const isTB = (d.g1 === 6 && d.g2 === 6);
+                        livePts1 = `<span class="live-pts-mini">${isTB ? (d.p1||0) : (tennisPoints[d.p1]||"0")}</span>`;
+                        livePts2 = `<span class="live-pts-mini">${isTB ? (d.p2||0) : (tennisPoints[d.p2]||"0")}</span>`;
+                    }
+
+                    cardHtml = `<div class="live-card-thin">
+                                    <div class="score-row"><span class="team-name-col">${d.t1}</span><span class="score-val-col">${s1}</span>${per1}${livePts1}</div>
+                                    <div class="score-row"><span class="team-name-col">${d.t2}</span><span class="score-val-col">${s2}</span>${per2}${livePts2}</div>
+                                </div>`;
                 } else { cardHtml = `<div class="live-card-thin"><div style="font-size:12px; text-align:center; color:#fff; font-weight:bold;">${d.name}</div></div>`; }
                 const icon = L.divIcon({ className: '', html: `<div class="sport-marker-wrapper ${isLive?'status-live-wrapper':''} ${zoomClass}"><div class="sport-ball">${sportEmojis[d.sport]||'⚽'}</div>${cardHtml}</div>`, iconSize: null, iconAnchor: [15, 30] });
                 L.marker([d.lat, d.lng], { icon }).addTo(map).on('click', (e) => { L.DomEvent.stopPropagation(e); if (auth.currentUser && d.owner === auth.currentUser.uid) openAdmin(d.key); else openDetails(d.key); });
@@ -183,13 +217,11 @@
             const d = allTereni.find(x => x.key === key); if(!d) return;
             document.getElementById('adm-name').innerText = d.name;
             document.getElementById('adm-main-score').innerText = `${d.score1 || 0} : ${d.score2 || 0}`;
-            
             let subS = d.sub_details ? Object.values(d.sub_details).join(' | ') : "";
             if(d.sport === "ODBOJKA") subS = `POENI: ${d.p1 || 0}:${d.p2 || 0} | ` + subS;
             if(d.sport === "TENIS") { const isTB = (d.g1 === 6 && d.g2 === 6); const pts1 = isTB ? (d.p1 || 0) : (tennisPoints[d.p1] || "0"); const pts2 = isTB ? (d.p2 || 0) : (tennisPoints[d.p2] || "0"); subS = `GEMOVI: ${d.g1 || 0}:${d.g2 || 0} (${pts1}:${pts2}) | ` + subS; }
             document.getElementById('adm-sub-display').innerText = subS;
 
-            // KREIRANJE KONTROLA
             const ctrl = document.getElementById('adm-sport-controls'); ctrl.innerHTML = "";
             if(d.sport === "FUDBAL") {
                 ctrl.innerHTML = `<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px;"><div style="display:flex; justify-content:center; gap:5px;"><button class="admin-btn" style="background:#ff3b30; width:45px;" onclick="proScore(1,-1)">-</button><button class="admin-btn" style="background:#28a745; width:45px;" onclick="proScore(1,1)">+</button></div><div style="display:flex; justify-content:center; gap:5px;"><button class="admin-btn" style="background:#ff3b30; width:45px;" onclick="proScore(2,-1)">-</button><button class="admin-btn" style="background:#28a745; width:45px;" onclick="proScore(2,1)">+</button></div></div><div style="background:#111; padding:15px; border-radius:12px; margin-bottom:15px;"><input type="text" id="event-player" placeholder="IME IGRAČA" style="width:100%; margin-bottom:8px;"><select id="event-team" style="width:100%; margin-bottom:8px;"><option value="1">TIM 1</option><option value="2">TIM 2</option></select><div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px;"><button onclick="addEvent('⚽')" class="admin-btn" style="background:#444;">GOL</button><button onclick="addEvent('🟨')" class="admin-btn" style="background:#C0A000;">ŽUTI</button><button onclick="addEvent('🟥')" class="admin-btn" style="background:#A00000;">CRVENI</button></div></div>`;
