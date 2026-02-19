@@ -37,65 +37,59 @@
         .back-btn { position: absolute; top: 20px; right: 20px; z-index: 5500; width: 40px; height: 40px; background: rgba(0,0,0,0.5); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); color: white; font-weight: bold; }
 
         .sport-marker-wrapper { display: flex; align-items: center; transition: all 0.3s ease; width: max-content; }
-        .sport-ball { font-size: 22px; z-index: 20; transition: font-size 0.3s; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8)); flex-shrink: 0; }
+        .sport-ball { font-size: 20px; z-index: 20; transition: font-size 0.3s; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8)); flex-shrink: 0; }
         .status-live-wrapper .sport-ball { animation: bounce-ball 0.6s ease infinite alternate; }
         
-        /* POPRAVLJENA KARTICA */
+        /* MINIMALISTIČKA KARTICA */
         .live-card-thin { 
-            background: rgba(15, 15, 15, 0.98); 
-            border: 1px solid #444; 
-            border-radius: 10px; 
-            padding: 8px 12px; 
-            margin-left: 5px; 
+            background: rgba(10, 10, 10, 0.98); 
+            border: 1px solid #333; 
+            border-radius: 6px; 
+            padding: 4px 8px; 
+            margin-left: 4px; 
             display: none; 
             flex-direction: column;
             width: max-content; 
-            min-width: 140px;
             color: white; 
             backdrop-filter: blur(15px); 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8); 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.8); 
             position: relative;
             overflow: hidden;
         }
         .zoom-near .live-card-thin { display: flex; }
-        .zoom-near .sport-ball { font-size: 32px; }
+        .zoom-near .sport-ball { font-size: 28px; }
         
-        .status-live-wrapper .live-card-thin { border: 2px solid #ff3b30; }
+        .status-live-wrapper .live-card-thin { border: 1.5px solid #ff3b30; }
         .status-live-wrapper .live-card-thin::after {
             content: "";
             position: absolute;
             top: -50%;
             left: -150%;
-            width: 60%;
+            width: 40%;
             height: 200%;
-            background: linear-gradient(
-                to right, 
-                rgba(255, 59, 48, 0) 0%, 
-                rgba(255, 59, 48, 0.25) 50%, 
-                rgba(255, 59, 48, 0) 100%
-            );
-            transform: rotate(25deg);
-            animation: shine 3.5s infinite linear;
+            background: linear-gradient(to right, transparent 0%, rgba(255, 59, 48, 0.2) 50%, transparent 100%);
+            transform: rotate(20deg);
+            animation: shine 4s infinite linear;
             z-index: 1;
         }
 
         @keyframes shine {
             0% { left: -150%; }
-            40% { left: 150%; }
+            30% { left: 150%; }
             100% { left: 150%; }
         }
 
-        .card-header-name { font-size: 9px; color: #ff3b30; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; border-bottom: 1px solid #333; padding-bottom: 3px; position: relative; z-index: 2; }
+        .card-header-name { font-size: 7px; color: #ff3b30; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; border-bottom: 0.5px solid #222; padding-bottom: 2px; position: relative; z-index: 2; }
         
-        .score-grid { display: grid; grid-template-columns: auto auto auto auto auto; align-items: center; gap: 10px; width: 100%; position: relative; z-index: 2; }
+        .score-grid { display: grid; grid-template-columns: auto auto auto auto auto; align-items: center; gap: 6px; width: 100%; position: relative; z-index: 2; }
         
-        .team-name-col { font-size: 11px; font-weight: 800; text-transform: uppercase; color: #fff; min-width: 65px; }
-        .score-val-col { font-family: 'Oswald'; font-size: 18px; color: #ff3b30; font-weight: 700; text-align: center; min-width: 20px; } 
-        .periods-col { font-size: 10px; color: #888; font-weight: 700; text-align: left; letter-spacing: 1px; } 
-        .gem-val-col { font-size: 11px; color: #eee; font-weight: 800; text-align: center; min-width: 25px; } 
-        .pts-val-col { font-size: 11px; color: #ff9500; font-weight: 900; text-align: right; min-width: 30px; } 
+        .team-name-col { font-size: 10px; font-weight: 800; text-transform: uppercase; color: #fff; min-width: 60px; }
+        .score-val-col { font-family: 'Oswald'; font-size: 14px; color: #ff3b30; font-weight: 700; text-align: center; min-width: 15px; } 
+        .periods-col { font-size: 9px; color: #666; font-weight: 700; text-align: left; letter-spacing: 0.5px; } 
+        .gem-val-col { font-size: 9px; color: #bbb; font-weight: 800; text-align: center; min-width: 20px; } 
+        .pts-val-col { font-size: 9px; color: #ff9500; font-weight: 900; text-align: right; min-width: 22px; } 
 
-        .card-sub-info { font-size: 8px; color: #aaa; font-weight: 800; margin-top: 6px; border-top: 1px solid #333; padding-top: 5px; text-align: center; position: relative; z-index: 2; }
+        .card-sub-info { font-size: 7px; color: #888; font-weight: 800; margin-top: 3px; border-top: 0.5px solid #222; padding-top: 2px; text-align: center; position: relative; z-index: 2; }
 
         #admin-panel { position: fixed; top: 0; left: 100%; width: 100%; height: 100%; background: #0a0a0a; z-index: 7000; transition: 0.4s cubic-bezier(0.19, 1, 0.22, 1); padding: 25px; display: flex; flex-direction: column; overflow-y: auto; }
         #admin-panel.active { left: 0; }
@@ -258,7 +252,7 @@
 
                     let bottomInfo = isLive ? "UŽIVO" : (d.sub_string || "");
                     if (isUpcoming) bottomInfo = d.match_time ? new Date(d.match_time).toLocaleString('sr-RS', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'}).toUpperCase() : "ZAKAZANO";
-                    if (isEnded) bottomInfo = d.match_time ? "ODIGRANO: " + new Date(d.match_time).toLocaleDateString('sr-RS').toUpperCase() : "ZAVRŠENO";
+                    if (isEnded) bottomInfo = d.match_time ? "ZAVRŠENO " + new Date(d.match_time).toLocaleDateString('sr-RS').toUpperCase() : "ZAVRŠENO";
 
                     cardHtml = `
                         <div class="live-card-thin">
@@ -280,7 +274,7 @@
                             ${bottomInfo ? `<div class="card-sub-info">${bottomInfo}</div>` : ''}
                         </div>`;
                 } else {
-                    cardHtml = `<div class="live-card-thin"><div class="team-name-col" style="font-size:14px; text-align:center; width: 100%; border:none;">${d.name}</div></div>`;
+                    cardHtml = `<div class="live-card-thin"><div class="team-name-col" style="font-size:12px; text-align:center; width: 100%; border:none;">${d.name}</div></div>`;
                 }
 
                 const icon = L.divIcon({
@@ -289,14 +283,13 @@
                              <div class="sport-ball">${sportEmojis[d.sport]||'⚽'}</div>
                              ${cardHtml}
                            </div>`,
-                    iconSize: null, // Ovo omogućava širenje prema sadržaju bez deformacije
+                    iconSize: null,
                     iconAnchor: [15, 30]
                 });
                 L.marker([d.lat, d.lng], { icon }).addTo(map).on('click', (e) => { L.DomEvent.stopPropagation(e); if (auth.currentUser && d.owner === auth.currentUser.uid) openAdmin(d.key); });
             });
         }
 
-        // --- ADMIN PANEL I LOGIKA (OSTAJE ISTO) ---
         function openAdmin(key) { currentAdminKey = key; refreshAdminPanel(key); document.getElementById('admin-panel').classList.add('active'); }
         function closeAdmin() { document.getElementById('admin-panel').classList.remove('active'); currentAdminKey = null; }
         function refreshAdminPanel(key) {
