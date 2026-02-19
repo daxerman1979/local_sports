@@ -36,7 +36,7 @@
         .location-btn img { filter: brightness(0) invert(1); width: 24px; }
         .back-btn { position: absolute; top: 20px; right: 20px; z-index: 5500; width: 40px; height: 40px; background: rgba(0,0,0,0.5); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); color: white; font-weight: bold; }
 
-        .sport-marker-wrapper { display: flex; align-items: center; width: max-content; position: relative; }
+        .sport-marker-wrapper { display: flex; align-items: center; width: max-content; }
         .sport-ball { font-size: 20px; z-index: 20; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.8)); flex-shrink: 0; }
         .status-live-wrapper .sport-ball { animation: bounce-ball 0.6s ease infinite alternate; }
         
@@ -191,25 +191,20 @@
             const myTereniCount = allTereni.filter(t => t.owner === auth.currentUser.uid).length;
             if (myTereniCount >= 3) { alert("LIMIT 3 TERENA!"); return; }
 
-            // LOGIKA ZABRANJENOG PRAVOUGONIKA (Levo od postojeće loptice / Desno od mesta klika)
             const clickPos = e.latlng;
             const isBlocked = allTereni.some(t => {
                 const markerPos = L.latLng(t.lat, t.lng);
-                // Provera distance (gruba 200m kao baza)
-                const dist = map.distance(clickPos, markerPos);
-                if (dist < 200) return true;
+                // 1. Hard limit od 200m
+                if (map.distance(clickPos, markerPos) < 200) return true;
 
-                // Precizna provera pravougaonika (kartica ide DESNO od loptice)
-                // Zabranjujemo klik ako on pada u zonu gde bi "udarila" postojeća kartica drugog terena
+                // 2. Provera sudara - zabranjen klik u zoni levo od postojeće loptice
                 const latDiff = Math.abs(clickPos.lat - markerPos.lat);
-                const lngDiff = clickPos.lng - markerPos.lng; // Pozitivno ako smo desno od markera
-
-                // Ako smo u visini kartice i desno od loptice do određene granice
-                if (latDiff < 0.0005 && lngDiff > 0 && lngDiff < 0.0025) return true;
+                const lngDiff = markerPos.lng - clickPos.lng;
+                if (latDiff < 0.0004 && lngDiff > 0 && lngDiff < 0.0022) return true;
                 return false;
             });
 
-            if (isBlocked) { alert("PREBLIZU DRUGE KARTICE!"); return; }
+            if (isBlocked) { alert("ZONA ZAUZETA!"); return; }
 
             const html = `<div style="padding:10px; background:#111; color:white; border-radius:10px;"><select id="p_sport" style="width:100%; padding:10px; margin-bottom:10px; background:#222; color:white; border:1px solid #444; border-radius:8px;"><option value="FUDBAL">FUDBAL</option><option value="KOŠARKA">KOŠARKA</option><option value="ODBOJKA">ODBOJKA</option><option value="TENIS">TENIS</option><option value="RUKOMET">RUKOMET</option></select><input type="text" id="p_name" placeholder="NAZIV TERENA" maxlength="10" style="width:100%; padding:10px; margin-bottom:10px; background:#222; color:white; border:1px solid #444; border-radius:8px;"><button onclick="saveTeren(${e.latlng.lat}, ${e.latlng.lng})" style="width:100%; background:#ff3b30; color:white; border:none; padding:10px; font-weight:bold; border-radius:8px;">KREIRAJ</button></div>`;
             L.popup().setLatLng(e.latlng).setContent(html).openOn(map);
@@ -217,16 +212,10 @@
 
         function renderMarkers() {
             if (!map) return;
-            map.eachLayer(l => { if((l instanceof L.Marker && l !== userMarker) || l instanceof L.Rectangle) map.removeLayer(l); });
+            map.eachLayer(l => { if(l instanceof L.Marker && l !== userMarker) map.removeLayer(l); });
             const zoom = map.getZoom(), zoomClass = zoom > 14 ? 'zoom-near' : '';
 
             allTereni.forEach(d => {
-                // CRTANJE PRAVOUGAONIKA ZA VIZUELNU PROVERU (Samo za admine/ulogovane)
-                if (auth.currentUser) {
-                    const bounds = [[d.lat - 0.0004, d.lng], [d.lat + 0.0004, d.lng + 0.0022]];
-                    L.rectangle(bounds, {color: "white", weight: 1, fillOpacity: 0.05, dashArray: '5,5', interactive: false}).addTo(map);
-                }
-
                 let cardHtml = "";
                 const isLive = d.status === 'live', isEnded = d.status === 'ended', isUpcoming = d.status === 'upcoming' && d.t1;
                 if (isLive || isEnded || isUpcoming) {
@@ -258,7 +247,6 @@
             });
         }
 
-        // --- ADMIN PANEL I OSTALA LOGIKA ---
         function toggleSearch() { document.getElementById('search-container').classList.toggle('expanded'); if(document.getElementById('search-container').classList.contains('expanded')) { document.getElementById('city-search').focus(); } }
         function openAdmin(key) { currentAdminKey = key; refreshAdminPanel(key); document.getElementById('admin-panel').classList.add('active'); }
         function closeAdmin() { document.getElementById('admin-panel').classList.remove('active'); currentAdminKey = null; }
