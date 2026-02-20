@@ -264,9 +264,14 @@
             else ctrl.innerHTML = `<div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:15px;"><div style="text-align:center;"><div style="color:#aaa; font-size:11px; margin-bottom:5px;">${d.t1 || t.team1}</div><div style="display:flex; justify-content:center; gap:8px;"><button class="admin-btn" style="background:#ff3b30; width:50px;" onclick="proScore(1,-1)">-</button><button class="admin-btn" style="background:#28a745; width:50px;" onclick="proScore(1,1)">+</button></div></div><div style="text-align:center;"><div style="color:#aaa; font-size:11px; margin-bottom:5px;">${d.t2 || t.team2}</div><div style="display:flex; justify-content:center; gap:8px;"><button class="admin-btn" style="background:#ff3b30; width:50px;" onclick="proScore(2,-1)">-</button><button class="admin-btn" style="background:#28a745; width:50px;" onclick="proScore(2,1)">+</button></div></div></div>`;
             
             const evMgr = document.getElementById('adm-events-manager'); 
-            evMgr.innerHTML = `<select onchange="removeEvent(this.value)"><option value="">--- OBRIŠI: IME + SIMBOL ---</option>`; 
-            if(d.events) Object.keys(d.events).forEach(ekey => { const ev = d.events[ekey]; evMgr.innerHTML += `<option value="${ekey}">${ev.emoji} ${ev.player}</option>`; });
-            evMgr.innerHTML += `</select>`;
+            let options = `<option value="">--- OBRIŠI: IME + SIMBOL ---</option>`; 
+            if(d.events) {
+                Object.keys(d.events).forEach(ekey => {
+                    const ev = d.events[ekey];
+                    options += `<option value="${ekey}">${ev.emoji} ${ev.player}</option>`;
+                });
+            }
+            evMgr.innerHTML = `<select onchange="removeEvent(this.value)">${options}</select>`;
             
             if(d.t1) { document.getElementById('adm-score-view').style.display = 'flex'; document.getElementById('match-setup').style.display = 'none'; document.getElementById('start-live-btn').style.display = d.status==='upcoming' ? 'block' : 'none'; document.getElementById('end-match-btn').style.display = d.status==='live' ? 'block' : 'none'; document.getElementById('reset-match-btn').style.display = d.status==='ended' ? 'block' : 'none'; } else { document.getElementById('adm-score-view').style.display = 'none'; document.getElementById('match-setup').style.display = 'flex'; }
         }
