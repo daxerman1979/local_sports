@@ -14,7 +14,6 @@
         
         input, select, textarea { font-size: 16px !important; outline: none !important; text-transform: uppercase; background: #222; color: white; border: 1px solid #444; padding: 12px; border-radius: 8px; }
         
-        /* Feedback na dugmadima */
         button { 
             font-size: 16px !important; 
             outline: none !important; 
@@ -40,11 +39,9 @@
         .location-btn img { filter: brightness(0) invert(1); width: 24px; }
         .back-btn { position: absolute; top: 20px; right: 20px; z-index: 5500; width: 40px; height: 40px; background: rgba(0,0,0,0.5); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); color: white; font-weight: bold; }
 
-        /* Settings Gear Icon */
         .settings-btn { position: absolute; top: 70px; right: 20px; z-index: 5500; width: 40px; height: 40px; background: rgba(0,0,0,0.5); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); }
         .settings-btn img { width: 20px; filter: invert(1); }
 
-        /* Logged in indicator */
         #user-indicator { position: absolute; bottom: 15px; left: 15px; z-index: 5500; color: rgba(255,255,255,0.4); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; pointer-events: none; }
 
         .sport-marker-wrapper { display: flex; align-items: center; width: max-content; }
@@ -85,11 +82,9 @@
         .user-location-dot { background: #007AFF; width: 14px; height: 14px; border: 2px solid white; border-radius: 50%; box-shadow: 0 0 20px #007AFF; }
         @keyframes bounce-ball { from { transform: translateY(0); } to { transform: translateY(-10px); } }
         
-        /* Language Modal */
         #lang-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; display: none; justify-content: center; align-items: center; backdrop-filter: blur(10px); }
         .lang-box { background: #111; padding: 30px; border-radius: 20px; border: 1px solid #ff3b30; text-align: center; }
 
-        /* Home Language Switcher */
         .home-lang-switch { display: flex; gap: 15px; justify-content: center; margin-top: 10px; }
         .home-lang-btn { background: none; border: 1px solid rgba(255,255,255,0.2); color: #aaa; padding: 5px 12px; border-radius: 15px; font-size: 10px; font-weight: 900; cursor: pointer; }
         .home-lang-btn.active { border-color: #ff3b30; color: white; }
@@ -232,11 +227,9 @@
             document.getElementById('btn-schedule').innerText = t.schedule;
             document.getElementById('btn-delete-court').innerText = t.deleteCourt;
             
-            // Home buttons active state
             document.getElementById('h-lang-sr').classList.toggle('active', currentLang === 'sr');
             document.getElementById('h-lang-en').classList.toggle('active', currentLang === 'en');
             
-            // Update indicator if user exists
             if(auth.currentUser) {
                 document.getElementById('user-indicator').innerText = `${t.loggedAs} ${auth.currentUser.email}`;
             }
@@ -291,7 +284,7 @@
             if (!map) return;
             const center = map.getCenter();
             map.eachLayer(l => { if(l instanceof L.Marker && l !== userMarker) map.removeLayer(l); });
-            const zoomClass = map.getZoom() > 14 ? 'zoom-near' : '';
+            const zoomClass = map.getZoom() > 12 ? 'zoom-near' : '';
             
             allTereni.forEach(d => {
                 const dist = map.distance(center, [d.lat, d.lng]);
@@ -300,7 +293,9 @@
                 const isLive = d.status === 'live', isEnded = d.status === 'ended', isUpcoming = d.status === 'upcoming' && d.t1;
                 let cardHtml = "";
                 if (isLive || isEnded || isUpcoming) {
-                    let s1 = (isLive || isEnded) ? (d.score1 || 0) : "?", s2 = (isLive || isEnded) ? (d.score2 || 0) : "?";
+                    /* PROMENJENO: Umesto upitnika (?) za upcoming, sada je prazan string */
+                    let s1 = (isLive || isEnded) ? (d.score1 || 0) : "";
+                    let s2 = (isLive || isEnded) ? (d.score2 || 0) : "";
                     let leagueHtml = d.league ? `<div class="card-league-mini">${d.league}</div>` : "";
                     cardHtml = `<div class="live-card-thin">
                                     ${leagueHtml}
