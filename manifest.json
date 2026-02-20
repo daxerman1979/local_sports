@@ -1,0 +1,15 @@
+{
+  "name": "MAPLAY",
+  "short_name": "MAPLAY",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#ff3b30",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/824/824308.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
