@@ -119,6 +119,16 @@
         #admin-panel.active { left: 0; }
         .admin-btn { padding: 12px; border: none; font-weight: 900; color: white; text-transform: uppercase; width: 100%; border-radius: 12px; cursor: pointer; font-family: 'Oswald'; margin-bottom: 8px; }
         .user-location-dot { background: #007AFF; width: 14px; height: 14px; border: 2px solid white; border-radius: 50%; box-shadow: 0 0 20px #007AFF; }
+
+        /* Nova animacija za krug */
+        @keyframes pulse-circle {
+            0% { stroke-opacity: 0.8; stroke-width: 1px; }
+            50% { stroke-opacity: 0.3; stroke-width: 2.5px; }
+            100% { stroke-opacity: 0.8; stroke-width: 1px; }
+        }
+        .animated-range-circle {
+            animation: pulse-circle 4s infinite ease-in-out;
+        }
     </style>
 </head>
 <body>
@@ -237,7 +247,17 @@
             map = L.map('map', { zoomControl: false, tap: false }).setView([sLat, sLng], sZoom);
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', { opacity: 0.8 }).addTo(map);
-            rangeCircle = L.circle([sLat, sLng], { radius: 30000, color: 'white', weight: 1, fillOpacity: 0.03, interactive: false }).addTo(map);
+            
+            // Krug sa dodatom klasom za animaciju
+            rangeCircle = L.circle([sLat, sLng], { 
+                radius: 30000, 
+                color: 'white', 
+                weight: 1, 
+                fillOpacity: 0.03, 
+                interactive: false,
+                className: 'animated-range-circle' 
+            }).addTo(map);
+
             map.on('move', () => { let c = map.getCenter(); rangeCircle.setLatLng(c); if(map.getZoom() > 10) rangeCircle.setStyle({opacity: 0, fillOpacity: 0}); else rangeCircle.setStyle({opacity: 1, fillOpacity: 0.03}); });
             map.on('moveend', () => { let c = map.getCenter(); localStorage.setItem('lastLat', c.lat); localStorage.setItem('lastLng', c.lng); localStorage.setItem('lastZoom', map.getZoom()); renderMarkers(); });
             map.on('click', handleMapClick);
