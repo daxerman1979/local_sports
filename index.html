@@ -55,7 +55,6 @@
         .settings-btn { position: absolute; top: 70px; right: 20px; z-index: 5500; width: 40px; height: 40px; background: rgba(0,0,0,0.5); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); }
         .settings-btn img { width: 20px; filter: invert(1); }
 
-        /* LANG MODAL STIL */
         #lang-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); z-index: 9000; display: none; justify-content: center; align-items: center; }
         .lang-box { background: #0a0a0a; padding: 30px; border-radius: 25px; border: 1px solid #ff3b30; width: 85%; max-width: 300px; text-align: center; }
 
@@ -267,7 +266,25 @@
             });
         }
 
-        function handleMapClick(e) { if (!auth.currentUser) return; const t = translations[currentLang]; const clickPos = e.latlng; if (allTereni.some(t => map.distance(clickPos, [t.lat, t.lng]) < 200)) { alert(t.zoneOccupied); return; } const html = `<div style="padding:10px;"><select id="p_sport"><option value="FUDBAL">FUDBAL</option><option value="KOŠARKA">KOŠARKA</option><option value="ODBOJKA">ODBOJKA</option><option value="TENIS">TENIS</option><option value="RUKOMET">RUKOMET</option></select><input type="text" id="p_name" placeholder="${t.courtName}" maxlength="15" style="margin:10px 0; width:100%;"><button onclick="saveTeren(${e.latlng.lat}, ${e.latlng.lng})" style="width:100%; background:#ff3b30; color:white; border:none; padding:10px; font-weight:bold; border-radius:12px;">${t.create}</button></div>`; L.popup().setLatLng(e.latlng).setContent(html).openOn(map); }
+        function handleMapClick(e) { 
+            if (!auth.currentUser) return; 
+            const t = translations[currentLang]; 
+            const clickPos = e.latlng; 
+            
+            // Provera udaljenosti: ne dozvoljava ako je klik bliži od 200m od BILO KOG terena u bazi
+            const isTooClose = allTereni.some(court => {
+                const courtLatLng = L.latLng(court.lat, court.lng);
+                return clickPos.distanceTo(courtLatLng) < 200;
+            });
+
+            if (isTooClose) { 
+                alert(t.zoneOccupied); 
+                return; 
+            } 
+
+            const html = `<div style="padding:10px;"><select id="p_sport"><option value="FUDBAL">FUDBAL</option><option value="KOŠARKA">KOŠARKA</option><option value="ODBOJKA">ODBOJKA</option><option value="TENIS">TENIS</option><option value="RUKOMET">RUKOMET</option></select><input type="text" id="p_name" placeholder="${t.courtName}" maxlength="15" style="margin:10px 0; width:100%;"><button onclick="saveTeren(${e.latlng.lat}, ${e.latlng.lng})" style="width:100%; background:#ff3b30; color:white; border:none; padding:10px; font-weight:bold; border-radius:12px;">${t.create}</button></div>`; 
+            L.popup().setLatLng(e.latlng).setContent(html).openOn(map); 
+        }
         
         function openDetails(key) { 
             const d = allTereni.find(x => x.key === key); 
