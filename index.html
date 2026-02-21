@@ -301,9 +301,9 @@
             } 
 
             // Kartica sa izborom: Teren ili Reklama
-            const choiceHtml = `<div style="padding:15px; display:flex; flex-direction:column; gap:10px;">
-                <button onclick="openTerenForm(${e.latlng.lat}, ${e.latlng.lng})" style="width:100%; background:#ff3b30; color:white; border:none; padding:12px; font-weight:bold; border-radius:12px;">${t.addCourt}</button>
-                <button onclick="openAdPlaceholder()" style="width:100%; background:#ffcc00; color:black; border:none; padding:12px; font-weight:bold; border-radius:12px;">${t.addAd}</button>
+            const choiceHtml = `<div style="padding:15px; display:flex; flex-direction:column; gap:10px; min-width:160px;">
+                <button onclick="openTerenForm(${e.latlng.lat}, ${e.latlng.lng})" style="width:100%; background:#ff3b30; color:white; border:none; padding:12px; font-weight:bold; border-radius:12px; font-family:'Inter';">${t.addCourt}</button>
+                <button onclick="openAdPlaceholder(${e.latlng.lat}, ${e.latlng.lng})" style="width:100%; background:#ffcc00; color:black; border:none; padding:12px; font-weight:bold; border-radius:12px; font-family:'Inter';">${t.addAd}</button>
             </div>`;
 
             L.popup().setLatLng(e.latlng).setContent(choiceHtml).openOn(map); 
@@ -316,11 +316,11 @@
             L.popup().setLatLng([lat, lng]).setContent(html).openOn(map);
         }
 
-        function openAdPlaceholder() {
+        function openAdPlaceholder(lat, lng) {
             const t = translations[currentLang];
-            const html = `<div style="padding:20px; text-align:center; font-family:'Oswald'; font-weight:700; color:#ffcc00; font-size:18px;">${t.adTitle}</div>`;
+            const html = `<div style="padding:20px; text-align:center; font-family:'Oswald'; font-weight:700; color:#ffcc00; font-size:18px; min-width:180px;">${t.adTitle}</div>`;
             map.closePopup();
-            L.popup().setLatLng(map.getCenter()).setContent(html).openOn(map);
+            L.popup().setLatLng([lat, lng]).setContent(html).openOn(map);
         }
         
         function openDetails(key) { 
