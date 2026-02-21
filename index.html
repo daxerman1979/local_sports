@@ -8,15 +8,13 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
-    <link rel="manifest" href="manifest.json">
-    
-    <script>
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js').catch(function(err) {
-          console.log('SW error:', err);
-        });
-      }
-    </script>
+<link rel="manifest" href="manifest.json">
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+  }
+</script>
+
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;700;900&family=Permanent+Marker&display=swap" rel="stylesheet">
@@ -56,17 +54,28 @@
         .back-btn { position: absolute; top: 20px; right: 20px; z-index: 5500; width: 40px; height: 40px; background: rgba(0,0,0,0.5); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); color: white; font-weight: bold; }
         .settings-btn { position: absolute; top: 70px; right: 20px; z-index: 5500; width: 40px; height: 40px; background: rgba(0,0,0,0.5); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); }
         .settings-btn img { width: 20px; filter: invert(1); }
-        #user-indicator { position: absolute; bottom: 15px; left: 15px; z-index: 5500; color: rgba(255,255,255,0.4); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; pointer-events: none; }
 
         .sport-marker-wrapper { display: flex; flex-direction: column; align-items: center; width: auto; position: relative; }
         .marker-content-box { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; pointer-events: none; }
+        .marker-content-box > * { pointer-events: auto; }
+
         .marker-ball-only { font-size: 16px; filter: drop-shadow(0 0 5px #ffcc00); display: block; }
         .zoom-near .marker-ball-only { display: none; }
-        .marker-pointer { width: 0; height: 0; border-left: 14px solid transparent; border-right: 14px solid transparent; border-top: 20px solid #ffcc00; display: none; z-index: 10; }
+
+        .marker-pointer {
+            width: 0; height: 0;
+            border-left: 14px solid transparent;
+            border-right: 14px solid transparent;
+            border-top: 20px solid #ffcc00;
+            display: none;
+            z-index: 10;
+        }
         .zoom-near .marker-pointer { display: block; }
         .status-live-wrapper .marker-pointer { border-top-color: #ff3b30; }
 
-        .live-card-thin { background: rgba(10, 10, 10, 0.98); border: 2px solid #ffcc00; border-radius: 12px; padding: 10px 14px; display: none; flex-direction: column; width: max-content; min-width: 150px; color: white; backdrop-filter: blur(15px); box-shadow: 0 8px 25px rgba(0,0,0,0.8); position: relative; overflow: hidden; z-index: 25; margin-bottom: -1px; }
+        .live-card-thin { 
+            background: rgba(10, 10, 10, 0.98); border: 2px solid #ffcc00; border-radius: 12px; padding: 10px 14px; display: none; flex-direction: column; width: max-content; min-width: 150px; color: white; backdrop-filter: blur(15px); box-shadow: 0 8px 25px rgba(0,0,0,0.8); position: relative; overflow: hidden; z-index: 25; margin-bottom: -1px;
+        }
         .card-bg-icon { position: absolute; right: -10px; bottom: -10px; font-size: 60px; opacity: 0.1; transform: rotate(-15deg); pointer-events: none; z-index: 0; }
         .zoom-near .live-card-thin { display: flex; }
         .status-live-wrapper .live-card-thin { border-color: #ff3b30; }
@@ -91,21 +100,12 @@
         .details-team-line { font-size: 22px; font-weight: 900; text-align: center; width: 100%; word-wrap: break-word; }
         .details-score-line { font-family: 'Oswald'; font-size: 50px; color: #ff3b30; line-height: 1; margin: 5px 0; }
         .details-extra-line { color: #ffcc00; font-weight: 800; font-size: 16px; margin-top: 5px; }
-        .details-section-title { color: #555; font-size: 11px; font-weight: 900; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 1px; display: block; margin-top: 15px; }
+        .details-section-title { color: #555; font-size: 11px; font-weight: 900; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 1px; display: block; }
         
-        /* UNIFIKOVAN STIL REDOVA SA ŽUTIM BORDEROM */
-        .pro-row-item { 
-            background: #111; padding: 10px 14px; border-radius: 10px; 
-            margin-bottom: 6px; border-left: 3px solid #ffcc00; 
-            font-size: 14px; font-weight: 700; display: flex; 
-            align-items: center; justify-content: space-between; 
-        }
-        .pro-row-item.right { border-left: none; border-right: 3px solid #ffcc00; flex-direction: row-reverse; }
-        .label-style { color: #ffcc00; font-size: 11px; font-weight: 900; text-transform: uppercase; }
-        .score-style { font-family: 'Oswald'; font-size: 18px; color: #fff; }
-
         .events-container-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-        .full-width-list { display: flex; flex-direction: column; gap: 4px; }
+        .events-column { display: flex; flex-direction: column; gap: 5px; }
+        .detail-event-box { background: #111; padding: 10px; border-radius: 10px; font-size: 13px; font-weight: 700; border-left: 3px solid #ffcc00; }
+        .events-column.right .detail-event-box { border-left: none; border-right: 3px solid #ffcc00; text-align: right; }
 
         #admin-panel { position: fixed; top: 0; left: 100%; width: 100%; height: 100%; background: #0a0a0a; z-index: 7000; transition: 0.4s; padding: 25px; display: flex; flex-direction: column; overflow-y: auto; }
         #admin-panel.active { left: 0; }
@@ -159,17 +159,13 @@
             <div id="det-t2" class="details-team-line"></div>
             <div id="det-extra-info" class="details-extra-line"></div>
         </div>
-        
-        <div id="periods-section">
-            <span class="details-section-title" id="txt-period-res">Rezultat po periodima</span>
-            <div id="det-periods" class="full-width-list"></div>
-        </div>
-
-        <div id="det-stats-container" style="display:none;">
+        <span class="details-section-title" id="txt-period-res">Rezultat po periodima</span>
+        <div id="det-periods" class="details-periods-grid"></div>
+        <div id="det-stats-container" style="display:none; margin-top:10px;">
             <span class="details-section-title" id="txt-match-events">Događaji na meču</span>
             <div class="events-container-grid">
-                <div id="det-events-home" class="events-column"></div>
-                <div id="det-events-away" class="events-column"></div>
+                <div id="det-events-home" class="events-column left"></div>
+                <div id="det-events-away" class="events-column right"></div>
             </div>
         </div>
     </div>
@@ -263,45 +259,9 @@
         }
 
         function handleMapClick(e) { if (!auth.currentUser) return; const t = translations[currentLang]; const clickPos = e.latlng; if (allTereni.some(t => map.distance(clickPos, [t.lat, t.lng]) < 200)) { alert(t.zoneOccupied); return; } const html = `<div style="padding:10px;"><select id="p_sport"><option value="FUDBAL">FUDBAL</option><option value="KOŠARKA">KOŠARKA</option><option value="ODBOJKA">ODBOJKA</option><option value="TENIS">TENIS</option><option value="RUKOMET">RUKOMET</option></select><input type="text" id="p_name" placeholder="${t.courtName}" maxlength="15" style="margin:10px 0; width:100%;"><button onclick="saveTeren(${e.latlng.lat}, ${e.latlng.lng})" style="width:100%; background:#ff3b30; color:white; border:none; padding:10px; font-weight:bold; border-radius:12px;">${t.create}</button></div>`; L.popup().setLatLng(e.latlng).setContent(html).openOn(map); }
-        
-        function openDetails(key) {
-            const d = allTereni.find(x => x.key === key); if(!d) return; const t = translations[currentLang];
-            document.getElementById('det-league').innerText = d.league || t.localMatch;
-            document.getElementById('det-time').innerText = d.match_time ? new Date(d.match_time).toLocaleString() : "";
-            document.getElementById('det-t1').innerText = d.t1 || t.team1; document.getElementById('det-t2').innerText = d.t2 || t.team2;
-            document.getElementById('det-score').innerText = `${d.score1||0} : ${d.score2||0}`;
-            
-            let ex = ""; 
-            if(d.sport === "ODBOJKA") ex = `${d.p1||0} : ${d.p2||0}`;
-            if(d.sport === "TENIS") { const isTB = (d.g1 === 6 && d.g2 === 6); const pts1 = isTB ? (d.p1||0) : (tennisPoints[d.p1]||"0"); const pts2 = isTB ? (d.p2||0) : (tennisPoints[d.p2]||"0"); ex = `${d.g1||0}:${d.g2||0} (${pts1}:${pts2})`; }
-            document.getElementById('det-extra-info').innerText = ex;
-
-            let pDiv = document.getElementById('det-periods'); pDiv.innerHTML = "";
-            if(d.sub_details) {
-                document.getElementById('periods-section').style.display = 'block';
-                Object.values(d.sub_details).forEach(v => {
-                    let parts = v.split(' ');
-                    let label = parts[0];
-                    let res = parts[1] || "";
-                    pDiv.innerHTML += `<div class="pro-row-item"><span class="label-style">${label}</span><span class="score-style">${res}</span></div>`;
-                });
-            } else { document.getElementById('periods-section').style.display = 'none'; }
-
-            let eHome = document.getElementById('det-events-home'), eAway = document.getElementById('det-events-away');
-            eHome.innerHTML = ""; eAway.innerHTML = "";
-            if(d.events) {
-                document.getElementById('det-stats-container').style.display = 'block';
-                Object.values(d.events).forEach(ev => {
-                    const row = `<div class="pro-row-item ${ev.team == 2 ? 'right' : ''}">${ev.emoji} ${ev.player}</div>`;
-                    if(ev.team == 1) eHome.innerHTML += row; else eAway.innerHTML += row;
-                });
-            } else { document.getElementById('det-stats-container').style.display = 'none'; }
-            document.getElementById('match-details-view').classList.add('active');
-        }
-
+        function openDetails(key) { const d = allTereni.find(x => x.key === key); if(!d) return; const t = translations[currentLang]; document.getElementById('det-league').innerText = d.league || t.localMatch; document.getElementById('det-time').innerText = d.match_time ? new Date(d.match_time).toLocaleString() : ""; document.getElementById('det-t1').innerText = d.t1 || t.team1; document.getElementById('det-t2').innerText = d.t2 || t.team2; document.getElementById('det-score').innerText = `${d.score1||0} : ${d.score2||0}`; let ex = ""; if(d.sport === "ODBOJKA") ex = `${d.p1||0} : ${d.p2||0}`; if(d.sport === "TENIS") { const isTB = (d.g1 === 6 && d.g2 === 6); const pts1 = isTB ? (d.p1||0) : (tennisPoints[d.p1]||"0"); const pts2 = isTB ? (d.p2||0) : (tennisPoints[d.p2]||"0"); ex = `${d.g1||0}:${d.g2||0} (${pts1}:${pts2})`; } document.getElementById('det-extra-info').innerText = ex; let pDiv = document.getElementById('det-periods'); pDiv.innerHTML = ""; if(d.sub_details) Object.values(d.sub_details).forEach(v => { pDiv.innerHTML += `<div class="detail-period-tag">${v}</div>`; }); let eHome = document.getElementById('det-events-home'), eAway = document.getElementById('det-events-away'); eHome.innerHTML = ""; eAway.innerHTML = ""; if(d.events) { document.getElementById('det-stats-container').style.display = 'block'; Object.values(d.events).forEach(ev => { const row = `<div class="detail-event-box">${ev.emoji} ${ev.player}</div>`; if(ev.team == 1) eHome.innerHTML += row; else eAway.innerHTML += row; }); } else document.getElementById('det-stats-container').style.display = 'none'; document.getElementById('match-details-view').classList.add('active'); }
         function openAdmin(key) { currentAdminKey = key; refreshAdminPanel(key); document.getElementById('admin-panel').classList.add('active'); }
         function closeAdmin() { document.getElementById('admin-panel').classList.remove('active'); currentAdminKey = null; }
-        
         function refreshAdminPanel(key) {
             const d = allTereni.find(x => x.key === key); if(!d) return; const t = translations[currentLang];
             document.getElementById('adm-name').innerText = d.name; document.getElementById('adm-main-score').innerText = `${d.score1 || 0} : ${d.score2 || 0}`;
