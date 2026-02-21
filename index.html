@@ -77,6 +77,7 @@
         .blink-live { animation: soft-blink 2s infinite ease-in-out; color: #ff3b30; font-weight: 900; text-transform: uppercase; font-size: 10px; z-index: 1; }
         @keyframes soft-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
+        /* OGLASI VIZUELNI IDENTITET */
         .ad-marker-wrapper { display: flex; align-items: center; background: rgba(0,0,0,0.85); border: 1.5px solid #ffcc00; border-radius: 20px; padding: 2px 8px 2px 2px; gap: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); white-space: nowrap; }
         .ad-icon-circle { background: #ffcc00; color: #000; width: 22px; height: 22px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 12px; }
         .ad-label-name { color: #fff; font-size: 10px; font-weight: 900; text-transform: uppercase; font-family: 'Inter'; }
@@ -86,6 +87,20 @@
         .ad-type-btn:active { background: #333; }
         .ad-payment-box { padding: 15px; text-align: center; font-weight: bold; color: #ffcc00; }
         
+        #match-details-view { position: fixed; bottom: -100%; left: 0; width: 100%; max-height: 90vh; background: #0a0a0a; z-index: 8000; border-top: 3px solid #ff3b30; border-radius: 30px 30px 0 0; padding: 20px; transition: 0.5s cubic-bezier(0.19, 1, 0.22, 1); overflow-y: auto; color: white; }
+        #match-details-view.active { bottom: 0; }
+        .details-header { text-align: center; margin-bottom: 20px; position: relative; }
+        .details-league { color: #ff3b30; font-weight: 900; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 5px; display: block; }
+        .details-time-full { color: #ffcc00; font-weight: 800; font-size: 11px; margin-bottom: 15px; display: block; }
+        .details-main-box { background: #151515; border-radius: 20px; padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 20px; border: 1px solid #222; }
+        .details-team-line { font-size: 22px; font-weight: 900; text-align: center; width: 100%; word-wrap: break-word; }
+        .details-score-line { font-family: 'Oswald'; font-size: 50px; color: #ff3b30; line-height: 1; margin: 5px 0; display: flex; align-items: center; gap: 15px; }
+        .details-extra-line { color: #ffcc00; font-weight: 800; font-size: 16px; margin-top: 5px; }
+        .details-section-title { color: #555; font-size: 11px; font-weight: 900; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 1px; display: block; }
+        
+        .details-periods-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .detail-period-tag { background: #111; padding: 10px; border-radius: 10px; font-size: 13px; font-weight: 700; border-left: 3px solid #ffcc00; color: white; }
+
         #admin-panel { position: fixed; top: 0; left: 100%; width: 100%; height: 100%; background: #0a0a0a; z-index: 7000; transition: 0.4s; padding: 25px; display: flex; flex-direction: column; overflow-y: auto; }
         #admin-panel.active { left: 0; }
         .admin-btn { padding: 12px; border: none; font-weight: 900; color: white; text-transform: uppercase; width: 100%; border-radius: 12px; cursor: pointer; font-family: 'Oswald'; margin-bottom: 8px; }
@@ -196,7 +211,16 @@
         };
 
         function setLanguage(lang) { currentLang = lang; localStorage.setItem('lang', lang); updateUILanguage(); }
-        function updateUILanguage() { const t = translations[currentLang]; document.getElementById('txt-subtitle').innerText = t.subtitle; document.getElementById('btn-login').innerText = t.login; document.getElementById('btn-explore').innerText = t.explore; document.getElementById('city-search').placeholder = t.search; document.getElementById('adm-name').innerText = t.adminTitle; if(auth.currentUser) document.getElementById('user-indicator').innerText = `${t.loggedAs} ${auth.currentUser.email}`; }
+        function updateUILanguage() { 
+            const t = translations[currentLang]; 
+            document.getElementById('txt-subtitle').innerText = t.subtitle; 
+            document.getElementById('btn-login').innerText = t.login; 
+            document.getElementById('btn-explore').innerText = t.explore; 
+            document.getElementById('city-search').placeholder = t.search; 
+            document.getElementById('adm-name').innerText = t.adminTitle; 
+            if(auth.currentUser) document.getElementById('user-indicator').innerText = `${t.loggedAs} ${auth.currentUser.email}`; 
+        }
+
         function toggleLangModal() { let m = document.getElementById('lang-modal'); m.style.display = (m.style.display === 'flex') ? 'none' : 'flex'; }
         function exploreMap() { document.getElementById('hero').style.display = 'none'; document.getElementById('map').style.display = 'block'; document.getElementById('ui-controls').style.display = 'block'; initMap(); updateUILanguage(); loadSuggestions(); }
         function goBackToLogin() { auth.signOut(); location.reload(); }
@@ -208,31 +232,53 @@
             map = L.map('map', { zoomControl: false, tap: false, preferCanvas: true }).setView([sLat, sLng], sZoom);
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', { opacity: 0.8 }).addTo(map);
-            courtLayer.addTo(map); adLayer.addTo(map);
+            
+            courtLayer.addTo(map); 
+            adLayer.addTo(map);
+
             rangeCircle = L.circle([sLat, sLng], { radius: 30000, color: 'white', weight: 1, fillOpacity: 0.03, interactive: false, className: 'animated-range-circle' }).addTo(map);
+            
             map.on('move', () => { let c = map.getCenter(); rangeCircle.setLatLng(c); });
             map.on('moveend', () => { renderMarkers(); });
             map.on('click', handleMapClick);
-            db.ref('tereni').on('value', snap => { allTereni = []; snap.forEach(c => { let d = c.val(); d.key = c.key; allTereni.push(d); }); renderMarkers(); });
-            db.ref('oglasi').on('value', snap => { allAds = []; snap.forEach(c => { let d = c.val(); d.key = c.key; allAds.push(d); }); renderMarkers(); });
+
+            db.ref('tereni').on('value', snap => { 
+                allTereni = []; 
+                snap.forEach(c => { let d = c.val(); d.key = c.key; allTereni.push(d); }); 
+                renderMarkers(); 
+            });
+
+            db.ref('oglasi').on('value', snap => { 
+                allAds = []; 
+                snap.forEach(c => { let d = c.val(); d.key = c.key; allAds.push(d); }); 
+                renderMarkers(); 
+            });
             trackGPS();
         }
 
         function renderMarkers() {
             if (!map) return;
             const center = map.getCenter(), zoomNear = map.getZoom() > 12;
-            courtLayer.clearLayers(); adLayer.clearLayers();
+            courtLayer.clearLayers(); 
+            adLayer.clearLayers();
+
             allTereni.forEach(d => {
                 if (map.distance(center, [d.lat, d.lng]) > 30000) return;
                 const ball = sportEmojis[d.sport] || '⚽', isLive = d.status === 'live';
                 let html = `<div class="sport-marker-wrapper ${isLive?'status-live-wrapper':''} ${zoomNear?'zoom-near':''}"><div class="marker-content-box"><div class="marker-ball-only">${ball}</div><div class="live-card-thin"><div style="font-size:12px; text-align:center; color:#fff; font-weight:bold;">${d.name}</div></div><div class="marker-pointer"></div></div></div>`;
-                L.marker([d.lat, d.lng], { icon: L.divIcon({ className: '', html, iconSize:[0,0] }) }).addTo(courtLayer).on('click', () => { if (auth.currentUser && d.owner === auth.currentUser.uid) openAdmin(d.key); else openDetails(d.key); });
+                L.marker([d.lat, d.lng], { icon: L.divIcon({ className: '', html, iconSize:[0,0] }) }).addTo(courtLayer).on('click', () => { 
+                    if (auth.currentUser && d.owner === auth.currentUser.uid) openAdmin(d.key); 
+                    else openDetails(d.key); 
+                });
             });
+
             allAds.forEach(a => {
                 if (map.distance(center, [a.lat, a.lng]) > 30000) return;
                 const icon = adEmojis[a.type] || "🏢";
                 const html = `<div class="ad-marker-wrapper"><div class="ad-icon-circle">${icon}</div><div class="ad-label-name">${a.name}</div></div>`;
-                L.marker([a.lat, a.lng], { icon: L.divIcon({ className: '', html, iconSize: [120, 26] }) }).addTo(adLayer).on('click', () => { L.popup().setLatLng([a.lat, a.lng]).setContent(`<div style="padding:10px; color:black;"><b>${a.name}</b></div>`).openOn(map); });
+                L.marker([a.lat, a.lng], { icon: L.divIcon({ className: '', html, iconSize: [120, 26] }) }).addTo(adLayer).on('click', () => { 
+                    L.popup().setLatLng([a.lat, a.lng]).setContent(`<div style="padding:10px; color:black;"><b>${a.name}</b></div>`).openOn(map); 
+                });
             });
         }
 
@@ -263,15 +309,15 @@
 
         function openAdFinalForm(lat, lng, type) {
             const t = translations[currentLang];
-            const html = `<div style="padding:10px;"><input type="text" id="ad_name_input" placeholder="${t.objName}" style="margin-bottom:10px;"><button onclick="saveAd(${lat}, ${lng}, '${type}')" id="ad-create-btn" style="width:100%; background:#ffcc00; color:#000; border:none; padding:10px; border-radius:12px; font-weight:bold;">${t.create}</button></div>`;
+            const html = `<div style="padding:10px;"><input type="text" id="ad_name_input" placeholder="${t.objName}" style="margin-bottom:10px;"><button onclick="saveAd(${lat}, ${lng}, '${type}')" style="width:100%; background:#ffcc00; color:#000; border:none; padding:10px; border-radius:12px; font-weight:bold;">${t.create}</button></div>`;
             L.popup().setLatLng([lat, lng]).setContent(html).openOn(map);
         }
 
         function saveAd(lat, lng, type) {
             const name = document.getElementById('ad_name_input').value.toUpperCase();
             if(!name) return;
-            map.closePopup();
-            // Direktno slanje u granu oglasi
+            
+            // Slanje podataka u Firebase
             db.ref('oglasi').push({
                 name: name,
                 lat: lat,
@@ -279,8 +325,11 @@
                 type: type,
                 owner: auth.currentUser.uid
             }).then(() => {
-                console.log("Oglas snimljen!");
+                // Tek kada je potvrđeno snimanje, zatvori i osveži
+                map.closePopup();
                 renderMarkers();
+            }).catch(err => {
+                alert("Greška pri snimanju: " + err.message);
             });
         }
 
@@ -292,20 +341,35 @@
 
         async function saveTeren(lat, lng) {
             const n = document.getElementById('p_name').value.toUpperCase();
+            if(!n) return;
             const myCourts = allTereni.filter(t => t.owner === auth.currentUser.uid);
             if (myCourts.length >= 3) { alert(translations[currentLang].limitReached); return; }
-            await db.ref('tereni').push({ name: n, lat, lng, owner: auth.currentUser.uid, sport: document.getElementById('p_sport').value, status: 'upcoming', score1: 0, score2: 0 });
-            map.closePopup();
+            db.ref('tereni').push({ name: n, lat, lng, owner: auth.currentUser.uid, sport: document.getElementById('p_sport').value, status: 'upcoming', score1: 0, score2: 0 })
+            .then(() => {
+                map.closePopup();
+                renderMarkers();
+            });
         }
 
-        function openDetails(key) { /* Prethodna logika za detalje */ }
-        function openAdmin(key) { /* Prethodna logika za admin tablu */ }
+        // --- FUNKCIJE ZA DETALJE I ADMIN TABLU ---
+        function openDetails(key) { 
+            const d = allTereni.find(x => x.key === key); 
+            if(!d) return; 
+            document.getElementById('det-t1').innerText = d.t1 || "TIM 1"; 
+            document.getElementById('det-t2').innerText = d.t2 || "TIM 2"; 
+            document.getElementById('det-score').innerText = `${d.score1||0} : ${d.score2||0}`;
+            document.getElementById('match-details-view').classList.add('active'); 
+        }
+        function closeDetails() { document.getElementById('match-details-view').classList.remove('active'); }
+        function openAdmin(key) { currentAdminKey = key; document.getElementById('admin-panel').classList.add('active'); }
+        function closeAdmin() { document.getElementById('admin-panel').classList.remove('active'); currentAdminKey = null; }
+
         function trackGPS() { if(!navigator.geolocation) return; navigator.geolocation.watchPosition(pos => { currentLat = pos.coords.latitude; currentLon = pos.coords.longitude; if(!userMarker) userMarker = L.marker([currentLat, currentLon], { icon: L.divIcon({ className: 'user-location-dot', iconSize: [14, 14] }) }).addTo(map); else userMarker.setLatLng([currentLat, currentLon]); }); }
         function goToMyLocation() { if(currentLat) map.flyTo([currentLat, currentLon], 18); }
         function handleAuth() { let e = document.getElementById('email').value.toUpperCase(), p = document.getElementById('password').value; auth.signInWithEmailAndPassword(e, p).catch(() => auth.createUserWithEmailAndPassword(e, p)); }
         function toggleSearch() { document.getElementById('search-container').classList.toggle('expanded'); }
         function handleSearch(e) { if(e.key === "Enter") fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${e.target.value}`).then(r => r.json()).then(d => d[0] && map.flyTo([d[0].lat, d[0].lon], 15)); }
-        function loadSuggestions() { /* Prethodna logika za sugestije */ }
+        function loadSuggestions() {}
     </script>
 </body>
 </html>
