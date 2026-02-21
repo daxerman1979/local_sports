@@ -12,10 +12,8 @@
     
     <script>
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js').then(function(reg) {
-          console.log('SW registrovan!', reg);
-        }).catch(function(err) {
-          console.log('SW greška:', err);
+        navigator.serviceWorker.register('sw.js').catch(function(err) {
+          console.log('SW error:', err);
         });
       }
     </script>
@@ -58,6 +56,7 @@
         .back-btn { position: absolute; top: 20px; right: 20px; z-index: 5500; width: 40px; height: 40px; background: rgba(0,0,0,0.5); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); color: white; font-weight: bold; }
         .settings-btn { position: absolute; top: 70px; right: 20px; z-index: 5500; width: 40px; height: 40px; background: rgba(0,0,0,0.5); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); }
         .settings-btn img { width: 20px; filter: invert(1); }
+        #user-indicator { position: absolute; bottom: 15px; left: 15px; z-index: 5500; color: rgba(255,255,255,0.4); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; pointer-events: none; }
 
         .sport-marker-wrapper { display: flex; flex-direction: column; align-items: center; width: auto; position: relative; }
         .marker-content-box { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; pointer-events: none; }
@@ -94,6 +93,7 @@
         .details-extra-line { color: #ffcc00; font-weight: 800; font-size: 16px; margin-top: 5px; }
         .details-section-title { color: #555; font-size: 11px; font-weight: 900; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 1px; display: block; margin-top: 15px; }
         
+        /* UNIFIKOVAN STIL REDOVA SA ŽUTIM BORDEROM */
         .pro-row-item { 
             background: #111; padding: 10px 14px; border-radius: 10px; 
             margin-bottom: 6px; border-left: 3px solid #ffcc00; 
@@ -105,11 +105,12 @@
         .score-style { font-family: 'Oswald'; font-size: 18px; color: #fff; }
 
         .events-container-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-        .full-width-list { display: flex; flex-direction: column; gap: 4px; margin-top: 10px; }
+        .full-width-list { display: flex; flex-direction: column; gap: 4px; }
 
         #admin-panel { position: fixed; top: 0; left: 100%; width: 100%; height: 100%; background: #0a0a0a; z-index: 7000; transition: 0.4s; padding: 25px; display: flex; flex-direction: column; overflow-y: auto; }
         #admin-panel.active { left: 0; }
         .admin-btn { padding: 12px; border: none; font-weight: 900; color: white; text-transform: uppercase; width: 100%; border-radius: 12px; cursor: pointer; font-family: 'Oswald'; margin-bottom: 8px; }
+        .user-location-dot { background: #007AFF; width: 14px; height: 14px; border: 2px solid white; border-radius: 50%; box-shadow: 0 0 20px #007AFF; }
     </style>
 </head>
 <body>
@@ -164,7 +165,7 @@
             <div id="det-periods" class="full-width-list"></div>
         </div>
 
-        <div id="det-stats-container" style="display:none; margin-top:10px;">
+        <div id="det-stats-container" style="display:none;">
             <span class="details-section-title" id="txt-match-events">Događaji na meču</span>
             <div class="events-container-grid">
                 <div id="det-events-home" class="events-column"></div>
@@ -275,7 +276,6 @@
             if(d.sport === "TENIS") { const isTB = (d.g1 === 6 && d.g2 === 6); const pts1 = isTB ? (d.p1||0) : (tennisPoints[d.p1]||"0"); const pts2 = isTB ? (d.p2||0) : (tennisPoints[d.p2]||"0"); ex = `${d.g1||0}:${d.g2||0} (${pts1}:${pts2})`; }
             document.getElementById('det-extra-info').innerText = ex;
 
-            // PERIODI SA ŽUTIM BORDEROM
             let pDiv = document.getElementById('det-periods'); pDiv.innerHTML = "";
             if(d.sub_details) {
                 document.getElementById('periods-section').style.display = 'block';
@@ -287,7 +287,6 @@
                 });
             } else { document.getElementById('periods-section').style.display = 'none'; }
 
-            // DOGAĐAJI (FUDBAL) - ŽUTI BORDER
             let eHome = document.getElementById('det-events-home'), eAway = document.getElementById('det-events-away');
             eHome.innerHTML = ""; eAway.innerHTML = "";
             if(d.events) {
@@ -302,6 +301,7 @@
 
         function openAdmin(key) { currentAdminKey = key; refreshAdminPanel(key); document.getElementById('admin-panel').classList.add('active'); }
         function closeAdmin() { document.getElementById('admin-panel').classList.remove('active'); currentAdminKey = null; }
+        
         function refreshAdminPanel(key) {
             const d = allTereni.find(x => x.key === key); if(!d) return; const t = translations[currentLang];
             document.getElementById('adm-name').innerText = d.name; document.getElementById('adm-main-score').innerText = `${d.score1 || 0} : ${d.score2 || 0}`;
