@@ -230,6 +230,7 @@
         const auth = firebase.auth(), db = firebase.database();
 
         let map, userMarker, currentLat, currentLon, currentAdminKey = null, allTereni = [], rangeCircle = null, allAds = [];
+        let courtLayer = L.layerGroup(), adLayer = L.layerGroup();
         let currentLang = localStorage.getItem('lang') || 'sr';
         const sportEmojis = { "FUDBAL": "⚽", "KOŠARKA": "🏀", "ODBOJKA": "🏐", "TENIS": "🎾", "RUKOMET": "🤾" };
         const adEmojis = { "CAFFE": "☕", "RESTORAN": "🍴", "FIRMA": "🏢" };
@@ -252,28 +253,56 @@
         function initMap() {
             if (map) return;
             const sLat = localStorage.getItem('lastLat') || 44.7866, sLng = localStorage.getItem('lastLng') || 20.4489, sZoom = localStorage.getItem('lastZoom') || 13;
-            map = L.map('map', { zoomControl: false, tap: false }).setView([sLat, sLng], sZoom);
+            map = L.map('map', { zoomControl: false, tap: false, preferCanvas: true }).setView([sLat, sLng], sZoom);
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', { opacity: 0.8 }).addTo(map);
             
+            courtLayer.addTo(map);
+            adLayer.addTo(map);
+
             rangeCircle = L.circle([sLat, sLng], { radius: 30000, color: 'white', weight: 1, fillOpacity: 0.03, interactive: false, className: 'animated-range-circle' }).addTo(map);
-            map.on('move', () => { let c = map.getCenter(); rangeCircle.setLatLng(c); if(map.getZoom() > 10) rangeCircle.setStyle({opacity: 0, fillOpacity: 0}); else rangeCircle.setStyle({opacity: 1, fillOpacity: 0.03}); });
-            map.on('moveend', () => { let c = map.getCenter(); localStorage.setItem('lastLat', c.lat); localStorage.setItem('lastLng', c.lng); localStorage.setItem('lastZoom', map.getZoom()); renderMarkers(); });
+            
+            map.on('move', () => { 
+                let c = map.getCenter(); 
+                rangeCircle.setLatLng(c); 
+                if(map.getZoom() > 10) rangeCircle.setStyle({opacity: 0, fillOpacity: 0}); 
+                else rangeCircle.setStyle({opacity: 1, fillOpacity: 0.03}); 
+            });
+
+            map.on('moveend', () => { 
+                let c = map.getCenter(); 
+                localStorage.setItem('lastLat', c.lat); 
+                localStorage.setItem('lastLng', c.lng); 
+                localStorage.setItem('lastZoom', map.getZoom()); 
+                renderMarkers(); 
+            });
+
             map.on('click', handleMapClick);
-            db.ref('tereni').on('value', snap => { allTereni = []; snap.forEach(c => { let d = c.val(); d.key = c.key; allTereni.push(d); }); renderMarkers(); });
-            db.ref('oglasi').on('value', snap => { allAds = []; snap.forEach(c => { let d = c.val(); d.key = c.key; allAds.push(d); }); renderMarkers(); });
+            
+            db.ref('tereni').on('value', snap => { 
+                allTereni = []; 
+                snap.forEach(c => { let d = c.val(); d.key = c.key; allTereni.push(d); }); 
+                renderMarkers(); 
+            });
+
+            db.ref('oglasi').on('value', snap => { 
+                allAds = []; 
+                snap.forEach(c => { let d = c.val(); d.key = c.key; allAds.push(d); }); 
+                renderMarkers(); 
+            });
             trackGPS();
         }
 
         function renderMarkers() {
             if (!map) return;
             const center = map.getCenter();
-            map.eachLayer(l => { if(l instanceof L.Marker && l !== userMarker) map.removeLayer(l); });
             const zoomNear = map.getZoom() > 12;
 
-            // Render Terena
+            courtLayer.clearLayers();
+            adLayer.clearLayers();
+
             allTereni.forEach(d => {
-                if (map.distance(center, [d.lat, d.lng]) > 30000) return;
+                if (map.distance(center, [d.lat, d.lng]) > 35000) return;
                 const isLive = d.status === 'live', isEnded = d.status === 'ended', isUpcoming = d.status === 'upcoming' && d.t1;
                 const ball = sportEmojis[d.sport] || '⚽';
                 let cardBody = "";
@@ -284,14 +313,23 @@
                     cardBody = `<div class="live-card-thin"><div class="card-bg-icon">${ball}</div>${d.league ? `<div class="card-league-mini">${d.league}</div>` : ""}<div class="score-row"><span class="team-name-col">${d.t1}</span><span class="score-val-col">${s1}</span></div><div class="score-row"><span class="team-name-col">${d.t2}</span><span class="score-val-col">${s2}</span></div>${bInfo}</div><div class="marker-pointer"></div>`;
                 } else cardBody = `<div class="live-card-thin"><div style="font-size:12px; text-align:center; color:#fff; font-weight:bold;">${d.name}</div></div><div class="marker-pointer"></div>`;
                 const html = `<div class="sport-marker-wrapper ${isLive?'status-live-wrapper':''} ${zoomNear?'zoom-near':''}"><div class="marker-content-box"><div class="marker-ball-only">${ball}</div>${cardBody}</div></div>`;
-                L.marker([d.lat, d.lng], { icon: L.divIcon({ className: '', html, iconSize: [0,0], iconAnchor: [0, 0] }) }).addTo(map).on('click', e => { L.DomEvent.stopPropagation(e); if (auth.currentUser && d.owner === auth.currentUser.uid) openAdmin(d.key); else openDetails(d.key); });
+                
+                L.marker([d.lat, d.lng], { 
+                    icon: L.divIcon({ className: '', html, iconSize: [0,0], iconAnchor: [0, 0] }) 
+                }).addTo(courtLayer).on('click', e => { 
+                    L.DomEvent.stopPropagation(e); 
+                    if (auth.currentUser && d.owner === auth.currentUser.uid) openAdmin(d.key); 
+                    else openDetails(d.key); 
+                });
             });
 
-            // Render Oglasa
             allAds.forEach(a => {
+                if (map.distance(center, [a.lat, a.lng]) > 35000) return;
                 const icon = adEmojis[a.type] || "🏢";
                 const html = `<div class="ad-marker-mini">${icon}</div>`;
-                L.marker([a.lat, a.lng], { icon: L.divIcon({ className: '', html, iconSize: [28, 28], iconAnchor: [14, 14] }) }).addTo(map).bindPopup(`<div style="padding:10px; font-weight:900; text-align:center; color:#000;">${a.name}</div>`);
+                L.marker([a.lat, a.lng], { 
+                    icon: L.divIcon({ className: '', html, iconSize: [28, 28], iconAnchor: [14, 14] }) 
+                }).addTo(adLayer).bindPopup(`<div style="padding:10px; font-weight:900; text-align:center; color:#000;">${a.name}</div>`);
             });
         }
 
