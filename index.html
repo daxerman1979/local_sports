@@ -98,7 +98,7 @@
         .details-time-full { color: #ffcc00; font-weight: 800; font-size: 11px; margin-bottom: 15px; display: block; }
         .details-main-box { background: #151515; border-radius: 20px; padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 20px; border: 1px solid #222; }
         .details-team-line { font-size: 22px; font-weight: 900; text-align: center; width: 100%; word-wrap: break-word; }
-        .details-score-line { font-family: 'Oswald'; font-size: 50px; color: #ff3b30; line-height: 1; margin: 5px 0; }
+        .details-score-line { font-family: 'Oswald'; font-size: 50px; color: #ff3b30; line-height: 1; margin: 5px 0; display: flex; align-items: center; gap: 15px; }
         .details-extra-line { color: #ffcc00; font-weight: 800; font-size: 16px; margin-top: 5px; }
         .details-section-title { color: #555; font-size: 11px; font-weight: 900; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 1px; display: block; }
         
@@ -109,6 +109,8 @@
         .events-column { display: flex; flex-direction: column; gap: 5px; }
         .detail-event-box { background: #111; padding: 10px; border-radius: 10px; font-size: 13px; font-weight: 700; border-left: 3px solid #ffcc00; }
         .events-column.right .detail-event-box { border-left: none; border-right: 3px solid #ffcc00; text-align: right; }
+
+        .live-dot-mini { width: 8px; height: 8px; background: #ff3b30; border-radius: 50%; display: inline-block; animation: soft-blink 1.5s infinite ease-in-out; }
 
         #admin-panel { position: fixed; top: 0; left: 100%; width: 100%; height: 100%; background: #0a0a0a; z-index: 7000; transition: 0.4s; padding: 25px; display: flex; flex-direction: column; overflow-y: auto; }
         #admin-panel.active { left: 0; }
@@ -267,11 +269,16 @@
             const d = allTereni.find(x => x.key === key); 
             if(!d) return; 
             const t = translations[currentLang]; 
+            const isLive = d.status === 'live';
+
             document.getElementById('det-league').innerText = d.league || t.localMatch; 
             document.getElementById('det-time').innerText = d.match_time ? new Date(d.match_time).toLocaleString() : ""; 
             document.getElementById('det-t1').innerText = d.t1 || t.team1; 
             document.getElementById('det-t2').innerText = d.t2 || t.team2; 
-            document.getElementById('det-score').innerText = `${d.score1||0} : ${d.score2||0}`; 
+            
+            // Dodajemo blinkajuću tačku ako je uživo
+            const liveIndicator = isLive ? `<div class="live-dot-mini"></div>` : "";
+            document.getElementById('det-score').innerHTML = `${liveIndicator} ${d.score1||0} : ${d.score2||0} ${liveIndicator}`; 
             
             let ex = ""; 
             if(d.sport === "ODBOJKA") ex = `${d.p1||0} : ${d.p2||0}`; 
