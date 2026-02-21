@@ -378,25 +378,25 @@
         }
 
         async function saveAd(lat, lng, type) {
-            const nameInput = document.getElementById('ad_name_input');
-            const name = nameInput ? nameInput.value.toUpperCase() : "";
+            const inputField = document.getElementById('ad_name_input');
+            if(!inputField) return;
+            const name = inputField.value.toUpperCase();
             if(!name) return;
             
-            try {
-                await db.ref('oglasi').push({ 
-                    name, 
-                    lat, 
-                    lng, 
-                    type, 
-                    owner: auth.currentUser.uid,
-                    created_at: firebase.database.ServerValue.TIMESTAMP
-                });
-                map.closePopup();
-                // Forces instant update
-                renderMarkers();
-            } catch (error) {
-                console.error("Greška pri snimanju oglasa:", error);
-            }
+            // 1. Odmah zatvaramo Popup
+            map.closePopup();
+
+            // 2. Upisujemo u bazu
+            await db.ref('oglasi').push({ 
+                name: name, 
+                lat: lat, 
+                lng: lng, 
+                type: type, 
+                owner: auth.currentUser.uid 
+            });
+
+            // 3. Forsiramo osvežavanje markera
+            renderMarkers();
         }
 
         function openTerenForm(lat, lng) {
