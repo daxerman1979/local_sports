@@ -303,7 +303,6 @@
             courtLayer.clearLayers();
             adLayer.clearLayers();
 
-            // Render utakmica (u krugu od 30km)
             allTereni.forEach(d => {
                 if (map.distance(center, [d.lat, d.lng]) > 30000) return;
                 const isLive = d.status === 'live', isEnded = d.status === 'ended', isUpcoming = d.status === 'upcoming' && d.t1;
@@ -326,12 +325,10 @@
                 });
             });
 
-            // Render oglasa (u krugu od 30km - sa amblemom i imenom)
             allAds.forEach(a => {
                 if (map.distance(center, [a.lat, a.lng]) > 30000) return;
                 const icon = adEmojis[a.type] || "🏢";
                 
-                // Amblem + Ime objekta
                 const html = `<div class="ad-marker-wrapper">
                     <div class="ad-icon-circle">${icon}</div>
                     <div class="ad-label-name">${a.name}</div>
@@ -381,10 +378,25 @@
         }
 
         async function saveAd(lat, lng, type) {
-            const name = document.getElementById('ad_name_input').value.toUpperCase();
+            const nameInput = document.getElementById('ad_name_input');
+            const name = nameInput ? nameInput.value.toUpperCase() : "";
             if(!name) return;
-            await db.ref('oglasi').push({ name, lat, lng, type, owner: auth.currentUser.uid });
-            map.closePopup();
+            
+            try {
+                await db.ref('oglasi').push({ 
+                    name, 
+                    lat, 
+                    lng, 
+                    type, 
+                    owner: auth.currentUser.uid,
+                    created_at: firebase.database.ServerValue.TIMESTAMP
+                });
+                map.closePopup();
+                // Forces instant update
+                renderMarkers();
+            } catch (error) {
+                console.error("Greška pri snimanju oglasa:", error);
+            }
         }
 
         function openTerenForm(lat, lng) {
