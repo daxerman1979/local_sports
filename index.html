@@ -106,12 +106,14 @@
         .admin-btn { padding: 12px; border: none; font-weight: 900; color: white; text-transform: uppercase; width: 100%; border-radius: 12px; cursor: pointer; font-family: 'Oswald'; margin-bottom: 8px; }
         .user-location-dot { background: #007AFF; width: 14px; height: 14px; border: 2px solid white; border-radius: 50%; box-shadow: 0 0 20px #007AFF; }
 
-        /* Oglasi */
         .ad-marker-wrapper { display: flex; align-items: center; background: rgba(0,0,0,0.85); border: 1.5px solid #ffcc00; border-radius: 20px; padding: 2px 8px 2px 2px; gap: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); white-space: nowrap; }
         .ad-icon-circle { background: #ffcc00; color: #000; width: 22px; height: 22px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 12px; }
         .ad-label-name { color: #fff; font-size: 10px; font-weight: 900; text-transform: uppercase; font-family: 'Inter'; }
         .ad-choice-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 10px; }
         .ad-type-btn { background: #1a1a1a; border: 1px solid #333; border-radius: 10px; padding: 10px; text-align: center; cursor: pointer; font-size: 20px; }
+
+        #adm-period-list-view { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 15px; padding: 10px; background: #111; border-radius: 12px; border: 1px dashed #333; }
+        .adm-mini-period-tag { font-size: 10px; background: #222; color: #ffcc00; padding: 4px 8px; border-radius: 6px; font-weight: 900; border: 1px solid #333; }
     </style>
 </head>
 <body>
@@ -177,6 +179,10 @@
                 <div id="adm-main-score" style="font-size:55px; font-family:'Oswald'; color:#ff3b30;">0 : 0</div>
                 <div id="adm-sub-display" style="color:#ffcc00; font-weight:900; font-family:'Oswald'; margin-top:10px;"></div>
             </div>
+            
+            <span style="font-size:9px; color:#555; text-transform:uppercase; font-weight:bold; margin-bottom:5px;">Sačuvani periodi:</span>
+            <div id="adm-period-list-view"></div>
+
             <div id="adm-sport-controls"></div>
             <div id="adm-events-manager" style="margin-bottom:15px; border-top:1px solid #222; padding-top:10px;"></div>
             <button class="admin-btn" style="background:#444;" onclick="triggerLogic('period')" id="btn-save-period">SAČUVAJ PERIOD / SET</button>
@@ -235,7 +241,16 @@
         }
 
         function toggleLangModal() { let m = document.getElementById('lang-modal'); m.style.display = (m.style.display === 'flex') ? 'none' : 'flex'; }
-        function exploreMap() { document.getElementById('hero').style.display = 'none'; document.getElementById('map').style.display = 'block'; document.getElementById('ui-controls').style.display = 'block'; initMap(); updateUILanguage(); }
+        
+        function exploreMap() { 
+            document.getElementById('hero').style.display = 'none'; 
+            document.getElementById('map').style.display = 'block'; 
+            document.getElementById('ui-controls').style.display = 'block'; 
+            initMap(); 
+            updateUILanguage(); 
+            trackGPS(); // Pokreće GPS odmah
+        }
+
         function goBackToLogin() { auth.signOut(); location.reload(); }
         auth.onAuthStateChanged(user => { if (user) exploreMap(); });
 
@@ -249,7 +264,7 @@
             
             map.on('move', () => { 
                 rangeCircle.setLatLng(map.getCenter()); 
-                renderMarkers(); // Osigurava da markeri reaguju na pomeranje kruga
+                renderMarkers();
             });
             map.on('moveend', () => renderMarkers());
             map.on('click', handleMapClick);
@@ -262,13 +277,12 @@
         function renderMarkers() {
             if (!map || !rangeCircle) return;
             const center = map.getCenter();
-            const radius = 30000; // 30km u metrima
+            const radius = 30000;
             const zoomNear = map.getZoom() > 12;
             
             courtLayer.clearLayers(); 
             adLayer.clearLayers();
 
-            // Filtriraj i prikaži samo terene unutar kruga
             allTereni.forEach(d => {
                 const courtLatLng = L.latLng(d.lat, d.lng);
                 if (center.distanceTo(courtLatLng) <= radius) {
@@ -280,7 +294,6 @@
                 }
             });
 
-            // Filtriraj i prikaži samo oglase unutar kruga
             allAds.forEach(a => {
                 const adLatLng = L.latLng(a.lat, a.lng);
                 if (center.distanceTo(adLatLng) <= radius) {
@@ -309,7 +322,13 @@
         }
 
         function saveAd(lat, lng, type) { const name = document.getElementById('ad_name_input').value.toUpperCase(); if(name) db.ref('oglasi').push({ name, lat, lng, type, owner: auth.currentUser.uid }).then(() => { map.closePopup(); renderMarkers(); }); }
-        function openTerenForm(lat, lng) { const t = translations[currentLang]; const html = `<div style="padding:10px;"><select id="p_sport"><option value="FUDBAL">FUDBAL</option><option value="KOŠARKA">KOŠARKA</option><option value="ODBOJKA">ODBOJKA</option><option value="TENIS">TENIS</option><option value="RUKOMET">RUKOMET</option></select><input type="text" id="p_name" placeholder="${t.courtName}" style="margin:10px 0;"><button onclick="saveTeren(${lat}, ${lng})" style="width:100%; background:#ff3b30; color:white; border:none; padding:10px; font-weight:bold; border-radius:12px;">${t.create}</button></div>`; L.popup().setLatLng([lat, lng]).setContent(html).openOn(map); }
+        
+        function openTerenForm(lat, lng) { 
+            const t = translations[currentLang]; 
+            const html = `<div style="padding:10px;"><select id="p_sport"><option value="FUDBAL">FUDBAL</option><option value="KOŠARKA">KOŠARKA</option><option value="ODBOJKA">ODBOJKA</option><option value="TENIS">TENIS</option><option value="RUKOMET">RUKOMET</option></select><input type="text" id="p_name" placeholder="${t.courtName}" style="margin:10px 0;"><button onclick="saveTeren(${lat}, ${lng})" style="width:100%; background:#ff3b30; color:white; border:none; padding:10px; font-weight:bold; border-radius:12px;">${t.create}</button></div>`; 
+            L.popup().setLatLng([lat, lng]).setContent(html).openOn(map); 
+        }
+        
         function saveTeren(lat, lng) { const n = document.getElementById('p_name').value.toUpperCase(); if(n) db.ref('tereni').push({ name: n, lat, lng, owner: auth.currentUser.uid, sport: document.getElementById('p_sport').value, status: 'upcoming', score1: 0, score2: 0 }).then(() => map.closePopup()); }
 
         function openDetails(key) { 
@@ -332,6 +351,16 @@
         function refreshAdminPanel(key) {
             const d = allTereni.find(x => x.key === key); if(!d) return; const t = translations[currentLang];
             document.getElementById('adm-name').innerText = d.name; document.getElementById('adm-main-score').innerText = `${d.score1||0} : ${d.score2||0}`;
+            
+            // OSVEŽAVANJE LISTE PERIODA U ADMIN PANELU
+            const admPList = document.getElementById('adm-period-list-view');
+            admPList.innerHTML = "";
+            if(d.sub_details) {
+                Object.values(d.sub_details).forEach(v => {
+                    admPList.innerHTML += `<div class="adm-mini-period-tag">${v}</div>`;
+                });
+            } else { admPList.innerHTML = `<span style="color:#333; font-size:10px;">NEMA SAČUVANIH PERIODA</span>`; }
+
             const ctrl = document.getElementById('adm-sport-controls'); ctrl.innerHTML = "";
             if(d.t1) {
                 document.getElementById('adm-score-view').style.display = 'flex'; document.getElementById('match-setup').style.display = 'none';
@@ -362,7 +391,20 @@
         function adminStatus(s) { db.ref(`tereni/${currentAdminKey}`).update({ status: s }); }
         function adminDelete() { if(confirm("OBRISATI?")) { db.ref(`tereni/${currentAdminKey}`).remove(); closeAdmin(); } }
         function resetMatch() { db.ref(`tereni/${currentAdminKey}`).update({ t1: null, t2: null, score1: 0, score2: 0, sub_details: null, events: null, status: 'upcoming' }); }
-        function trackGPS() { if(navigator.geolocation) navigator.geolocation.watchPosition(p => { currentLat = p.coords.latitude; currentLon = p.coords.longitude; if(!userMarker) userMarker = L.marker([currentLat,currentLon], {icon: L.divIcon({className:'user-location-dot', iconSize:[14,14]})}).addTo(map); else userMarker.setLatLng([currentLat,currentLon]); }); }
+        
+        function trackGPS() { 
+            if(!navigator.geolocation) return; 
+            navigator.geolocation.watchPosition(p => { 
+                currentLat = p.coords.latitude; 
+                currentLon = p.coords.longitude; 
+                if(!userMarker) {
+                    userMarker = L.marker([currentLat,currentLon], {icon: L.divIcon({className:'user-location-dot', iconSize:[14,14]})}).addTo(map); 
+                } else {
+                    userMarker.setLatLng([currentLat,currentLon]); 
+                }
+            }, err => console.log(err), { enableHighAccuracy: true }); 
+        }
+
         function goToMyLocation() { if(currentLat) map.flyTo([currentLat, currentLon], 18); }
         function handleAuth() { let e = document.getElementById('email').value.toUpperCase(), p = document.getElementById('password').value; auth.signInWithEmailAndPassword(e, p).catch(() => auth.createUserWithEmailAndPassword(e, p)); }
         function toggleSearch() { document.getElementById('search-container').classList.toggle('expanded'); }
