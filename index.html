@@ -112,9 +112,6 @@
         .ad-label-name { color: #fff; font-size: 10px; font-weight: 900; text-transform: uppercase; font-family: 'Inter'; }
         .ad-choice-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 10px; }
         .ad-type-btn { background: #1a1a1a; border: 1px solid #333; border-radius: 10px; padding: 10px; text-align: center; cursor: pointer; font-size: 20px; }
-
-        @keyframes pulse-circle { 0% { stroke-opacity: 0.8; stroke-width: 1px; } 50% { stroke-opacity: 0.3; stroke-width: 2.5px; } 100% { stroke-opacity: 0.8; stroke-width: 1px; } }
-        .animated-range-circle { animation: pulse-circle 4s infinite ease-in-out; }
     </style>
 </head>
 <body>
@@ -244,11 +241,11 @@
 
         function initMap() {
             if (map) return;
-            map = L.map('map', { zoomControl: false, tap: false }).setView([44.7866, 20.4489], 13);
+            map = L.map('map', { zoomControl: false, tap: false, preferCanvas: true }).setView([44.7866, 20.4489], 13);
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', { opacity: 0.8 }).addTo(map);
             courtLayer.addTo(map); adLayer.addTo(map);
-            rangeCircle = L.circle([44.7866, 20.4489], { radius: 30000, color: 'white', weight: 1, fillOpacity: 0.03, interactive: false, className: 'animated-range-circle' }).addTo(map);
+            rangeCircle = L.circle([44.7866, 20.4489], { radius: 30000, color: 'white', weight: 1, fillOpacity: 0.03, interactive: false }).addTo(map);
             map.on('move', () => { rangeCircle.setLatLng(map.getCenter()); });
             map.on('moveend', () => renderMarkers());
             map.on('click', handleMapClick);
@@ -292,7 +289,7 @@
             L.popup().setLatLng([lat, lng]).setContent(html).openOn(map);
         }
 
-        function saveAd(lat, lng, type) { const name = document.getElementById('ad_name_input').value.toUpperCase(); if(name) db.ref('oglasi').push({ name, lat, lng, type, owner: auth.currentUser.uid }).then(() => map.closePopup()); }
+        function saveAd(lat, lng, type) { const name = document.getElementById('ad_name_input').value.toUpperCase(); if(name) db.ref('oglasi').push({ name, lat, lng, type, owner: auth.currentUser.uid }).then(() => { map.closePopup(); renderMarkers(); }); }
         function openTerenForm(lat, lng) { const t = translations[currentLang]; const html = `<div style="padding:10px;"><select id="p_sport"><option value="FUDBAL">FUDBAL</option><option value="KOŠARKA">KOŠARKA</option><option value="ODBOJKA">ODBOJKA</option><option value="TENIS">TENIS</option><option value="RUKOMET">RUKOMET</option></select><input type="text" id="p_name" placeholder="${t.courtName}" style="margin:10px 0;"><button onclick="saveTeren(${lat}, ${lng})" style="width:100%; background:#ff3b30; color:white; border:none; padding:10px; font-weight:bold; border-radius:12px;">${t.create}</button></div>`; L.popup().setLatLng([lat, lng]).setContent(html).openOn(map); }
         function saveTeren(lat, lng) { const n = document.getElementById('p_name').value.toUpperCase(); if(n) db.ref('tereni').push({ name: n, lat, lng, owner: auth.currentUser.uid, sport: document.getElementById('p_sport').value, status: 'upcoming', score1: 0, score2: 0 }).then(() => map.closePopup()); }
 
