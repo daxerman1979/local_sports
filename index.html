@@ -15,6 +15,7 @@
   }
 </script>
 
+    <script src="https://www.paypal.com/sdk/js?client-id=PRISTUPNI_KLJUČ&currency=EUR"></script>
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;700;900&family=Permanent+Marker&display=swap" rel="stylesheet">
@@ -408,18 +409,36 @@
                 
                 <div style="background:#111; padding:10px; border-radius:10px;">
                     <div style="font-size:10px; color:#aaa; margin-bottom:5px;">${t.adDurationLabel}</div>
-                    <select id="ad_duration" style="margin-bottom:10px;">
+                    <select id="ad_duration" style="margin-bottom:15px;">
                         <option value="30">${t.adPrice1}</option>
                         <option value="365">${t.adPrice2}</option>
                     </select>
-                    <input type="email" id="paypal_email" placeholder="${t.adPaypalPlaceholder}" style="border: 1px solid #ffcc00;">
+                    <div id="paypal-button-container"></div>
                 </div>
 
-                <div style="font-size:10px; color:#aaa;">${t.adUploadLabel}</div>
+                <div style="font-size:10px; color:#aaa; margin-top:10px;">${t.adUploadLabel}</div>
                 <input type="file" id="ad_files" accept="image/*" multiple style="font-size:10px; padding:5px;">
-                <button onclick="processAd(${lat}, ${lng}, '${type}')" style="background:#ffcc00; color:black; width:100%; padding:12px; border-radius:12px; font-weight:bold; border:none; cursor:pointer;">${t.create}</button>
             </div>`;
             L.popup().setLatLng([lat, lng]).setContent(h).openOn(map);
+
+            // RENDER PAYPAL BUTTONS
+            setTimeout(() => {
+                paypal.Buttons({
+                    createOrder: function(data, actions) {
+                        let duration = document.getElementById('ad_duration').value;
+                        let price = (duration === "30") ? "2.00" : "10.00";
+                        return actions.order.create({
+                            purchase_units: [{ amount: { value: price } }]
+                        });
+                    },
+                    onApprove: function(data, actions) {
+                        return actions.order.capture().then(function(details) {
+                            processAd(lat, lng, type);
+                            alert(currentLang === 'sr' ? 'UPLATA USPEŠNA!' : 'PAYMENT SUCCESSFUL!');
+                        });
+                    }
+                }).render('#paypal-button-container');
+            }, 100);
         }
 
         async function processAd(lat, lng, type) {
@@ -427,15 +446,9 @@
             const desc = document.getElementById('ad_desc_input').value;
             const web = document.getElementById('ad_web_input').value;
             const duration = parseInt(document.getElementById('ad_duration').value);
-            const paypal = document.getElementById('paypal_email').value.toLowerCase();
             const fileInput = document.getElementById('ad_files');
             
             if(!name) return;
-            
-            if (paypal !== 'daxer') {
-                alert(currentLang === 'sr' ? "MOLIMO IZVRŠITE UPLATU NA PAYPAL." : "PLEASE COMPLETE THE PAYPAL PAYMENT.");
-                return;
-            }
 
             let images = [];
             if(fileInput.files.length > 0) {
