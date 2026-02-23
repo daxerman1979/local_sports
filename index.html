@@ -97,7 +97,6 @@
         .admin-btn { padding: 12px; border: none; font-weight: 900; color: white; text-transform: uppercase; width: 100%; border-radius: 12px; cursor: pointer; font-family: 'Oswald'; margin-bottom: 8px; }
         .user-location-dot { background: #007AFF; width: 14px; height: 14px; border: 2px solid white; border-radius: 50%; box-shadow: 0 0 20px #007AFF; }
 
-        /* Oglasi Style */
         .ad-marker-wrapper { display: flex; align-items: center; background: rgba(0,0,0,0.85); border: 1.5px solid #ffcc00; border-radius: 20px; padding: 2px 8px 2px 2px; gap: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); white-space: nowrap; }
         .ad-icon-circle { background: #ffcc00; color: #000; width: 22px; height: 22px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 12px; }
         .ad-label-name { color: #fff; font-size: 10px; font-weight: 900; text-transform: uppercase; font-family: 'Inter'; }
@@ -106,6 +105,10 @@
 
         @keyframes pulse-circle { 0% { stroke-opacity: 0.8; stroke-width: 1px; } 50% { stroke-opacity: 0.3; stroke-width: 2.5px; } 100% { stroke-opacity: 0.8; stroke-width: 1px; } }
         .animated-range-circle { animation: pulse-circle 4s infinite ease-in-out; }
+        
+        .events-container-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .events-column { display: flex; flex-direction: column; gap: 5px; }
+        .event-item { font-size: 12px; background: #111; padding: 5px; border-radius: 5px; }
     </style>
 </head>
 <body>
@@ -143,15 +146,15 @@
     </div>
 
     <div id="match-details-view">
-        <div class="details-header">
+        <div class="details-header" style="position:relative;">
             <div onclick="closeDetails()" style="position:absolute; right:0; top:-10px; font-size:35px; color:#ff3b30; cursor:pointer;">&times;</div>
-            <span id="det-league" class="details-league"></span>
-            <span id="det-time" class="details-time-full"></span>
+            <span id="det-league" class="details-league" style="color:#ffcc00; font-weight:900; font-size:12px;"></span><br>
+            <span id="det-time" class="details-time-full" style="font-size:10px; color:#666;"></span>
         </div>
         <div class="details-main-box">
-            <div id="det-t1" class="details-team-line"></div>
+            <div id="det-t1" class="details-team-line" style="font-weight:900; font-size:20px;"></div>
             <div id="det-score" class="details-score-line"></div>
-            <div id="det-t2" class="details-team-line"></div>
+            <div id="det-t2" class="details-team-line" style="font-weight:900; font-size:20px;"></div>
             <div id="det-extra-info" style="color:#ffcc00; font-weight:800; font-size:16px; margin-top:5px;"></div>
         </div>
         <span class="details-section-title">Rezultat po periodima</span>
@@ -210,6 +213,40 @@
             en: { periods: { FUDBAL: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "OT"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } }
         };
 
+        function setLanguage(l) {
+            currentLang = l;
+            localStorage.setItem('lang', l);
+            document.querySelectorAll('.home-lang-btn').forEach(b => b.classList.remove('active'));
+            const activeBtn = document.getElementById(`h-lang-${l}`);
+            if(activeBtn) activeBtn.classList.add('active');
+            renderMarkers();
+        }
+
+        function toggleSearch() { document.getElementById('search-container').classList.toggle('expanded'); }
+
+        async function handleSearch(e) {
+            if(e.key === 'Enter') {
+                const city = e.target.value;
+                const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${city}`);
+                const data = await res.json();
+                if(data.length > 0) {
+                    map.flyTo([data[0].lat, data[0].lon], 13);
+                    toggleSearch();
+                }
+            }
+        }
+
+        function goBackToLogin() {
+            document.getElementById('hero').style.display = 'flex';
+            document.getElementById('map').style.display = 'none';
+            document.getElementById('ui-controls').style.display = 'none';
+        }
+
+        function toggleLangModal() {
+            const m = document.getElementById('lang-modal');
+            m.style.display = (m.style.display === 'flex') ? 'none' : 'flex';
+        }
+
         function exploreMap() { 
             document.getElementById('hero').style.display = 'none'; 
             document.getElementById('map').style.display = 'block'; 
@@ -240,8 +277,15 @@
             });
             map.on('click', handleMapClick);
 
-            db.ref('tereni').on('value', snap => { allTereni = []; snap.forEach(c => { let d = c.val(); d.key = c.key; allTereni.push(d); }); renderMarkers(); if(currentAdminKey) refreshAdminPanel(currentAdminKey); });
-            db.ref('oglasi').on('value', snap => { allAds = []; snap.forEach(c => { let d = c.val(); d.key = c.key; allAds.push(d); }); renderMarkers(); });
+            db.ref('tereni').on('value', snap => { 
+                allTereni = []; snap.forEach(c => { let d = c.val(); d.key = c.key; allTereni.push(d); }); 
+                renderMarkers(); 
+                if(currentAdminKey) refreshAdminPanel(currentAdminKey); 
+            });
+            db.ref('oglasi').on('value', snap => { 
+                allAds = []; snap.forEach(c => { let d = c.val(); d.key = c.key; allAds.push(d); }); 
+                renderMarkers(); 
+            });
         }
 
         function renderMarkers() {
@@ -255,7 +299,9 @@
                 let cardBody = `<div class="live-card-thin"><div style="font-size:12px; text-align:center; color:#fff; font-weight:bold;">${d.name}</div></div>`;
                 if(d.t1) cardBody = `<div class="live-card-thin"><div class="card-bg-icon">${ball}</div>${d.league?`<div class="card-league-mini">${d.league}</div>`:""}<div class="score-row"><span class="team-name-col">${d.t1}</span><span class="score-val-col">${isLive||isEnded?d.score1:""}</span></div><div class="score-row"><span class="team-name-col">${d.t2}</span><span class="score-val-col">${isLive||isEnded?d.score2:""}</span></div>${isLive?`<div class="blink-live">LIVE</div>`:''}</div>`;
                 let html = `<div class="sport-marker-wrapper ${isLive?'status-live-wrapper':''} ${zoomNear?'zoom-near':''}"><div class="marker-content-box"><div class="marker-ball-only">${ball}</div>${cardBody}<div class="marker-pointer"></div></div></div>`;
-                L.marker([d.lat, d.lng], { icon: L.divIcon({ className: '', html }) }).addTo(map).on('click', () => { if (auth.currentUser && d.owner === auth.currentUser.uid) openAdmin(d.key); else openDetails(d.key); });
+                L.marker([d.lat, d.lng], { icon: L.divIcon({ className: '', html }) }).addTo(map).on('click', () => { 
+                    if (auth.currentUser && d.owner === auth.currentUser.uid) openAdmin(d.key); else openDetails(d.key); 
+                });
             });
 
             allAds.forEach(a => {
@@ -284,7 +330,13 @@
                     document.getElementById('adm-events-manager').innerHTML = `<select onchange="removeEvent(this.value)">${opt}</select>`;
                 }
             }
-            if(d.t1) { document.getElementById('adm-score-view').style.display = 'flex'; document.getElementById('match-setup').style.display = 'none'; document.getElementById('start-live-btn').style.display = d.status==='upcoming'?'block':'none'; document.getElementById('end-match-btn').style.display = d.status==='live'?'block':'none'; }
+            if(d.t1) { 
+                document.getElementById('adm-score-view').style.display = 'flex'; 
+                document.getElementById('match-setup').style.display = 'none'; 
+                document.getElementById('start-live-btn').style.display = d.status==='upcoming'?'block':'none'; 
+                document.getElementById('end-match-btn').style.display = d.status==='live'?'block':'none';
+                document.getElementById('reset-match-btn').style.display = d.status==='ended'?'block':'none';
+            }
             else { document.getElementById('adm-score-view').style.display = 'none'; document.getElementById('match-setup').style.display = 'flex'; }
         }
 
@@ -308,7 +360,17 @@
 
         function autoSaveSet(d, p1, p2, win) { let sub = d.sub_details || {}; let n = Object.keys(sub).length; const label = translations[currentLang].periods[d.sport][n] || "S"+(n+1); sub["S"+n] = `${label} ${p1}:${p2}`; db.ref(`tereni/${currentAdminKey}`).update({ p1: 0, p2: 0, score1: win===1?((d.score1||0)+1):(d.score1||0), score2: win===2?((d.score2||0)+1):(d.score2||0), sub_details: sub }); }
         function autoSaveTennisSet(d, g1, g2, win) { let sub = d.sub_details || {}; let n = Object.keys(sub).length; const label = translations[currentLang].periods[d.sport][n] || "S"+(n+1); sub["S"+n] = `${label} ${g1}:${g2}`; db.ref(`tereni/${currentAdminKey}`).update({ p1: 0, p2: 0, g1: 0, g2: 0, score1: win===1?((d.score1||0)+1):(d.score1||0), score2: win===2?((d.score2||0)+1):(d.score2||0), sub_details: sub }); }
-        function triggerLogic(type) { const d = allTereni.find(x => x.key === currentAdminKey); if(type === 'period') { let sub = d.sub_details || {}; let n = Object.keys(sub).length; const label = translations[currentLang].periods[d.sport][n] || "P"+(n+1); sub["P"+n] = `${label} ${d.score1}:${d.score2}`; db.ref(`tereni/${currentAdminKey}`).update({ sub_details: sub }); } }
+        
+        function triggerLogic(type) { 
+            const d = allTereni.find(x => x.key === currentAdminKey); 
+            if(type === 'period') { 
+                let sub = d.sub_details || {}; 
+                let n = Object.keys(sub).length; 
+                const label = translations[currentLang].periods[d.sport][n] || "P"+(n+1); 
+                sub["P"+n] = `${label} ${d.score1}:${d.score2}`; 
+                db.ref(`tereni/${currentAdminKey}`).update({ sub_details: sub }); 
+            } 
+        }
         
         function handleMapClick(e) { if (!auth.currentUser) return; const h = `<div style="padding:15px; display:flex; flex-direction:column; gap:10px;"><button onclick="openTerenForm(${e.latlng.lat}, ${e.latlng.lng})" style="background:#ff3b30; color:white; border:none; padding:12px; border-radius:12px;">DODAJ TEREN</button><button onclick="openAdChoice(${e.latlng.lat}, ${e.latlng.lng})" style="background:#ffcc00; border:none; padding:12px; border-radius:12px;">DODAJ REKLAMU</button></div>`; L.popup().setLatLng(e.latlng).setContent(h).openOn(map); }
         function openAdChoice(lat, lng) { const h = `<div class="ad-choice-grid"><div class="ad-type-btn" onclick="openAdFinalForm(${lat}, ${lng}, 'CAFFE')">☕</div><div class="ad-type-btn" onclick="openAdFinalForm(${lat}, ${lng}, 'RESTORAN')">🍴</div><div class="ad-type-btn" onclick="openAdFinalForm(${lat}, ${lng}, 'FIRMA')">🏢</div></div>`; L.popup().setLatLng([lat, lng]).setContent(h).openOn(map); }
@@ -319,17 +381,67 @@
         
         function trackGPS() { if(navigator.geolocation) navigator.geolocation.watchPosition(p => { currentLat = p.coords.latitude; currentLon = p.coords.longitude; if(!userMarker) userMarker = L.marker([currentLat,currentLon], {icon: L.divIcon({className:'user-location-dot', iconSize:[14,14]})}).addTo(map); else userMarker.setLatLng([currentLat,currentLon]); }, null, { enableHighAccuracy: true }); }
         function goToMyLocation() { if(currentLat) map.flyTo([currentLat, currentLon], 18); }
-        function handleAuth() { let e = document.getElementById('email').value.toUpperCase(), p = document.getElementById('password').value; auth.signInWithEmailAndPassword(e, p).catch(() => auth.createUserWithEmailAndPassword(e, p)); }
+        
+        function handleAuth() { 
+            let e = document.getElementById('email').value.toUpperCase(), p = document.getElementById('password').value; 
+            auth.signInWithEmailAndPassword(e, p).then(() => exploreMap()).catch(() => {
+                auth.createUserWithEmailAndPassword(e, p).then(() => exploreMap());
+            }); 
+        }
+
         function openAdmin(key) { currentAdminKey = key; refreshAdminPanel(key); document.getElementById('admin-panel').classList.add('active'); }
         function closeAdmin() { document.getElementById('admin-panel').classList.remove('active'); currentAdminKey = null; }
-        function openDetails(key) { const d = allTereni.find(x => x.key === key); if(!d) return; document.getElementById('det-score').innerText = `${d.score1||0} : ${d.score2||0}`; document.getElementById('match-details-view').classList.add('active'); }
+
+        function openDetails(key) { 
+            const d = allTereni.find(x => x.key === key); 
+            if(!d) return; 
+            document.getElementById('det-league').innerText = d.league || d.name;
+            document.getElementById('det-t1').innerText = d.t1 || "TIM 1";
+            document.getElementById('det-t2').innerText = d.t2 || "TIM 2";
+            document.getElementById('det-score').innerText = `${d.score1||0} : ${d.score2||0}`; 
+            
+            // Periodi
+            const pDiv = document.getElementById('det-periods');
+            pDiv.innerHTML = "";
+            if(d.sub_details) {
+                Object.values(d.sub_details).forEach(val => {
+                    pDiv.innerHTML += `<div class="detail-period-tag">${val}</div>`;
+                });
+            }
+
+            // Events
+            const evCont = document.getElementById('det-stats-container');
+            const evHome = document.getElementById('det-events-home');
+            const evAway = document.getElementById('det-events-away');
+            evHome.innerHTML = ""; evAway.innerHTML = "";
+            
+            if(d.events) {
+                evCont.style.display = 'block';
+                Object.values(d.events).forEach(ev => {
+                    const el = `<div class="event-item">${ev.emoji} ${ev.player}</div>`;
+                    if(ev.team == "1") evHome.innerHTML += el; else evAway.innerHTML += el;
+                });
+            } else {
+                evCont.style.display = 'none';
+            }
+
+            document.getElementById('match-details-view').classList.add('active'); 
+        }
+
         function closeDetails() { document.getElementById('match-details-view').classList.remove('active'); }
-        function setupMatch() { const t1 = document.getElementById('adm-t1').value.toUpperCase(), t2 = document.getElementById('adm-t2').value.toUpperCase(); db.ref(`tereni/${currentAdminKey}`).update({ t1, t2, status: 'upcoming' }); }
+        
+        function setupMatch() { 
+            const t1 = document.getElementById('adm-t1').value.toUpperCase();
+            const t2 = document.getElementById('adm-t2').value.toUpperCase();
+            const league = document.getElementById('adm-league-input').value.toUpperCase();
+            db.ref(`tereni/${currentAdminKey}`).update({ t1, t2, league, status: 'upcoming', score1:0, score2:0 }); 
+        }
+
         function adminStatus(s) { db.ref(`tereni/${currentAdminKey}`).update({ status: s }); }
         function addEvent(emoji) { const p = document.getElementById('event-player').value.toUpperCase(), t = document.getElementById('event-team').value; db.ref(`tereni/${currentAdminKey}/events`).push({ player: p, team: t, emoji }); }
         function removeEvent(k) { if(k) db.ref(`tereni/${currentAdminKey}/events/${k}`).remove(); }
         function adminDelete() { if(confirm('OBRISATI?')) { db.ref(`tereni/${currentAdminKey}`).remove(); closeAdmin(); } }
-        function resetMatch() { db.ref(`tereni/${currentAdminKey}`).update({ t1:null, t2:null, score1:0, score2:0, sub_details:null, events:null, status:'upcoming' }); }
+        function resetMatch() { db.ref(`tereni/${currentAdminKey}`).update({ t1:null, t2:null, score1:0, score2:0, sub_details:null, events:null, status:'upcoming', p1:0, p2:0, g1:0, g2:0 }); }
     </script>
 </body>
 </html>
