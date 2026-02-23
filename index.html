@@ -58,6 +58,7 @@
         #lang-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); z-index: 9000; display: none; justify-content: center; align-items: center; }
         .lang-box { background: #0a0a0a; padding: 30px; border-radius: 25px; border: 1px solid #ff3b30; width: 85%; max-width: 300px; text-align: center; }
 
+        /* Marker Base */
         .sport-marker-wrapper { display: flex; flex-direction: column; align-items: center; width: auto; position: relative; }
         .marker-content-box { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; pointer-events: none; }
         .marker-content-box > * { pointer-events: auto; }
@@ -94,10 +95,14 @@
         .status-live-wrapper .score-val-col { color: #ff3b30; }
         .card-time-mini { font-size: 9px; color: #ffcc00; font-weight: 900; text-align: center; border-top: 1px solid #222; padding-top: 4px; margin-top: 4px; position: relative; z-index: 1; }
 
-        /* Oglasi Stil */
-        .ad-marker-wrapper { display: flex; align-items: center; background: rgba(0,0,0,0.85); border: 1.5px solid #ffcc00; border-radius: 20px; padding: 2px 8px 2px 2px; gap: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); white-space: nowrap; }
-        .ad-icon-circle { background: #ffcc00; color: #000; width: 22px; height: 22px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 12px; }
-        .ad-label-name { color: #fff; font-size: 10px; font-weight: 900; text-transform: uppercase; font-family: 'Inter'; }
+        /* OGLASI SPECIJALNI STIL */
+        .ad-marker-full { 
+            display: none; align-items: center; background: rgba(0,0,0,0.95); border: 2px solid #ffcc00; border-radius: 20px; padding: 5px 12px; gap: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.8); white-space: nowrap; margin-bottom: -1px; z-index: 25;
+        }
+        .zoom-near .ad-marker-full { display: flex; }
+        .ad-ball-only { font-size: 22px; filter: drop-shadow(0 0 5px #ffcc00); display: block; }
+        .zoom-near .ad-ball-only { display: none; }
+        .ad-label-name { color: #fff; font-size: 12px; font-weight: 900; text-transform: uppercase; font-family: 'Inter'; }
         .ad-choice-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 10px; }
         .ad-type-btn { background: #1a1a1a; border: 1px solid #333; border-radius: 10px; padding: 10px; text-align: center; cursor: pointer; font-size: 20px; }
 
@@ -280,7 +285,7 @@
             map.eachLayer(l => { if(l instanceof L.Marker && l !== userMarker) map.removeLayer(l); });
             const zoomNear = map.getZoom() > 12;
 
-            // Render Terena
+            // RENDER TERENA
             allTereni.forEach(d => {
                 if (map.distance(center, [d.lat, d.lng]) > 30000) return;
                 const isLive = d.status === 'live', isEnded = d.status === 'ended', isUpcoming = d.status === 'upcoming' && d.t1;
@@ -296,11 +301,22 @@
                 L.marker([d.lat, d.lng], { icon: L.divIcon({ className: '', html, iconSize: [0,0], iconAnchor: [0, 0] }) }).addTo(map).on('click', e => { L.DomEvent.stopPropagation(e); if (auth.currentUser && d.owner === auth.currentUser.uid) openAdmin(d.key); else openDetails(d.key); });
             });
 
-            // Render Reklama
+            // RENDER OGLASA (SA IDENTIČNOM LOGIKOM KAO TERENI)
             allAds.forEach(a => {
                 if (map.distance(center, [a.lat, a.lng]) > 30000) return;
-                const html = `<div class="ad-marker-wrapper"><div class="ad-icon-circle">${adEmojis[a.type]||'🏢'}</div><div class="ad-label-name">${a.name}</div></div>`;
-                L.marker([a.lat, a.lng], { icon: L.divIcon({ className: '', html, iconSize: [120, 26] }) }).addTo(map).on('click', (e) => { 
+                const icon = adEmojis[a.type] || '🏢';
+                const html = `
+                <div class="sport-marker-wrapper ${zoomNear?'zoom-near':''}">
+                    <div class="marker-content-box">
+                        <div class="ad-ball-only">${icon}</div>
+                        <div class="ad-marker-full">
+                            <div class="ad-icon-circle">${icon}</div>
+                            <div class="ad-label-name">${a.name}</div>
+                        </div>
+                        <div class="marker-pointer" style="border-top-color:#ffcc00;"></div>
+                    </div>
+                </div>`;
+                L.marker([a.lat, a.lng], { icon: L.divIcon({ className: '', html, iconSize: [0,0], iconAnchor: [0, 0] }) }).addTo(map).on('click', (e) => { 
                     L.DomEvent.stopPropagation(e);
                     L.popup().setLatLng([a.lat, a.lng]).setContent(`<div style="padding:10px; color:#000; font-weight:900; text-align:center;">${a.name}</div>`).openOn(map); 
                 });
@@ -314,7 +330,7 @@
             
             const isTooClose = allTereni.some(court => {
                 const courtLatLng = L.latLng(court.lat, court.lng);
-                return clickPos.distanceTo(courtLatLng) < 200;
+                return clickPos.distanceTo(courtLatLng) < 100;
             });
 
             if (isTooClose) { 
@@ -330,7 +346,6 @@
             L.popup().setLatLng(e.latlng).setContent(choiceHtml).openOn(map); 
         }
 
-        // --- Logika za Reklame ---
         function openAdChoice(lat, lng) {
             const h = `<div class="ad-choice-grid">
                 <div class="ad-type-btn" onclick="openAdFinalForm(${lat}, ${lng}, 'CAFFE')">☕</div>
