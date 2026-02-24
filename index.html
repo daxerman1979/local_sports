@@ -15,7 +15,6 @@
   }
 </script>
 
-
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;700;900&family=Permanent+Marker&display=swap" rel="stylesheet">
     
@@ -25,8 +24,8 @@
         
         input, select, textarea, datalist { 
             font-size: 16px !important; outline: none !important; text-transform: uppercase; 
-            background: #1a1a1a; color: white; border: 1px solid #333; 
-            padding: 12px; border-radius: 12px; font-family: 'Inter'; width: 100%;
+            background: #222; color: white; border: 1px solid #444; 
+            padding: 12px; border-radius: 12px; font-family: 'Inter'; width: 100%; margin-bottom: 5px;
         }
         
         button { font-size: 16px !important; outline: none !important; transition: transform 0.1s active, opacity 0.2s; position: relative; overflow: hidden; }
@@ -102,14 +101,12 @@
         .ad-ball-only { font-size: 22px; filter: drop-shadow(0 0 5px #ffcc00); display: block; }
         .zoom-near .ad-ball-only { display: none; }
         .ad-label-name { color: #fff; font-size: 12px; font-weight: 900; text-transform: uppercase; font-family: 'Inter'; }
-        .ad-choice-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 10px; }
-        .ad-type-btn { background: #1a1a1a; border: 1px solid #333; border-radius: 10px; padding: 10px; text-align: center; cursor: pointer; font-size: 20px; }
         
         .ad-popup-images { display: flex; gap: 5px; overflow-x: auto; margin-top: 10px; padding-bottom: 5px; }
         .ad-popup-images img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid #333; flex-shrink: 0; }
         .ad-popup-btn-web { background: #ffcc00; color: #000; font-weight: bold; border: none; padding: 8px; border-radius: 8px; width: 100%; margin-top: 10px; cursor: pointer; text-decoration: none; display: block; text-align: center; font-size: 12px; }
 
-        /* Revolut Button Style */
+        /* Revolut Button */
         .revolut-pay-btn { background: #fff; color: #000; font-weight: 900; border: none; padding: 12px; border-radius: 12px; width: 100%; margin-top: 10px; cursor: pointer; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 10px; font-family: 'Inter'; font-size: 14px; border: 1px solid #eee; }
         .revolut-pay-btn img { height: 18px; }
 
@@ -147,6 +144,8 @@
         .animated-range-circle {
             animation: pulse-circle 4s infinite ease-in-out;
         }
+        
+        .ad-form-label { color: #ffcc00; font-size: 10px; font-weight: bold; margin-bottom: 2px; text-align: left; display: block; text-transform: uppercase; }
     </style>
 </head>
 <body>
@@ -247,8 +246,8 @@
         const tennisPoints = ["0", "15", "30", "40", "AD"];
 
         const translations = {
-            sr: { subtitle: "Result Tracker", login: "ULAZ U SISTEM", explore: "ISTRAŽI MAPU", search: "Pretraži...", periodRes: "Rezultat po periodima", matchEvents: "Događaji na meču", adminTitle: "ADMIN TABLA", savePeriod: "SAČUVAJ PERIOD / SET", goLive: "KRENI UŽIVO", endMatch: "ZAVRŠI MEČ", resetMatch: "RESET / NOVI MEČ", schedule: "ZAKAŽI MEČ", deleteCourt: "OBRIŠI TEREN", zoneOccupied: "ZONA ZAUZETA!", create: "POŠALJI ZAHTEV", courtName: "NAZIV TERENA", player: "IME IGRAČA", team: "TIM", loggedAs: "ULOGOVAN KAO:", localMatch: "LOKALNI MEČ", points: "POENI", games: "GEMOVI", league: "LIGA (NOVA)", team1: "TIM 1", team2: "TIM 2", goal: "GOL", yellow: "ŽUTI", red: "CRVENI", confirmDelete: "OBRISATI?", timeAt: "U", live: "UŽIVO", limitReached: "LIMIT OD 3 TERENA JE DOSTIGNUT!", addCourt: "DODAJ TEREN", addAd: "DODAJ REKLAMU", adTitle: "DODAVANJE REKLAME", adNamePlaceholder: "NAZIV OBJEKTA", adDescPlaceholder: "OPIS (DO 20 REČI)", adWebPlaceholder: "WEB ADRESA (URL)", adDurationLabel: "IZABERITE TRAJANJE:", adPayInstructions: "UPLATITE NA REVOLUT", adVisitBtn: "POSETI SAJT", adExpiresIn: "ISTIČE ZA:", adDays: "DANA", adUploadLabel: "UČITAJ DO 3 SLIKE:", adPrice1: "1 MESEC - 2€", adPrice2: "1 GODINA - 10€", adRevBtn: "OTVORI REVOLUT", periods: { FUDBAL: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "PROD"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } },
-            en: { subtitle: "Result Tracker", login: "ENTER SYSTEM", explore: "EXPLORE MAP", search: "Search...", periodRes: "Period Results", matchEvents: "Match Events", adminTitle: "ADMIN PANEL", savePeriod: "SAVE PERIOD / SET", goLive: "GO LIVE", endMatch: "END MATCH", resetMatch: "RESET / NEW MATCH", schedule: "SCHEDULE MATCH", deleteCourt: "DELETE COURT", zoneOccupied: "ZONE OCCUPIED!", create: "SEND REQUEST", courtName: "COURT NAME", player: "PLAYER NAME", team: "TEAM", loggedAs: "LOGGED AS:", localMatch: "LOCAL MATCH", points: "POINTS", games: "GAMES", league: "LEAGUE (NEW)", team1: "TEAM 1", team2: "TEAM 2", goal: "GOAL", yellow: "YELLOW", red: "RED", confirmDelete: "DELETE?", timeAt: "AT", live: "LIVE", limitReached: "LIMIT OF 3 COURTS REACHED!", addCourt: "ADD COURT", addAd: "ADD AD", adTitle: "ADD ADVERTISEMENT", adNamePlaceholder: "OBJECT NAME", adDescPlaceholder: "DESCRIPTION (MAX 20 WORDS)", adWebPlaceholder: "WEBSITE (URL)", adDurationLabel: "CHOOSE DURATION:", adPayInstructions: "PAY ON REVOLUT", adVisitBtn: "VISIT WEBSITE", adExpiresIn: "EXPIRES IN:", adDays: "DAYS", adUploadLabel: "UPLOAD UP TO 3 IMAGES:", adPrice1: "1 MONTH - 2€", adPrice2: "1 YEAR - 10€", adRevBtn: "OPEN REVOLUT", periods: { FUDBAL: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "OT"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } }
+            sr: { subtitle: "Result Tracker", login: "ULAZ U SISTEM", explore: "ISTRAŽI MAPU", search: "Pretraži...", periodRes: "Rezultat po periodima", matchEvents: "Događaji na meču", adminTitle: "ADMIN TABLA", savePeriod: "SAČUVAJ PERIOD / SET", goLive: "KRENI UŽIVO", endMatch: "ZAVRŠI MEČ", resetMatch: "RESET / NOVI MEČ", schedule: "ZAKAŽI MEČ", deleteCourt: "OBRIŠI TEREN", zoneOccupied: "ZONA ZAUZETA!", create: "POŠALJI ZAHTEV", courtName: "NAZIV TERENA", player: "IME IGRAČA", team: "TIM", loggedAs: "ULOGOVAN KAO:", localMatch: "LOKALNI MEČ", points: "POENI", games: "GEMOVI", league: "LIGA (NOVA)", team1: "TIM 1", team2: "TIM 2", goal: "GOL", yellow: "ŽUTI", red: "CRVENI", confirmDelete: "OBRISATI?", timeAt: "U", live: "UŽIVO", limitReached: "LIMIT OD 3 TERENA JE DOSTIGNUT!", addCourt: "DODAJ TEREN", addAd: "DODAJ REKLAMU", adTitle: "DODAVANJE REKLAME", adNamePlaceholder: "NAZIV OBJEKTA", adDescPlaceholder: "OPIS (DO 20 REČI)", adWebPlaceholder: "WEB ADRESA (URL)", adDurationLabel: "TRAJANJE I CENA:", adPayInstructions: "UPLATITE NA REVOLUT:", adVisitBtn: "POSETI SAJT", adExpiresIn: "ISTIČE ZA:", adDays: "DANA", adUploadLabel: "UČITAJ DO 3 SLIKE:", adPrice1: "1 MESEC - 1€", adPrice2: "1 GODINA - 10€", adRevBtn: "UPLATI 1€", adRevBtnYear: "UPLATI 10€", periods: { FUDBAL: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "PROD"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } },
+            en: { subtitle: "Result Tracker", login: "ENTER SYSTEM", explore: "EXPLORE MAP", search: "Search...", periodRes: "Period Results", matchEvents: "Match Events", adminTitle: "ADMIN PANEL", savePeriod: "SAVE PERIOD / SET", goLive: "GO LIVE", endMatch: "END MATCH", resetMatch: "RESET / NEW MATCH", schedule: "SCHEDULE MATCH", deleteCourt: "DELETE COURT", zoneOccupied: "ZONE OCCUPIED!", create: "SEND REQUEST", courtName: "COURT NAME", player: "PLAYER NAME", team: "TEAM", loggedAs: "LOGGED AS:", localMatch: "LOCAL MATCH", points: "POINTS", games: "GAMES", league: "LEAGUE (NEW)", team1: "TEAM 1", team2: "TEAM 2", goal: "GOAL", yellow: "YELLOW", red: "RED", confirmDelete: "DELETE?", timeAt: "AT", live: "LIVE", limitReached: "LIMIT OF 3 COURTS REACHED!", addCourt: "ADD COURT", addAd: "ADD AD", adTitle: "ADD ADVERTISEMENT", adNamePlaceholder: "OBJECT NAME", adDescPlaceholder: "DESCRIPTION (MAX 20 WORDS)", adWebPlaceholder: "WEBSITE (URL)", adDurationLabel: "DURATION & PRICE:", adPayInstructions: "PAY ON REVOLUT:", adVisitBtn: "VISIT WEBSITE", adExpiresIn: "EXPIRES IN:", adDays: "DAYS", adUploadLabel: "UPLOAD UP TO 3 IMAGES:", adPrice1: "1 MONTH - 1€", adPrice2: "1 YEAR - 10€", adRevBtn: "PAY 1€", adRevBtnYear: "PAY 10€", periods: { FUDBAL: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "OT"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } }
         };
 
         function setLanguage(lang) { currentLang = lang; localStorage.setItem('lang', lang); updateUILanguage(); if(document.getElementById('lang-modal').style.display === 'flex') toggleLangModal(); if(currentAdminKey) refreshAdminPanel(currentAdminKey); renderMarkers(); }
@@ -405,31 +404,46 @@
 
         function openAdFinalForm(lat, lng, type) {
             const t = translations[currentLang];
-            const h = `<div style="padding:15px; width:260px; display:flex; flex-direction:column; gap:8px; text-align:center;">
-                <div style="color:#ffcc00; font-weight:900; font-size:14px;">${t.adTitle} (${type})</div>
+            const h = `<div style="padding:15px; width:280px; display:flex; flex-direction:column; gap:8px; text-align:center; color:white;">
+                <div style="color:#ffcc00; font-weight:900; font-size:14px; margin-bottom:5px;">${t.adTitle} (${type})</div>
+                
+                <span class="ad-form-label">Naziv objekta</span>
                 <input type="text" id="ad_name_input" placeholder="${t.adNamePlaceholder}">
+                
+                <span class="ad-form-label">Kratak opis</span>
                 <textarea id="ad_desc_input" placeholder="${t.adDescPlaceholder}" rows="2" style="resize:none;"></textarea>
+                
+                <span class="ad-form-label">Web adresa</span>
                 <input type="url" id="ad_web_input" placeholder="${t.adWebPlaceholder}">
                 
-                <div style="background:#111; padding:10px; border-radius:10px; border:1px solid #333;">
-                    <div style="font-size:10px; color:#aaa; margin-bottom:8px;">${t.adDurationLabel}</div>
-                    <select id="ad_duration" style="margin-bottom:12px;">
+                <div style="background:#111; padding:10px; border-radius:12px; border:1px solid #333; margin-top:5px;">
+                    <span class="ad-form-label" style="text-align:center;">${t.adDurationLabel}</span>
+                    <select id="ad_duration" onchange="updateRevBtnText()" style="margin-bottom:10px; border-color:#ffcc00;">
                         <option value="30">${t.adPrice1}</option>
                         <option value="365">${t.adPrice2}</option>
                     </select>
-                    <div style="color:#ffcc00; font-size:10px; font-weight:bold; margin-bottom:5px;">${t.adPayInstructions}</div>
                     
-                    <a href="http://revolut.me/dax79" target="_blank" class="revolut-pay-btn">
+                    <div style="color:#ffcc00; font-size:10px; font-weight:bold; margin-bottom:8px;">${t.adPayInstructions}</div>
+                    
+                    <a id="rev_pay_link" href="http://revolut.me/dax79" target="_blank" class="revolut-pay-btn">
                         <img src="https://upload.wikimedia.org/wikipedia/commons/4/4b/Revolut_logo.svg">
-                        ${t.adRevBtn}
+                        <span id="rev_btn_text">${t.adRevBtn}</span>
                     </a>
                 </div>
 
-                <div style="font-size:10px; color:#aaa; margin-top:5px;">${t.adUploadLabel}</div>
-                <input type="file" id="ad_files" accept="image/*" multiple style="font-size:10px; padding:5px;">
-                <button onclick="processAd(${lat}, ${lng}, '${type}')" style="background:#ffcc00; color:black; width:100%; padding:12px; border-radius:12px; font-weight:bold; border:none; cursor:pointer; margin-top:5px;">${t.create}</button>
+                <span class="ad-form-label" style="margin-top:5px;">${t.adUploadLabel}</span>
+                <input type="file" id="ad_files" accept="image/*" multiple style="font-size:10px; padding:5px; background:#111;">
+                
+                <button onclick="processAd(${lat}, ${lng}, '${type}')" style="background:#ffcc00; color:black; width:100%; padding:14px; border-radius:12px; font-weight:bold; border:none; cursor:pointer; margin-top:10px;">${t.create}</button>
             </div>`;
             L.popup().setLatLng([lat, lng]).setContent(h).openOn(map);
+        }
+        
+        function updateRevBtnText() {
+            const duration = document.getElementById('ad_duration').value;
+            const btnText = document.getElementById('rev_btn_text');
+            const t = translations[currentLang];
+            btnText.innerText = (duration === "30") ? t.adRevBtn : t.adRevBtnYear;
         }
 
         async function processAd(lat, lng, type) {
@@ -455,9 +469,10 @@
             db.ref('oglasi').push({ 
                 name, lat, lng, type, desc, web, images, expiresAt,
                 owner: auth.currentUser.uid,
+                duration: duration,
                 pending: true 
             }).then(() => {
-                alert(currentLang === 'sr' ? 'ZAHTEV POSLAT! OGLAS ĆE BITI AKTIVAN NAKON PROVERE UPLATE NA REVOLUT.' : 'REQUEST SENT! AD WILL BE ACTIVE AFTER REVOLUT PAYMENT VERIFICATION.');
+                alert(currentLang === 'sr' ? 'ZAHTEV POSLAT! OGLAS ĆE BITI AKTIVAN NAKON PROVERE UPLATE.' : 'REQUEST SENT! AD WILL BE ACTIVE AFTER PAYMENT VERIFICATION.');
                 map.closePopup();
             });
         }
