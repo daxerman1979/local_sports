@@ -15,6 +15,7 @@
   }
 </script>
 
+
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;700;900&family=Permanent+Marker&display=swap" rel="stylesheet">
     
@@ -136,15 +137,6 @@
         .admin-btn { padding: 12px; border: none; font-weight: 900; color: white; text-transform: uppercase; width: 100%; border-radius: 12px; cursor: pointer; font-family: 'Oswald'; margin-bottom: 8px; }
         .user-location-dot { background: #007AFF; width: 14px; height: 14px; border: 2px solid white; border-radius: 50%; box-shadow: 0 0 20px #007AFF; }
 
-        @keyframes pulse-circle {
-            0% { stroke-opacity: 0.8; stroke-width: 1px; }
-            50% { stroke-opacity: 0.3; stroke-width: 2.5px; }
-            100% { stroke-opacity: 0.8; stroke-width: 1px; }
-        }
-        .animated-range-circle {
-            animation: pulse-circle 4s infinite ease-in-out;
-        }
-        
         .ad-form-label { color: #ffcc00; font-size: 10px; font-weight: bold; margin-bottom: 2px; text-align: left; display: block; text-transform: uppercase; }
     </style>
 </head>
@@ -418,14 +410,14 @@
                 
                 <div style="background:#111; padding:10px; border-radius:12px; border:1px solid #333; margin-top:5px;">
                     <span class="ad-form-label" style="text-align:center;">${t.adDurationLabel}</span>
-                    <select id="ad_duration" onchange="updateRevBtnText()" style="margin-bottom:10px; border-color:#ffcc00;">
+                    <select id="ad_duration" onchange="updateRevLink()" style="margin-bottom:10px; border-color:#ffcc00;">
                         <option value="30">${t.adPrice1}</option>
                         <option value="365">${t.adPrice2}</option>
                     </select>
                     
                     <div style="color:#ffcc00; font-size:10px; font-weight:bold; margin-bottom:8px;">${t.adPayInstructions}</div>
                     
-                    <a id="rev_pay_link" href="http://revolut.me/dax79" target="_blank" class="revolut-pay-btn">
+                    <a id="rev_pay_link" href="https://revolut.me/dax79/1" target="_blank" class="revolut-pay-btn">
                         <img src="https://upload.wikimedia.org/wikipedia/commons/4/4b/Revolut_logo.svg">
                         <span id="rev_btn_text">${t.adRevBtn}</span>
                     </a>
@@ -439,11 +431,19 @@
             L.popup().setLatLng([lat, lng]).setContent(h).openOn(map);
         }
         
-        function updateRevBtnText() {
+        function updateRevLink() {
             const duration = document.getElementById('ad_duration').value;
+            const link = document.getElementById('rev_pay_link');
             const btnText = document.getElementById('rev_btn_text');
             const t = translations[currentLang];
-            btnText.innerText = (duration === "30") ? t.adRevBtn : t.adRevBtnYear;
+            
+            if (duration === "30") {
+                link.href = "https://revolut.me/dax79/1";
+                btnText.innerText = t.adRevBtn;
+            } else {
+                link.href = "https://revolut.me/dax79/10";
+                btnText.innerText = t.adRevBtnYear;
+            }
         }
 
         async function processAd(lat, lng, type) {
@@ -472,7 +472,7 @@
                 duration: duration,
                 pending: true 
             }).then(() => {
-                alert(currentLang === 'sr' ? 'ZAHTEV POSLAT! OGLAS ĆE BITI AKTIVAN NAKON PROVERE UPLATE.' : 'REQUEST SENT! AD WILL BE ACTIVE AFTER PAYMENT VERIFICATION.');
+                alert(currentLang === 'sr' ? 'ZAHTEV POSLAT! OGLAS ĆE BITI AKTIVAN NAKON PROVERE UPLATE NA REVOLUT.' : 'REQUEST SENT! AD WILL BE ACTIVE AFTER REVOLUT PAYMENT VERIFICATION.');
                 map.closePopup();
             });
         }
