@@ -38,7 +38,6 @@
         #search-container.expanded #city-search { opacity: 1; pointer-events: all; }
         .search-icon { position: absolute; left: 10px; width: 20px; height: 20px; filter: brightness(0) invert(1); opacity: 0.8; cursor: pointer; z-index: 5001; }
 
-        /* NOVI PROFI DIZAJN POCETNE */
         #hero { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(255, 59, 48, 0.8) 0%, rgba(255, 149, 0, 0.8) 100%), url('https://images.unsplash.com/photo-1519861531473-9200262188bf?q=80&w=1500&auto=format&fit=crop') center/cover; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 6000; color: white; padding: 20px; }
         .hero-logo { font-family: 'Permanent Marker', cursive; font-size: 82px; color: #fff; text-shadow: 6px 6px 0px rgba(0,0,0,0.2); transform: rotate(-2deg); margin-bottom: 0; }
         .hero-subtitle { font-family: 'Oswald'; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 4px; color: rgba(255,255,255,0.9); margin-bottom: 5px; margin-top: -5px; }
@@ -78,14 +77,33 @@
             z-index: 10;
         }
         .zoom-near .marker-pointer { display: block; }
+        
+        /* LIVE ANIMACIJE */
         .status-live-wrapper .marker-pointer { border-top-color: #ff3b30; }
+        .status-live-wrapper .live-card-thin { 
+            border-color: #ff3b30; 
+            box-shadow: 0 0 20px rgba(255, 59, 48, 0.6);
+            animation: live-glow 2s infinite ease-in-out;
+        }
+        .status-live-wrapper .card-bg-icon {
+            animation: float-icon 4s infinite linear;
+        }
+
+        @keyframes live-glow {
+            0%, 100% { box-shadow: 0 0 10px rgba(255, 59, 48, 0.4); }
+            50% { box-shadow: 0 0 25px rgba(255, 59, 48, 0.8); }
+        }
+        @keyframes float-icon {
+            0% { transform: rotate(-15deg) scale(1); }
+            50% { transform: rotate(5deg) scale(1.2); }
+            100% { transform: rotate(-15deg) scale(1); }
+        }
 
         .live-card-thin { 
             background: rgba(10, 10, 10, 0.98); border: 2px solid #ffcc00; border-radius: 12px; padding: 10px 14px; display: none; flex-direction: column; width: max-content; min-width: 150px; color: white; backdrop-filter: blur(15px); box-shadow: 0 8px 25px rgba(0,0,0,0.8); position: relative; overflow: hidden; z-index: 25; margin-bottom: -1px;
         }
         .card-bg-icon { position: absolute; right: -10px; bottom: -10px; font-size: 60px; opacity: 0.1; transform: rotate(-15deg); pointer-events: none; z-index: 0; }
         .zoom-near .live-card-thin { display: flex; }
-        .status-live-wrapper .live-card-thin { border-color: #ff3b30; }
 
         .blink-live { animation: soft-blink 2s infinite ease-in-out; color: #ff3b30; font-weight: 900; text-transform: uppercase; font-size: 10px; z-index: 1; }
         @keyframes soft-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
@@ -227,7 +245,7 @@
         const auth = firebase.auth(), db = firebase.database();
 
         let map, userMarker, currentLat, currentLon, currentAdminKey = null, allTereni = [], rangeCircle = null;
-        let currentLang = localStorage.getItem('lang') || 'en'; // DEFAULT NA ENG
+        let currentLang = localStorage.getItem('lang') || 'en';
         const sportEmojis = { "FUDBAL": "⚽", "KOŠARKA": "🏀", "ODBOJKA": "🏐", "TENIS": "🎾", "RUKOMET": "🤾" };
         const tennisPoints = ["0", "15", "30", "40", "AD"];
 
@@ -266,8 +284,6 @@
                 live: "UŽIVO", 
                 limitReached: "LIMIT OD 3 TERENA JE DOSTIGNUT!", 
                 addCourt: "DODAJ TEREN", 
-                addAd: "DODAJ REKLAMU", 
-                adTitle: "DODAVANJE REKLAME",
                 sports: { FUDBAL: "FUDBAL", KOŠARKA: "KOŠARKA", ODBOJKA: "ODBOJKA", TENIS: "TENIS", RUKOMET: "RUKOMET" },
                 periods: { FUDBAL: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "PROD"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } 
             },
@@ -305,8 +321,6 @@
                 live: "LIVE", 
                 limitReached: "LIMIT OF 3 COURTS REACHED!", 
                 addCourt: "ADD COURT", 
-                addAd: "ADD AD", 
-                adTitle: "ADD ADVERTISEMENT",
                 sports: { FUDBAL: "FOOTBALL", KOŠARKA: "BASKETBALL", ODBOJKA: "VOLLEYBALL", TENIS: "TENNIS", RUKOMET: "HANDBALL" },
                 periods: { FUDBAL: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "OT"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } 
             }
@@ -403,12 +417,7 @@
                 return; 
             } 
 
-            const choiceHtml = `<div style="padding:15px; display:flex; flex-direction:column; gap:10px; min-width:160px;">
-                <button onclick="openTerenForm(${e.latlng.lat}, ${e.latlng.lng})" style="width:100%; background:#ff3b30; color:white; border:none; padding:12px; font-weight:bold; border-radius:12px; font-family:'Inter';">${t.addCourt}</button>
-                <button onclick="openAdPlaceholder(${e.latlng.lat}, ${e.latlng.lng})" style="width:100%; background:#ffcc00; color:black; border:none; padding:12px; font-weight:bold; border-radius:12px; font-family:'Inter';">${t.addAd}</button>
-            </div>`;
-
-            L.popup().setLatLng(e.latlng).setContent(choiceHtml).openOn(map); 
+            openTerenForm(e.latlng.lat, e.latlng.lng);
         }
 
         function openTerenForm(lat, lng) {
@@ -420,14 +429,6 @@
                 <option value="TENIS">${t.sports.TENIS}</option>
                 <option value="RUKOMET">${t.sports.RUKOMET}</option>
             </select><input type="text" id="p_name" placeholder="${t.courtName}" maxlength="15" style="margin:10px 0; width:100%;"><button onclick="saveTeren(${lat}, ${lng})" style="width:100%; background:#ff3b30; color:white; border:none; padding:10px; font-weight:bold; border-radius:12px;">${t.create}</button></div>`; 
-            map.closePopup();
-            L.popup().setLatLng([lat, lng]).setContent(html).openOn(map);
-        }
-
-        function openAdPlaceholder(lat, lng) {
-            const t = translations[currentLang];
-            const html = `<div style="padding:20px; text-align:center; font-family:'Oswald'; font-weight:700; color:#ffcc00; font-size:18px; min-width:180px;">${t.adTitle}</div>`;
-            map.closePopup();
             L.popup().setLatLng([lat, lng]).setContent(html).openOn(map);
         }
         
@@ -478,6 +479,11 @@
             document.getElementById('adm-name').innerText = d.name; document.getElementById('adm-main-score').innerText = `${d.score1 || 0} : ${d.score2 || 0}`;
             let subS = d.sub_details ? Object.values(d.sub_details).join(' | ') : ""; if(d.sport === "ODBOJKA") subS = t.points + `: ${d.p1 || 0}:${d.p2 || 0} | ` + subS; if(d.sport === "TENIS") { const isTB = (d.g1 === 6 && d.g2 === 6); const pts1 = isTB ? (d.p1 || 0) : (tennisPoints[d.p1] || "0"); const pts2 = isTB ? (d.p2 || 0) : (tennisPoints[d.p2] || "0"); subS = t.games + `: ${d.g1 || 0}:${d.g2 || 0} (${pts1}:${pts2}) | ` + subS; }
             document.getElementById('adm-sub-display').innerText = subS;
+            
+            // SAKRIJ SAVE PERIOD ZA ODBOJKU I TENIS
+            const saveBtn = document.getElementById('btn-save-period');
+            if(d.sport === "ODBOJKA" || d.sport === "TENIS") saveBtn.style.display = "none"; else saveBtn.style.display = "block";
+
             const ctrl = document.getElementById('adm-sport-controls'); ctrl.innerHTML = "";
             if(d.sport === "FUDBAL" || d.sport === "RUKOMET") {
                 ctrl.innerHTML = `<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px;"><div style="display:flex; justify-content:center; gap:5px;"><button class="admin-btn" style="background:#ff3b30; width:45px;" onclick="proScore(1,-1)">-</button><button class="admin-btn" style="background:#28a745; width:45px;" onclick="proScore(1,1)">+</button></div><div style="display:flex; justify-content:center; gap:5px;"><button class="admin-btn" style="background:#ff3b30; width:45px;" onclick="proScore(2,-1)">-</button><button class="admin-btn" style="background:#28a745; width:45px;" onclick="proScore(2,1)">+</button></div></div>`;
