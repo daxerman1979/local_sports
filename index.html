@@ -38,36 +38,51 @@
         #search-container.expanded #city-search { opacity: 1; pointer-events: all; }
         .search-icon { position: absolute; left: 10px; width: 20px; height: 20px; filter: brightness(0) invert(1); opacity: 0.8; cursor: pointer; z-index: 5001; }
 
-        /* ULTRA PRO POČETNA */
+        /* NOVI SPORTS-TECH HERO */
         #hero { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: linear-gradient(-45deg, #ff3b30, #ff9500, #ff2d55, #000);
-            background-size: 400% 400%;
-            animation: gradient-animation 15s ease infinite;
-            display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 6000; color: white; padding: 20px; 
+            background: radial-gradient(circle at center, #222 0%, #000 100%);
+            display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 6000; color: white; padding: 20px;
+            overflow: hidden;
         }
-        @keyframes gradient-animation {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        #hero::before {
+            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
+            opacity: 0.2; pointer-events: none;
         }
         .hero-logo { 
             font-family: 'Permanent Marker', cursive; 
-            font-size: 64px; /* SMANJENO DA NE IZLAZI IZ EKRANA */
-            color: #fff; text-shadow: 4px 4px 15px rgba(0,0,0,0.3); 
-            transform: rotate(-1deg); margin-bottom: 0; max-width: 90%; text-align: center;
+            font-size: 60px; 
+            color: #ff3b30; text-shadow: 0 0 20px rgba(255, 59, 48, 0.4);
+            transform: skewX(-5deg); margin-bottom: 0; text-align: center;
+            letter-spacing: -2px;
         }
-        .hero-subtitle { font-family: 'Oswald'; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 3px; color: rgba(255,255,255,0.8); margin-bottom: 5px; }
-        .hero-tagline { font-family: 'Oswald'; font-weight: 900; font-size: 18px; color: #fff; text-transform: uppercase; margin-bottom: 25px; letter-spacing: 1px; border-top: 1px solid rgba(255,255,255,0.3); padding-top: 5px; }
+        .hero-subtitle { font-family: 'Oswald'; font-weight: 700; font-size: 10px; text-transform: uppercase; letter-spacing: 5px; color: #fff; opacity: 0.6; margin-bottom: 5px; }
+        .hero-tagline { 
+            font-family: 'Oswald'; font-weight: 900; font-size: 22px; color: #fff; 
+            text-transform: uppercase; margin-bottom: 30px; letter-spacing: 1px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
         
-        .auth-box { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(20px); padding: 30px; border-radius: 30px; width: 100%; max-width: 350px; display: flex; flex-direction: column; gap: 12px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 25px 50px rgba(0,0,0,0.4); }
-        .auth-btn { background: #ff3b30; color: #fff; border: none; padding: 16px; font-weight: 900; cursor: pointer; text-transform: uppercase; border-radius: 15px; font-family: 'Oswald'; font-size: 18px !important; transition: 0.3s; }
-        .auth-btn:hover { background: #fff; color: #ff3b30; }
+        .auth-box { 
+            background: rgba(20, 20, 20, 0.8); 
+            backdrop-filter: blur(15px); padding: 30px; border-radius: 25px; 
+            width: 100%; max-width: 340px; display: flex; flex-direction: column; gap: 15px; 
+            border: 1px solid rgba(255, 59, 48, 0.3); 
+            box-shadow: 0 30px 60px rgba(0,0,0,0.6); 
+        }
+        .auth-btn { 
+            background: linear-gradient(90deg, #ff3b30 0%, #ff7b30 100%); 
+            color: #fff; border: none; padding: 18px; font-weight: 900; cursor: pointer; 
+            text-transform: uppercase; border-radius: 12px; font-family: 'Oswald'; 
+            font-size: 16px !important; letter-spacing: 1px;
+        }
 
-        .home-lang-switch { display: flex; gap: 10px; justify-content: center; margin-top: 15px; }
-        .home-lang-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 8px 18px; border-radius: 10px; font-size: 11px; font-weight: 900; cursor: pointer; transition: 0.3s; }
-        .home-lang-btn.active { background: #fff; color: #000; border-color: #fff; }
+        .home-lang-switch { display: flex; gap: 10px; justify-content: center; margin-top: 10px; }
+        .home-lang-btn { background: #111; border: 1px solid #333; color: #666; padding: 8px 16px; border-radius: 8px; font-size: 10px; font-weight: 900; cursor: pointer; }
+        .home-lang-btn.active { border-color: #ff3b30; color: #fff; background: #222; }
 
+        /* OSTATAK STILOVA ZADRŽAN */
         #map { width: 100vw; height: 100vh; background: #111; display: none; }
         .location-btn { position: absolute; bottom: 40px; right: 20px; z-index: 5500; width: 55px; height: 55px; background: #ff3b30; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 20px rgba(255,59,48,0.5); border: 2px solid white; }
         .location-btn img { filter: brightness(0) invert(1); width: 24px; }
@@ -178,7 +193,7 @@
             <input type="email" id="email" placeholder="EMAIL">
             <input type="password" id="password" placeholder="PASSWORD">
             <button class="auth-btn" id="btn-login" onclick="handleAuth()">ULAZ U SISTEM</button>
-            <button id="btn-explore" onclick="exploreMap()" style="background:none; border:none; color:rgba(255,255,255,0.8); cursor:pointer; font-weight:bold; margin-top:10px; text-decoration: underline;">ISTRAŽI MAPU</button>
+            <button id="btn-explore" onclick="exploreMap()" style="background:none; border:none; color:rgba(255,255,255,0.4); cursor:pointer; font-weight:bold; margin-top:10px; text-decoration: underline; font-size:12px;">ISTRAŽI MAPU</button>
             <div class="home-lang-switch">
                 <div class="home-lang-btn" id="h-lang-sr" onclick="setLanguage('sr')">SRB</div>
                 <div class="home-lang-btn" id="h-lang-en" onclick="setLanguage('en')">ENG</div>
@@ -313,7 +328,6 @@
         function initMap() {
             if (map) return;
             const sLat = localStorage.getItem('lastLat') || 44.7866, sLng = localStorage.getItem('lastLng') || 20.4489, sZoom = localStorage.getItem('lastZoom') || 13;
-            // DODATO doubleClickZoom: false ZA ONEMOGUĆAVANJE ZOOM-A NA BRZI KLIK
             map = L.map('map', { zoomControl: false, tap: false, doubleClickZoom: false }).setView([sLat, sLng], sZoom);
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', { opacity: 0.8 }).addTo(map);
