@@ -38,16 +38,14 @@
         #search-container.expanded #city-search { opacity: 1; pointer-events: all; }
         .search-icon { position: absolute; left: 10px; width: 20px; height: 20px; filter: brightness(0) invert(1); opacity: 0.8; cursor: pointer; z-index: 5001; }
 
-        /* SVETLA PROFI POCETNA - "JERSEY" STIL */
         #hero { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background-color: #f4f4f4;
-            /* Suptilne pruge kao dres */
             background-image: linear-gradient(90deg, transparent 50%, rgba(0,0,0,0.02) 50%);
             background-size: 40px 100%;
             display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 6000; color: #111; padding: 20px;
             overflow: hidden;
-            touch-action: none; /* ZABRANA ZUMIRANJA RAZVLACENJEM */
+            touch-action: none; 
         }
         .hero-logo { 
             font-family: 'Permanent Marker', cursive; 
@@ -68,11 +66,7 @@
             border: 1px solid #ddd; 
             box-shadow: 0 15px 35px rgba(0,0,0,0.1); 
         }
-        .auth-box input {
-            background: #fff;
-            border: 1px solid #ddd;
-            color: #111;
-        }
+        .auth-box input { background: #fff; border: 1px solid #ddd; color: #111; }
         .auth-box input::placeholder { color: #aaa; }
 
         .auth-btn { 
@@ -87,7 +81,6 @@
         .home-lang-btn { background: #eee; border: 1px solid #ddd; color: #999; padding: 8px 16px; border-radius: 8px; font-size: 10px; font-weight: 900; cursor: pointer; }
         .home-lang-btn.active { border-color: #ff3b30; color: #ff3b30; background: #fff; }
 
-        /* OSTATAK KODA NETAKNUT */
         #map { width: 100vw; height: 100vh; background: #111; display: none; }
         .location-btn { position: absolute; bottom: 40px; right: 20px; z-index: 5500; width: 55px; height: 55px; background: #ff3b30; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 20px rgba(255,59,48,0.5); border: 2px solid white; }
         .location-btn img { filter: brightness(0) invert(1); width: 24px; }
@@ -116,37 +109,20 @@
         .zoom-near .marker-pointer { display: block; }
         
         .status-live-wrapper .marker-pointer { border-top-color: #ff3b30; }
-        .status-live-wrapper .live-card-thin { 
-            border-color: #ff3b30; 
-            box-shadow: 0 0 20px rgba(255, 59, 48, 0.6);
-            animation: live-glow 2s infinite ease-in-out;
-        }
-        .status-live-wrapper .card-bg-icon {
-            animation: float-icon 4s infinite linear;
-        }
 
-        @keyframes live-glow {
-            0%, 100% { box-shadow: 0 0 10px rgba(255, 59, 48, 0.4); }
-            50% { box-shadow: 0 0 25px rgba(255, 59, 48, 0.8); }
-        }
-        @keyframes float-icon {
-            0% { transform: rotate(-15deg) scale(1); }
-            50% { transform: rotate(5deg) scale(1.2); }
-            100% { transform: rotate(-15deg) scale(1); }
-        }
-
-        /* ANIMACIJA REKLAME NA KARTICI */
+        /* NOVO: ANIMACIJA KARTICE (CELA SE SKLANJA) */
         .live-card-thin { 
             background: rgba(10, 10, 10, 0.98); border: 2px solid #ffcc00; border-radius: 12px; padding: 10px 14px; display: none; flex-direction: column; width: max-content; min-width: 150px; color: white; backdrop-filter: blur(15px); box-shadow: 0 8px 25px rgba(0,0,0,0.8); position: relative; overflow: hidden; z-index: 25; margin-bottom: -1px;
+            transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55), opacity 0.5s;
         }
         .zoom-near .live-card-thin { display: flex; }
 
-        .card-slider { display: flex; flex-direction: column; transition: transform 0.6s cubic-bezier(0.85, 0, 0.15, 1); height: 100%; }
-        .card-content-match, .card-content-ad { min-height: 100%; display: flex; flex-direction: column; justify-content: center; }
-        .card-content-ad { color: #ff3b30; font-family: 'Oswald'; font-weight: 900; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; text-align: center; padding: 5px 0; }
-
-        .ad-active .card-slider { transform: translateY(-50%); }
-        .live-card-thin.ad-mode { height: 75px; } /* Fiksna visina za laksu animaciju */
+        .card-inner-switcher { position: relative; width: 100%; }
+        .match-view, .ad-view { width: 100%; transition: opacity 0.3s; }
+        .ad-view { display: none; text-align: center; color: #ff3b30; font-family: 'Oswald'; font-weight: 900; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; padding: 10px 0; }
+        
+        /* Klasa za sklanjanje kartice */
+        .card-hidden { transform: translateX(150%) scale(0.5); opacity: 0; }
 
         .card-bg-icon { position: absolute; right: -10px; bottom: -10px; font-size: 60px; opacity: 0.1; transform: rotate(-15deg); pointer-events: none; z-index: 0; }
 
@@ -191,7 +167,6 @@
         .admin-btn { padding: 12px; border: none; font-weight: 900; color: white; text-transform: uppercase; width: 100%; border-radius: 12px; cursor: pointer; font-family: 'Oswald'; margin-bottom: 8px; }
         .user-location-dot { background: #007AFF; width: 14px; height: 14px; border: 2px solid white; border-radius: 50%; box-shadow: 0 0 20px #007AFF; }
 
-        /* PROFI ADMIN SELECT */
         .admin-select-wrapper { margin-bottom: 15px; background: #111; border: 1px solid #333; border-radius: 12px; padding: 15px; }
         .admin-select-wrapper label { display: block; font-size: 10px; color: #555; font-weight: 900; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px; }
         .admin-select-wrapper select { border: 1px solid #ff3b30 !important; color: #ff3b30; font-weight: 700; }
@@ -201,9 +176,7 @@
             50% { stroke-opacity: 0.3; stroke-width: 2.5px; }
             100% { stroke-opacity: 0.8; stroke-width: 1px; }
         }
-        .animated-range-circle {
-            animation: pulse-circle 4s infinite ease-in-out;
-        }
+        .animated-range-circle { animation: pulse-circle 4s infinite ease-in-out; }
     </style>
 </head>
 <body>
@@ -356,12 +329,7 @@
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', { opacity: 0.8 }).addTo(map);
             
             rangeCircle = L.circle([sLat, sLng], { 
-                radius: 30000, 
-                color: 'white', 
-                weight: 1, 
-                fillOpacity: 0.03, 
-                interactive: false,
-                className: 'animated-range-circle' 
+                radius: 30000, color: 'white', weight: 1, fillOpacity: 0.03, interactive: false, className: 'animated-range-circle' 
             }).addTo(map);
 
             map.on('move', () => { let c = map.getCenter(); rangeCircle.setLatLng(c); if(map.getZoom() > 10) rangeCircle.setStyle({opacity: 0, fillOpacity: 0}); else rangeCircle.setStyle({opacity: 1, fillOpacity: 0.03}); });
@@ -369,13 +337,37 @@
             map.on('click', handleMapClick);
             db.ref('tereni').on('value', snap => { allTereni = []; snap.forEach(c => { let d = c.val(); d.key = c.key; allTereni.push(d); }); renderMarkers(); if(currentAdminKey) refreshAdminPanel(currentAdminKey); });
             trackGPS();
-            
-            // AUTOMATSKI TAJMER ZA REKLAME
+            startAdLoop();
+        }
+
+        // NOVO: LOGIKA ZA 10s MATCH / 3s AD
+        function startAdLoop() {
             setInterval(() => {
-                document.querySelectorAll('.live-card-thin.has-ad').forEach(card => {
-                    card.classList.toggle('ad-active');
+                const cards = document.querySelectorAll('.live-card-thin');
+                cards.forEach(card => {
+                    // Skloni karticu (10s prošlo)
+                    card.classList.add('card-hidden');
+                    
+                    setTimeout(() => {
+                        // Prebaci na Ad i vrati karticu
+                        card.querySelector('.match-view').style.display = 'none';
+                        card.querySelector('.ad-view').style.display = 'block';
+                        card.classList.remove('card-hidden');
+                        
+                        setTimeout(() => {
+                            // Skloni reklamu (3s prošlo)
+                            card.classList.add('card-hidden');
+                            
+                            setTimeout(() => {
+                                // Vrati meč i vrati karticu
+                                card.querySelector('.ad-view').style.display = 'none';
+                                card.querySelector('.match-view').style.display = 'block';
+                                card.classList.remove('card-hidden');
+                            }, 800); // Vreme klizanja
+                        }, 3000); // Trajanje reklame
+                    }, 800); // Vreme klizanja
                 });
-            }, 6000); // 3 sec ad + 3 sec match
+            }, 13000); // Ukupni krug (10s meč + 3s reklama)
         }
 
         function renderMarkers() {
@@ -394,23 +386,23 @@
                     let s2 = (isLive || isEnded) ? (d.score2 || 0) : "";
                     let bInfo = isLive ? `<div class="blink-live">${translations[currentLang].live}</div>` : (d.match_time ? `<div class="card-time-mini">${new Date(d.match_time).toLocaleDateString([],{day:'2-digit',month:'2-digit'})} ${translations[currentLang].timeAt} ${new Date(d.match_time).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div>` : "");
                     
-                    cardBody = `<div class="live-card-thin ad-mode has-ad">
-                        <div class="card-bg-icon">${ball}</div>
-                        <div class="card-slider">
-                            <div class="card-content-match">
+                    cardBody = `<div class="live-card-thin">
+                        <div class="card-inner-switcher">
+                            <div class="match-view">
                                 ${d.league ? `<div class="card-league-mini">${d.league}</div>` : ""}
                                 <div class="score-row"><span class="team-name-col">${d.t1}</span><span class="score-val-col">${s1}</span></div>
                                 <div class="score-row"><span class="team-name-col">${d.t2}</span><span class="score-val-col">${s2}</span></div>
                                 ${bInfo}
                             </div>
-                            <div class="card-content-ad">${translations[currentLang].adText}</div>
+                            <div class="ad-view">${translations[currentLang].adText}</div>
                         </div>
+                        <div class="card-bg-icon">${ball}</div>
                     </div><div class="marker-pointer"></div>`;
                 } else {
-                    cardBody = `<div class="live-card-thin ad-mode has-ad">
-                        <div class="card-slider">
-                            <div class="card-content-match" style="font-size:12px; text-align:center; color:#fff; font-weight:bold;">${d.name}</div>
-                            <div class="card-content-ad">${translations[currentLang].adText}</div>
+                    cardBody = `<div class="live-card-thin">
+                        <div class="card-inner-switcher">
+                            <div class="match-view" style="font-size:12px; text-align:center; color:#fff; font-weight:bold;">${d.name}</div>
+                            <div class="ad-view">${translations[currentLang].adText}</div>
                         </div>
                     </div><div class="marker-pointer"></div>`;
                 }
@@ -455,10 +447,8 @@
             let ex = ""; if(d.sport === "ODBOJKA") ex = `${d.p1||0} : ${d.p2||0}`; 
             if(d.sport === "TENIS") { const isTB = (d.g1 === 6 && d.g2 === 6); const pts1 = isTB ? (d.p1||0) : (tennisPoints[d.p1]||"0"); const pts2 = isTB ? (d.p2||0) : (tennisPoints[d.p2]||"0"); ex = `${d.g1||0}:${d.g2||0} (${pts1}:${pts2})`; } 
             document.getElementById('det-extra-info').innerText = ex; 
-            
             let pDiv = document.getElementById('det-periods'); pDiv.innerHTML = ""; 
             if(d.sub_details) { Object.values(d.sub_details).forEach(v => { pDiv.innerHTML += `<div class="detail-period-tag">${v}</div>`; }); }
-            
             let eHome = document.getElementById('det-events-home'), eAway = document.getElementById('det-events-away'); 
             eHome.innerHTML = ""; eAway.innerHTML = ""; 
             if(d.events) { 
