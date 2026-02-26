@@ -110,19 +110,28 @@
         
         .status-live-wrapper .marker-pointer { border-top-color: #ff3b30; }
 
-        /* NOVO: ANIMACIJA KARTICE (CELA SE SKLANJA) */
         .live-card-thin { 
             background: rgba(10, 10, 10, 0.98); border: 2px solid #ffcc00; border-radius: 12px; padding: 10px 14px; display: none; flex-direction: column; width: max-content; min-width: 150px; color: white; backdrop-filter: blur(15px); box-shadow: 0 8px 25px rgba(0,0,0,0.8); position: relative; overflow: hidden; z-index: 25; margin-bottom: -1px;
-            transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55), opacity 0.5s;
         }
         .zoom-near .live-card-thin { display: flex; }
 
-        .card-inner-switcher { position: relative; width: 100%; }
-        .match-view, .ad-view { width: 100%; transition: opacity 0.3s; }
+        /* NOVO: ANIMACIJA TALASA PREKO KARTICE */
+        .card-inner-switcher { position: relative; width: 100%; overflow: hidden; }
+        .match-view, .ad-view { width: 100%; transition: opacity 0.5s ease; }
         .ad-view { display: none; text-align: center; color: #ff3b30; font-family: 'Oswald'; font-weight: 900; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; padding: 10px 0; }
-        
-        /* Klasa za sklanjanje kartice */
-        .card-hidden { transform: translateX(150%) scale(0.5); opacity: 0; }
+
+        /* TALAS EFEKAT */
+        .card-wave-overlay {
+            position: absolute; top: 0; left: -150%; width: 150%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            z-index: 30; pointer-events: none;
+        }
+        .wave-active .card-wave-overlay { animation: shimmer-wave 1.2s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        @keyframes shimmer-wave {
+            0% { left: -150%; }
+            100% { left: 150%; }
+        }
 
         .card-bg-icon { position: absolute; right: -10px; bottom: -10px; font-size: 60px; opacity: 0.1; transform: rotate(-15deg); pointer-events: none; z-index: 0; }
 
@@ -340,34 +349,36 @@
             startAdLoop();
         }
 
-        // NOVO: LOGIKA ZA 10s MATCH / 3s AD
+        // NOVO: LOGIKA TALASA: 10s MATCH / 3s AD
         function startAdLoop() {
             setInterval(() => {
-                const cards = document.querySelectorAll('.live-card-thin');
-                cards.forEach(card => {
-                    // Skloni karticu (10s prošlo)
-                    card.classList.add('card-hidden');
+                const containers = document.querySelectorAll('.live-card-thin');
+                containers.forEach(card => {
+                    // 1. Pokreni talas
+                    card.classList.add('wave-active');
                     
+                    // 2. Na sredini talasa promeni sadržaj
                     setTimeout(() => {
-                        // Prebaci na Ad i vrati karticu
-                        card.querySelector('.match-view').style.display = 'none';
-                        card.querySelector('.ad-view').style.display = 'block';
-                        card.classList.remove('card-hidden');
+                        const mv = card.querySelector('.match-view');
+                        const av = card.querySelector('.ad-view');
                         
-                        setTimeout(() => {
-                            // Skloni reklamu (3s prošlo)
-                            card.classList.add('card-hidden');
-                            
-                            setTimeout(() => {
-                                // Vrati meč i vrati karticu
-                                card.querySelector('.ad-view').style.display = 'none';
-                                card.querySelector('.match-view').style.display = 'block';
-                                card.classList.remove('card-hidden');
-                            }, 800); // Vreme klizanja
-                        }, 3000); // Trajanje reklame
-                    }, 800); // Vreme klizanja
+                        if(mv.style.display !== 'none') {
+                            mv.style.display = 'none';
+                            av.style.display = 'block';
+                            setTimeout(() => av.style.opacity = '1', 50);
+                        } else {
+                            av.style.display = 'none';
+                            mv.style.display = 'block';
+                            setTimeout(() => mv.style.opacity = '1', 50);
+                        }
+                    }, 600); // Pola animacije (0.6s)
+
+                    // 3. Skloni klasu animacije posle završetka
+                    setTimeout(() => {
+                        card.classList.remove('wave-active');
+                    }, 1200);
                 });
-            }, 13000); // Ukupni krug (10s meč + 3s reklama)
+            }, 13000); // Ukupan krug 13s (10 meč + 3 reklama)
         }
 
         function renderMarkers() {
@@ -387,6 +398,7 @@
                     let bInfo = isLive ? `<div class="blink-live">${translations[currentLang].live}</div>` : (d.match_time ? `<div class="card-time-mini">${new Date(d.match_time).toLocaleDateString([],{day:'2-digit',month:'2-digit'})} ${translations[currentLang].timeAt} ${new Date(d.match_time).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div>` : "");
                     
                     cardBody = `<div class="live-card-thin">
+                        <div class="card-wave-overlay"></div>
                         <div class="card-inner-switcher">
                             <div class="match-view">
                                 ${d.league ? `<div class="card-league-mini">${d.league}</div>` : ""}
@@ -400,6 +412,7 @@
                     </div><div class="marker-pointer"></div>`;
                 } else {
                     cardBody = `<div class="live-card-thin">
+                        <div class="card-wave-overlay"></div>
                         <div class="card-inner-switcher">
                             <div class="match-view" style="font-size:12px; text-align:center; color:#fff; font-weight:bold;">${d.name}</div>
                             <div class="ad-view">${translations[currentLang].adText}</div>
