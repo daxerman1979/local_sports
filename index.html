@@ -111,26 +111,26 @@
         .status-live-wrapper .marker-pointer { border-top-color: #ff3b30; }
 
         .live-card-thin { 
-            background: rgba(10, 10, 10, 0.98); border: 2px solid #ffcc00; border-radius: 12px; padding: 10px 14px; display: none; flex-direction: column; width: max-content; min-width: 150px; color: white; backdrop-filter: blur(15px); box-shadow: 0 8px 25px rgba(0,0,0,0.8); position: relative; overflow: hidden; z-index: 25; margin-bottom: -1px;
+            background: rgba(10, 10, 10, 0.98); border: 2px solid #ffcc00; border-radius: 12px; padding: 10px 14px; display: none; flex-direction: column; width: max-content; min-width: 170px; min-height: 85px; color: white; backdrop-filter: blur(15px); box-shadow: 0 8px 25px rgba(0,0,0,0.8); position: relative; overflow: hidden; z-index: 25; margin-bottom: -1px;
+            justify-content: center;
         }
         .zoom-near .live-card-thin { display: flex; }
 
-        /* NOVO: ANIMACIJA TALASA PREKO KARTICE */
-        .card-inner-switcher { position: relative; width: 100%; overflow: hidden; }
-        .match-view, .ad-view { width: 100%; transition: opacity 0.5s ease; }
-        .ad-view { display: none; text-align: center; color: #ff3b30; font-family: 'Oswald'; font-weight: 900; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; padding: 10px 0; }
+        /* ANIMACIJA TALASA - SPORIJA I FIKSNA VELIČINA */
+        .card-inner-switcher { position: relative; width: 100%; height: 100%; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        .match-view, .ad-view { width: 100%; transition: opacity 0.8s ease; }
+        .ad-view { display: none; text-align: center; color: #ff3b30; font-family: 'Oswald'; font-weight: 900; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; opacity: 0; }
 
-        /* TALAS EFEKAT */
         .card-wave-overlay {
-            position: absolute; top: 0; left: -150%; width: 150%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            position: absolute; top: 0; left: -200%; width: 200%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), rgba(255,255,255,0.6), rgba(255,255,255,0.3), transparent);
             z-index: 30; pointer-events: none;
         }
-        .wave-active .card-wave-overlay { animation: shimmer-wave 1.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .wave-active .card-wave-overlay { animation: shimmer-wave 2.5s cubic-bezier(0.45, 0.05, 0.55, 0.95); }
 
         @keyframes shimmer-wave {
-            0% { left: -150%; }
-            100% { left: 150%; }
+            0% { left: -200%; }
+            100% { left: 200%; }
         }
 
         .card-bg-icon { position: absolute; right: -10px; bottom: -10px; font-size: 60px; opacity: 0.1; transform: rotate(-15deg); pointer-events: none; z-index: 0; }
@@ -349,15 +349,15 @@
             startAdLoop();
         }
 
-        // NOVO: LOGIKA TALASA: 10s MATCH / 3s AD
+        // LOGIKA TALASA: 10s MATCH / 3s AD - SPORIJE (2.5s)
         function startAdLoop() {
             setInterval(() => {
                 const containers = document.querySelectorAll('.live-card-thin');
                 containers.forEach(card => {
-                    // 1. Pokreni talas
+                    // Pokreni sporiji talas
                     card.classList.add('wave-active');
                     
-                    // 2. Na sredini talasa promeni sadržaj
+                    // Sredina animacije (1.25s) - zamena sadržaja
                     setTimeout(() => {
                         const mv = card.querySelector('.match-view');
                         const av = card.querySelector('.ad-view');
@@ -371,14 +371,14 @@
                             mv.style.display = 'block';
                             setTimeout(() => mv.style.opacity = '1', 50);
                         }
-                    }, 600); // Pola animacije (0.6s)
+                    }, 1250); 
 
-                    // 3. Skloni klasu animacije posle završetka
+                    // Čišćenje klase
                     setTimeout(() => {
                         card.classList.remove('wave-active');
-                    }, 1200);
+                    }, 2500);
                 });
-            }, 13000); // Ukupan krug 13s (10 meč + 3 reklama)
+            }, 13000); 
         }
 
         function renderMarkers() {
