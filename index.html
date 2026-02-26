@@ -105,12 +105,14 @@
         .details-extra-line { color: #ffcc00; font-weight: 800; font-size: 16px; margin-top: 5px; }
         .details-section-title { color: #555; font-size: 11px; font-weight: 900; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 1px; display: block; }
         
-        .details-periods-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .detail-period-tag { background: #111; padding: 10px; border-radius: 10px; font-size: 13px; font-weight: 700; border-left: 3px solid #ffcc00; color: white; }
+        /* NOVI STIL ZA PERIODI U JEDNOM REDU */
+        .details-periods-grid { display: flex; overflow-x: auto; gap: 10px; margin-bottom: 20px; padding-bottom: 10px; scrollbar-width: none; }
+        .details-periods-grid::-webkit-scrollbar { display: none; }
+        .detail-period-tag { background: #111; padding: 10px 15px; border-radius: 10px; font-size: 13px; font-weight: 700; border-left: 3px solid #ffcc00; color: white; white-space: nowrap; flex-shrink: 0; }
 
         .events-container-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
         .events-column { display: flex; flex-direction: column; gap: 5px; }
-        .detail-event-box { background: #111; padding: 10px; border-radius: 10px; font-size: 13px; font-weight: 700; border-left: 3px solid #ffcc00; }
+        .detail-event-box { background: #111; padding: 10px; border-radius: 10px; font-size: 13px; font-weight: 700; border-left: 3px solid #ffcc00; margin-bottom: 2px; }
         .events-column.right .detail-event-box { border-left: none; border-right: 3px solid #ffcc00; text-align: right; }
 
         .live-dot-mini { width: 8px; height: 8px; background: #ff3b30; border-radius: 50%; display: inline-block; animation: soft-blink 1.5s infinite ease-in-out; }
@@ -343,6 +345,7 @@
                 ex = `${d.g1||0}:${d.g2||0} (${pts1}:${pts2})`; 
             } 
             document.getElementById('det-extra-info').innerText = ex; 
+            
             let pDiv = document.getElementById('det-periods'); 
             pDiv.innerHTML = ""; 
             if(d.sub_details) {
@@ -350,6 +353,7 @@
                     pDiv.innerHTML += `<div class="detail-period-tag">${v}</div>`; 
                 }); 
             }
+
             let eHome = document.getElementById('det-events-home'), eAway = document.getElementById('det-events-away'); 
             eHome.innerHTML = ""; eAway.innerHTML = ""; 
             if(d.events) { 
