@@ -83,60 +83,57 @@
         .mini-btn { width: 44px; height: 44px; font-size: 18px; }
         .mini-btn img { width: 20px; filter: invert(1); }
 
-        /* Organizovana Pro Kartica Markera */
+        /* PROFESIONALNA KARTICA NA MAPI */
         .live-card-thin { 
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(255, 245, 230, 1)); 
-            border: 1px solid #ff9800; border-radius: 12px; padding: 10px; 
-            display: none; flex-direction: column; width: 180px; 
+            background: linear-gradient(135deg, #ffffff 0%, #fef9f2 100%); 
+            border: 1px solid #ff9800; border-radius: 10px; padding: 8px; 
+            display: none; flex-direction: column; width: 170px; 
             color: #1a1a1a; backdrop-filter: blur(20px); 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.25); position: relative; z-index: 25; margin-bottom: -1px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2); position: relative;
         }
         .zoom-near .live-card-thin { display: flex; }
-        .status-live-wrapper .live-card-thin { border: 2px solid #ff5722; background: #fff; }
+        .status-live-wrapper .live-card-thin { border: 2px solid #ff5722; }
 
-        .card-league-mini { font-size: 8px; color: #777; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
-        .card-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
-        .team-name-col { font-size: 13px; font-weight: 700; color: #222; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
-        .score-val-col { font-family: 'Oswald'; font-size: 18px; color: #111; font-weight: 700; width: 30px; text-align: center; background: rgba(0,0,0,0.03); border-radius: 4px; margin-left: 8px; }
-        .status-live-wrapper .score-val-col { color: #ff5722; background: rgba(255,87,34,0.05); }
+        .card-header-mini { font-size: 8px; color: #888; font-weight: 800; text-transform: uppercase; display: flex; justify-content: space-between; margin-bottom: 6px; border-bottom: 1px solid #eee; padding-bottom: 4px; }
+        .card-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 3px; }
+        .team-name-col { font-size: 12px; font-weight: 700; color: #333; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .score-val-col { font-family: 'Oswald'; font-size: 16px; color: #000; font-weight: 700; width: 28px; text-align: center; background: #f5f5f5; border-radius: 3px; margin-left: 6px; }
+        .status-live-wrapper .score-val-col { color: #ff5722; background: #fff5f2; }
 
         .blink-live { color: #ff5722; font-weight: 900; font-size: 8px; display: flex; align-items: center; gap: 3px; }
-        .card-footer { font-size: 9px; margin-top: 6px; padding-top: 6px; border-top: 1px solid #eee; display: flex; justify-content: center; font-weight: 700; color: #ff9800; }
-        .status-live-wrapper .card-footer { color: #ff5722; }
+        @keyframes soft-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        .blink-live span { width: 5px; height: 5px; background: #ff5722; border-radius: 50%; animation: soft-blink 1.5s infinite; }
 
-        /* Match Details Panel - Profesionalni Raspored */
+        /* MATCH DETAILS - PROFESIONALNI SCOREBOARD */
         #match-details-view { position: fixed; bottom: -100%; left: 0; width: 100%; max-height: 85vh; background: #0a0a0a; z-index: 8000; border-top: 4px solid #ff5722; border-radius: 35px 35px 0 0; padding: 25px; transition: 0.6s cubic-bezier(0.19, 1, 0.22, 1); overflow-y: auto; color: white; }
         #match-details-view.active { bottom: 0; }
         
-        .details-header { text-align: center; margin-bottom: 25px; position: relative; }
-        .details-league { color: #ff5722; font-weight: 900; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 5px; display: block; }
-        .details-time-full { color: #777; font-weight: 600; font-size: 11px; margin-bottom: 15px; display: block; }
-
-        .scoreboard-main { background: rgba(255,255,255,0.03); border-radius: 20px; padding: 20px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-around; align-items: center; margin-bottom: 25px; }
-        .scoreboard-team { display: flex; flex-direction: column; align-items: center; width: 40%; text-align: center; }
-        .scoreboard-team-name { font-size: 18px; font-weight: 900; text-transform: uppercase; margin-top: 10px; }
-        .scoreboard-score-box { font-family: 'Oswald'; font-size: 50px; color: #ff5722; font-weight: 700; line-height: 1; }
-        .scoreboard-extra { font-size: 14px; color: #ff9800; margin-top: 10px; font-weight: 700; background: rgba(255,152,0,0.1); padding: 5px 15px; border-radius: 10px; }
-
-        .details-section-title { color: #555; font-size: 11px; font-weight: 900; text-transform: uppercase; margin: 20px 0 12px 0; letter-spacing: 2px; display: block; border-left: 3px solid #ff5722; padding-left: 10px; }
+        .details-league-bar { text-align: center; font-size: 11px; font-weight: 900; color: #ff5722; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; }
         
-        .details-periods-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(60px, 1fr)); gap: 10px; margin-bottom: 25px; }
-        .detail-period-tag { background: rgba(255,255,255,0.03); padding: 10px; border-radius: 10px; font-size: 11px; font-weight: 700; text-align: center; border-bottom: 2px solid #ff9800; }
+        .scoreboard-container { display: grid; grid-template-columns: 1fr 80px 1fr; align-items: center; text-align: center; background: rgba(255,255,255,0.03); padding: 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); }
+        .sc-team-name { font-size: 18px; font-weight: 900; text-transform: uppercase; line-height: 1.2; }
+        .sc-score-main { font-family: 'Oswald'; font-size: 44px; font-weight: 700; color: #ff5722; }
+        .sc-extra { font-size: 12px; color: #ff9800; font-weight: 800; margin-top: 5px; display: block; }
 
-        /* Organizacija po kolonama za događaje */
-        .events-container-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); }
-        .events-column { display: flex; flex-direction: column; padding: 15px 10px; }
-        .events-column.left { border-right: 1px solid rgba(255,255,255,0.05); }
-        .detail-event-box { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; margin-bottom: 8px; color: #ddd; }
-        .events-column.right .detail-event-box { flex-direction: row-reverse; text-align: right; }
-        .event-emoji { font-size: 14px; opacity: 0.9; }
+        .details-section-title { color: #555; font-size: 10px; font-weight: 900; text-transform: uppercase; margin: 25px 0 15px 0; letter-spacing: 1.5px; border-left: 3px solid #ff5722; padding-left: 10px; }
+
+        .periods-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; }
+        .period-badge { background: rgba(255,255,255,0.05); padding: 8px 15px; border-radius: 8px; font-size: 11px; font-weight: 700; border-bottom: 2px solid #ff9800; white-space: nowrap; }
+
+        /* DOGAĐAJI PO KOLONAMA */
+        .match-events-grid { display: grid; grid-template-columns: 1fr 1px 1fr; gap: 0; margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.05); }
+        .events-divider { background: rgba(255,255,255,0.05); height: 100%; }
+        .ev-col { display: flex; flex-direction: column; padding: 15px 10px; }
+        .ev-item { display: flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 600; margin-bottom: 10px; color: #eee; }
+        .ev-col.right .ev-item { flex-direction: row-reverse; text-align: right; }
+        .ev-icon { font-size: 14px; }
 
         .sport-marker-wrapper { display: flex; flex-direction: column; align-items: center; width: auto; position: relative; }
         .marker-content-box { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; pointer-events: none; }
         .marker-content-box > * { pointer-events: auto; }
         .marker-ball-only { font-size: 20px; filter: drop-shadow(0 0 8px rgba(0,0,0,0.8)); display: block; background: rgba(0,0,0,0.6); padding: 5px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(5px); }
         .zoom-near .marker-ball-only { display: none; }
-        .marker-pointer { width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-top: 12px solid #ff9800; display: none; z-index: 10; margin-top: -1px; }
+        .marker-pointer { width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 10px solid #ff9800; display: none; z-index: 10; margin-top: -1px; }
         .zoom-near .marker-pointer { display: block; }
         .status-live-wrapper .marker-pointer { border-top-color: #ff5722; }
 
@@ -193,33 +190,30 @@
     </div>
 
     <div id="match-details-view">
-        <div class="details-header">
-            <div onclick="closeDetails()" style="position:absolute; right:0; top:-10px; font-size:35px; color:#ff5722; cursor:pointer;">&times;</div>
-            <span id="det-league" class="details-league"></span>
-            <span id="det-time" class="details-time-full"></span>
+        <div style="display:flex; justify-content:flex-end;">
+            <div onclick="closeDetails()" style="font-size:35px; color:#ff5722; cursor:pointer; line-height: 1;">&times;</div>
         </div>
+        
+        <div id="det-league" class="details-league-bar"></div>
 
-        <div class="scoreboard-main">
-            <div class="scoreboard-team">
-                <span id="det-t1" class="scoreboard-team-name"></span>
+        <div class="scoreboard-container">
+            <div id="det-t1" class="sc-team-name"></div>
+            <div class="sc-score-box">
+                <div id="det-score-main" class="sc-score-main">0 : 0</div>
+                <div id="det-extra-info" class="sc-extra"></div>
             </div>
-            <div class="scoreboard-score-box">
-                <span id="det-score-main">0 : 0</span>
-                <div id="det-extra-info" class="scoreboard-extra" style="display:none;"></div>
-            </div>
-            <div class="scoreboard-team">
-                <span id="det-t2" class="scoreboard-team-name"></span>
-            </div>
+            <div id="det-t2" class="sc-team-name"></div>
         </div>
 
         <span class="details-section-title" id="txt-period-res">Rezultat po periodima</span>
-        <div id="det-periods" class="details-periods-grid"></div>
+        <div id="det-periods" class="periods-row"></div>
 
         <div id="det-stats-container" style="display:none;">
             <span class="details-section-title" id="txt-match-events">Događaji na meču</span>
-            <div class="events-container-grid">
-                <div id="det-events-home" class="events-column left"></div>
-                <div id="det-events-away" class="events-column right"></div>
+            <div class="match-events-grid">
+                <div id="det-events-home" class="ev-col left"></div>
+                <div class="events-divider"></div>
+                <div id="det-events-away" class="ev-col right"></div>
             </div>
         </div>
     </div>
@@ -305,11 +299,11 @@
                 if (isLive || isEnded || isUpcoming) {
                     let s1 = (isLive || isEnded) ? (d.score1 || 0) : "-";
                     let s2 = (isLive || isEnded) ? (d.score2 || 0) : "-";
-                    let statusTxt = isLive ? `<div class="blink-live"><span style="width:5px; height:5px; background:#ff5722; border-radius:50%;"></span>${translations[currentLang].live}</div>` : (d.match_time ? new Date(d.match_time).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : "");
+                    let statusTxt = isLive ? `<div class="blink-live"><span></span>${translations[currentLang].live}</div>` : (d.match_time ? new Date(d.match_time).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) : "");
                     
                     cardHtml = `
                         <div class="live-card-thin">
-                            <div class="card-league-mini">
+                            <div class="card-header-mini">
                                 <span>${d.league || translations[currentLang].localMatch}</span>
                                 ${statusTxt}
                             </div>
@@ -325,7 +319,7 @@
                         </div>
                         <div class="marker-pointer"></div>`;
                 } else {
-                    cardHtml = `<div class="live-card-thin" style="text-align:center; padding:8px 5px;"><div style="font-weight:900; font-size:11px;">${d.name}</div><div style="font-size:8px; opacity:0.6;">${ball} ${d.sport}</div></div><div class="marker-pointer"></div>`;
+                    cardHtml = `<div class="live-card-thin" style="text-align:center; padding:8px 5px;"><div style="font-weight:900; font-size:11px;">${d.name}</div><div style="font-size:8px; opacity:0.6; margin-top:2px;">${ball} ${d.sport}</div></div><div class="marker-pointer"></div>`;
                 }
 
                 const html = `<div class="sport-marker-wrapper ${isLive?'status-live-wrapper':''} ${zoomNear?'zoom-near':''}"><div class="marker-content-box"><div class="marker-ball-only">${ball}</div>${cardHtml}</div></div>`;
@@ -355,12 +349,9 @@
             const t = translations[currentLang]; 
             
             document.getElementById('det-league').innerText = d.league || t.localMatch; 
-            document.getElementById('det-time').innerText = d.match_time ? new Date(d.match_time).toLocaleString() : ""; 
             document.getElementById('det-t1').innerText = d.t1 || t.team1; 
             document.getElementById('det-t2').innerText = d.t2 || t.team2; 
-            
-            const liveIndicator = d.status === 'live' ? `<div class="live-dot-mini" style="width:10px; height:10px; background:#ff5722; border-radius:50%; display:inline-block; animation:soft-blink 1.5s infinite; margin-right:10px;"></div>` : "";
-            document.getElementById('det-score-main').innerHTML = `${liveIndicator} ${d.score1||0} : ${d.score2||0}`; 
+            document.getElementById('det-score-main').innerText = `${d.score1||0} : ${d.score2||0}`; 
             
             let ex = ""; 
             if(d.sport === "ODBOJKA") ex = `${d.p1||0} : ${d.p2||0}`; 
@@ -369,24 +360,18 @@
                 const pts2 = (d.g1===6&&d.g2===6)?(d.p2||0):(tennisPoints[d.p2]||"0"); 
                 ex = `${d.g1||0}:${d.g2||0} (${pts1}:${pts2})`; 
             } 
-            
-            if(ex) {
-                document.getElementById('det-extra-info').innerText = ex;
-                document.getElementById('det-extra-info').style.display = 'inline-block';
-            } else {
-                document.getElementById('det-extra-info').style.display = 'none';
-            }
+            document.getElementById('det-extra-info').innerText = ex;
 
             let pDiv = document.getElementById('det-periods'); pDiv.innerHTML = ""; 
-            if(d.sub_details) Object.values(d.sub_details).forEach(v => pDiv.innerHTML += `<div class="detail-period-tag">${v}</div>`); 
+            if(d.sub_details) Object.values(d.sub_details).forEach(v => pDiv.innerHTML += `<div class="period-badge">${v}</div>`); 
             
             let eHome = document.getElementById('det-events-home'), eAway = document.getElementById('det-events-away'); 
             eHome.innerHTML = ""; eAway.innerHTML = ""; 
             if(d.events) { 
                 document.getElementById('det-stats-container').style.display = 'block'; 
                 Object.values(d.events).forEach(ev => { 
-                    let row = `<div class="detail-event-box"><span class="event-emoji">${ev.emoji}</span><span>${ev.player}</span></div>`; 
-                    if(ev.team == 1) eHome.innerHTML += row; else eAway.innerHTML += row; 
+                    let item = `<div class="ev-item"><span class="ev-icon">${ev.emoji}</span><span>${ev.player}</span></div>`; 
+                    if(ev.team == 1) eHome.innerHTML += item; else eAway.innerHTML += item; 
                 }); 
             } else document.getElementById('det-stats-container').style.display = 'none'; 
             
