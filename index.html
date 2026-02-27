@@ -104,13 +104,32 @@
         .card-footer { font-size: 9px; margin-top: 6px; padding-top: 6px; border-top: 1px solid #eee; display: flex; justify-content: center; font-weight: 700; color: #ff9800; }
         .status-live-wrapper .card-footer { color: #ff5722; }
 
-        /* Match Details Panel */
+        /* Match Details Panel - Profesionalni Raspored */
         #match-details-view { position: fixed; bottom: -100%; left: 0; width: 100%; max-height: 85vh; background: #0a0a0a; z-index: 8000; border-top: 4px solid #ff5722; border-radius: 35px 35px 0 0; padding: 25px; transition: 0.6s cubic-bezier(0.19, 1, 0.22, 1); overflow-y: auto; color: white; }
         #match-details-view.active { bottom: 0; }
         
-        .events-container-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; position: relative; }
-        .detail-event-box { background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 10px; font-size: 12px; font-weight: 700; margin-bottom: 6px; border-left: 3px solid #ff5722; display: flex; align-items: center; gap: 8px; }
-        .events-column.right .detail-event-box { border-left: none; border-right: 3px solid #ff5722; flex-direction: row-reverse; text-align: right; }
+        .details-header { text-align: center; margin-bottom: 25px; position: relative; }
+        .details-league { color: #ff5722; font-weight: 900; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 5px; display: block; }
+        .details-time-full { color: #777; font-weight: 600; font-size: 11px; margin-bottom: 15px; display: block; }
+
+        .scoreboard-main { background: rgba(255,255,255,0.03); border-radius: 20px; padding: 20px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-around; align-items: center; margin-bottom: 25px; }
+        .scoreboard-team { display: flex; flex-direction: column; align-items: center; width: 40%; text-align: center; }
+        .scoreboard-team-name { font-size: 18px; font-weight: 900; text-transform: uppercase; margin-top: 10px; }
+        .scoreboard-score-box { font-family: 'Oswald'; font-size: 50px; color: #ff5722; font-weight: 700; line-height: 1; }
+        .scoreboard-extra { font-size: 14px; color: #ff9800; margin-top: 10px; font-weight: 700; background: rgba(255,152,0,0.1); padding: 5px 15px; border-radius: 10px; }
+
+        .details-section-title { color: #555; font-size: 11px; font-weight: 900; text-transform: uppercase; margin: 20px 0 12px 0; letter-spacing: 2px; display: block; border-left: 3px solid #ff5722; padding-left: 10px; }
+        
+        .details-periods-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(60px, 1fr)); gap: 10px; margin-bottom: 25px; }
+        .detail-period-tag { background: rgba(255,255,255,0.03); padding: 10px; border-radius: 10px; font-size: 11px; font-weight: 700; text-align: center; border-bottom: 2px solid #ff9800; }
+
+        /* Organizacija po kolonama za događaje */
+        .events-container-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); }
+        .events-column { display: flex; flex-direction: column; padding: 15px 10px; }
+        .events-column.left { border-right: 1px solid rgba(255,255,255,0.05); }
+        .detail-event-box { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; margin-bottom: 8px; color: #ddd; }
+        .events-column.right .detail-event-box { flex-direction: row-reverse; text-align: right; }
+        .event-emoji { font-size: 14px; opacity: 0.9; }
 
         .sport-marker-wrapper { display: flex; flex-direction: column; align-items: center; width: auto; position: relative; }
         .marker-content-box { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; pointer-events: none; }
@@ -176,19 +195,28 @@
     <div id="match-details-view">
         <div class="details-header">
             <div onclick="closeDetails()" style="position:absolute; right:0; top:-10px; font-size:35px; color:#ff5722; cursor:pointer;">&times;</div>
-            <span id="det-league" class="details-league" style="color:#ff5722;"></span>
+            <span id="det-league" class="details-league"></span>
             <span id="det-time" class="details-time-full"></span>
         </div>
-        <div class="details-main-box" style="background:rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);">
-            <div id="det-t1" class="details-team-line"></div>
-            <div id="det-score" class="details-score-line" style="color:#ff5722;"></div>
-            <div id="det-t2" class="details-team-line"></div>
-            <div id="det-extra-info" class="details-extra-line" style="color:#ff9800; background:rgba(255,152,0,0.1);"></div>
+
+        <div class="scoreboard-main">
+            <div class="scoreboard-team">
+                <span id="det-t1" class="scoreboard-team-name"></span>
+            </div>
+            <div class="scoreboard-score-box">
+                <span id="det-score-main">0 : 0</span>
+                <div id="det-extra-info" class="scoreboard-extra" style="display:none;"></div>
+            </div>
+            <div class="scoreboard-team">
+                <span id="det-t2" class="scoreboard-team-name"></span>
+            </div>
         </div>
-        <span class="details-section-title" id="txt-period-res" style="border-left-color:#ff5722;">Rezultat po periodima</span>
+
+        <span class="details-section-title" id="txt-period-res">Rezultat po periodima</span>
         <div id="det-periods" class="details-periods-grid"></div>
-        <div id="det-stats-container" style="display:none; margin-top:10px;">
-            <span class="details-section-title" id="txt-match-events" style="border-left-color:#ff5722;">Događaji na meču</span>
+
+        <div id="det-stats-container" style="display:none;">
+            <span class="details-section-title" id="txt-match-events">Događaji na meču</span>
             <div class="events-container-grid">
                 <div id="det-events-home" class="events-column left"></div>
                 <div id="det-events-away" class="events-column right"></div>
@@ -324,21 +352,44 @@
 
         function openDetails(key) { 
             const d = allTereni.find(x => x.key === key); if(!d) return; 
-            const t = translations[currentLang]; const isLive = d.status === 'live';
+            const t = translations[currentLang]; 
+            
             document.getElementById('det-league').innerText = d.league || t.localMatch; 
             document.getElementById('det-time').innerText = d.match_time ? new Date(d.match_time).toLocaleString() : ""; 
             document.getElementById('det-t1').innerText = d.t1 || t.team1; 
             document.getElementById('det-t2').innerText = d.t2 || t.team2; 
-            document.getElementById('det-score').innerHTML = (isLive ? `<div class="live-dot-mini" style="width:10px; height:10px; background:#ff5722; border-radius:50%; display:inline-block; animation:soft-blink 1.5s infinite;"></div>` : "") + ` ${d.score1||0} : ${d.score2||0}`; 
-            document.getElementById('det-extra-info').innerText = d.sport === "ODBOJKA" ? `${d.p1||0} : ${d.p2||0}` : (d.sport === "TENIS" ? `${d.g1||0}:${d.g2||0} (${(d.g1===6&&d.g2===6)?(d.p1||0):(tennisPoints[d.p1]||"0")}:${(d.g1===6&&d.g2===6)?(d.p2||0):(tennisPoints[d.p2]||"0")})` : "");
+            
+            const liveIndicator = d.status === 'live' ? `<div class="live-dot-mini" style="width:10px; height:10px; background:#ff5722; border-radius:50%; display:inline-block; animation:soft-blink 1.5s infinite; margin-right:10px;"></div>` : "";
+            document.getElementById('det-score-main').innerHTML = `${liveIndicator} ${d.score1||0} : ${d.score2||0}`; 
+            
+            let ex = ""; 
+            if(d.sport === "ODBOJKA") ex = `${d.p1||0} : ${d.p2||0}`; 
+            if(d.sport === "TENIS") { 
+                const pts1 = (d.g1===6&&d.g2===6)?(d.p1||0):(tennisPoints[d.p1]||"0"); 
+                const pts2 = (d.g1===6&&d.g2===6)?(d.p2||0):(tennisPoints[d.p2]||"0"); 
+                ex = `${d.g1||0}:${d.g2||0} (${pts1}:${pts2})`; 
+            } 
+            
+            if(ex) {
+                document.getElementById('det-extra-info').innerText = ex;
+                document.getElementById('det-extra-info').style.display = 'inline-block';
+            } else {
+                document.getElementById('det-extra-info').style.display = 'none';
+            }
+
             let pDiv = document.getElementById('det-periods'); pDiv.innerHTML = ""; 
             if(d.sub_details) Object.values(d.sub_details).forEach(v => pDiv.innerHTML += `<div class="detail-period-tag">${v}</div>`); 
+            
             let eHome = document.getElementById('det-events-home'), eAway = document.getElementById('det-events-away'); 
             eHome.innerHTML = ""; eAway.innerHTML = ""; 
             if(d.events) { 
                 document.getElementById('det-stats-container').style.display = 'block'; 
-                Object.values(d.events).forEach(ev => { let row = `<div class="detail-event-box"><span>${ev.emoji}</span><span>${ev.player}</span></div>`; if(ev.team == 1) eHome.innerHTML += row; else eAway.innerHTML += row; }); 
+                Object.values(d.events).forEach(ev => { 
+                    let row = `<div class="detail-event-box"><span class="event-emoji">${ev.emoji}</span><span>${ev.player}</span></div>`; 
+                    if(ev.team == 1) eHome.innerHTML += row; else eAway.innerHTML += row; 
+                }); 
             } else document.getElementById('det-stats-container').style.display = 'none'; 
+            
             document.getElementById('match-details-view').classList.add('active'); 
         }
 
