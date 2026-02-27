@@ -498,26 +498,27 @@
         async function handleAuth() { let e = document.getElementById('email').value.toUpperCase(), p = document.getElementById('password').value; try { await auth.signInWithEmailAndPassword(e, p); } catch { try { await auth.createUserWithEmailAndPassword(e, p); } catch(err) { alert(err.message); } } }
 
         async function saveTeren(lat, lng) { 
-            const n = document.getElementById('p_name').value.toUpperCase();
-            const myCourts = allTereni.filter(t => t.owner === auth.currentUser.uid);
-            
-            if (myCourts.length >= 3) {
-                alert(translations[currentLang].limitReached);
-                return;
-            }
+    const n = document.getElementById('p_name').value.toUpperCase();
+    const myCourts = allTereni.filter(t => t.owner === auth.currentUser.uid);
+    
+    if (myCourts.length >= 3) {
+        alert(translations[currentLang].limitReached);
+        return;
+    }
 
-            await db.ref('tereni').push({ 
-                name: n, 
-                lat, 
-                lng, 
-                owner: auth.currentUser.uid, 
-                sport: document.getElementById('p_sport').value, 
-                status: 'upcoming', 
-                score1: 0, 
-                score2: 0 
-            }); 
-            map.closePopup(); 
-        }
+    await db.ref('tereni').push({ 
+        name: n, 
+        lat, 
+        lng, 
+        owner: auth.currentUser.uid, 
+        sport: document.getElementById('p_sport').value, 
+        status: 'upcoming', 
+        score1: 0, 
+        score2: 0,
+        createdAt: firebase.database.ServerValue.TIMESTAMP // DODATO: Vreme kreiranja na serveru
+    }); 
+    map.closePopup(); 
+}
 
         function adminStatus(s) { db.ref(`tereni/${currentAdminKey}`).update({ status: s }); }
         function adminDelete() { if(confirm(translations[currentLang].confirmDelete)) { db.ref(`tereni/${currentAdminKey}`).remove(); closeAdmin(); } }
