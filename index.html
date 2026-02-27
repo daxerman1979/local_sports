@@ -49,7 +49,7 @@
         .home-lang-btn.active { border-color: #ff3b30; color: white; background: #222; }
 
         #map { width: 100vw; height: 100vh; background: #111; display: none; }
-        .location-btn { position: absolute; bottom: 80px; right: 20px; z-index: 5500; width: 55px; height: 55px; background: #ff3b30; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 20px rgba(255,59,48,0.5); border: 2px solid white; }
+        .location-btn { position: absolute; bottom: 85px; right: 20px; z-index: 5500; width: 55px; height: 55px; background: #ff3b30; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 20px rgba(255,59,48,0.5); border: 2px solid white; }
         .location-btn img { filter: brightness(0) invert(1); width: 24px; }
         .back-btn { position: absolute; top: 20px; right: 20px; z-index: 5500; width: 40px; height: 40px; background: rgba(0,0,0,0.5); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); color: white; font-weight: bold; }
         .settings-btn { position: absolute; top: 70px; right: 20px; z-index: 5500; width: 40px; height: 40px; background: rgba(0,0,0,0.5); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); }
@@ -130,27 +130,27 @@
             animation: pulse-circle 4s infinite ease-in-out;
         }
 
-        /* --- STILOVI ZA REKLAME --- */
-        #ad-ticker-bar { 
-            position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; 
-            background: rgba(10,10,10,0.95); border-top: 2px solid #ffcc00; 
-            z-index: 9999; display: none; align-items: center; padding: 10px 20px;
-            backdrop-filter: blur(10px); color: white;
+        /* STIL ZA REKLAME */
+        #ad-ticker-footer { 
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 75px; 
+            background: rgba(10,10,10,0.98); border-top: 3px solid #ffcc00; 
+            z-index: 9999; display: none; align-items: center; padding: 0 15px; 
+            color: white; backdrop-filter: blur(15px);
         }
-        .ad-ticker-item { display: flex; align-items: center; gap: 15px; width: 100%; }
-        .ad-ticker-thumb { width: 50px; height: 50px; border-radius: 10px; object-fit: cover; border: 1px solid #ffcc00; }
-        .ad-ticker-info { flex: 1; overflow: hidden; }
-        .ad-ticker-title { font-family: 'Oswald'; font-weight: 700; color: #ffcc00; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .ad-ticker-sub { font-size: 11px; opacity: 0.8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        
-        .ad-choice-box { display: flex; flex-direction: column; gap: 10px; width: 180px; padding: 10px; }
-        .ad-choice-item { background: #222; padding: 12px; border-radius: 12px; display: flex; align-items: center; gap: 10px; cursor: pointer; border: 1px solid #333; }
-        .ad-choice-item img { width: 25px; }
-        .ad-choice-item span { font-size: 11px; font-weight: bold; color: white; }
+        .ad-ticker-content { display: flex; align-items: center; gap: 12px; width: 100%; }
+        .ad-ticker-img { width: 55px; height: 55px; border-radius: 8px; object-fit: cover; border: 1px solid #ffcc00; }
+        .ad-ticker-text { flex: 1; overflow: hidden; }
+        .ad-ticker-name { color: #ffcc00; font-family: 'Oswald'; font-size: 15px; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .ad-ticker-desc { font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0.9; }
 
-        .img-input-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; margin-top: 5px; }
-        .img-input-btn { background: #1a1a1a; border: 1px dashed #555; height: 50px; border-radius: 8px; display: flex; justify-content: center; align-items: center; color: #555; cursor: pointer; overflow: hidden; }
-        .img-input-btn img { width: 100%; height: 100%; object-fit: cover; }
+        .ad-choice-box { display: flex; flex-direction: column; gap: 8px; padding: 10px; width: 200px; }
+        .ad-choice-item { background: #1a1a1a; padding: 10px; border-radius: 12px; display: flex; align-items: center; gap: 12px; border: 1px solid #333; cursor: pointer; }
+        .ad-choice-item img { width: 28px; }
+        .ad-choice-item span { font-size: 11px; font-weight: 900; color: #fff; }
+
+        .img-upload-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; margin: 5px 0; }
+        .img-slot { background: #111; border: 1px dashed #444; height: 55px; border-radius: 8px; display: flex; justify-content: center; align-items: center; font-size: 20px; color: #444; overflow: hidden; cursor: pointer; }
+        .img-slot img { width: 100%; height: 100%; object-fit: cover; }
     </style>
 </head>
 <body>
@@ -179,8 +179,8 @@
         <div id="user-indicator"></div>
     </div>
 
-    <div id="ad-ticker-bar" onclick="openAdLink()">
-        <div class="ad-ticker-item" id="ad-ticker-content"></div>
+    <div id="ad-ticker-footer" onclick="openAdLink()">
+        <div id="ad-ticker-content" class="ad-ticker-content"></div>
     </div>
 
     <div id="lang-modal" onclick="toggleLangModal()">
@@ -250,11 +250,11 @@
 
         let map, userMarker, currentLat, currentLon, currentAdminKey = null, allTereni = [], allAds = [], rangeCircle = null, activeAd = null;
         let currentLang = localStorage.getItem('lang') || 'sr';
-        let adImages = [null, null, null];
+        let tempImgs = [null, null, null];
 
         const translations = {
-            sr: { subtitle: "Result Tracker", login: "ULAZ U SISTEM", explore: "ISTRAŽI MAPU", search: "Pretraži...", periodRes: "Rezultat po periodima", matchEvents: "Događaji na meču", adminTitle: "ADMIN TABLA", savePeriod: "SAČUVAJ PERIOD / SET", goLive: "KRENI UŽIVO", endMatch: "ZAVRŠI MEČ", resetMatch: "RESET / NOVI MEČ", schedule: "ZAKAŽI MEČ", deleteCourt: "OBRIŠI TEREN", zoneOccupied: "ZONA ZAUZETA!", create: "KRENI", courtName: "NAZIV TERENA", player: "IME IGRAČA", team: "TIM", loggedAs: "ULOGOVAN KAO:", localMatch: "LOKALNI MEČ", points: "POENI", games: "GEMOVI", league: "LIGA (NOVA)", team1: "TIM 1", team2: "TIM 2", goal: "GOL", yellow: "ŽUTI", red: "CRVENI", confirmDelete: "OBRISATI?", timeAt: "U", live: "UŽIVO", limitReached: "LIMIT OD 3 TERENA JE DOSTIGNUT!", addCourt: "DODAJ TEREN", addAd: "DODAJ REKLAMU", adTitle: "NOVA REKLAMA", adName: "IME REKLAME", adDesc: "OPIS (DO 20 REČI)", adLink: "LINK (URL)", createAd: "KRENI", cafe: "KAFIĆ", resto: "RESTORAN", biz: "FIRMA", periods: { FUDBAL: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "PROD"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } },
-            en: { subtitle: "Result Tracker", login: "ENTER SYSTEM", explore: "EXPLORE MAP", search: "Search...", periodRes: "Period Results", matchEvents: "Match Events", adminTitle: "ADMIN PANEL", savePeriod: "SAVE PERIOD / SET", goLive: "GO LIVE", endMatch: "END MATCH", resetMatch: "RESET / NEW MATCH", schedule: "SCHEDULE MATCH", deleteCourt: "DELETE COURT", zoneOccupied: "ZONE OCCUPIED!", create: "CREATE", courtName: "COURT NAME", player: "PLAYER NAME", team: "TEAM", loggedAs: "LOGGED AS:", localMatch: "LOCAL MATCH", points: "POINTS", games: "GAMES", league: "LEAGUE (NEW)", team1: "TEAM 1", team2: "TEAM 2", goal: "GOAL", yellow: "YELLOW", red: "RED", confirmDelete: "DELETE?", timeAt: "AT", live: "LIVE", limitReached: "LIMIT REACHED!", addCourt: "ADD COURT", addAd: "ADD AD", adTitle: "NEW AD", adName: "AD NAME", adDesc: "DESC (UP TO 20 WORDS)", adLink: "LINK (URL)", createAd: "CREATE", cafe: "CAFE", resto: "RESTAURANT", biz: "BUSINESS", periods: { FUDBAL: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "OT"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } }
+            sr: { subtitle: "Result Tracker", login: "ULAZ U SISTEM", explore: "ISTRAŽI MAPU", search: "Pretraži...", periodRes: "Rezultat po periodima", matchEvents: "Događaji na meču", adminTitle: "ADMIN TABLA", savePeriod: "SAČUVAJ PERIOD / SET", goLive: "KRENI UŽIVO", endMatch: "ZAVRŠI MEČ", resetMatch: "RESET / NOVI MEČ", schedule: "ZAKAŽI MEČ", deleteCourt: "OBRIŠI TEREN", zoneOccupied: "ZONA ZAUZETA!", create: "KRENI", courtName: "NAZIV TERENA", player: "IME IGRAČA", team: "TIM", loggedAs: "LOGGED AS:", localMatch: "LOKALNI MEČ", points: "POENI", games: "GEMOVI", league: "LIGA (NOVA)", team1: "TIM 1", team2: "TIM 2", goal: "GOL", yellow: "ŽUTI", red: "CRVENI", confirmDelete: "OBRISATI?", timeAt: "U", live: "UŽIVO", limitReached: "LIMIT OD 3 TERENA JE DOSTIGNUT!", addCourt: "DODAJ TEREN", addAd: "DODAJ REKLAMU", adTitle: "NOVA REKLAMA", adName: "IME REKLAME", adDesc: "OPIS (DO 20 REČI)", adLink: "LINK (URL)", cafe: "KAFIĆ", resto: "RESTORAN", biz: "FIRMA", createAd: "KRENI", periods: { FUDBAL: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "PROD"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } },
+            en: { subtitle: "Result Tracker", login: "ENTER SYSTEM", explore: "EXPLORE MAP", search: "Search...", periodRes: "Period Results", matchEvents: "Match Events", adminTitle: "ADMIN PANEL", savePeriod: "SAVE PERIOD / SET", goLive: "GO LIVE", endMatch: "END MATCH", resetMatch: "RESET / NEW MATCH", schedule: "SCHEDULE MATCH", deleteCourt: "DELETE COURT", zoneOccupied: "ZONE OCCUPIED!", create: "CREATE", courtName: "COURT NAME", player: "PLAYER NAME", team: "TEAM", loggedAs: "LOGGED AS:", localMatch: "LOCAL MATCH", points: "POINTS", games: "GAMES", league: "LEAGUE (NEW)", team1: "TEAM 1", team2: "TEAM 2", goal: "GOAL", yellow: "YELLOW", red: "RED", confirmDelete: "DELETE?", timeAt: "AT", live: "LIVE", limitReached: "LIMIT REACHED!", addCourt: "ADD COURT", addAd: "ADD AD", adTitle: "NEW AD", adName: "AD NAME", adDesc: "DESC (MAX 20 WORDS)", adLink: "LINK (URL)", cafe: "CAFE", resto: "RESTAURANT", biz: "BUSINESS", createAd: "CREATE", periods: { FUDBAL: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "OT"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } }
         };
 
         const sportEmojis = { "FUDBAL": "⚽", "KOŠARKA": "🏀", "ODBOJKA": "🏐", "TENIS": "🎾", "RUKOMET": "🤾" };
@@ -279,38 +279,42 @@
             rangeCircle = L.circle([sLat, sLng], { radius: 30000, color: 'white', weight: 1, fillOpacity: 0.03, interactive: false, className: 'animated-range-circle' }).addTo(map);
 
             map.on('move', () => { 
-                let c = map.getCenter(); 
-                rangeCircle.setLatLng(c); 
+                let c = map.getCenter(); rangeCircle.setLatLng(c); 
                 if(map.getZoom() > 10) rangeCircle.setStyle({opacity: 0, fillOpacity: 0}); else rangeCircle.setStyle({opacity: 1, fillOpacity: 0.03});
-                checkAdsProx(c);
+                checkAdsDistance(c);
             });
             map.on('moveend', () => { let c = map.getCenter(); localStorage.setItem('lastLat', c.lat); localStorage.setItem('lastLng', c.lng); localStorage.setItem('lastZoom', map.getZoom()); renderMarkers(); });
             map.on('click', handleMapClick);
             
-            db.ref('tereni').on('value', snap => { allTereni = []; snap.forEach(c => { let d = c.val(); d.key = c.key; allTereni.push(d); }); renderMarkers(); if(currentAdminKey) refreshAdminPanel(currentAdminKey); });
-            db.ref('ads').on('value', snap => { allAds = []; snap.forEach(c => { let d = c.val(); d.key = c.key; allAds.push(d); }); checkAdsProx(map.getCenter()); });
+            db.ref('tereni').on('value', snap => { allTereni = []; snap.forEach(c => { let d = c.val(); d.key = c.key; allTereni.push(d); }); renderMarkers(); });
             
+            // PUTANJA ISPRAVLJENA NA "oglasi" PREMA TVOJIM RULES
+            db.ref('oglasi').on('value', snap => { 
+                allAds = []; 
+                snap.forEach(c => { let d = c.val(); d.key = c.key; allAds.push(d); }); 
+                checkAdsDistance(map.getCenter());
+            });
+
             trackGPS();
         }
 
-        // --- LOGIKA ZA LINIJU REKLAMA ---
-        function checkAdsProx(center) {
+        // PROVERA BLIZINE REKLAMA (100 KM)
+        function checkAdsDistance(center) {
             let found = null;
             allAds.forEach(ad => {
-                let dist = map.distance(center, [ad.lat, ad.lng]);
-                if(dist < 100000) found = ad; // 100km
+                let d = map.distance(center, [ad.lat, ad.lng]);
+                if (d <= 100000) found = ad;
             });
-            const bar = document.getElementById('ad-ticker-bar');
-            if(found) {
+            const bar = document.getElementById('ad-ticker-footer');
+            if (found) {
                 activeAd = found;
                 bar.style.display = 'flex';
                 document.getElementById('ad-ticker-content').innerHTML = `
-                    <img src="${found.images ? found.images[0] : ''}" class="ad-ticker-thumb">
-                    <div class="ad-ticker-info">
-                        <div class="ad-ticker-title">${found.name}</div>
-                        <div class="ad-ticker-sub">${found.desc}</div>
-                    </div>
-                `;
+                    <img src="${found.imgs ? found.imgs[0] : ''}" class="ad-ticker-img">
+                    <div class="ad-ticker-text">
+                        <div class="ad-ticker-name">${found.name}</div>
+                        <div class="ad-ticker-desc">${found.desc}</div>
+                    </div>`;
             } else {
                 activeAd = null;
                 bar.style.display = 'none';
@@ -318,75 +322,75 @@
         }
         function openAdLink() { if(activeAd && activeAd.link) window.open(activeAd.link, '_blank'); }
 
-        function handleMapClick(e) { 
-            if (!auth.currentUser) return; 
-            const t = translations[currentLang]; 
+        function handleMapClick(e) {
+            if(!auth.currentUser) return;
+            const t = translations[currentLang];
             const html = `
                 <div class="ad-choice-box">
                     <button onclick="openTerenForm(${e.latlng.lat}, ${e.latlng.lng})" style="background:#ff3b30; color:white; border:none; padding:12px; font-weight:bold; border-radius:12px;">${t.addCourt}</button>
                     <button onclick="openAdMenu(${e.latlng.lat}, ${e.latlng.lng})" style="background:#ffcc00; color:black; border:none; padding:12px; font-weight:bold; border-radius:12px;">${t.addAd}</button>
                 </div>`;
-            L.popup().setLatLng(e.latlng).setContent(html).openOn(map); 
+            L.popup().setLatLng(e.latlng).setContent(html).openOn(map);
         }
 
         function openAdMenu(lat, lng) {
             const t = translations[currentLang];
             const html = `
                 <div class="ad-choice-box">
-                    <div class="ad-choice-item" onclick="openAdForm(${lat}, ${lng}, 'cafe')"><img src="https://cdn-icons-png.flaticon.com/512/2734/2734034.png"><span>${t.cafe}</span></div>
-                    <div class="ad-choice-item" onclick="openAdForm(${lat}, ${lng}, 'resto')"><img src="https://cdn-icons-png.flaticon.com/512/3448/3448609.png"><span>${t.resto}</span></div>
-                    <div class="ad-choice-item" onclick="openAdForm(${lat}, ${lng}, 'biz')"><img src="https://cdn-icons-png.flaticon.com/512/9322/9322127.png"><span>${t.biz}</span></div>
+                    <div class="ad-choice-item" onclick="openOglasForm(${lat}, ${lng}, 'cafe')"><img src="https://cdn-icons-png.flaticon.com/512/2734/2734034.png"><span>${t.cafe}</span></div>
+                    <div class="ad-choice-item" onclick="openOglasForm(${lat}, ${lng}, 'restoran')"><img src="https://cdn-icons-png.flaticon.com/512/3448/3448609.png"><span>${t.resto}</span></div>
+                    <div class="ad-choice-item" onclick="openOglasForm(${lat}, ${lng}, 'firma')"><img src="https://cdn-icons-png.flaticon.com/512/9322/9322127.png"><span>${t.biz}</span></div>
                 </div>`;
             L.popup().setLatLng([lat, lng]).setContent(html).openOn(map);
         }
 
-        function openAdForm(lat, lng, type) {
+        function openOglasForm(lat, lng, type) {
             const t = translations[currentLang];
-            adImages = [null, null, null];
+            tempImgs = [null, null, null];
             const html = `
                 <div style="padding:10px; width:220px; display:flex; flex-direction:column; gap:8px;">
-                    <h4 style="margin:0; text-align:center; color:#ffcc00; font-family:'Oswald';">${t.adTitle} (${type.toUpperCase()})</h4>
-                    <input type="text" id="ad_name" placeholder="${t.adName}">
-                    <textarea id="ad_desc" placeholder="${t.adDesc}" style="height:60px;"></textarea>
-                    <input type="text" id="ad_link" placeholder="${t.adLink}">
-                    <div class="img-input-grid">
-                        <div class="img-input-btn" onclick="document.getElementById('f1').click()" id="b1">+<input type="file" id="f1" hidden accept="image/*" onchange="handleImg(event, 0)"></div>
-                        <div class="img-input-btn" onclick="document.getElementById('f2').click()" id="b2">+<input type="file" id="f2" hidden accept="image/*" onchange="handleImg(event, 1)"></div>
-                        <div class="img-input-btn" onclick="document.getElementById('f3').click()" id="b3">+<input type="file" id="f3" hidden accept="image/*" onchange="handleImg(event, 2)"></div>
+                    <h4 style="margin:0; text-align:center; color:#ffcc00; font-family:'Oswald';">${t.adTitle}</h4>
+                    <input type="text" id="o_name" placeholder="${t.adName}">
+                    <textarea id="o_desc" placeholder="${t.adDesc}" style="height:55px;"></textarea>
+                    <input type="text" id="o_link" placeholder="${t.adLink}">
+                    <div class="img-upload-grid">
+                        <div class="img-slot" onclick="document.getElementById('f0').click()" id="s0">+<input type="file" id="f0" hidden accept="image/*" onchange="loadImg(event,0)"></div>
+                        <div class="img-slot" onclick="document.getElementById('f1').click()" id="s1">+<input type="file" id="f1" hidden accept="image/*" onchange="loadImg(event,1)"></div>
+                        <div class="img-slot" onclick="document.getElementById('f2').click()" id="s2">+<input type="file" id="f2" hidden accept="image/*" onchange="loadImg(event,2)"></div>
                     </div>
-                    <button onclick="saveAd(${lat}, ${lng}, '${type}')" style="background:#ffcc00; color:black; border:none; padding:10px; font-weight:bold; border-radius:12px;">${t.createAd}</button>
+                    <button onclick="saveOglas(${lat}, ${lng}, '${type}')" style="background:#ffcc00; color:black; border:none; padding:10px; font-weight:bold; border-radius:12px;">${t.createAd}</button>
                 </div>`;
             L.popup().setLatLng([lat, lng]).setContent(html).openOn(map);
         }
 
-        function handleImg(e, idx) {
-            const file = e.target.files[0];
-            if(!file) return;
-            const reader = new FileReader();
-            reader.onload = (ev) => {
-                adImages[idx] = ev.target.result;
-                document.getElementById('b' + (idx+1)).innerHTML = `<img src="${ev.target.result}">`;
+        function loadImg(e, i) {
+            const file = e.target.files[0]; if(!file) return;
+            const r = new FileReader();
+            r.onload = (ev) => {
+                tempImgs[i] = ev.target.result;
+                document.getElementById('s'+i).innerHTML = `<img src="${ev.target.result}">`;
             };
-            reader.readAsDataURL(file);
+            r.readAsDataURL(file);
         }
 
-        async function saveAd(lat, lng, type) {
-            const name = document.getElementById('ad_name').value.toUpperCase();
-            const desc = document.getElementById('ad_desc').value;
-            const link = document.getElementById('ad_link').value;
+        async function saveOglas(lat, lng, type) {
+            const name = document.getElementById('o_name').value.toUpperCase();
+            const desc = document.getElementById('o_desc').value;
+            const link = document.getElementById('o_link').value;
             if(!name || !desc) return;
             if(desc.split(/\s+/).length > 20) { alert("Max 20 reci!"); return; }
 
-            await db.ref('ads').push({
+            // UPIS U "oglasi" GRANU
+            await db.ref('oglasi').push({
                 lat, lng, name, desc, link, type,
-                images: adImages.filter(x => x !== null),
+                imgs: tempImgs.filter(x => x !== null),
                 owner: auth.currentUser.uid,
-                time: Date.now()
+                ts: Date.now()
             });
             map.closePopup();
         }
 
-        // --- SVE OSTALE FUNKCIJE ZADRŽANE ---
+        // --- ZADRŽANE SVE OSTALE FUNKCIJE ---
         function renderMarkers() {
             if (!map) return;
             const center = map.getCenter();
