@@ -28,6 +28,14 @@
             padding: 12px; border-radius: 12px; font-family: 'Inter'; width: 100%;
             backdrop-filter: blur(10px);
         }
+
+        /* FIX ZA VIDLJIVOST FORME KOD DODAVANJA NA MAPI */
+        .leaflet-popup-content input, .leaflet-popup-content select {
+            background: #f8f8f8 !important;
+            color: #000 !important;
+            border: 1px solid #ccc !important;
+            margin-bottom: 8px !important;
+        }
         
         button { font-size: 16px !important; outline: none !important; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; }
         button:active { transform: scale(0.94); opacity: 0.8; }
@@ -83,7 +91,7 @@
         .mini-btn { width: 44px; height: 44px; font-size: 18px; }
         .mini-btn img { width: 20px; filter: invert(1); }
 
-        /* PRECIZNA KARTICA NA MAPI */
+        /* KARTICA NA MAPI */
         .live-card-thin { 
             background: white; border: 1px solid #ff9800; border-radius: 10px; padding: 10px; 
             display: none; flex-direction: column; width: 170px; color: #1a1a1a; 
@@ -94,32 +102,33 @@
 
         .card-league-header { font-size: 8px; color: #777; font-weight: 900; text-transform: uppercase; border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 8px; display: flex; justify-content: space-between; }
         .card-match-row { display: grid; grid-template-columns: 1fr 30px; align-items: center; margin-bottom: 4px; gap: 5px; }
-        .card-team-name { font-size: 13px; font-weight: 700; color: #222; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .card-score-val { font-family: 'Oswald'; font-size: 18px; color: #000; font-weight: 700; text-align: center; background: #f8f8f8; border-radius: 4px; padding: 2px 0; }
+        .card-team-name { font-size: 12px; font-weight: 700; color: #222; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .card-score-val { font-family: 'Oswald'; font-size: 16px; color: #000; font-weight: 700; text-align: center; background: #f8f8f8; border-radius: 4px; padding: 2px 0; }
         .status-live-wrapper .card-score-val { color: #ff5722; background: #fff1f0; }
 
         .blink-live { color: #ff5722; font-weight: 900; font-size: 8px; display: flex; align-items: center; gap: 3px; }
         .blink-live span { width: 5px; height: 5px; background: #ff5722; border-radius: 50%; animation: soft-blink 1.5s infinite; }
         @keyframes soft-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-        /* MATCH DETAILS - PROFESIONALNI SCOREBOARD */
+        /* MATCH DETAILS - REORGANIZOVAN SCOREBOARD ZA DVA REDA */
         #match-details-view { position: fixed; bottom: -100%; left: 0; width: 100%; max-height: 85vh; background: #0a0a0a; z-index: 8000; border-top: 4px solid #ff5722; border-radius: 35px 35px 0 0; padding: 25px; transition: 0.6s cubic-bezier(0.19, 1, 0.22, 1); overflow-y: auto; color: white; }
         #match-details-view.active { bottom: 0; }
         
         .det-header-league { text-align: center; font-size: 12px; font-weight: 900; color: #ff5722; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; opacity: 0.8; }
         
-        .det-scoreboard { display: grid; grid-template-columns: 1fr 100px 1fr; align-items: center; text-align: center; background: rgba(255,255,255,0.03); padding: 25px 15px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); }
-        .det-team-box { display: flex; flex-direction: column; align-items: center; }
-        .det-team-name { font-size: 18px; font-weight: 900; text-transform: uppercase; word-break: break-word; }
-        .det-score-center { font-family: 'Oswald'; font-size: 50px; font-weight: 700; color: #ff5722; line-height: 1; }
-        .det-extra-info { font-size: 13px; color: #ff9800; font-weight: 800; margin-top: 10px; background: rgba(255,152,0,0.1); padding: 4px 12px; border-radius: 8px; }
+        .det-scoreboard-pro { display: flex; flex-direction: column; gap: 15px; background: rgba(255,255,255,0.03); padding: 25px 15px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); }
+        .det-sc-row { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        .det-sc-team { font-size: 22px; font-weight: 900; text-transform: uppercase; max-width: 70%; line-height: 1.1; }
+        .det-sc-score { font-family: 'Oswald'; font-size: 32px; font-weight: 700; color: #ff5722; min-width: 50px; text-align: right; }
+        .det-sc-vs { font-size: 12px; opacity: 0.3; text-align: center; margin: 5px 0; font-weight: 900; letter-spacing: 3px; }
+        
+        .det-extra-info-pro { text-align: center; font-size: 14px; color: #ff9800; font-weight: 800; margin-top: 15px; background: rgba(255,152,0,0.1); padding: 8px; border-radius: 10px; width: 100%; }
 
         .det-section-title { color: #444; font-size: 10px; font-weight: 900; text-transform: uppercase; margin: 30px 0 15px 0; letter-spacing: 1.5px; border-left: 3px solid #ff5722; padding-left: 10px; }
 
         .det-periods-list { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; }
         .det-period-item { background: rgba(255,255,255,0.05); padding: 10px 18px; border-radius: 10px; font-size: 12px; font-weight: 700; border-bottom: 2px solid #ff9800; white-space: nowrap; }
 
-        /* SIMETRIČNI DOGAĐAJI */
         .det-events-wrapper { display: grid; grid-template-columns: 1fr 1px 1fr; gap: 0; margin-top: 5px; border-top: 1px solid rgba(255,255,255,0.05); }
         .det-ev-col { display: flex; flex-direction: column; padding: 15px 10px; }
         .det-ev-line { display: flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 600; margin-bottom: 12px; color: #fff; }
@@ -194,17 +203,17 @@
         
         <div id="det-league" class="det-header-league"></div>
 
-        <div class="det-scoreboard">
-            <div class="det-team-box">
-                <span id="det-t1" class="det-team-name"></span>
+        <div class="det-scoreboard-pro">
+            <div class="det-sc-row">
+                <span id="det-t1" class="det-sc-team"></span>
+                <span id="det-s1" class="det-sc-score">0</span>
             </div>
-            <div class="det-team-box">
-                <div id="det-score-main" class="det-score-center">0 : 0</div>
-                <div id="det-extra-info" class="det-extra-info" style="display:none;"></div>
+            <div class="det-sc-vs">VS</div>
+            <div class="det-sc-row">
+                <span id="det-t2" class="det-sc-team"></span>
+                <span id="det-s2" class="det-sc-score">0</span>
             </div>
-            <div class="det-team-box">
-                <span id="det-t2" class="det-team-name"></span>
-            </div>
+            <div id="det-extra-info" class="det-extra-info-pro" style="display:none;"></div>
         </div>
 
         <span class="det-section-title" id="txt-period-res">Rezultat po periodima</span>
@@ -335,17 +344,16 @@
             const isTooClose = allTereni.some(court => L.latLng(court.lat, court.lng).distanceTo(e.latlng) < 200);
             if (isTooClose) { alert(t.zoneOccupied); return; } 
             
-            // VRACEN SELEKTOR SPORTOVA KOD DODAVANJA
             const html = `
                 <div style="padding:10px; min-width:180px;">
-                    <select id="p_sport" style="margin-bottom:10px;">
+                    <select id="p_sport">
                         <option value="FUDBAL">FUDBAL</option>
                         <option value="KOŠARKA">KOŠARKA</option>
                         <option value="ODBOJKA">ODBOJKA</option>
                         <option value="TENIS">TENIS</option>
                         <option value="RUKOMET">RUKOMET</option>
                     </select>
-                    <input type="text" id="p_name" placeholder="${t.courtName}" maxlength="15" style="margin-bottom:10px;">
+                    <input type="text" id="p_name" placeholder="${t.courtName}" maxlength="15">
                     <button onclick="saveTeren(${e.latlng.lat}, ${e.latlng.lng})" style="width:100%; background:#ff5722; color:white; border:none; padding:12px; font-weight:bold; border-radius:12px; font-family:'Oswald';">${t.create}</button>
                 </div>`; 
             L.popup().setLatLng(e.latlng).setContent(html).openOn(map); 
@@ -366,7 +374,8 @@
             document.getElementById('det-league').innerText = d.league || t.localMatch; 
             document.getElementById('det-t1').innerText = d.t1 || t.team1; 
             document.getElementById('det-t2').innerText = d.t2 || t.team2; 
-            document.getElementById('det-score-main').innerText = `${d.score1||0} : ${d.score2||0}`; 
+            document.getElementById('det-s1').innerText = d.score1||0; 
+            document.getElementById('det-s2').innerText = d.score2||0; 
             
             let ex = ""; 
             if(d.sport === "ODBOJKA") ex = `${d.p1||0} : ${d.p2||0}`; 
