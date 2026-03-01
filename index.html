@@ -110,7 +110,6 @@
 
         .live-card-thin { 
             background: rgba(22, 18, 15, 0.98); border: 2px solid #FFCC00; border-radius: 12px; padding: 10px 14px; display: none; flex-direction: column; width: max-content; min-width: 160px; color: white; backdrop-filter: blur(15px); box-shadow: 0 8px 25px rgba(0,0,0,0.8); position: relative; overflow: hidden; z-index: 25; margin-bottom: -1px;
-            /* Uklonjena pop-up animacija koja uzrokuje poskakivanje */
         }
 
         .card-bg-icon { 
@@ -146,8 +145,9 @@
         .details-extra-line { color: #FFCC00; font-weight: 800; font-size: 16px; margin-top: 5px; }
         .details-section-title { color: #777; font-size: 11px; font-weight: 900; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 1px; display: block; }
         
-        .details-periods-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .detail-period-tag { background: #0a0a0a; padding: 10px; border-radius: 10px; font-size: 13px; font-weight: 700; border-left: 3px solid #FFCC00; color: white; }
+        /* FIX: PERIODI U JEDNOM REDU */
+        .details-periods-grid { display: flex; flex-wrap: nowrap; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; justify-content: space-evenly; }
+        .detail-period-tag { background: #0a0a0a; padding: 8px 12px; border-radius: 10px; font-size: 12px; font-weight: 700; border-bottom: 3px solid #FFCC00; color: white; white-space: nowrap; flex: 1; text-align: center; }
 
         .events-container-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
         .events-column { display: flex; flex-direction: column; gap: 5px; }
@@ -236,7 +236,9 @@
                 <div id="adm-sub-display" style="color:#FFCC00; font-weight:900; font-family:'Oswald'; margin-top:10px;"></div>
             </div>
             <div id="adm-sport-controls"></div>
+            
             <div id="adm-events-manager" style="margin-bottom:15px; border-top:1px solid #333; padding-top:10px;"></div>
+            
             <button class="admin-btn" style="background:#444;" onclick="triggerLogic('period')" id="btn-save-period">SAČUVAJ PERIOD / SET</button>
             <button id="start-live-btn" class="admin-btn" style="background:#007AFF;" onclick="adminStatus('live')">KRENI UŽIVO</button>
             <button id="end-match-btn" class="admin-btn" style="background:#FF9500; display:none;" onclick="triggerLogic('end')">ZAVRŠI MEČ</button>
@@ -459,12 +461,22 @@
             } else {
                 ctrl.innerHTML = `<div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:15px;"><div style="text-align:center;"><div style="color:#aaa; font-size:11px; margin-bottom:5px;">${d.t1 || t.team1}</div><div style="display:flex; justify-content:center; gap:8px;"><button class="admin-btn" style="background:#FF9500; width:50px;" onclick="proScore(1,-1)">-</button><button class="admin-btn" style="background:#28a745; width:50px;" onclick="proScore(1,1)">+</button></div></div><div style="text-align:center;"><div style="color:#aaa; font-size:11px; margin-bottom:5px;">${d.t2 || t.team2}</div><div style="display:flex; justify-content:center; gap:8px;"><button class="admin-btn" style="background:#FF9500; width:50px;" onclick="proScore(2,-1)">-</button><button class="admin-btn" style="background:#28a745; width:50px;" onclick="proScore(2,1)">+</button></div></div></div>`;
             }
+
+            // FIX: PODELJENI STRELCI I KARTONI U ADMINU
             const evMgr = document.getElementById('adm-events-manager'); 
             if(d.sport === "FUDBAL") {
-                let options = `<option value="">--- OBRIŠI: IME + SIMBOL ---</option>`; 
-                if(d.events) { Object.keys(d.events).forEach(ekey => { const ev = d.events[ekey]; options += `<option value="${ekey}">${ev.emoji} ${ev.player}</option>`; }); }
-                evMgr.innerHTML = `<select onchange="removeEvent(this.value)">${options}</select>`;
+                let hOpts = `<option value="">--- ${d.t1 || t.team1} ---</option>`;
+                let aOpts = `<option value="">--- ${d.t2 || t.team2} ---</option>`;
+                if(d.events) { 
+                    Object.keys(d.events).forEach(ekey => { 
+                        const ev = d.events[ekey]; 
+                        const row = `<option value="${ekey}">${ev.emoji} ${ev.player}</option>`;
+                        if(ev.team == 1) hOpts += row; else aOpts += row;
+                    }); 
+                }
+                evMgr.innerHTML = `<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;"><select onchange="removeEvent(this.value)">${hOpts}</select><select onchange="removeEvent(this.value)">${aOpts}</select></div>`;
             } else { evMgr.innerHTML = ""; }
+
             if(d.t1) { document.getElementById('adm-score-view').style.display = 'flex'; document.getElementById('match-setup').style.display = 'none'; document.getElementById('start-live-btn').style.display = d.status==='upcoming' ? 'block' : 'none'; document.getElementById('end-match-btn').style.display = d.status==='live' ? 'block' : 'none'; document.getElementById('reset-match-btn').style.display = d.status==='ended' ? 'block' : 'none'; } else { document.getElementById('adm-score-view').style.display = 'none'; document.getElementById('match-setup').style.display = 'flex'; }
         }
 
