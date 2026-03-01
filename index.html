@@ -31,36 +31,35 @@
         button { font-size: 16px !important; outline: none !important; transition: transform 0.1s active, opacity 0.2s; position: relative; overflow: hidden; }
         button:active { transform: scale(0.96); opacity: 0.8; }
 
-        #search-container { position: absolute; top: 20px; left: 20px; z-index: 5000; display: flex; align-items: center; transition: all 0.4s ease; width: 40px; height: 40px; background: rgba(0,0,0,0.4); border-radius: 20px; backdrop-filter: blur(10px); overflow: hidden; border: 1px solid rgba(255,255,255,0.2); }
-        #search-container.expanded { width: calc(100% - 80px); background: rgba(0,0,0,0.9); border: 1px solid #ff3b30; }
+        #search-container { position: absolute; top: 20px; left: 20px; z-index: 5000; display: flex; align-items: center; transition: all 0.4s ease; width: 40px; height: 40px; background: rgba(18, 16, 14, 0.6); border-radius: 20px; backdrop-filter: blur(10px); overflow: hidden; border: 1px solid rgba(255,149,0,0.3); }
+        #search-container.expanded { width: calc(100% - 80px); background: rgba(10,8,5,0.95); border: 1px solid #FF9500; }
         #city-search { width: 100%; border: none; background: transparent; color: white; padding: 12px 15px 12px 40px; font-size: 16px; outline: none; opacity: 0; transition: 0.3s; pointer-events: none; }
         #search-container.expanded #city-search { opacity: 1; pointer-events: all; }
         .search-icon { position: absolute; left: 10px; width: 20px; height: 20px; filter: brightness(0) invert(1); opacity: 0.8; cursor: pointer; z-index: 5001; }
 
-        #hero { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1519861531473-9200262188bf?q=80&w=1500&auto=format&fit=crop') center/cover; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 6000; color: white; padding: 20px; }
-        .hero-logo { font-family: 'Permanent Marker', cursive; font-size: 72px; color: #ff3b30; text-shadow: 4px 4px 0px #000; transform: rotate(-2deg); margin-bottom: 0; }
+        #hero { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(18,16,14,0.5), rgba(18,16,14,0.9)), url('https://images.unsplash.com/photo-1519861531473-9200262188bf?q=80&w=1500&auto=format&fit=crop') center/cover; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 6000; color: white; padding: 20px; }
+        .hero-logo { font-family: 'Permanent Marker', cursive; font-size: 72px; color: #FF9500; text-shadow: 4px 4px 0px #000; transform: rotate(-2deg); margin-bottom: 0; }
         .hero-subtitle { font-family: 'Oswald'; font-weight: 700; font-size: 18px; text-transform: uppercase; letter-spacing: 5px; color: #fff; margin-bottom: 30px; margin-top: -10px; }
-        .auth-box { background: rgba(10,10,10,0.95); backdrop-filter: blur(25px); padding: 35px; border-radius: 30px; width: 100%; max-width: 360px; display: flex; flex-direction: column; gap: 15px; border: 1px solid rgba(255,59,48,0.5); }
-        .auth-btn { background: #ff3b30; color: white; border: none; padding: 16px; font-weight: 900; cursor: pointer; text-transform: uppercase; border-radius: 12px; font-family: 'Oswald'; box-shadow: 0 4px 15px rgba(255,59,48,0.3); }
+        .auth-box { background: rgba(18,16,14,0.95); backdrop-filter: blur(25px); padding: 35px; border-radius: 30px; width: 100%; max-width: 360px; display: flex; flex-direction: column; gap: 15px; border: 1px solid rgba(255,149,0,0.4); }
+        .auth-btn { background: #FF9500; color: white; border: none; padding: 16px; font-weight: 900; cursor: pointer; text-transform: uppercase; border-radius: 12px; font-family: 'Oswald'; box-shadow: 0 4px 15px rgba(255,149,0,0.3); }
 
         .home-lang-switch { display: flex; gap: 15px; justify-content: center; margin-top: 15px; }
         .home-lang-btn { background: #1a1a1a; border: 1px solid #333; color: #aaa; padding: 8px 15px; border-radius: 10px; font-size: 12px; font-weight: 900; cursor: pointer; }
-        .home-lang-btn.active { border-color: #ff3b30; color: white; background: #222; }
+        .home-lang-btn.active { border-color: #FF9500; color: white; background: #222; }
 
         #map { width: 100vw; height: 100vh; background: #111; display: none; }
-        .location-btn { position: absolute; bottom: 40px; right: 20px; z-index: 5500; width: 55px; height: 55px; background: #ff3b30; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 20px rgba(255,59,48,0.5); border: 2px solid white; }
+        .location-btn { position: absolute; bottom: 40px; right: 20px; z-index: 5500; width: 55px; height: 55px; background: #FF9500; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 20px rgba(255,149,0,0.4); border: 2px solid white; }
         .location-btn img { filter: brightness(0) invert(1); width: 24px; }
         .back-btn { position: absolute; top: 20px; right: 20px; z-index: 5500; width: 40px; height: 40px; background: rgba(0,0,0,0.5); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); color: white; font-weight: bold; }
         .settings-btn { position: absolute; top: 70px; right: 20px; z-index: 5500; width: 40px; height: 40px; background: rgba(0,0,0,0.5); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); }
         .settings-btn img { width: 20px; filter: invert(1); }
 
         #lang-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); z-index: 9000; display: none; justify-content: center; align-items: center; }
-        .lang-box { background: #0a0a0a; padding: 30px; border-radius: 25px; border: 1px solid #ff3b30; width: 85%; max-width: 300px; text-align: center; }
+        .lang-box { background: #0a0a0a; padding: 30px; border-radius: 25px; border: 1px solid #FF9500; width: 85%; max-width: 300px; text-align: center; }
 
         /* DINAMIČKI MARKERI */
         .sport-marker-wrapper { display: flex; flex-direction: column; align-items: center; width: auto; position: relative; }
         
-        /* Loptice sa oreolom kada je zoom mali */
         .marker-ball-only { 
             font-size: 16px; 
             transition: all 0.3s; 
@@ -78,7 +77,7 @@
             width: 30px;
             height: 30px;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(255,59,48,0.6) 0%, rgba(255,59,48,0) 70%);
+            background: radial-gradient(circle, rgba(255,149,0,0.6) 0%, rgba(255,149,0,0) 70%);
             z-index: 4;
             pointer-events: none;
             animation: halo-pulse 2s infinite ease-in-out;
@@ -102,19 +101,17 @@
             width: 0; height: 0;
             border-left: 14px solid transparent;
             border-right: 14px solid transparent;
-            border-top: 20px solid #ffcc00;
+            border-top: 20px solid #FFCC00;
             display: none;
             z-index: 10;
         }
         .zoom-near .marker-pointer { display: block; }
-        .status-live-wrapper .marker-pointer { border-top-color: #ff3b30; }
+        .status-live-wrapper .marker-pointer { border-top-color: #FF9500; }
 
         .live-card-thin { 
-            background: rgba(10, 10, 10, 0.98); border: 2px solid #ffcc00; border-radius: 12px; padding: 10px 14px; display: none; flex-direction: column; width: max-content; min-width: 160px; color: white; backdrop-filter: blur(15px); box-shadow: 0 8px 25px rgba(0,0,0,0.8); position: relative; overflow: hidden; z-index: 25; margin-bottom: -1px;
-            /* Pop-up animacija se okida samo kada se element pojavi u DOM-u */
-            animation: card-pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background: rgba(22, 18, 15, 0.98); border: 2px solid #FFCC00; border-radius: 12px; padding: 10px 14px; display: none; flex-direction: column; width: max-content; min-width: 160px; color: white; backdrop-filter: blur(15px); box-shadow: 0 8px 25px rgba(0,0,0,0.8); position: relative; overflow: hidden; z-index: 25; margin-bottom: -1px;
+            /* Uklonjena pop-up animacija koja uzrokuje poskakivanje */
         }
-        @keyframes card-pop { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
         .card-bg-icon { 
             position: absolute; right: -5px; top: -5px; font-size: 45px; opacity: 0.15; 
@@ -123,43 +120,43 @@
         @keyframes icon-rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
         .zoom-near .live-card-thin { display: flex; }
-        .status-live-wrapper .live-card-thin { border-color: #ff3b30; }
+        .status-live-wrapper .live-card-thin { border-color: #FF9500; }
 
-        .blink-live { animation: soft-blink 2s infinite ease-in-out; color: #ff3b30; font-weight: 900; text-transform: uppercase; font-size: 10px; z-index: 1; }
+        .blink-live { animation: soft-blink 2s infinite ease-in-out; color: #FF9500; font-weight: 900; text-transform: uppercase; font-size: 10px; z-index: 1; }
         @keyframes soft-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-        .card-league-mini { font-size: 8px; color: #ffcc00; font-weight: 900; letter-spacing: 1px; margin-bottom: 4px; text-transform: uppercase; border-bottom: 1px solid #222; position: relative; z-index: 1; }
-        .status-live-wrapper .card-league-mini { color: #ff3b30; }
+        .card-league-mini { font-size: 8px; color: #FFCC00; font-weight: 900; letter-spacing: 1px; margin-bottom: 4px; text-transform: uppercase; border-bottom: 1px solid #333; position: relative; z-index: 1; }
+        .status-live-wrapper .card-league-mini { color: #FF9500; }
         .score-row { display: flex; justify-content: space-between; align-items: center; gap: 15px; position: relative; z-index: 1; margin-bottom: 3px; width: 100%; }
         .team-name-col { font-size: 14px; font-weight: 900; text-transform: uppercase; color: #fff; white-space: nowrap; }
-        .score-val-col { font-family: 'Oswald'; font-size: 20px; color: #ffcc00; font-weight: 700; text-align: right; min-width: 25px; }
-        .status-live-wrapper .score-val-col { color: #ff3b30; }
+        .score-val-col { font-family: 'Oswald'; font-size: 20px; color: #FFCC00; font-weight: 700; text-align: right; min-width: 25px; }
+        .status-live-wrapper .score-val-col { color: #FF9500; }
         
         .tennis-sub-points { font-size: 10px; color: #fff; opacity: 0.8; font-family: 'Inter'; display: block; margin-top: -5px; }
-        .card-time-mini { font-size: 9px; color: #ffcc00; font-weight: 900; text-align: center; border-top: 1px solid #222; padding-top: 4px; margin-top: 4px; position: relative; z-index: 1; }
+        .card-time-mini { font-size: 9px; color: #FFCC00; font-weight: 900; text-align: center; border-top: 1px solid #333; padding-top: 4px; margin-top: 4px; position: relative; z-index: 1; }
 
-        #match-details-view { position: fixed; bottom: -100%; left: 0; width: 100%; max-height: 90vh; background: #0a0a0a; z-index: 8000; border-top: 3px solid #ff3b30; border-radius: 30px 30px 0 0; padding: 20px; transition: 0.5s cubic-bezier(0.19, 1, 0.22, 1); overflow-y: auto; color: white; }
+        #match-details-view { position: fixed; bottom: -100%; left: 0; width: 100%; max-height: 90vh; background: #12100e; z-index: 8000; border-top: 3px solid #FF9500; border-radius: 30px 30px 0 0; padding: 20px; transition: 0.5s cubic-bezier(0.19, 1, 0.22, 1); overflow-y: auto; color: white; }
         #match-details-view.active { bottom: 0; }
         .details-header { text-align: center; margin-bottom: 20px; position: relative; }
-        .details-league { color: #ff3b30; font-weight: 900; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 5px; display: block; }
-        .details-time-full { color: #ffcc00; font-weight: 800; font-size: 11px; margin-bottom: 15px; display: block; }
-        .details-main-box { background: #151515; border-radius: 20px; padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 20px; border: 1px solid #222; }
+        .details-league { color: #FF9500; font-weight: 900; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 5px; display: block; }
+        .details-time-full { color: #FFCC00; font-weight: 800; font-size: 11px; margin-bottom: 15px; display: block; }
+        .details-main-box { background: #1c1916; border-radius: 20px; padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 20px; border: 1px solid #333; }
         .details-team-line { font-size: 22px; font-weight: 900; text-align: center; width: 100%; word-wrap: break-word; }
-        .details-score-line { font-family: 'Oswald'; font-size: 50px; color: #ff3b30; line-height: 1; margin: 5px 0; display: flex; align-items: center; gap: 15px; }
-        .details-extra-line { color: #ffcc00; font-weight: 800; font-size: 16px; margin-top: 5px; }
-        .details-section-title { color: #555; font-size: 11px; font-weight: 900; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 1px; display: block; }
+        .details-score-line { font-family: 'Oswald'; font-size: 50px; color: #FF9500; line-height: 1; margin: 5px 0; display: flex; align-items: center; gap: 15px; }
+        .details-extra-line { color: #FFCC00; font-weight: 800; font-size: 16px; margin-top: 5px; }
+        .details-section-title { color: #777; font-size: 11px; font-weight: 900; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 1px; display: block; }
         
         .details-periods-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .detail-period-tag { background: #111; padding: 10px; border-radius: 10px; font-size: 13px; font-weight: 700; border-left: 3px solid #ffcc00; color: white; }
+        .detail-period-tag { background: #0a0a0a; padding: 10px; border-radius: 10px; font-size: 13px; font-weight: 700; border-left: 3px solid #FFCC00; color: white; }
 
         .events-container-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
         .events-column { display: flex; flex-direction: column; gap: 5px; }
-        .detail-event-box { background: #111; padding: 10px; border-radius: 10px; font-size: 13px; font-weight: 700; border-left: 3px solid #ffcc00; }
-        .events-column.right .detail-event-box { border-left: none; border-right: 3px solid #ffcc00; text-align: right; }
+        .detail-event-box { background: #0a0a0a; padding: 10px; border-radius: 10px; font-size: 13px; font-weight: 700; border-left: 3px solid #FFCC00; }
+        .events-column.right .detail-event-box { border-left: none; border-right: 3px solid #FFCC00; text-align: right; }
 
-        .live-dot-mini { width: 8px; height: 8px; background: #ff3b30; border-radius: 50%; display: inline-block; animation: soft-blink 1.5s infinite ease-in-out; }
+        .live-dot-mini { width: 8px; height: 8px; background: #FF9500; border-radius: 50%; display: inline-block; animation: soft-blink 1.5s infinite ease-in-out; }
 
-        #admin-panel { position: fixed; top: 0; left: 100%; width: 100%; height: 100%; background: #0a0a0a; z-index: 7000; transition: 0.4s; padding: 25px; display: flex; flex-direction: column; overflow-y: auto; }
+        #admin-panel { position: fixed; top: 0; left: 100%; width: 100%; height: 100%; background: #12100e; z-index: 7000; transition: 0.4s; padding: 25px; display: flex; flex-direction: column; overflow-y: auto; }
         #admin-panel.active { left: 0; }
         .admin-btn { padding: 12px; border: none; font-weight: 900; color: white; text-transform: uppercase; width: 100%; border-radius: 12px; cursor: pointer; font-family: 'Oswald'; margin-bottom: 8px; }
         .user-location-dot { background: #007AFF; width: 14px; height: 14px; border: 2px solid white; border-radius: 50%; box-shadow: 0 0 20px #007AFF; }
@@ -210,7 +207,7 @@
 
     <div id="match-details-view">
         <div class="details-header">
-            <div onclick="closeDetails()" style="position:absolute; right:0; top:-10px; font-size:35px; color:#ff3b30; cursor:pointer;">&times;</div>
+            <div onclick="closeDetails()" style="position:absolute; right:0; top:-10px; font-size:35px; color:#FF9500; cursor:pointer;">&times;</div>
             <span id="det-league" class="details-league"></span>
             <span id="det-time" class="details-time-full"></span>
         </div>
@@ -232,17 +229,17 @@
     </div>
 
     <div id="admin-panel">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;"><div id="adm-name" style="font-family:'Oswald'; font-size:24px; color:#fff;">ADMIN TABLA</div><div onclick="closeAdmin()" style="font-size:40px; color:#ff3b30; cursor:pointer;">&times;</div></div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;"><div id="adm-name" style="font-family:'Oswald'; font-size:24px; color:#fff;">ADMIN TABLA</div><div onclick="closeAdmin()" style="font-size:40px; color:#FF9500; cursor:pointer;">&times;</div></div>
         <div id="adm-score-view" style="display:none; flex-direction:column;">
-            <div style="background:#151515; border:1px solid #ff3b30; border-radius:20px; padding:20px; text-align:center; margin-bottom:15px;">
-                <div id="adm-main-score" style="font-size:55px; font-family:'Oswald'; color:#ff3b30;">0 : 0</div>
-                <div id="adm-sub-display" style="color:#ffcc00; font-weight:900; font-family:'Oswald'; margin-top:10px;"></div>
+            <div style="background:#1c1916; border:1px solid #FF9500; border-radius:20px; padding:20px; text-align:center; margin-bottom:15px;">
+                <div id="adm-main-score" style="font-size:55px; font-family:'Oswald'; color:#FF9500;">0 : 0</div>
+                <div id="adm-sub-display" style="color:#FFCC00; font-weight:900; font-family:'Oswald'; margin-top:10px;"></div>
             </div>
             <div id="adm-sport-controls"></div>
-            <div id="adm-events-manager" style="margin-bottom:15px; border-top:1px solid #222; padding-top:10px;"></div>
+            <div id="adm-events-manager" style="margin-bottom:15px; border-top:1px solid #333; padding-top:10px;"></div>
             <button class="admin-btn" style="background:#444;" onclick="triggerLogic('period')" id="btn-save-period">SAČUVAJ PERIOD / SET</button>
             <button id="start-live-btn" class="admin-btn" style="background:#007AFF;" onclick="adminStatus('live')">KRENI UŽIVO</button>
-            <button id="end-match-btn" class="admin-btn" style="background:#ff3b30; display:none;" onclick="triggerLogic('end')">ZAVRŠI MEČ</button>
+            <button id="end-match-btn" class="admin-btn" style="background:#FF9500; display:none;" onclick="triggerLogic('end')">ZAVRŠI MEČ</button>
             <button id="reset-match-btn" class="admin-btn" style="background:#ff9500; display:none;" onclick="resetMatch()">RESET / NOVI MEČ</button>
         </div>
         <div id="match-setup" style="display:none; flex-direction:column; gap:12px;">
@@ -293,7 +290,7 @@
             
             rangeCircle = L.circle([sLat, sLng], { 
                 radius: 30000, 
-                color: 'white', 
+                color: '#FF9500', 
                 weight: 1, 
                 fillOpacity: 0.03, 
                 interactive: false,
@@ -364,7 +361,7 @@
                 const html = `
                     <div class="sport-marker-wrapper ${isLive?'status-live-wrapper':''} ${zoomNear?'zoom-near':''} ${zoomFar?'zoom-far':''}">
                         <div class="marker-content-box">
-                            <div class="ball-halo" style="background: radial-gradient(circle, ${isLive?'rgba(255,59,48,0.6)':'rgba(255,204,0,0.4)'} 0%, rgba(0,0,0,0) 70%);"></div>
+                            <div class="ball-halo" style="background: radial-gradient(circle, ${isLive?'rgba(255,149,0,0.6)':'rgba(255,204,0,0.4)'} 0%, rgba(0,0,0,0) 70%);"></div>
                             <div class="marker-ball-only">${ball}</div>
                             ${cardBody}
                         </div>
@@ -395,13 +392,12 @@
                 return; 
             } 
 
-            // Uklonjen deo za oglas, samo direktan teren
             openTerenForm(e.latlng.lat, e.latlng.lng);
         }
 
         function openTerenForm(lat, lng) {
             const t = translations[currentLang];
-            const html = `<div style="padding:10px;"><select id="p_sport"><option value="FUDBAL">FUDBAL</option><option value="KOŠARKA">KOŠARKA</option><option value="ODBOJKA">ODBOJKA</option><option value="TENIS">TENIS</option><option value="RUKOMET">RUKOMET</option></select><input type="text" id="p_name" placeholder="${t.courtName}" maxlength="15" style="margin:10px 0; width:100%;"><button onclick="saveTeren(${lat}, ${lng})" style="width:100%; background:#ff3b30; color:white; border:none; padding:10px; font-weight:bold; border-radius:12px;">${t.create}</button></div>`; 
+            const html = `<div style="padding:10px;"><select id="p_sport"><option value="FUDBAL">FUDBAL</option><option value="KOŠARKA">KOŠARKA</option><option value="ODBOJKA">ODBOJKA</option><option value="TENIS">TENIS</option><option value="RUKOMET">RUKOMET</option></select><input type="text" id="p_name" placeholder="${t.courtName}" maxlength="15" style="margin:10px 0; width:100%;"><button onclick="saveTeren(${lat}, ${lng})" style="width:100%; background:#FF9500; color:white; border:none; padding:10px; font-weight:bold; border-radius:12px;">${t.create}</button></div>`; 
             map.closePopup();
             L.popup().setLatLng([lat, lng]).setContent(html).openOn(map);
         }
@@ -458,10 +454,10 @@
             const ctrl = document.getElementById('adm-sport-controls'); ctrl.innerHTML = "";
             
             if(d.sport === "FUDBAL" || d.sport === "RUKOMET") {
-                ctrl.innerHTML = `<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px;"><div style="display:flex; justify-content:center; gap:5px;"><button class="admin-btn" style="background:#ff3b30; width:45px;" onclick="proScore(1,-1)">-</button><button class="admin-btn" style="background:#28a745; width:45px;" onclick="proScore(1,1)">+</button></div><div style="display:flex; justify-content:center; gap:5px;"><button class="admin-btn" style="background:#ff3b30; width:45px;" onclick="proScore(2,-1)">-</button><button class="admin-btn" style="background:#28a745; width:45px;" onclick="proScore(2,1)">+</button></div></div>`;
+                ctrl.innerHTML = `<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px;"><div style="display:flex; justify-content:center; gap:5px;"><button class="admin-btn" style="background:#FF9500; width:45px;" onclick="proScore(1,-1)">-</button><button class="admin-btn" style="background:#28a745; width:45px;" onclick="proScore(1,1)">+</button></div><div style="display:flex; justify-content:center; gap:5px;"><button class="admin-btn" style="background:#FF9500; width:45px;" onclick="proScore(2,-1)">-</button><button class="admin-btn" style="background:#28a745; width:45px;" onclick="proScore(2,1)">+</button></div></div>`;
                 if(d.sport === "FUDBAL") { ctrl.innerHTML += `<div style="background:#111; padding:15px; border-radius:12px; margin-bottom:15px;"><input type="text" id="event-player" placeholder="${t.player}" style="width:100%; margin-bottom:8px;"><select id="event-team" style="width:100%; margin-bottom:8px;"><option value="1">${d.t1 || t.team1}</option><option value="2">${d.t2 || t.team2}</option></select><div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px;"><button onclick="addEvent('⚽')" class="admin-btn" style="background:#444;">${t.goal}</button><button onclick="addEvent('🟨')" class="admin-btn" style="background:#C0A000;">${t.yellow}</button><button onclick="addEvent('🟥')" class="admin-btn" style="background:#A00000;">${t.red}</button></div></div>`; }
             } else {
-                ctrl.innerHTML = `<div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:15px;"><div style="text-align:center;"><div style="color:#aaa; font-size:11px; margin-bottom:5px;">${d.t1 || t.team1}</div><div style="display:flex; justify-content:center; gap:8px;"><button class="admin-btn" style="background:#ff3b30; width:50px;" onclick="proScore(1,-1)">-</button><button class="admin-btn" style="background:#28a745; width:50px;" onclick="proScore(1,1)">+</button></div></div><div style="text-align:center;"><div style="color:#aaa; font-size:11px; margin-bottom:5px;">${d.t2 || t.team2}</div><div style="display:flex; justify-content:center; gap:8px;"><button class="admin-btn" style="background:#ff3b30; width:50px;" onclick="proScore(2,-1)">-</button><button class="admin-btn" style="background:#28a745; width:50px;" onclick="proScore(2,1)">+</button></div></div></div>`;
+                ctrl.innerHTML = `<div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:15px;"><div style="text-align:center;"><div style="color:#aaa; font-size:11px; margin-bottom:5px;">${d.t1 || t.team1}</div><div style="display:flex; justify-content:center; gap:8px;"><button class="admin-btn" style="background:#FF9500; width:50px;" onclick="proScore(1,-1)">-</button><button class="admin-btn" style="background:#28a745; width:50px;" onclick="proScore(1,1)">+</button></div></div><div style="text-align:center;"><div style="color:#aaa; font-size:11px; margin-bottom:5px;">${d.t2 || t.team2}</div><div style="display:flex; justify-content:center; gap:8px;"><button class="admin-btn" style="background:#FF9500; width:50px;" onclick="proScore(2,-1)">-</button><button class="admin-btn" style="background:#28a745; width:50px;" onclick="proScore(2,1)">+</button></div></div></div>`;
             }
             const evMgr = document.getElementById('adm-events-manager'); 
             if(d.sport === "FUDBAL") {
