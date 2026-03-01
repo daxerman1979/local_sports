@@ -131,7 +131,12 @@
         .score-val-col { font-family: 'Oswald'; font-size: 20px; color: #FFCC00; font-weight: 700; text-align: right; min-width: 25px; }
         .status-live-wrapper .score-val-col { color: #FF9500; }
         
-        .tennis-sub-points { font-size: 10px; color: #fff; opacity: 0.8; font-family: 'Inter'; display: block; margin-top: -5px; }
+        .tennis-live-row { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; width: 100%; margin-bottom: 3px; }
+        .tennis-live-row .team-name-col { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80px; }
+        .tennis-live-row .score-val-col { font-size: 18px; min-width: 20px; text-align: center; color: #FFCC00; }
+        .tennis-live-row .gem-val-col { font-family: 'Oswald'; font-size: 18px; min-width: 20px; text-align: center; color: #fff; background: rgba(255,255,255,0.1); border-radius: 4px; padding: 0 4px; }
+        
+        .tennis-sub-points { font-size: 10px; color: #fff; opacity: 0.8; font-family: 'Inter'; display: block; margin-top: -2px; text-align: right; }
         .card-time-mini { font-size: 9px; color: #FFCC00; font-weight: 900; text-align: center; border-top: 1px solid #333; padding-top: 4px; margin-top: 4px; position: relative; z-index: 1; }
 
         #match-details-view { position: fixed; bottom: -100%; left: 0; width: 100%; max-height: 90vh; background: #12100e; z-index: 8000; border-top: 3px solid #FF9500; border-radius: 30px 30px 0 0; padding: 20px; transition: 0.5s cubic-bezier(0.19, 1, 0.22, 1); overflow-y: auto; color: white; }
@@ -145,7 +150,6 @@
         .details-extra-line { color: #FFCC00; font-weight: 800; font-size: 16px; margin-top: 5px; }
         .details-section-title { color: #777; font-size: 11px; font-weight: 900; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 1px; display: block; }
         
-        /* FIX: PERIODI U JEDNOM REDU */
         .details-periods-grid { display: flex; flex-wrap: nowrap; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; justify-content: space-evenly; }
         .detail-period-tag { background: #0a0a0a; padding: 8px 12px; border-radius: 10px; font-size: 12px; font-weight: 700; border-bottom: 3px solid #FFCC00; color: white; white-space: nowrap; flex: 1; text-align: center; }
 
@@ -336,26 +340,34 @@
                     let s1 = (isLive || isEnded) ? (d.score1 || 0) : "";
                     let s2 = (isLive || isEnded) ? (d.score2 || 0) : "";
                     
-                    let extraScoreHtml = "";
+                    let bInfo = isLive ? `<div class="blink-live">${translations[currentLang].live}</div>` : (d.match_time ? `<div class="card-time-mini">${new Date(d.match_time).toLocaleDateString([],{day:'2-digit',month:'2-digit'})} ${translations[currentLang].timeAt} ${new Date(d.match_time).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div>` : "");
+                    
                     if(d.sport === "TENIS" && isLive) {
                         const isTB = (d.g1 === 6 && d.g2 === 6);
                         const pts1 = isTB ? (d.p1||0) : (tennisPoints[d.p1]||"0");
                         const pts2 = isTB ? (d.p2||0) : (tennisPoints[d.p2]||"0");
-                        extraScoreHtml = `<div class="tennis-sub-points">G: ${d.g1||0}:${d.g2||0} (${pts1}:${pts2})</div>`;
+                        
+                        cardBody = `
+                            <div class="live-card-thin">
+                                <div class="card-bg-icon">${ball}</div>
+                                ${d.league ? `<div class="card-league-mini">${d.league}</div>` : ""}
+                                <div class="tennis-live-row"><span class="team-name-col">${d.t1}</span><span class="score-val-col">${s1}</span><span class="gem-val-col">${d.g1||0}</span></div>
+                                <div class="tennis-live-row"><span class="team-name-col">${d.t2}</span><span class="score-val-col">${s2}</span><span class="gem-val-col">${d.g2||0}</span></div>
+                                <div class="tennis-sub-points">PTS: ${pts1}:${pts2}</div>
+                                ${bInfo}
+                            </div>
+                            <div class="marker-pointer"></div>`;
+                    } else {
+                        cardBody = `
+                            <div class="live-card-thin">
+                                <div class="card-bg-icon">${ball}</div>
+                                ${d.league ? `<div class="card-league-mini">${d.league}</div>` : ""}
+                                <div class="score-row"><span class="team-name-col">${d.t1}</span><span class="score-val-col">${s1}</span></div>
+                                <div class="score-row"><span class="team-name-col">${d.t2}</span><span class="score-val-col">${s2}</span></div>
+                                ${bInfo}
+                            </div>
+                            <div class="marker-pointer"></div>`;
                     }
-
-                    let bInfo = isLive ? `<div class="blink-live">${translations[currentLang].live}</div>` : (d.match_time ? `<div class="card-time-mini">${new Date(d.match_time).toLocaleDateString([],{day:'2-digit',month:'2-digit'})} ${translations[currentLang].timeAt} ${new Date(d.match_time).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div>` : "");
-                    
-                    cardBody = `
-                        <div class="live-card-thin">
-                            <div class="card-bg-icon">${ball}</div>
-                            ${d.league ? `<div class="card-league-mini">${d.league}</div>` : ""}
-                            <div class="score-row"><span class="team-name-col">${d.t1}</span><span class="score-val-col">${s1}</span></div>
-                            <div class="score-row"><span class="team-name-col">${d.t2}</span><span class="score-val-col">${s2}</span></div>
-                            ${extraScoreHtml}
-                            ${bInfo}
-                        </div>
-                        <div class="marker-pointer"></div>`;
                 } else {
                     cardBody = `<div class="live-card-thin"><div style="font-size:12px; text-align:center; color:#fff; font-weight:bold;">${d.name}</div></div><div class="marker-pointer"></div>`;
                 }
@@ -462,7 +474,6 @@
                 ctrl.innerHTML = `<div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:15px;"><div style="text-align:center;"><div style="color:#aaa; font-size:11px; margin-bottom:5px;">${d.t1 || t.team1}</div><div style="display:flex; justify-content:center; gap:8px;"><button class="admin-btn" style="background:#FF9500; width:50px;" onclick="proScore(1,-1)">-</button><button class="admin-btn" style="background:#28a745; width:50px;" onclick="proScore(1,1)">+</button></div></div><div style="text-align:center;"><div style="color:#aaa; font-size:11px; margin-bottom:5px;">${d.t2 || t.team2}</div><div style="display:flex; justify-content:center; gap:8px;"><button class="admin-btn" style="background:#FF9500; width:50px;" onclick="proScore(2,-1)">-</button><button class="admin-btn" style="background:#28a745; width:50px;" onclick="proScore(2,1)">+</button></div></div></div>`;
             }
 
-            // FIX: PODELJENI STRELCI I KARTONI U ADMINU
             const evMgr = document.getElementById('adm-events-manager'); 
             if(d.sport === "FUDBAL") {
                 let hOpts = `<option value="">--- ${d.t1 || t.team1} ---</option>`;
@@ -477,7 +488,19 @@
                 evMgr.innerHTML = `<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;"><select onchange="removeEvent(this.value)">${hOpts}</select><select onchange="removeEvent(this.value)">${aOpts}</select></div>`;
             } else { evMgr.innerHTML = ""; }
 
-            if(d.t1) { document.getElementById('adm-score-view').style.display = 'flex'; document.getElementById('match-setup').style.display = 'none'; document.getElementById('start-live-btn').style.display = d.status==='upcoming' ? 'block' : 'none'; document.getElementById('end-match-btn').style.display = d.status==='live' ? 'block' : 'none'; document.getElementById('reset-match-btn').style.display = d.status==='ended' ? 'block' : 'none'; } else { document.getElementById('adm-score-view').style.display = 'none'; document.getElementById('match-setup').style.display = 'flex'; }
+            if(d.t1) { 
+                document.getElementById('adm-score-view').style.display = 'flex'; 
+                document.getElementById('match-setup').style.display = 'none'; 
+                document.getElementById('start-live-btn').style.display = d.status==='upcoming' ? 'block' : 'none'; 
+                document.getElementById('end-match-btn').style.display = d.status==='live' ? 'block' : 'none'; 
+                document.getElementById('reset-match-btn').style.display = d.status==='ended' ? 'block' : 'none'; 
+                
+                // UKIDANJE DUGMETA ZA PERIOD ZA ODBOJKU I TENIS
+                document.getElementById('btn-save-period').style.display = (d.sport === "ODBOJKA" || d.sport === "TENIS") ? 'none' : 'block';
+            } else { 
+                document.getElementById('adm-score-view').style.display = 'none'; 
+                document.getElementById('match-setup').style.display = 'flex'; 
+            }
         }
 
         function proScore(team, sign) { 
