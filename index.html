@@ -112,11 +112,14 @@
             background: rgba(22, 18, 15, 0.98); border: 2px solid #FFCC00; border-radius: 12px; padding: 10px 14px; display: none; flex-direction: column; width: max-content; min-width: 160px; color: white; backdrop-filter: blur(15px); box-shadow: 0 8px 25px rgba(0,0,0,0.8); position: relative; overflow: hidden; z-index: 25; margin-bottom: -1px;
         }
 
-        .card-bg-icon { 
-            position: absolute; right: -5px; top: -5px; font-size: 45px; opacity: 0.15; 
-            z-index: 0; animation: icon-rotate 5s infinite linear; 
+        /* NOVA ANIMACIJA ZA LOPTU PORED LIGE */
+        .card-league-row { display: flex; align-items: center; gap: 6px; border-bottom: 1px solid #333; margin-bottom: 6px; padding-bottom: 2px; }
+        .league-ball-icon { font-size: 14px; animation: icon-bounce-rotate 2s infinite ease-in-out; }
+        
+        @keyframes icon-bounce-rotate { 
+            0%, 100% { transform: scale(1) rotate(0deg); } 
+            50% { transform: scale(1.2) rotate(15deg); } 
         }
-        @keyframes icon-rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
         .zoom-near .live-card-thin { display: flex; }
         .status-live-wrapper .live-card-thin { border-color: #FF9500; }
@@ -124,7 +127,7 @@
         .blink-live { animation: soft-blink 2s infinite ease-in-out; color: #FF9500; font-weight: 900; text-transform: uppercase; font-size: 10px; z-index: 1; }
         @keyframes soft-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-        .card-league-mini { font-size: 8px; color: #FFCC00; font-weight: 900; letter-spacing: 1px; margin-bottom: 4px; text-transform: uppercase; border-bottom: 1px solid #333; position: relative; z-index: 1; }
+        .card-league-mini { font-size: 8px; color: #FFCC00; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; position: relative; z-index: 1; }
         .status-live-wrapper .card-league-mini { color: #FF9500; }
         .score-row { display: flex; justify-content: space-between; align-items: center; gap: 15px; position: relative; z-index: 1; margin-bottom: 3px; width: 100%; }
         .team-name-col { font-size: 14px; font-weight: 900; text-transform: uppercase; color: #fff; white-space: nowrap; }
@@ -285,7 +288,7 @@
         function goBackToLogin() { auth.signOut(); location.reload(); }
         auth.onAuthStateChanged(user => { if (user) exploreMap(); else updateUILanguage(); });
         function loadSuggestions() { db.ref('suggestions/leagues').on('value', snap => { let dl = document.getElementById('league-list'); dl.innerHTML = ""; snap.forEach(s => dl.innerHTML += `<option value="${s.val()}">`); }); db.ref('suggestions/teams').on('value', snap => { let dl = document.getElementById('team-list'); dl.innerHTML = ""; snap.forEach(s => dl.innerHTML += `<option value="${s.val()}">`); }); }
-        function saveSuggestion(type, value) { if(!value) return; const ref = db.ref(`suggestions/${type}`); ref.once('value', snap => { let ex = false; snap.forEach(s => { if(s.val() === value) ex = true; }); if(!ex) ref.push(value); }); }
+        function saveSuggestion(type, value) { if(!value) return; const ref = db.ref(`suggestions/${type}`); ref.once('value', snap => { let x = false; snap.forEach(s => { if(s.val() === value) x = true; }); if(!x) ref.push(value); }); }
 
         function initMap() {
             if (map) return;
@@ -342,6 +345,9 @@
                     
                     let bInfo = isLive ? `<div class="blink-live">${translations[currentLang].live}</div>` : (d.match_time ? `<div class="card-time-mini">${new Date(d.match_time).toLocaleDateString([],{day:'2-digit',month:'2-digit'})} ${translations[currentLang].timeAt} ${new Date(d.match_time).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div>` : "");
                     
+                    // HEADER ROW WITH ANIMATED BALL
+                    let leagueHeader = `<div class="card-league-row"><div class="league-ball-icon">${ball}</div>${d.league ? `<div class="card-league-mini">${d.league}</div>` : ""}</div>`;
+
                     if(d.sport === "TENIS" && isLive) {
                         const isTB = (d.g1 === 6 && d.g2 === 6);
                         const pts1 = isTB ? (d.p1||0) : (tennisPoints[d.p1]||"0");
@@ -349,8 +355,7 @@
                         
                         cardBody = `
                             <div class="live-card-thin">
-                                <div class="card-bg-icon">${ball}</div>
-                                ${d.league ? `<div class="card-league-mini">${d.league}</div>` : ""}
+                                ${leagueHeader}
                                 <div class="tennis-live-row"><span class="team-name-col">${d.t1}</span><span class="score-val-col">${s1}</span><span class="gem-val-col">${d.g1||0}</span></div>
                                 <div class="tennis-live-row"><span class="team-name-col">${d.t2}</span><span class="score-val-col">${s2}</span><span class="gem-val-col">${d.g2||0}</span></div>
                                 <div class="tennis-sub-points">PTS: ${pts1}:${pts2}</div>
@@ -360,8 +365,7 @@
                     } else {
                         cardBody = `
                             <div class="live-card-thin">
-                                <div class="card-bg-icon">${ball}</div>
-                                ${d.league ? `<div class="card-league-mini">${d.league}</div>` : ""}
+                                ${leagueHeader}
                                 <div class="score-row"><span class="team-name-col">${d.t1}</span><span class="score-val-col">${s1}</span></div>
                                 <div class="score-row"><span class="team-name-col">${d.t2}</span><span class="score-val-col">${s2}</span></div>
                                 ${bInfo}
@@ -369,7 +373,7 @@
                             <div class="marker-pointer"></div>`;
                     }
                 } else {
-                    cardBody = `<div class="live-card-thin"><div style="font-size:12px; text-align:center; color:#fff; font-weight:bold;">${d.name}</div></div><div class="marker-pointer"></div>`;
+                    cardBody = `<div class="live-card-thin"><div class="card-league-row"><div class="league-ball-icon">${ball}</div><div style="font-size:12px; text-align:center; color:#fff; font-weight:bold;">${d.name}</div></div></div><div class="marker-pointer"></div>`;
                 }
 
                 const html = `
@@ -495,7 +499,6 @@
                 document.getElementById('end-match-btn').style.display = d.status==='live' ? 'block' : 'none'; 
                 document.getElementById('reset-match-btn').style.display = d.status==='ended' ? 'block' : 'none'; 
                 
-                // UKIDANJE DUGMETA ZA PERIOD ZA ODBOJKU I TENIS
                 document.getElementById('btn-save-period').style.display = (d.sport === "ODBOJKA" || d.sport === "TENIS") ? 'none' : 'block';
             } else { 
                 document.getElementById('adm-score-view').style.display = 'none'; 
