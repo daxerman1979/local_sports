@@ -396,7 +396,11 @@
 
         function initMap() {
             if (map) return;
-            const sLat = localStorage.getItem('lastLat') || 44.7866, sLng = localStorage.getItem('lastLng') || 20.4489, sZoom = localStorage.getItem('lastZoom') || 13;
+            // DODAJE LOGIKU ZA PAMĆENJE LOKACIJE
+            const sLat = localStorage.getItem('lastLat') || 44.7866;
+            const sLng = localStorage.getItem('lastLng') || 20.4489;
+            const sZoom = localStorage.getItem('lastZoom') || 13;
+
             map = L.map('map', { zoomControl: false, tap: false }).setView([sLat, sLng], sZoom);
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', { opacity: 0.8 }).addTo(map);
@@ -418,6 +422,7 @@
             });
             map.on('moveend', () => { 
                 let c = map.getCenter(); 
+                // ČUVANJE LOKACIJE U LOCALSTORAGE
                 localStorage.setItem('lastLat', c.lat); 
                 localStorage.setItem('lastLng', c.lng); 
                 localStorage.setItem('lastZoom', map.getZoom()); 
