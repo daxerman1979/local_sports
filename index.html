@@ -54,6 +54,14 @@
         .settings-btn { position: absolute; top: 70px; right: 20px; z-index: 5500; width: 40px; height: 40px; background: rgba(0,0,0,0.5); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); }
         .settings-btn img { width: 20px; filter: invert(1); }
 
+        /* DISCLAIMER MODAL */
+        #disclaimer-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); backdrop-filter: blur(20px); z-index: 10000; display: none; justify-content: center; align-items: center; padding: 20px; }
+        .disclaimer-box { background: #12100e; padding: 30px; border-radius: 30px; border: 1px solid #FF9500; width: 100%; max-width: 400px; text-align: center; color: white; }
+        .disclaimer-box h2 { font-family: 'Oswald'; color: #FF9500; margin-top: 0; }
+        .disclaimer-box p { font-size: 14px; line-height: 1.6; color: #ccc; margin-bottom: 25px; }
+        .disclaimer-check-row { display: flex; align-items: center; gap: 10px; margin-bottom: 25px; text-align: left; font-size: 13px; font-weight: bold; }
+        .disclaimer-check-row input { width: 20px; height: 20px; accent-color: #FF9500; }
+
         #lang-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); z-index: 9000; display: none; justify-content: center; align-items: center; }
         .lang-box { background: #0a0a0a; padding: 30px; border-radius: 25px; border: 1px solid #FF9500; width: 85%; max-width: 300px; text-align: center; }
 
@@ -180,6 +188,20 @@
 </head>
 <body>
 
+    <div id="disclaimer-modal">
+        <div class="disclaimer-box">
+            <h2>NAPOMENA</h2>
+            <p id="disclaimer-text">
+                Sav sadržaj na ovom sajtu je nezvaničnog karaktera. Vlasnik sajta ne odgovara za tačnost informacija niti za bilo kakvu štetu nastalu korišćenjem istih. Sajt služi isključivo u svrhe zabave.
+            </p>
+            <div class="disclaimer-check-row">
+                <input type="checkbox" id="disclaimer-check">
+                <label for="disclaimer-check" id="disclaimer-label">Prihvatam uslove korišćenja i razumem da su informacije nezvanične.</label>
+            </div>
+            <button class="auth-btn" style="width:100%;" onclick="acceptDisclaimer()" id="disclaimer-btn">NASTAVI</button>
+        </div>
+    </div>
+
     <div id="hero">
         <div class="hero-logo">MAPLAY</div>
         <div class="hero-subtitle" id="txt-subtitle">Result Tracker</div>
@@ -277,17 +299,99 @@
         const tennisPoints = ["0", "15", "30", "40", "AD"];
 
         const translations = {
-            sr: { subtitle: "Result Tracker", login: "ULAZ U SISTEM", explore: "ISTRAŽI MAPU", search: "Pretraži...", periodRes: "Rezultat po periodima", matchEvents: "Događaji na meču", adminTitle: "ADMIN TABLA", savePeriod: "SAČUVAJ PERIOD / SET", goLive: "KRENI UŽIVO", endMatch: "ZAVRŠI MEČ", resetMatch: "RESET / NOVI MEČ", schedule: "ZAKAŽI MEČ", deleteCourt: "OBRIŠI TEREN", zoneOccupied: "ZONA ZAUZETA!", create: "KRENI", courtName: "NAZIV TERENA", player: "IME IGRAČA", team: "TIM", loggedAs: "ULOGOVAN KAO:", localMatch: "LOKALNI MEČ", points: "POENI", games: "GEMOVI", league: "LIGA (NOVA)", team1: "TIM 1", team2: "TIM 2", goal: "GOL", yellow: "ŽUTI", red: "CRVENI", confirmDelete: "OBRISATI?", timeAt: "U", live: "UŽIVO", limitReached: "LIMIT OD 3 TERENA JE DOSTIGNUT!", addCourt: "DODAJ TEREN", periods: { FUDBAL: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "PROD"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } },
-            en: { subtitle: "Result Tracker", login: "ENTER SYSTEM", explore: "EXPLORE MAP", search: "Search...", periodRes: "Period Results", matchEvents: "Match Events", adminTitle: "ADMIN PANEL", savePeriod: "SAVE PERIOD / SET", goLive: "GO LIVE", endMatch: "END MATCH", resetMatch: "RESET / NEW MATCH", schedule: "SCHEDULE MATCH", deleteCourt: "DELETE COURT", zoneOccupied: "ZONE OCCUPIED!", create: "CREATE", courtName: "COURT NAME", player: "PLAYER NAME", team: "TEAM", loggedAs: "LOGGED AS:", localMatch: "LOCAL MATCH", points: "POINTS", games: "GAMES", league: "LEAGUE (NEW)", team1: "TEAM 1", team2: "TEAM 2", goal: "GOAL", yellow: "YELLOW", red: "RED", confirmDelete: "DELETE?", timeAt: "AT", live: "LIVE", limitReached: "LIMIT OF 3 COURTS REACHED!", addCourt: "ADD COURT", periods: { FUDBAL: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "OT"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } }
+            sr: { 
+                subtitle: "Result Tracker", login: "ULAZ U SISTEM", explore: "ISTRAŽI MAPU", search: "Pretraži...", periodRes: "Rezultat po periodima", matchEvents: "Događaji na meču", adminTitle: "ADMIN TABLA", savePeriod: "SAČUVAJ PERIOD / SET", goLive: "KRENI UŽIVO", endMatch: "ZAVRŠI MEČ", resetMatch: "RESET / NOVI MEČ", schedule: "ZAKAŽI MEČ", deleteCourt: "OBRIŠI TEREN", zoneOccupied: "ZONA ZAUZETA!", create: "KRENI", courtName: "NAZIV TERENA", player: "IME IGRAČA", team: "TIM", loggedAs: "ULOGOVAN KAO:", localMatch: "LOKALNI MEČ", points: "POENI", games: "GEMOVI", league: "LIGA (NOVA)", team1: "TIM 1", team2: "TIM 2", goal: "GOL", yellow: "ŽUTI", red: "CRVENI", confirmDelete: "OBRISATI?", timeAt: "U", live: "UŽIVO", limitReached: "LIMIT OD 3 TERENA JE DOSTIGNUT!", addCourt: "DODAJ TEREN",
+                discTitle: "NAPOMENA", discText: "Sav sadržaj na ovom sajtu je nezvaničnog karaktera. Vlasnik sajta ne odgovara za tačnost informacija niti za bilo kakvu štetu nastalu korišćenjem istih. Sajt služi isključivo u svrhe zabave.", discLabel: "Prihvatam uslove korišćenja i razumem da su informacije nezvanične.", discBtn: "NASTAVI",
+                periods: { FUDBAL: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "PROD"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } 
+            },
+            en: { 
+                subtitle: "Result Tracker", login: "ENTER SYSTEM", explore: "EXPLORE MAP", search: "Search...", periodRes: "Period Results", matchEvents: "Match Events", adminTitle: "ADMIN PANEL", savePeriod: "SAVE PERIOD / SET", goLive: "GO LIVE", endMatch: "END MATCH", resetMatch: "RESET / NEW MATCH", schedule: "SCHEDULE MATCH", deleteCourt: "DELETE COURT", zoneOccupied: "ZONE OCCUPIED!", create: "CREATE", courtName: "COURT NAME", player: "PLAYER NAME", team: "TEAM", loggedAs: "LOGGED AS:", localMatch: "LOCAL MATCH", points: "POINTS", games: "GAMES", league: "LEAGUE (NEW)", team1: "TEAM 1", team2: "TEAM 2", goal: "GOAL", yellow: "YELLOW", red: "RED", confirmDelete: "DELETE?", timeAt: "AT", live: "LIVE", limitReached: "LIMIT OF 3 COURTS REACHED!", addCourt: "ADD COURT",
+                discTitle: "DISCLAIMER", discText: "All content on this site is unofficial. The site owner is not responsible for information accuracy or any damage caused by using the site. This site is for entertainment purposes only.", discLabel: "I accept the terms and understand that information is unofficial.", discBtn: "CONTINUE",
+                periods: { FUDBAL: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "OT"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } 
+            }
         };
 
         function setLanguage(lang) { currentLang = lang; localStorage.setItem('lang', lang); updateUILanguage(); if(document.getElementById('lang-modal').style.display === 'flex') toggleLangModal(); if(currentAdminKey) refreshAdminPanel(currentAdminKey); }
-        function updateUILanguage() { const t = translations[currentLang]; document.getElementById('txt-subtitle').innerText = t.subtitle; document.getElementById('btn-login').innerText = t.login; document.getElementById('btn-explore').innerText = t.explore; document.getElementById('city-search').placeholder = t.search; document.getElementById('txt-period-res').innerText = t.periodRes; document.getElementById('txt-match-events').innerText = t.matchEvents; document.getElementById('adm-name').innerText = t.adminTitle; document.getElementById('btn-save-period').innerText = t.savePeriod; document.getElementById('start-live-btn').innerText = t.goLive; document.getElementById('end-match-btn').innerText = t.endMatch; document.getElementById('reset-match-btn').innerText = t.resetMatch; document.getElementById('btn-schedule').innerText = t.schedule; document.getElementById('btn-delete-court').innerText = t.deleteCourt; document.getElementById('adm-league-input').placeholder = t.league; document.getElementById('adm-t1').placeholder = t.team1; document.getElementById('adm-t2').placeholder = t.team2; document.getElementById('h-lang-sr').classList.toggle('active', currentLang === 'sr'); document.getElementById('h-lang-en').classList.toggle('active', currentLang === 'en'); if(auth.currentUser) document.getElementById('user-indicator').innerText = `${t.loggedAs} ${auth.currentUser.email}`; }
+        
+        function updateUILanguage() { 
+            const t = translations[currentLang]; 
+            document.getElementById('txt-subtitle').innerText = t.subtitle; 
+            document.getElementById('btn-login').innerText = t.login; 
+            document.getElementById('btn-explore').innerText = t.explore; 
+            document.getElementById('city-search').placeholder = t.search; 
+            document.getElementById('txt-period-res').innerText = t.periodRes; 
+            document.getElementById('txt-match-events').innerText = t.matchEvents; 
+            document.getElementById('adm-name').innerText = t.adminTitle; 
+            document.getElementById('btn-save-period').innerText = t.savePeriod; 
+            document.getElementById('start-live-btn').innerText = t.goLive; 
+            document.getElementById('end-match-btn').innerText = t.endMatch; 
+            document.getElementById('reset-match-btn').innerText = t.resetMatch; 
+            document.getElementById('btn-schedule').innerText = t.schedule; 
+            document.getElementById('btn-delete-court').innerText = t.deleteCourt; 
+            document.getElementById('adm-league-input').placeholder = t.league; 
+            document.getElementById('adm-t1').placeholder = t.team1; 
+            document.getElementById('adm-t2').placeholder = t.team2; 
+            document.getElementById('h-lang-sr').classList.toggle('active', currentLang === 'sr'); 
+            document.getElementById('h-lang-en').classList.toggle('active', currentLang === 'en'); 
+            
+            // Disclaimer update
+            document.querySelector('.disclaimer-box h2').innerText = t.discTitle;
+            document.getElementById('disclaimer-text').innerText = t.discText;
+            document.getElementById('disclaimer-label').innerText = t.discLabel;
+            document.getElementById('disclaimer-btn').innerText = t.discBtn;
+
+            if(auth.currentUser) document.getElementById('user-indicator').innerText = `${t.loggedAs} ${auth.currentUser.email}`; 
+        }
+
+        async function checkDisclaimer() {
+            const user = auth.currentUser;
+            if (!user) return;
+            
+            const deviceKey = `disclaimer_accepted_${user.uid}`;
+            const acceptedOnDevice = localStorage.getItem(deviceKey);
+
+            if (!acceptedOnDevice) {
+                const snap = await db.ref(`users/${user.uid}/disclaimer_accepted`).get();
+                if (!snap.exists() || snap.val() !== true) {
+                    document.getElementById('disclaimer-modal').style.display = 'flex';
+                } else {
+                    localStorage.setItem(deviceKey, 'true');
+                }
+            }
+        }
+
+        async function acceptDisclaimer() {
+            const checkbox = document.getElementById('disclaimer-check');
+            if (!checkbox.checked) {
+                alert(currentLang === 'sr' ? "Morate prihvatiti uslove!" : "You must accept the terms!");
+                return;
+            }
+            const user = auth.currentUser;
+            if (user) {
+                await db.ref(`users/${user.uid}/disclaimer_accepted`).set(true);
+                localStorage.setItem(`disclaimer_accepted_${user.uid}`, 'true');
+            }
+            document.getElementById('disclaimer-modal').style.display = 'none';
+        }
+
         function toggleLangModal() { let m = document.getElementById('lang-modal'); m.style.display = (m.style.display === 'flex') ? 'none' : 'flex'; }
-        function exploreMap() { document.getElementById('hero').style.display = 'none'; document.getElementById('map').style.display = 'block'; document.getElementById('ui-controls').style.display = 'block'; initMap(); updateUILanguage(); loadSuggestions(); }
+        
+        function exploreMap() { 
+            document.getElementById('hero').style.display = 'none'; 
+            document.getElementById('map').style.display = 'block'; 
+            document.getElementById('ui-controls').style.display = 'block'; 
+            initMap(); 
+            updateUILanguage(); 
+            loadSuggestions(); 
+            checkDisclaimer();
+        }
+
         function goBackToLogin() { auth.signOut(); location.reload(); }
+        
         auth.onAuthStateChanged(user => { if (user) exploreMap(); else updateUILanguage(); });
+        
         function loadSuggestions() { db.ref('suggestions/leagues').on('value', snap => { let dl = document.getElementById('league-list'); dl.innerHTML = ""; snap.forEach(s => dl.innerHTML += `<option value="${s.val()}">`); }); db.ref('suggestions/teams').on('value', snap => { let dl = document.getElementById('team-list'); dl.innerHTML = ""; snap.forEach(s => dl.innerHTML += `<option value="${s.val()}">`); }); }
+        
         function saveSuggestion(type, value) { if(!value) return; const ref = db.ref(`suggestions/${type}`); ref.once('value', snap => { let x = false; snap.forEach(s => { if(s.val() === value) x = true; }); if(!x) ref.push(value); }); }
 
         function initMap() {
@@ -345,7 +449,6 @@
                     
                     let bInfo = isLive ? `<div class="blink-live">${translations[currentLang].live}</div>` : (d.match_time ? `<div class="card-time-mini">${new Date(d.match_time).toLocaleDateString([],{day:'2-digit',month:'2-digit'})} ${translations[currentLang].timeAt} ${new Date(d.match_time).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div>` : "");
                     
-                    // HEADER ROW WITH ANIMATED BALL
                     let leagueHeader = `<div class="card-league-row"><div class="league-ball-icon">${ball}</div>${d.league ? `<div class="card-league-mini">${d.league}</div>` : ""}</div>`;
 
                     if(d.sport === "TENIS" && isLive) {
