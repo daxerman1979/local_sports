@@ -179,7 +179,10 @@
 
     <div id="map"></div>
     <div id="ui-controls" style="display:none;">
-        <div id="search-container"><img src="https://cdn-icons-png.flaticon.com/512/622/622669.png" class="search-icon" onclick="toggleSearch()"><input type="text" id="city-search" placeholder="Pretraži..." onkeypress="handleSearch(event)"></div>
+        <div id="search-container">
+            <img src="https://cdn-icons-png.flaticon.com/512/622/622669.png" class="search-icon" onclick="toggleSearch()">
+            <input type="text" id="city-search" placeholder="Pretraži..." onkeydown="handleSearch(event)" onblur="handleSearch(event)" enterkeyhint="search">
+        </div>
         <div class="back-btn" onclick="goBackToLogin()" id="main-back-btn">
             <img src="https://cdn-icons-png.flaticon.com/512/1828/1828479.png" id="back-icon" style="display:none;">
             <span id="back-x">&#10006;</span>
@@ -286,11 +289,9 @@
             if(document.getElementById('lang-modal').style.display === 'flex') toggleLangModal(); 
             if(currentAdminKey) refreshAdminPanel(currentAdminKey);
             
-            // Re-render popupa ako je otvoren da bi se promenio jezik unutar forme
             const openPopup = map && map.hasLayer(map._popup) ? map._popup : null;
             if(openPopup) {
                 const latlng = openPopup.getLatLng();
-                // Proveravamo da li je to "Save" forma (ako nema name u podacima terena)
                 if(document.getElementById('p_name')) {
                     openTerenForm(latlng.lat, latlng.lng);
                 }
@@ -580,7 +581,26 @@
         function trackGPS() { if(!navigator.geolocation) return; navigator.geolocation.watchPosition(pos => { currentLat = pos.coords.latitude; currentLon = pos.coords.longitude; if(!userMarker) userMarker = L.marker([currentLat, currentLon], { icon: L.divIcon({ className: 'user-location-dot', iconSize: [14, 14] }) }).addTo(map); else userMarker.setLatLng([currentLat, currentLon]); }, null, { enableHighAccuracy: true }); }
         function goToMyLocation() { if(currentLat) map.flyTo([currentLat, currentLon], 18); }
         function toggleSearch() { document.getElementById('search-container').classList.toggle('expanded'); if(document.getElementById('search-container').classList.contains('expanded')) document.getElementById('city-search').focus(); }
-        function handleSearch(e) { if(e.key === "Enter") { fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${e.target.value}`).then(r => r.json()).then(data => { if(data[0]) { map.flyTo([data[0].lat, data[0].lon], 15); toggleSearch(); } }); } }
+        
+        function handleSearch(e) { 
+            // Pokreni ako je pritisnut Enter (Search/Go na tastaturi) ILI ako je polje izgubilo fokus nakon unosa (blur)
+            if (e.key === "Enter" || e.type === "blur") { 
+                const query = document.getElementById('city-search').value;
+                if (!query) return;
+                
+                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}`)
+                .then(r => r.json())
+                .then(data => { 
+                    if(data[0]) { 
+                        map.flyTo([data[0].lat, data[0].lon], 15); 
+                        // Zatvori search UI i skloni tastaturu
+                        document.getElementById('search-container').classList.remove('expanded');
+                        document.getElementById('city-search').blur(); 
+                    } 
+                }); 
+            } 
+        }
+
         async function handleAuth() { let e = document.getElementById('email').value.toUpperCase(), p = document.getElementById('password').value; try { await auth.signInWithEmailAndPassword(e, p); } catch { try { await auth.createUserWithEmailAndPassword(e, p); } catch(err) { alert(err.message); } } }
     </script>
 </body>
