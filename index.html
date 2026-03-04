@@ -24,7 +24,6 @@
         
         input, select, textarea, datalist { 
             font-size: 16px !important; outline: none !important; 
-            /* Osigurava da se vizuelno uvek kuca velikim slovima */
             text-transform: uppercase; 
             background: #1a1a1a; color: white; border: 1px solid #333; 
             padding: 12px; border-radius: 12px; font-family: 'Inter'; width: 100%;
@@ -57,12 +56,10 @@
         .settings-btn { position: absolute; top: 70px; right: 20px; z-index: 5500; width: 40px; height: 40px; background: rgba(0,0,0,0.5); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); }
         .settings-btn img { width: 20px; filter: invert(1); }
 
-        /* MODERAN POPUP ZA KREIRANJE TERENA */
         .leaflet-popup-content-wrapper { background: rgba(18, 16, 14, 0.95) !important; color: white !important; border: 1px solid #FF9500 !important; border-radius: 20px !important; backdrop-filter: blur(10px); }
         .leaflet-popup-tip { background: #FF9500 !important; }
         .leaflet-popup-content { margin: 15px !important; width: 220px !important; }
 
-        /* DISNEY DISCLAIMER MODAL */
         #disclaimer-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); backdrop-filter: blur(20px); z-index: 10000; display: none; justify-content: center; align-items: center; padding: 20px; }
         .disclaimer-box { background: #12100e; padding: 30px; border-radius: 30px; border: 1px solid #FF9500; width: 100%; max-width: 400px; text-align: center; color: white; }
         .disclaimer-box h2 { font-family: 'Oswald'; color: #FF9500; margin-top: 0; }
@@ -73,7 +70,6 @@
         #lang-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); z-index: 9000; display: none; justify-content: center; align-items: center; }
         .lang-box { background: #0a0a0a; padding: 30px; border-radius: 25px; border: 1px solid #FF9500; width: 85%; max-width: 300px; text-align: center; }
 
-        /* MARKERI */
         .sport-marker-wrapper { display: flex; flex-direction: column; align-items: center; width: auto; position: relative; }
         .marker-ball-only { font-size: 16px; transition: all 0.3s; filter: drop-shadow(0 0 2px black); position: relative; z-index: 5; }
         .ball-halo { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 30px; height: 30px; border-radius: 50%; background: radial-gradient(circle, rgba(255,149,0,0.6) 0%, rgba(255,149,0,0) 70%); z-index: 4; pointer-events: none; animation: halo-pulse 2s infinite ease-in-out; }
@@ -93,7 +89,6 @@
         .zoom-near .marker-pointer { display: block; }
         .status-live-wrapper .marker-pointer { border-top-color: #FF9500; }
 
-        /* UNIFICIRAN DIZAJN KARTICA */
         .live-card-thin { 
             background: rgba(22, 18, 15, 0.98); border: 2px solid #FFCC00; border-radius: 12px; padding: 10px 14px; 
             display: none; flex-direction: column; width: max-content; min-width: 180px; color: white; 
@@ -121,7 +116,6 @@
         @keyframes soft-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
         .card-time-mini { font-size: 9px; color: #FFCC00; font-weight: 900; text-align: center; border-top: 1px solid #333; padding-top: 4px; margin-top: 4px; }
 
-        /* MATCH DETAILS & ADMIN */
         #match-details-view { position: fixed; bottom: -100%; left: 0; width: 100%; max-height: 90vh; background: #12100e; z-index: 8000; border-top: 3px solid #FF9500; border-radius: 30px 30px 0 0; padding: 20px; transition: 0.5s cubic-bezier(0.19, 1, 0.22, 1); overflow-y: auto; color: white; }
         #match-details-view.active { bottom: 0; }
         .details-header { text-align: center; margin-bottom: 20px; position: relative; }
@@ -561,11 +555,26 @@
         function triggerLogic(type) { 
             const d = allTereni.find(x => x.key === currentAdminKey); 
             if(type === 'period') { 
-                let sub = d.sub_details || {}; let n = Object.keys(sub).length; 
+                let sub = d.sub_details || {}; 
+                let keys = Object.keys(sub);
+                let n = keys.length;
                 let pName = (document.getElementById('adm-period-name').value || (translations[currentLang].periods[d.sport][n] || "P"+(n+1))).toUpperCase();
+
+                let pScore1 = d.score1 || 0;
+                let pScore2 = d.score2 || 0;
+
+                // Računanje rezultata samo za ovaj period
+                if(n > 0) {
+                    // Prolazimo kroz sve prethodne upisane periode i oduzimamo njihove vrednosti
+                    keys.forEach(k => {
+                        let parts = sub[k].split(' ');
+                        let lastRes = parts[parts.length - 1].split(':');
+                        pScore1 -= parseInt(lastRes[0]);
+                        pScore2 -= parseInt(lastRes[1]);
+                    });
+                }
                 
-                // Ovde je ključna izmena: Prikazujemo samo trenutni rezultat perioda (score1 : score2)
-                sub["P"+n] = `${pName} ${d.score1}:${d.score2}`; 
+                sub["P"+n] = `${pName} ${pScore1}:${pScore2}`; 
                 
                 db.ref(`tereni/${currentAdminKey}`).update({ sub_details: sub });
                 document.getElementById('adm-period-name').value = "";
