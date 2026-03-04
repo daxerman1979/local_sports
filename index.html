@@ -283,7 +283,14 @@
             updateUILanguage(); 
             if(document.getElementById('lang-modal').style.display === 'flex') toggleLangModal(); 
             if(currentAdminKey) refreshAdminPanel(currentAdminKey);
-            renderMarkers(); // Osveži popupe na mapi ako su otvoreni
+            
+            // Re-render popupa ako je otvoren
+            const openPopup = map.getBounds() && map.hasLayer(map._popup) ? map._popup : null;
+            if(openPopup) {
+                const latlng = openPopup.getLatLng();
+                openTerenForm(latlng.lat, latlng.lng);
+            }
+            renderMarkers(); 
         }
         
         function updateUILanguage() { 
@@ -340,7 +347,6 @@
             updateUILanguage(); 
             checkDisclaimer();
             
-            // UI Promena X u Logout
             if(auth.currentUser) {
                 document.getElementById('back-icon').style.display = 'block';
                 document.getElementById('back-x').style.display = 'none';
@@ -399,7 +405,7 @@
                     if(d.sport === "TENIS") {
                         const pts1 = (d.g1===6 && d.g2===6) ? (d.p1||0) : (tennisPoints[d.p1]||"0");
                         const pts2 = (d.g1===6 && d.g2===6) ? (d.p2||0) : (tennisPoints[d.p2]||"0");
-                        extraRows = `<div class="extra-data-row"><span class="extra-val">GEMS: ${d.g1||0}:${d.g2||0}</span><span class="extra-val">PTS: ${pts1}:${pts2}</span></div>`;
+                        extraRows = `<div class="extra-data-row"><span class="extra-val">${translations[currentLang].games}: ${d.g1||0}:${d.g2||0}</span><span class="extra-val">PTS: ${pts1}:${pts2}</span></div>`;
                     } else if(d.sport === "ODBOJKA") {
                         extraRows = `<div class="extra-data-row"><span class="extra-val">PTS: ${d.p1||0}:${d.p2||0}</span></div>`;
                     }
@@ -448,7 +454,12 @@
             const html = `
             <div style="display:flex; flex-direction:column; gap:10px;">
                 <select id="p_sport" onchange="toggleOtherSport(this.value)" style="background:#111; color:white; border:1px solid #444; border-radius:10px; padding:10px;">
-                    <option value="FUDBAL">FUDBAL</option><option value="KOŠARKA">KOŠARKA</option><option value="ODBOJKA">ODBOJKA</option><option value="TENIS">TENIS</option><option value="RUKOMET">RUKOMET</option><option value="OSTALO">OSTALO</option>
+                    <option value="FUDBAL">${t.periods.FUDBAL ? 'FUDBAL' : 'FOOTBALL'}</option>
+                    <option value="KOŠARKA">${t.periods.KOŠARKA ? 'KOŠARKA' : 'BASKETBALL'}</option>
+                    <option value="ODBOJKA">${t.periods.ODBOJKA ? 'ODBOJKA' : 'VOLLEYBALL'}</option>
+                    <option value="TENIS">${t.periods.TENIS ? 'TENIS' : 'TENNIS'}</option>
+                    <option value="RUKOMET">${t.periods.RUKOMET ? 'RUKOMET' : 'HANDBALL'}</option>
+                    <option value="OSTALO">${currentLang === 'sr' ? 'OSTALO' : 'OTHER'}</option>
                 </select>
                 <input type="text" id="p_custom_sport" placeholder="${t.otherSport}" style="display:none; background:#111; border:1px solid #444; border-radius:10px; padding:10px; color:white;">
                 <input type="text" id="p_name" placeholder="${t.courtName}" maxlength="15" style="background:#111; border:1px solid #444; border-radius:10px; padding:10px; color:white;">
