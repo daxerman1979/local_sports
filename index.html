@@ -23,7 +23,9 @@
         html, body { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background: #000; font-family: 'Inter', sans-serif; position: fixed; }
         
         input, select, textarea, datalist { 
-            font-size: 16px !important; outline: none !important; text-transform: uppercase; 
+            font-size: 16px !important; outline: none !important; 
+            /* Osigurava da se vizuelno uvek kuca velikim slovima */
+            text-transform: uppercase; 
             background: #1a1a1a; color: white; border: 1px solid #333; 
             padding: 12px; border-radius: 12px; font-family: 'Inter'; width: 100%;
         }
@@ -560,8 +562,11 @@
             const d = allTereni.find(x => x.key === currentAdminKey); 
             if(type === 'period') { 
                 let sub = d.sub_details || {}; let n = Object.keys(sub).length; 
-                let pName = document.getElementById('adm-period-name').value || (translations[currentLang].periods[d.sport][n] || "P"+(n+1));
+                let pName = (document.getElementById('adm-period-name').value || (translations[currentLang].periods[d.sport][n] || "P"+(n+1))).toUpperCase();
+                
+                // Ovde je ključna izmena: Prikazujemo samo trenutni rezultat perioda (score1 : score2)
                 sub["P"+n] = `${pName} ${d.score1}:${d.score2}`; 
+                
                 db.ref(`tereni/${currentAdminKey}`).update({ sub_details: sub });
                 document.getElementById('adm-period-name').value = "";
             } else if(type === 'end') db.ref(`tereni/${currentAdminKey}`).update({ status: 'ended' }); 
@@ -583,9 +588,8 @@
         function toggleSearch() { document.getElementById('search-container').classList.toggle('expanded'); if(document.getElementById('search-container').classList.contains('expanded')) document.getElementById('city-search').focus(); }
         
         function handleSearch(e) { 
-            // Pokreni ako je pritisnut Enter (Search/Go na tastaturi) ILI ako je polje izgubilo fokus nakon unosa (blur)
             if (e.key === "Enter" || e.type === "blur") { 
-                const query = document.getElementById('city-search').value;
+                const query = document.getElementById('city-search').value.toUpperCase();
                 if (!query) return;
                 
                 fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}`)
@@ -593,7 +597,6 @@
                 .then(data => { 
                     if(data[0]) { 
                         map.flyTo([data[0].lat, data[0].lon], 15); 
-                        // Zatvori search UI i skloni tastaturu
                         document.getElementById('search-container').classList.remove('expanded');
                         document.getElementById('city-search').blur(); 
                     } 
