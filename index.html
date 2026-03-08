@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover">
-    <title>MAPLAY - Rezultati Uživo</title>
+    <title>LOWLIG - Grassroots Tracker</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -16,7 +16,7 @@
     </script>
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;700;900&family=Permanent+Marker&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700;900&family=Inter:wght@400;700;900&family=Permanent+Marker&display=swap" rel="stylesheet">
     
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; touch-action: pan-x pan-y; }
@@ -38,11 +38,13 @@
         #search-container.expanded #city-search { opacity: 1; pointer-events: all; }
         .search-icon { position: absolute; left: 10px; width: 20px; height: 20px; filter: brightness(0) invert(1); opacity: 0.8; cursor: pointer; z-index: 5001; }
 
-        /* Nova slika ubačena preko stabilnog URL-a za bolji mobilni prikaz */
-        #hero { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.95)), url('https://images.unsplash.com/photo-1504450758481-7338eba7524a?q=80&w=1000&auto=format&fit=crop') center/cover; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 6000; color: white; padding: 20px; }
+        /* LOWLIG HERO STYLE */
+        #hero { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.95)), url('https://images.unsplash.com/photo-1526232762682-d2f5f714dfc3?q=80&w=1000&auto=format&fit=crop') center/cover; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 6000; color: white; padding: 20px; }
         
-        .hero-logo { font-family: 'Permanent Marker', cursive; font-size: 72px; color: #FF9500; text-shadow: 4px 4px 0px #000; transform: rotate(-2deg); margin-bottom: 0; }
-        .hero-subtitle { font-family: 'Oswald'; font-weight: 700; font-size: 18px; text-transform: uppercase; letter-spacing: 5px; color: #fff; margin-bottom: 30px; margin-top: -10px; }
+        .hero-logo { font-family: 'Oswald', sans-serif; font-weight: 900; font-size: 82px; color: #fff; line-height: 0.8; letter-spacing: -4px; margin: 0; text-align: center; }
+        .hero-logo span { color: #FF9500; }
+        .hero-subtitle { font-family: 'Inter'; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 8px; color: #FF9500; margin-bottom: 40px; margin-top: 10px; }
+        
         .auth-box { background: rgba(18,16,14,0.95); backdrop-filter: blur(25px); padding: 35px; border-radius: 30px; width: 100%; max-width: 360px; display: flex; flex-direction: column; gap: 15px; border: 1px solid rgba(255,149,0,0.4); }
         .auth-btn { background: #FF9500; color: white; border: none; padding: 16px; font-weight: 900; cursor: pointer; text-transform: uppercase; border-radius: 12px; font-family: 'Oswald'; box-shadow: 0 4px 15px rgba(255,149,0,0.3); }
 
@@ -161,8 +163,8 @@
     </div>
 
     <div id="hero">
-        <div class="hero-logo">MAPLAY</div>
-        <div class="hero-subtitle" id="txt-subtitle">Result Tracker</div>
+        <h1 class="hero-logo">LOW<span>LIG</span></h1>
+        <div class="hero-subtitle" id="txt-subtitle">TRUE GRASSROOTS TRACKER</div>
         <div class="auth-box">
             <input type="email" id="email" placeholder="EMAIL">
             <input type="password" id="password" placeholder="PASSWORD">
@@ -267,13 +269,13 @@
 
         const translations = {
             sr: { 
-                subtitle: "Result Tracker", login: "ULAZ U SISTEM", explore: "ISTRAŽI MAPU", search: "Pretraži...", periodRes: "Rezultat po periodima", matchEvents: "Događaji na meču", adminTitle: "ADMIN TABLA", savePeriod: "SAČUVAJ PERIOD", goLive: "KRENI UŽIVO", endMatch: "ZAVRŠI MEČ", resetMatch: "RESET / NOVI MEČ", schedule: "ZAKAŽI MEČ", deleteCourt: "OBRIŠI TEREN", zoneOccupied: "ZONA ZAUZETA!", create: "KRENI", courtName: "NAZIV TERENA", player: "IME IGRAČA", team: "TIM", loggedAs: "ULOGOVAN:", localMatch: "LOKALNI MEČ", points: "POENI", games: "GEMOVI", league: "LIGA (NOVA)", team1: "TIM 1", team2: "TIM 2", goal: "GOL", yellow: "ŽUTI", red: "CRVENI", confirmDelete: "OBRISATI?", timeAt: "U", live: "UŽIVO", limitReached: "LIMIT DOSTIGNUT!", addCourt: "DODAJ TEREN", otherSport: "UPIŠI SPORT",
+                subtitle: "TRUE GRASSROOTS TRACKER", login: "ULAZ U SISTEM", explore: "ISTRAŽI MAPU", search: "Pretraži...", periodRes: "Rezultat po periodima", matchEvents: "Događaji na meču", adminTitle: "ADMIN TABLA", savePeriod: "SAČUVAJ PERIOD", goLive: "KRENI UŽIVO", endMatch: "ZAVRŠI MEČ", resetMatch: "RESET / NOVI MEČ", schedule: "ZAKAŽI MEČ", deleteCourt: "OBRIŠI TEREN", zoneOccupied: "ZONA ZAUZETA!", create: "KRENI", courtName: "NAZIV TERENA", player: "IME IGRAČA", team: "TIM", loggedAs: "ULOGOVAN:", localMatch: "LOKALNI MEČ", points: "POENI", games: "GEMOVI", league: "LIGA (NOVA)", team1: "TIM 1", team2: "TIM 2", goal: "GOL", yellow: "ŽUTI", red: "CRVENI", confirmDelete: "OBRISATI?", timeAt: "U", live: "UŽIVO", limitReached: "LIMIT DOSTIGNUT!", addCourt: "DODAJ TEREN", otherSport: "UPIŠI SPORT",
                 discH2: "NAPOMENA", discText: "Sav sadržaj na ovom sajtu je nezvaničnog karaktera. Vlasnik sajta ne odgovara za tačnost informacija. Sajt služi isključivo u svrhe zabave.", discLabel: "Prihvatam uslove korišćenja.", discBtn: "NASTAVI",
                 sportNames: { FUDBAL: "FUDBAL", KOŠARKA: "KOŠARKA", ODBOJKA: "ODBOJKA", TENIS: "TENIS", RUKOMET: "RUKOMET", OSTALO: "OSTALO" },
                 periods: { FUDBAL: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "PROD"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], TENIS: ["S1", "S2", "S3", "S4", "S5"], OSTALO: [] } 
             },
             en: { 
-                subtitle: "Result Tracker", login: "ENTER SYSTEM", explore: "EXPLORE MAP", search: "Search...", periodRes: "Period Results", matchEvents: "Match Events", adminTitle: "ADMIN PANEL", savePeriod: "SAVE PERIOD", goLive: "GO LIVE", endMatch: "END MATCH", resetMatch: "RESET / NEW MATCH", schedule: "SCHEDULE MATCH", deleteCourt: "DELETE COURT", zoneOccupied: "ZONE OCCUPIED!", create: "CREATE", courtName: "COURT NAME", player: "PLAYER NAME", team: "TEAM", loggedAs: "LOGGED:", localMatch: "LOCAL MATCH", points: "POINTS", games: "GAMES", league: "LEAGUE (NEW)", team1: "TEAM 1", team2: "TEAM 2", goal: "GOAL", yellow: "YELLOW", red: "RED", confirmDelete: "DELETE?", timeAt: "AT", live: "LIVE", limitReached: "LIMIT REACHED!", addCourt: "ADD COURT", otherSport: "ENTER SPORT",
+                subtitle: "TRUE GRASSROOTS TRACKER", login: "ENTER SYSTEM", explore: "EXPLORE MAP", search: "Search...", periodRes: "Period Results", matchEvents: "Match Events", adminTitle: "ADMIN PANEL", savePeriod: "SAVE PERIOD", goLive: "GO LIVE", endMatch: "END MATCH", resetMatch: "RESET / NEW MATCH", schedule: "SCHEDULE MATCH", deleteCourt: "DELETE COURT", zoneOccupied: "ZONE OCCUPIED!", create: "CREATE", courtName: "COURT NAME", player: "PLAYER NAME", team: "TEAM", loggedAs: "LOGGED:", localMatch: "LOCAL MATCH", points: "POINTS", games: "GAMES", league: "LEAGUE (NEW)", team1: "TEAM 1", team2: "TEAM 2", goal: "GOAL", yellow: "YELLOW", red: "RED", confirmDelete: "DELETE?", timeAt: "AT", live: "LIVE", limitReached: "LIMIT REACHED!", addCourt: "ADD COURT", otherSport: "ENTER SPORT",
                 discH2: "DISCLAIMER", discText: "All content on this site is unofficial. The site owner is not responsible for information accuracy. The site is for entertainment purposes only.", discLabel: "I accept terms of use.", discBtn: "CONTINUE",
                 sportNames: { FUDBAL: "FOOTBALL", KOŠARKA: "BASKETBALL", ODBOJKA: "VOLLEYBALL", TENIS: "TENNIS", RUKOMET: "HANDBALL", OSTALO: "OTHER" },
                 periods: { FUDBAL: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "OT"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], TENIS: ["S1", "S2", "S3", "S4", "S5"], OSTALO: [] } 
