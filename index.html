@@ -55,9 +55,13 @@
         .auth-box { background: rgba(25,25,25,0.6); backdrop-filter: blur(25px); padding: 30px; border-radius: 30px; width: 100%; max-width: 360px; display: flex; flex-direction: column; gap: 12px; border: 1px solid rgba(255,255,255,0.1); position: relative; z-index: 1; }
         .auth-btn { background: #FF9500; color: white; border: none; padding: 18px; font-weight: 900; cursor: pointer; text-transform: uppercase; border-radius: 16px; font-family: 'Oswald'; box-shadow: 0 10px 20px rgba(255,149,0,0.2); font-size: 18px; }
 
-        .home-lang-switch { display: flex; gap: 25px; justify-content: center; margin-top: 20px; }
-        .home-lang-btn { font-size: 32px; cursor: pointer; transition: 0.3s; opacity: 0.6; filter: grayscale(0.5); }
-        .home-lang-btn:hover, .home-lang-btn.active { opacity: 1; filter: grayscale(0); transform: scale(1.1); }
+        .home-lang-switch { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
+        .home-lang-text-btn { 
+            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); 
+            color: white; padding: 8px 15px; border-radius: 10px; font-size: 12px; 
+            font-weight: 800; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .home-lang-text-btn.active { background: #FF9500; border-color: #FF9500; }
 
         /* UI CONTROLS */
         #search-container { position: absolute; top: 20px; left: 20px; z-index: 5000; display: flex; align-items: center; transition: all 0.4s ease; width: 40px; height: 40px; background: rgba(18, 16, 14, 0.6); border-radius: 20px; backdrop-filter: blur(10px); overflow: hidden; border: 1px solid rgba(255,149,0,0.3); }
@@ -125,7 +129,7 @@
         .admin-btn { padding: 12px; border: none; font-weight: 900; color: white; text-transform: uppercase; width: 100%; border-radius: 12px; cursor: pointer; font-family: 'Oswald'; margin-bottom: 8px; }
         
         .admin-event-item { background: #1a1a1a; padding: 8px 12px; border-radius: 8px; margin-bottom: 5px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; border-left: 3px solid #FF9500; }
-        .delete-event-btn { color: #ff4444; font-size: 18px; cursor: pointer; padding: 0 5px; }
+        .delete-event-btn { color: #ff4444; font-size: 24px; cursor: pointer; padding: 0 5px; font-weight: bold; }
 
         .user-location-dot { background: #007AFF; width: 14px; height: 14px; border: 2px solid white; border-radius: 50%; box-shadow: 0 0 20px #007AFF; }
         .animated-range-circle { animation: pulse-circle 4s infinite ease-in-out; }
@@ -155,8 +159,8 @@
             <button class="auth-btn" id="btn-login" onclick="handleAuth()">ULAZ U SISTEM</button>
             <button id="btn-explore" onclick="exploreMap()" style="background:none; border:none; color:#eee; cursor:pointer; font-weight:bold; margin-top:10px; text-decoration: none; font-size:13px; text-transform:uppercase; letter-spacing:1px; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">ISTRAŽI MAPU</button>
             <div class="home-lang-switch">
-                <div class="home-lang-btn" id="h-lang-sr" onclick="setLanguage('sr')">🇷🇸</div>
-                <div class="home-lang-btn" id="h-lang-en" onclick="setLanguage('en')">🇺🇸</div>
+                <div class="home-lang-text-btn" id="h-lang-sr" onclick="setLanguage('sr')">BALKAN</div>
+                <div class="home-lang-text-btn" id="h-lang-en" onclick="setLanguage('en')">ENGLISH</div>
             </div>
         </div>
     </div>
@@ -179,8 +183,8 @@
     <div id="lang-modal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); backdrop-filter:blur(10px); z-index:9000; display:none; justify-content:center; align-items:center;" onclick="toggleLangModal()">
         <div class="lang-box" style="background:#0a0a0a; padding:30px; border-radius:25px; border:1px solid #FF9500; width:85%; max-width:300px; text-align:center;" onclick="event.stopPropagation()">
             <h3 style="color:white; margin-bottom:20px; font-family:'Oswald';" id="lang-title">JEZIK / LANGUAGE</h3>
-            <button class="admin-btn" style="background:#1a1a1a; margin-bottom:10px; border: 1px solid #333; display: flex; align-items: center; justify-content: center; gap: 10px;" onclick="setLanguage('sr')"><span>🇷🇸</span> SRPSKI</button>
-            <button class="admin-btn" style="background:#1a1a1a; border: 1px solid #333; display: flex; align-items: center; justify-content: center; gap: 10px;" onclick="setLanguage('en')"><span>🇺🇸</span> ENGLISH</button>
+            <button class="admin-btn" style="background:#1a1a1a; margin-bottom:10px; border: 1px solid #333;" onclick="setLanguage('sr')">BALKAN</button>
+            <button class="admin-btn" style="background:#1a1a1a; border: 1px solid #333;" onclick="setLanguage('en')">ENGLISH</button>
         </div>
     </div>
 
@@ -199,7 +203,7 @@
         <span class="details-section-title" id="txt-period-res" style="color:#777; font-size:11px; font-weight:900; text-transform:uppercase; margin-bottom:10px; display:block;">Rezultat po periodima</span>
         <div id="det-periods" style="display:flex; flex-wrap:nowrap; gap:8px; margin-bottom:20px; overflow-x:auto; padding-bottom:5px; justify-content:space-evenly;"></div>
         <div id="det-stats-container" style="display:none; margin-top:10px;">
-            <span class="details-section-title" style="color:#777; font-size:11px; font-weight:900; text-transform:uppercase; margin-bottom:10px; display:block;">Događaji na meču</span>
+            <span class="details-section-title" id="txt-match-events" style="color:#777; font-size:11px; font-weight:900; text-transform:uppercase; margin-bottom:10px; display:block;">Događaji na meču</span>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;">
                 <div id="det-events-home" style="display:flex; flex-direction:column; gap:5px;"></div>
                 <div id="det-events-away" style="display:flex; flex-direction:column; gap:5px; text-align:right;"></div>
@@ -255,13 +259,13 @@
 
         const translations = {
             sr: { 
-                subtitle: "TRUE GRASSROOTS TRACKER", login: "ULAZ U SISTEM", explore: "ISTRAŽI MAPU", search: "Pretraži...", periodRes: "Rezultat po periodima", adminTitle: "ADMIN TABLA", savePeriod: "SAČUVAJ PERIOD", goLive: "KRENI UŽIVO", endMatch: "ZAVRŠI MEČ", resetMatch: "RESET / NOVI MEČ", schedule: "ZAKAŽI MEČ", deleteCourt: "OBRIŠI TEREN", zoneOccupied: "ZONA ZAUZETA!", create: "KRENI", courtName: "NAZIV TERENA", player: "IME IGRAČA", loggedAs: "ULOGOVAN:", points: "POENI", games: "GEMOVI", league: "LIGA (NOVA)", team1: "TIM 1", team2: "TIM 2", goal: "GOL", yellow: "ŽUTI", red: "CRVENI", confirmDelete: "OBRISATI?", timeAt: "U", live: "UŽIVO", limitReached: "LIMIT DOSTIGNUT!", addCourt: "DODAJ TEREN", otherSport: "UPIŠI SPORT",
+                subtitle: "TRUE GRASSROOTS TRACKER", login: "ULAZ U SISTEM", explore: "ISTRAŽI MAPU", search: "Pretraži...", periodRes: "Rezultat po periodima", matchEvents: "Događaji na meču", adminTitle: "ADMIN TABLA", savePeriod: "SAČUVAJ PERIOD", goLive: "KRENI UŽIVO", endMatch: "ZAVRŠI MEČ", resetMatch: "RESET / NOVI MEČ", schedule: "ZAKAŽI MEČ", deleteCourt: "OBRIŠI TEREN", zoneOccupied: "ZONA ZAUZETA!", create: "KRENI", courtName: "NAZIV TERENA", player: "IME IGRAČA", loggedAs: "ULOGOVAN:", points: "POENI", games: "GEMOVI", league: "LIGA (NOVA)", team1: "TIM 1", team2: "TIM 2", goal: "GOL", yellow: "ŽUTI", red: "CRVENI", confirmDelete: "OBRISATI?", timeAt: "U", live: "UŽIVO", limitReached: "LIMIT DOSTIGNUT!", addCourt: "DODAJ TEREN", otherSport: "UPIŠI SPORT",
                 discH2: "NAPOMENA", discText: "Sav sadržaj na ovom sajtu je nezvaničnog karaktera. Vlasnik sajta ne odgovara za tačnost informacija. Sajt služi isključivo u svrhe zabave.", discLabel: "Prihvatam uslove korišćenja.", discBtn: "NASTAVI",
                 sportNames: { FUDBAL: "FUDBAL", KOŠARKA: "KOŠARKA", ODBOJKA: "ODBOJKA", TENIS: "TENIS", RUKOMET: "RUKOMET", OSTALO: "OSTALO" },
                 periods: { FUDBAL: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "PROD"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], TENIS: ["S1", "S2", "S3", "S4", "S5"], OSTALO: [] } 
             },
             en: { 
-                subtitle: "TRUE GRASSROOTS TRACKER", login: "ENTER SYSTEM", explore: "EXPLORE MAP", search: "Search...", periodRes: "Period Results", adminTitle: "ADMIN PANEL", savePeriod: "SAVE PERIOD", goLive: "GO LIVE", endMatch: "END MATCH", resetMatch: "RESET / NEW MATCH", schedule: "SCHEDULE MATCH", deleteCourt: "DELETE COURT", zoneOccupied: "ZONE OCCUPIED!", create: "CREATE", courtName: "COURT NAME", player: "PLAYER NAME", loggedAs: "LOGGED:", points: "POINTS", games: "GAMES", league: "LEAGUE (NEW)", team1: "TEAM 1", team2: "TEAM 2", goal: "GOAL", yellow: "YELLOW", red: "RED", confirmDelete: "DELETE?", timeAt: "AT", live: "LIVE", limitReached: "LIMIT REACHED!", addCourt: "ADD COURT", otherSport: "ENTER SPORT",
+                subtitle: "TRUE GRASSROOTS TRACKER", login: "ENTER SYSTEM", explore: "EXPLORE MAP", search: "Search...", periodRes: "Period Results", matchEvents: "Match Events", adminTitle: "ADMIN PANEL", savePeriod: "SAVE PERIOD", goLive: "GO LIVE", endMatch: "END MATCH", resetMatch: "RESET / NEW MATCH", schedule: "SCHEDULE MATCH", deleteCourt: "DELETE COURT", zoneOccupied: "ZONE OCCUPIED!", create: "CREATE", courtName: "COURT NAME", player: "PLAYER NAME", loggedAs: "LOGGED:", points: "POINTS", games: "GAMES", league: "LEAGUE (NEW)", team1: "TEAM 1", team2: "TEAM 2", goal: "GOAL", yellow: "YELLOW", red: "RED", confirmDelete: "DELETE?", timeAt: "AT", live: "LIVE", limitReached: "LIMIT REACHED!", addCourt: "ADD COURT", otherSport: "ENTER SPORT",
                 discH2: "DISCLAIMER", discText: "All content on this site is unofficial. The site owner is not responsible for information accuracy. The site is for entertainment purposes only.", discLabel: "I accept terms of use.", discBtn: "CONTINUE",
                 sportNames: { FUDBAL: "FOOTBALL", KOŠARKA: "BASKETBALL", ODBOJKA: "VOLLEYBALL", TENIS: "TENNIS", RUKOMET: "HANDBALL", OSTALO: "OTHER" },
                 periods: { FUDBAL: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "OT"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], TENIS: ["S1", "S2", "S3", "S4", "S5"], OSTALO: [] } 
@@ -284,6 +288,7 @@
             document.getElementById('btn-explore').innerText = t.explore; 
             document.getElementById('city-search').placeholder = t.search; 
             document.getElementById('txt-period-res').innerText = t.periodRes; 
+            document.getElementById('txt-match-events').innerText = t.matchEvents;
             document.getElementById('adm-name').innerText = t.adminTitle; 
             document.getElementById('btn-save-period').innerText = t.savePeriod; 
             document.getElementById('start-live-btn').innerText = t.goLive; 
@@ -299,8 +304,8 @@
             document.getElementById('disclaimer-label').innerText = t.discLabel;
             document.getElementById('disclaimer-btn').innerText = t.discBtn;
             
-            document.querySelectorAll('.home-lang-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById('h-lang-' + (currentLang === 'en' ? 'en' : 'sr')).classList.add('active');
+            document.querySelectorAll('.home-lang-text-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('h-lang-' + currentLang).classList.add('active');
 
             if(auth.currentUser) document.getElementById('user-indicator').innerText = `${t.loggedAs} ${auth.currentUser.email}`; 
         }
@@ -497,12 +502,11 @@
             const d = allTereni.find(x => x.key === key); if(!d) return; const t = translations[currentLang];
             document.getElementById('adm-name').innerText = d.name; document.getElementById('adm-main-score').innerText = `${d.score1 || 0} : ${d.score2 || 0}`;
             
-            // Events List Update
             const evList = document.getElementById('adm-events-list'); evList.innerHTML = "";
             if(d.events) {
                 Object.entries(d.events).forEach(([evKey, ev]) => {
                     evList.innerHTML += `<div class="admin-event-item">
-                        <span>${ev.emoji} ${ev.player} (${ev.team == 1 ? (d.t1||'T1') : (d.t2||'T2')})</span>
+                        <span>${ev.emoji} ${ev.player} (${ev.team == 1 ? (d.t1||t.team1) : (d.t2||t.team2)})</span>
                         <span class="delete-event-btn" onclick="deleteEvent('${evKey}')">&times;</span>
                     </div>`;
                 });
@@ -533,7 +537,7 @@
             }
         }
 
-        function deleteEvent(evKey) { if(confirm('Obrisati?')) db.ref(`tereni/${currentAdminKey}/events/${evKey}`).remove(); }
+        function deleteEvent(evKey) { if(confirm(translations[currentLang].confirmDelete)) db.ref(`tereni/${currentAdminKey}/events/${evKey}`).remove(); }
 
         function proScore(team, sign) { 
             const d = allTereni.find(x => x.key === currentAdminKey); if(!d || d.status !== 'live') return; 
@@ -568,6 +572,7 @@
         function adminDelete() { if(confirm(translations[currentLang].confirmDelete)) { db.ref(`tereni/${currentAdminKey}/`).remove(); closeAdmin(); } }
         function resetMatch() { db.ref(`tereni/${currentAdminKey}/`).update({ t1: null, t2: null, status: 'upcoming', score1: 0, score2: 0, sub_details: null, events: null, p1: 0, p2: 0, g1: 0, g2: 0 }); }
         async function setupMatch() { 
+            const t = translations[currentLang];
             let l = document.getElementById('adm-league-input').value.toUpperCase(), t1 = document.getElementById('adm-t1').value.toUpperCase(), t2 = document.getElementById('adm-t2').value.toUpperCase(), time = document.getElementById('adm-time').value; 
             if(!t1 || !t2) return; 
             await db.ref(`tereni/${currentAdminKey}`).update({ league: l, t1, t2, match_time: time, status: 'upcoming', score1: 0, score2: 0, events: null, sub_details: null, p1: 0, p2: 0, g1: 0, g2: 0 }); 
