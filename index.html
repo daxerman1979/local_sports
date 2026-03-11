@@ -262,7 +262,7 @@
                 subtitle: "TRUE GRASSROOTS TRACKER", login: "ULAZ U SISTEM", explore: "ISTRAŽI MAPU", search: "Pretraži...", periodRes: "Rezultat po periodima", matchEvents: "Događaji na meču", adminTitle: "ADMIN TABLA", savePeriod: "SAČUVAJ PERIOD", goLive: "KRENI UŽIVO", endMatch: "ZAVRŠI MEČ", resetMatch: "RESET / NOVI MEČ", schedule: "ZAKAŽI MEČ", deleteCourt: "OBRIŠI TEREN", zoneOccupied: "ZONA ZAUZETA!", create: "KRENI", courtName: "NAZIV TERENA", player: "IME IGRAČA", loggedAs: "ULOGOVAN:", points: "POENI", games: "GEMOVI", league: "LIGA (NOVA)", team1: "TIM 1", team2: "TIM 2", goal: "GOL", yellow: "ŽUTI", red: "CRVENI", confirmDelete: "OBRISATI?", timeAt: "U", live: "UŽIVO", limitReached: "LIMIT DOSTIGNUT!", addCourt: "DODAJ TEREN", otherSport: "UPIŠI SPORT",
                 discH2: "NAPOMENA", discText: "Sav sadržaj na ovom sajtu je nezvaničnog karaktera. Vlasnik sajta ne odgovara za tačnost informacija. Sajt služi isključivo u svrhe zabave.", discLabel: "Prihvatam uslove korišćenja.", discBtn: "NASTAVI",
                 sportNames: { FUDBAL: "FUDBAL", KOŠARKA: "KOŠARKA", ODBOJKA: "ODBOJKA", TENIS: "TENIS", RUKOMET: "RUKOMET", OSTALO: "OSTALO" },
-                periods: { FUDBAL: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "PROD"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], TENIS: ["S1", "S2", "S3", "S4", "S5"], OSTALO: [] } 
+                periods: { FUDBAL: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "PROD"], ODBOJKA: ["1.SET", "2.SET", "3.SET", "4.SET", "5.SET"], RUKOMET: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], TENIS: ["1.SET", "2.SET", "3.SET", "4.SET", "5.SET"], OSTALO: [] } 
             },
             en: { 
                 subtitle: "TRUE GRASSROOTS TRACKER", login: "ENTER SYSTEM", explore: "EXPLORE MAP", search: "Search...", periodRes: "Period Results", matchEvents: "Match Events", adminTitle: "ADMIN PANEL", savePeriod: "SAVE PERIOD", goLive: "GO LIVE", endMatch: "END MATCH", resetMatch: "RESET / NEW MATCH", schedule: "SCHEDULE MATCH", deleteCourt: "DELETE COURT", zoneOccupied: "ZONE OCCUPIED!", create: "CREATE", courtName: "COURT NAME", player: "PLAYER NAME", loggedAs: "LOGGED:", points: "POINTS", games: "GAMES", league: "LEAGUE (NEW)", team1: "TEAM 1", team2: "TEAM 2", goal: "GOAL", yellow: "YELLOW", red: "RED", confirmDelete: "DELETE?", timeAt: "AT", live: "LIVE", limitReached: "LIMIT REACHED!", addCourt: "ADD COURT", otherSport: "ENTER SPORT",
@@ -465,7 +465,7 @@
             const s = document.getElementById('p_sport').value;
             const cs = document.getElementById('p_custom_sport').value.toUpperCase();
             if (allTereni.filter(t => t.owner === auth.currentUser.uid).length >= 3) { alert(translations[currentLang].limitReached); return; }
-            await db.ref('tereni').push({ name: n, lat, lng, owner: auth.currentUser.uid, sport: s, custom_sport: cs, status: 'upcoming', score1: 0, score2: 0 }); 
+            await db.ref('tereni').push({ name: n, lat, lng, owner: auth.currentUser.uid, sport: s, custom_sport: cs, status: 'upcoming', score1: 0, score2: 0, p1: 0, p2: 0, g1: 0, g2: 0 }); 
             map.closePopup(); 
         }
 
@@ -514,7 +514,7 @@
 
             let subS = d.sub_details ? Object.values(d.sub_details).join(' | ') : ""; 
             if(d.sport === "ODBOJKA") subS = t.points + `: ${d.p1 || 0}:${d.p2 || 0} | ` + subS; 
-            if(d.sport === "TENIS") { const pts1 = (d.g1===6&&d.g2===6) ? (d.p1||0) : (tennisPoints[d.p1]||"0"); const pts2 = (d.g1===6&&d.g2===6) ? (d.p2||0) : (tennisPoints[d.p2]||"0"); subS = t.games + `: ${d.g1||0}:${d.g2||0} (${pts1}:${pts2}) | ` + subS; }
+            if(d.sport === "TENIS") { const pts1 = (d.g1===6&&d.g2===6) ? (d.p1||0) : (tennisPoints[d.p1]||"0"); const pts2 = (d.g1===6&&d.g2===6) ? (d.p1||0) : (tennisPoints[d.p2]||"0"); subS = t.games + `: ${d.g1||0}:${d.g2||0} (${pts1}:${pts2}) | ` + subS; }
             document.getElementById('adm-sub-display').innerText = subS;
             
             const ctrl = document.getElementById('adm-sport-controls'); ctrl.innerHTML = "";
@@ -541,14 +541,39 @@
 
         function proScore(team, sign) { 
             const d = allTereni.find(x => x.key === currentAdminKey); if(!d || d.status !== 'live') return; 
-            if(d.sport === "ODBOJKA") { let p1 = d.p1 || 0, p2 = d.p2 || 0; if(team === 1) p1 = Math.max(0, p1 + sign); else p2 = Math.max(0, p2 + sign); db.ref(`tereni/${currentAdminKey}`).update({ p1, p2 }); } 
+            if(d.sport === "ODBOJKA") { 
+                let p1 = d.p1 || 0, p2 = d.p2 || 0, s1 = d.score1 || 0, s2 = d.score2 || 0;
+                if(team === 1) p1 = Math.max(0, p1 + sign); else p2 = Math.max(0, p2 + sign);
+                // Automatski set ako se dodje do 25 (ili 15 u petom setu)
+                const limit = (s1+s2 >= 4) ? 15 : 25;
+                if(p1 >= limit && (p1 - p2) >= 2) { triggerLogic('period'); s1++; p1=0; p2=0; }
+                else if(p2 >= limit && (p2 - p1) >= 2) { triggerLogic('period'); s2++; p1=0; p2=0; }
+                db.ref(`tereni/${currentAdminKey}`).update({ p1, p2, score1: s1, score2: s2 });
+            } 
             else if(d.sport === "TENIS") { 
-                let p1 = d.p1 || 0, p2 = d.p2 || 0, g1 = d.g1 || 0, g2 = d.g2 || 0;
+                let p1 = d.p1 || 0, p2 = d.p2 || 0, g1 = d.g1 || 0, g2 = d.g2 || 0, s1 = d.score1 || 0, s2 = d.score2 || 0;
                 if(sign === 1) {
-                    if(team === 1) { if(p1 === 3 && p2 < 3) { g1++; p1=0; p2=0; } else if(p1 === 3 && p2 === 3) p1 = 4; else if(p1 === 3 && p2 === 4) p2 = 3; else if(p1 === 4) { g1++; p1=0; p2=0; } else p1++; }
-                    else { if(p2 === 3 && p1 < 3) { g2++; p1=0; p2=0; } else if(p2 === 3 && p1 === 3) p2 = 4; else if(p2 === 3 && p1 === 4) p1 = 3; else if(p2 === 4) { g2++; p1=0; p2=0; } else p2++; }
-                } else { p1 = Math.max(0, p1 - 1); p2 = Math.max(0, p2 - 1); }
-                db.ref(`tereni/${currentAdminKey}`).update({ p1, p2, g1, g2 });
+                    if(team === 1) { 
+                        if(p1 === 3 && p2 < 3) { g1++; p1=0; p2=0; } 
+                        else if(p1 === 3 && p2 === 3) p1 = 4; // AD
+                        else if(p1 === 3 && p2 === 4) p2 = 3; // Back to Deuce
+                        else if(p1 === 4) { g1++; p1=0; p2=0; } 
+                        else p1++; 
+                    }
+                    else { 
+                        if(p2 === 3 && p1 < 3) { g2++; p1=0; p2=0; } 
+                        else if(p2 === 3 && p1 === 3) p2 = 4; 
+                        else if(p2 === 3 && p1 === 4) p1 = 3; 
+                        else if(p2 === 4) { g2++; p1=0; p2=0; } 
+                        else p2++; 
+                    }
+                    // Provera za kraj seta
+                    if((g1 >= 6 && (g1-g2) >= 2) || g1 === 7) { triggerLogic('period'); s1++; g1=0; g2=0; p1=0; p2=0; }
+                    else if((g2 >= 6 && (g2-g1) >= 2) || g2 === 7) { triggerLogic('period'); s2++; g1=0; g2=0; p1=0; p2=0; }
+                } else { 
+                    if(team === 1) p1 = Math.max(0, p1 - 1); else p2 = Math.max(0, p2 - 1);
+                }
+                db.ref(`tereni/${currentAdminKey}`).update({ p1, p2, g1, g2, score1: s1, score2: s2 });
             } else { db.ref(`tereni/${currentAdminKey}`).update({ [`score${team}`]: Math.max(0, (d[`score${team}`] || 0) + sign) }); }
         }
 
@@ -556,12 +581,21 @@
             const d = allTereni.find(x => x.key === currentAdminKey); 
             if(type === 'period') { 
                 let sub = d.sub_details || {}; 
-                let keys = Object.keys(sub);
-                let n = keys.length;
+                let n = Object.keys(sub).length;
                 let pName = (document.getElementById('adm-period-name').value || (translations[currentLang].periods[d.sport][n] || "P"+(n+1))).toUpperCase();
-                let pScore1 = d.score1 || 0; let pScore2 = d.score2 || 0;
-                if(n > 0) { keys.forEach(k => { let lastRes = sub[k].split(' ').pop().split(':'); pScore1 -= parseInt(lastRes[0]); pScore2 -= parseInt(lastRes[1]); }); }
-                sub["P"+n] = `${pName} ${pScore1}:${pScore2}`; 
+                
+                let pScore1, pScore2;
+                if(d.sport === "ODBOJKA") { pScore1 = d.p1 || 0; pScore2 = d.p2 || 0; }
+                else if(d.sport === "TENIS") { pScore1 = d.g1 || 0; pScore2 = d.g2 || 0; }
+                else {
+                    pScore1 = d.score1 || 0; pScore2 = d.score2 || 0;
+                    Object.values(sub).forEach(v => { 
+                        let lastRes = v.split(' ').pop().split(':'); 
+                        pScore1 -= parseInt(lastRes[0]); pScore2 -= parseInt(lastRes[1]); 
+                    });
+                }
+                
+                sub["P"+Date.now()] = `${pName} ${pScore1}:${pScore2}`; 
                 db.ref(`tereni/${currentAdminKey}`).update({ sub_details: sub });
                 document.getElementById('adm-period-name').value = "";
             } else if(type === 'end') db.ref(`tereni/${currentAdminKey}`).update({ status: 'ended' }); 
