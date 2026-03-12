@@ -515,11 +515,14 @@
             const d = allTereni.find(x => x.key === key); if(!d) return; const t = translations[currentLang];
             document.getElementById('adm-name').innerText = d.name; document.getElementById('adm-main-score').innerText = `${d.score1 || 0} : ${d.score2 || 0}`;
             let subS = d.sub_details ? Object.values(d.sub_details).join(' | ') : ""; 
+            
+            // Prikaz dodatnih informacija u zavisnosti od sporta (ali kontrole su iste)
             if(d.sport === "ODBOJKA") subS = t.points + `: ${d.p1 || 0}:${d.p2 || 0} | ` + subS; 
             if(d.sport === "TENIS") { const pts1 = (d.g1===6&&d.g2===6) ? (d.p1||0) : (tennisPoints[d.p1]||"0"); const pts2 = (d.g1===6&&d.g2===6) ? (d.p2||0) : (tennisPoints[d.p2]||"0"); subS = t.games + `: ${d.g1||0}:${d.g2||0} (${pts1}:${pts2}) | ` + subS; }
             document.getElementById('adm-sub-display').innerText = subS;
             
             const ctrl = document.getElementById('adm-sport-controls'); ctrl.innerHTML = "";
+            // UNIVERZALNE KONTROLE ZA SVE SPORTOVE (kao na rukometu)
             ctrl.innerHTML = `<div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:15px;">
                 <div style="text-align:center;"><div style="color:#aaa; font-size:11px; margin-bottom:5px;">${d.t1 || t.team1}</div><div style="display:flex; justify-content:center; gap:8px;"><button class="admin-btn" style="background:#444; width:50px;" onclick="proScore(1,-1)">-</button><button class="admin-btn" style="background:#28a745; width:50px;" onclick="proScore(1,1)">+</button></div></div>
                 <div style="text-align:center;"><div style="color:#aaa; font-size:11px; margin-bottom:5px;">${d.t2 || t.team2}</div><div style="display:flex; justify-content:center; gap:8px;"><button class="admin-btn" style="background:#444; width:50px;" onclick="proScore(2,-1)">-</button><button class="admin-btn" style="background:#28a745; width:50px;" onclick="proScore(2,1)">+</button></div></div>
@@ -541,15 +544,8 @@
 
         function proScore(team, sign) { 
             const d = allTereni.find(x => x.key === currentAdminKey); if(!d || d.status !== 'live') return; 
-            if(d.sport === "ODBOJKA") { let p1 = d.p1 || 0, p2 = d.p2 || 0; if(team === 1) p1 = Math.max(0, p1 + sign); else p2 = Math.max(0, p2 + sign); db.ref(`tereni/${currentAdminKey}`).update({ p1, p2 }); } 
-            else if(d.sport === "TENIS") { 
-                let p1 = d.p1 || 0, p2 = d.p2 || 0, g1 = d.g1 || 0, g2 = d.g2 || 0;
-                if(sign === 1) {
-                    if(team === 1) { if(p1 === 3 && p2 < 3) { g1++; p1=0; p2=0; } else if(p1 === 3 && p2 === 3) p1 = 4; else if(p1 === 3 && p2 === 4) p2 = 3; else if(p1 === 4) { g1++; p1=0; p2=0; } else p1++; }
-                    else { if(p2 === 3 && p1 < 3) { g2++; p1=0; p2=0; } else if(p2 === 3 && p1 === 3) p2 = 4; else if(p2 === 3 && p1 === 4) p1 = 3; else if(p2 === 4) { g2++; p1=0; p2=0; } else p2++; }
-                } else { p1 = Math.max(0, p1 - 1); p2 = Math.max(0, p2 - 1); }
-                db.ref(`tereni/${currentAdminKey}`).update({ p1, p2, g1, g2 });
-            } else { db.ref(`tereni/${currentAdminKey}`).update({ [`score${team}`]: Math.max(0, (d[`score${team}`] || 0) + sign) }); }
+            // SVI SPORTOVI SADA MENJAJU score1/score2 kao na rukometu
+            db.ref(`tereni/${currentAdminKey}`).update({ [`score${team}`]: Math.max(0, (d[`score${team}`] || 0) + sign) });
         }
 
         function triggerLogic(type) { 
@@ -563,9 +559,7 @@
                 let pScore1 = d.score1 || 0;
                 let pScore2 = d.score2 || 0;
 
-                // Računanje rezultata samo za ovaj period
                 if(n > 0) {
-                    // Prolazimo kroz sve prethodne upisane periode i oduzimamo njihove vrednosti
                     keys.forEach(k => {
                         let parts = sub[k].split(' ');
                         let lastRes = parts[parts.length - 1].split(':');
