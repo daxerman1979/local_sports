@@ -211,7 +211,7 @@
         <span class="details-section-title" id="txt-period-res">Rezultat po periodima</span>
         <div id="det-periods" class="details-periods-grid"></div>
         <div id="det-stats-container" style="display:none; margin-top:10px;">
-            <span class="details-section-title" id="txt-period-res">Događaji na meču</span>
+            <span class="details-section-title">Događaji na meču</span>
             <div class="events-container-grid">
                 <div id="det-events-home" class="events-column left"></div>
                 <div id="det-events-away" class="events-column right"></div>
@@ -265,13 +265,13 @@
 
         const translations = {
             sr: { 
-                subtitle: "Result Tracker", login: "ULAZ U SISTEM", explore: "ISTRAŽI MAPU", search: "Pretraži...", periodRes: "Rezultat po periodima", matchEvents: "Događaji na meču", adminTitle: "ADMIN TABLA", savePeriod: "SAČUVAJ PERIOD", goLive: "KRENI UŽIVO", endMatch: "ZAVRŠI MEČ", resetMatch: "RESET / NOVI MEČ", schedule: "ZAKAŽI MEČ", deleteCourt: "OBRIŠI TEREN", zoneOccupied: "ZONA ZAUZETA!", create: "KRENI", courtName: "NAZIV TERENA", player: "IME IGRAČA", team: "TIM", loggedAs: "ULOGOVAN:", localMatch: "LOKALNI MEČ", points: "POENI", games: "GEMOVI", league: "LIGA (NOVA)", team1: "TIM 1", team2: "TIM 2", goal: "GOL", yellow: "ŽUTI", red: "CRVENI", confirmDelete: "OBRISATI?", timeAt: "U", live: "UŽIVO", limitReached: "LIMIT DOSTIGNUT!", addCourt: "DODAJ TEREN", otherSport: "UPIŠI SPORT",
+                subtitle: "Result Tracker", login: "ULAZ U SISTEM", explore: "ISTRAŽI MAPU", search: "Pretraži...", periodRes: "Rezultat po periodima", matchEvents: "Događaji na meču", adminTitle: "ADMIN TABLA", savePeriod: "SAČUVAJ PERIOD", goLive: "KRENI UŽIVO", endMatch: "ZAVRŠI MEČ", resetMatch: "RESET / NOVI MEČ", schedule: "ZAKAŽI MEČ", deleteCourt: "OBRIŠI TEREN", zoneOccupied: "ZONA ZAUZETA!", create: "KRENI", courtName: "NAZIV TERENA", player: "IME IGRAČA", team: "TIM", loggedAs: "ULOGOVAN:", localMatch: "LOKALNI MEČ", points: "POENI", games: "GEMOVI", league: "LIGA (NOVA)", team1: "TIM 1", team2: "TIM 2", goal: "GOL", yellow: "ŽUTI", red: "CRVENI", confirmDelete: "OBRISATI?", timeAt: "U", live: "UŽIVO", limitReached: "LIMIT DOSTIGNUT!", addCourt: "DODAJ TEREN", otherSport: "UPIŠI SPORT", limitPeriod: "MAKSIMALAN BROJ PERIODA!",
                 discH2: "NAPOMENA", discText: "Sav sadržaj na ovom sajtu je nezvaničnog karaktera. Vlasnik sajta ne odgovara za tačnost informacija. Sajt služi isključivo u svrhe zabave.", discLabel: "Prihvatam uslove korišćenja.", discBtn: "NASTAVI",
                 sportNames: { FUDBAL: "FUDBAL", KOŠARKA: "KOŠARKA", ODBOJKA: "ODBOJKA", TENIS: "TENIS", RUKOMET: "RUKOMET", OSTALO: "OSTALO" },
                 periods: { FUDBAL: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "PROD"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], TENIS: ["S1", "S2", "S3", "S4", "S5"], OSTALO: [] } 
             },
             en: { 
-                subtitle: "Result Tracker", login: "ENTER SYSTEM", explore: "EXPLORE MAP", search: "Search...", periodRes: "Period Results", matchEvents: "Match Events", adminTitle: "ADMIN PANEL", savePeriod: "SAVE PERIOD", goLive: "GO LIVE", endMatch: "END MATCH", resetMatch: "RESET / NEW MATCH", schedule: "SCHEDULE MATCH", deleteCourt: "DELETE COURT", zoneOccupied: "ZONE OCCUPIED!", create: "CREATE", courtName: "COURT NAME", player: "PLAYER NAME", team: "TEAM", loggedAs: "LOGGED:", localMatch: "LOCAL MATCH", points: "POINTS", games: "GAMES", league: "LEAGUE (NEW)", team1: "TEAM 1", team2: "TEAM 2", goal: "GOAL", yellow: "YELLOW", red: "RED", confirmDelete: "DELETE?", timeAt: "AT", live: "LIVE", limitReached: "LIMIT REACHED!", addCourt: "ADD COURT", otherSport: "ENTER SPORT",
+                subtitle: "Result Tracker", login: "ENTER SYSTEM", explore: "EXPLORE MAP", search: "Search...", periodRes: "Period Results", matchEvents: "Match Events", adminTitle: "ADMIN PANEL", savePeriod: "SAVE PERIOD", goLive: "GO LIVE", endMatch: "END MATCH", resetMatch: "RESET / NEW MATCH", schedule: "SCHEDULE MATCH", deleteCourt: "DELETE COURT", zoneOccupied: "ZONE OCCUPIED!", create: "CREATE", courtName: "COURT NAME", player: "PLAYER NAME", team: "TEAM", loggedAs: "LOGGED:", localMatch: "LOCAL MATCH", points: "POINTS", games: "GAMES", league: "LEAGUE (NEW)", team1: "TEAM 1", team2: "TEAM 2", goal: "GOAL", yellow: "YELLOW", red: "RED", confirmDelete: "DELETE?", timeAt: "AT", live: "LIVE", limitReached: "LIMIT REACHED!", addCourt: "ADD COURT", otherSport: "ENTER SPORT", limitPeriod: "MAX PERIODS REACHED!",
                 discH2: "DISCLAIMER", discText: "All content on this site is unofficial. The site owner is not responsible for information accuracy. The site is for entertainment purposes only.", discLabel: "I accept terms of use.", discBtn: "CONTINUE",
                 sportNames: { FUDBAL: "FOOTBALL", KOŠARKA: "BASKETBALL", ODBOJKA: "VOLLEYBALL", TENIS: "TENNIS", RUKOMET: "HANDBALL", OSTALO: "OTHER" },
                 periods: { FUDBAL: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "OT"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], TENIS: ["S1", "S2", "S3", "S4", "S5"], OSTALO: [] } 
@@ -553,29 +553,30 @@
         }
 
         function triggerLogic(type) { 
-            const d = allTereni.find(x => x.key === currentAdminKey); 
+            const d = allTereni.find(x => x.key === currentAdminKey); if(!d) return;
+            const t = translations[currentLang];
+            
             if(type === 'period') { 
                 let sub = d.sub_details || {}; 
                 let keys = Object.keys(sub);
                 let n = keys.length;
-                let pName = (document.getElementById('adm-period-name').value || (translations[currentLang].periods[d.sport][n] || "P"+(n+1))).toUpperCase();
+                
+                // LOGIČKO OGRANIČENJE PERIODA
+                const maxPeriods = { "FUDBAL": 5, "RUKOMET": 5, "ODBOJKA": 5, "TENIS": 5, "KOŠARKA": 10, "OSTALO": 10 };
+                if(n >= (maxPeriods[d.sport] || 10)) { alert(t.limitPeriod); return; }
 
-                let pScore1 = d.score1 || 0;
-                let pScore2 = d.score2 || 0;
+                let pName = (document.getElementById('adm-period-name').value || (t.periods[d.sport][n] || "P"+(n+1))).toUpperCase();
+                let pScore1 = d.score1 || 0, pScore2 = d.score2 || 0;
 
-                // Računanje rezultata samo za ovaj period
                 if(n > 0) {
-                    // Prolazimo kroz sve prethodne upisane periode i oduzimamo njihove vrednosti
                     keys.forEach(k => {
                         let parts = sub[k].split(' ');
                         let lastRes = parts[parts.length - 1].split(':');
-                        pScore1 -= parseInt(lastRes[0]);
-                        pScore2 -= parseInt(lastRes[1]);
+                        pScore1 -= parseInt(lastRes[0]); pScore2 -= parseInt(lastRes[1]);
                     });
                 }
                 
                 sub["P"+n] = `${pName} ${pScore1}:${pScore2}`; 
-                
                 db.ref(`tereni/${currentAdminKey}`).update({ sub_details: sub });
                 document.getElementById('adm-period-name').value = "";
             } else if(type === 'end') db.ref(`tereni/${currentAdminKey}`).update({ status: 'ended' }); 
@@ -600,7 +601,6 @@
             if (e.key === "Enter" || e.type === "blur") { 
                 const query = document.getElementById('city-search').value.toUpperCase();
                 if (!query) return;
-                
                 fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}`)
                 .then(r => r.json())
                 .then(data => { 
