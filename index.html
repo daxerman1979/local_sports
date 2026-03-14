@@ -56,6 +56,123 @@
         .settings-btn { position: absolute; top: 70px; right: 20px; z-index: 5500; width: 40px; height: 40px; background: rgba(0,0,0,0.5); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); }
         .settings-btn img { width: 20px; filter: invert(1); }
 
+        /* NOVE KARTICE NA MAPI - REDIZAJN PREMA SLICI */
+        .live-card-thin { 
+            background: linear-gradient(145deg, rgba(28, 26, 23, 0.95) 0%, rgba(15, 13, 11, 0.98) 100%);
+            border: 1px solid rgba(255, 149, 0, 0.4);
+            border-radius: 18px;
+            padding: 12px;
+            display: none;
+            flex-direction: column;
+            width: 210px;
+            color: white;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8), inset 0 0 10px rgba(255,149,0,0.05);
+            position: relative;
+            z-index: 25;
+            margin-bottom: 12px;
+        }
+        
+        .zoom-near .live-card-thin { display: flex; }
+        
+        .status-live-wrapper .live-card-thin { 
+            border-color: #FF9500;
+            box-shadow: 0 0 15px rgba(255,149,0,0.2), 0 10px 30px rgba(0,0,0,0.8);
+        }
+
+        .card-league-row { 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .league-ball-icon { font-size: 16px; }
+        
+        .card-league-mini { 
+            font-size: 10px; 
+            color: #FF9500; 
+            font-weight: 800; 
+            letter-spacing: 1.5px; 
+            text-transform: uppercase;
+            font-family: 'Oswald';
+        }
+
+        .score-row { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 6px; 
+            width: 100%;
+            background: rgba(255,255,255,0.03);
+            padding: 6px 10px;
+            border-radius: 8px;
+        }
+        
+        .team-name-col { 
+            font-size: 13px; 
+            font-weight: 700; 
+            text-transform: uppercase; 
+            color: #efefef;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 130px;
+        }
+        
+        .score-val-col { 
+            font-family: 'Oswald'; 
+            font-size: 22px; 
+            color: #FF9500; 
+            font-weight: 700; 
+            min-width: 35px;
+            text-align: right;
+        }
+
+        .extra-data-row { 
+            display: flex; 
+            justify-content: flex-start; 
+            gap: 6px; 
+            margin-top: 4px;
+        }
+        
+        .extra-val { 
+            font-size: 10px; 
+            font-family: 'Oswald'; 
+            background: rgba(255, 149, 0, 0.15); 
+            padding: 2px 8px; 
+            border-radius: 6px; 
+            color: #FF9500;
+            border: 1px solid rgba(255,149,0,0.2);
+        }
+
+        .blink-live { 
+            background: #FF9500;
+            color: black;
+            font-weight: 900;
+            font-size: 9px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            align-self: center;
+            margin-top: 8px;
+            animation: soft-blink 1.5s infinite;
+        }
+        
+        @keyframes soft-blink { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.7; transform: scale(0.95); } }
+
+        .card-time-mini { 
+            font-size: 9px; 
+            color: #888; 
+            font-weight: 700; 
+            text-align: center; 
+            margin-top: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        /* OSTALI ELEMENTI */
         .leaflet-popup-content-wrapper { background: rgba(18, 16, 14, 0.95) !important; color: white !important; border: 1px solid #FF9500 !important; border-radius: 20px !important; backdrop-filter: blur(10px); }
         .leaflet-popup-tip { background: #FF9500 !important; }
         .leaflet-popup-content { margin: 15px !important; width: 220px !important; }
@@ -71,13 +188,13 @@
         .lang-box { background: #0a0a0a; padding: 30px; border-radius: 25px; border: 1px solid #FF9500; width: 85%; max-width: 300px; text-align: center; }
 
         .sport-marker-wrapper { display: flex; flex-direction: column; align-items: center; width: auto; position: relative; }
-        .marker-ball-only { font-size: 16px; transition: all 0.3s; filter: drop-shadow(0 0 2px black); position: relative; z-index: 5; }
-        .ball-halo { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 30px; height: 30px; border-radius: 50%; background: radial-gradient(circle, rgba(255,149,0,0.6) 0%, rgba(255,149,0,0) 70%); z-index: 4; pointer-events: none; animation: halo-pulse 2s infinite ease-in-out; }
+        .marker-ball-only { font-size: 18px; transition: all 0.3s; filter: drop-shadow(0 0 5px rgba(255,149,0,0.5)); position: relative; z-index: 5; }
+        .ball-halo { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 35px; height: 35px; border-radius: 50%; background: radial-gradient(circle, rgba(255,149,0,0.4) 0%, rgba(255,149,0,0) 70%); z-index: 4; pointer-events: none; animation: halo-pulse 2s infinite ease-in-out; }
 
         @keyframes halo-pulse {
-            0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.4; }
-            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.8; }
-            100% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.4; }
+            0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.3; }
+            50% { transform: translate(-50%, -50%) scale(1.3); opacity: 0.6; }
+            100% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.3; }
         }
 
         .zoom-far .marker-ball-only { font-size: 10px; }
@@ -85,55 +202,28 @@
         .marker-content-box { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; pointer-events: none; }
         .marker-content-box > * { pointer-events: auto; }
         .zoom-near .marker-ball-only, .zoom-near .ball-halo { display: none; }
-        .marker-pointer { width: 0; height: 0; border-left: 14px solid transparent; border-right: 14px solid transparent; border-top: 20px solid #FFCC00; display: none; z-index: 10; }
-        .zoom-near .marker-pointer { display: block; }
-        .status-live-wrapper .marker-pointer { border-top-color: #FF9500; }
-
-        .live-card-thin { 
-            background: rgba(22, 18, 15, 0.98); border: 2px solid #FFCC00; border-radius: 12px; padding: 10px 14px; 
-            display: none; flex-direction: column; width: max-content; min-width: 180px; color: white; 
-            backdrop-filter: blur(15px); box-shadow: 0 8px 25px rgba(0,0,0,0.8); position: relative; overflow: hidden; z-index: 25; margin-bottom: -1px;
-        }
-        .zoom-near .live-card-thin { display: flex; }
-        .status-live-wrapper .live-card-thin { border-color: #FF9500; }
-
-        .card-league-row { display: flex; align-items: center; gap: 6px; border-bottom: 1px solid #333; margin-bottom: 6px; padding-bottom: 4px; }
-        .league-ball-icon { font-size: 14px; animation: icon-bounce-rotate 2s infinite ease-in-out; }
-        @keyframes icon-bounce-rotate { 0%, 100% { transform: scale(1) rotate(0deg); } 50% { transform: scale(1.2) rotate(15deg); } }
         
-        .card-league-mini { font-size: 9px; color: #FFCC00; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; }
-        .status-live-wrapper .card-league-mini { color: #FF9500; }
-
-        .score-row { display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 4px; width: 100%; }
-        .team-name-col { font-size: 14px; font-weight: 900; text-transform: uppercase; color: #fff; white-space: normal; line-height: 1.1; max-width: 120px; }
-        .score-val-col { font-family: 'Oswald'; font-size: 20px; color: #FFCC00; font-weight: 700; text-align: right; min-width: 30px; }
-        .status-live-wrapper .score-val-col { color: #FF9500; }
-
-        .extra-data-row { display: flex; justify-content: flex-end; gap: 5px; margin-top: -2px; margin-bottom: 4px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 2px; }
-        .extra-val { font-size: 11px; font-family: 'Oswald'; background: rgba(255,255,255,0.1); padding: 0 4px; border-radius: 4px; color: #FFCC00; }
-
-        .blink-live { animation: soft-blink 2s infinite ease-in-out; color: #FF9500; font-weight: 900; text-transform: uppercase; font-size: 10px; text-align: center; margin-top: 4px; }
-        @keyframes soft-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-        .card-time-mini { font-size: 9px; color: #FFCC00; font-weight: 900; text-align: center; border-top: 1px solid #333; padding-top: 4px; margin-top: 4px; }
+        .marker-pointer { width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-top: 12px solid rgba(255,149,0,0.6); display: none; z-index: 10; margin-top: -13px; }
+        .zoom-near .marker-pointer { display: block; }
 
         #match-details-view { position: fixed; bottom: -100%; left: 0; width: 100%; max-height: 90vh; background: #12100e; z-index: 8000; border-top: 3px solid #FF9500; border-radius: 30px 30px 0 0; padding: 20px; transition: 0.5s cubic-bezier(0.19, 1, 0.22, 1); overflow-y: auto; color: white; }
         #match-details-view.active { bottom: 0; }
         .details-header { text-align: center; margin-bottom: 20px; position: relative; }
         .details-league { color: #FF9500; font-weight: 900; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 5px; display: block; }
-        .details-time-full { color: #FFCC00; font-weight: 800; font-size: 11px; margin-bottom: 15px; display: block; }
+        .details-time-full { color: #888; font-weight: 800; font-size: 11px; margin-bottom: 15px; display: block; }
         .details-main-box { background: #1c1916; border-radius: 20px; padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 20px; border: 1px solid #333; }
         .details-team-line { font-size: 22px; font-weight: 900; text-align: center; width: 100%; }
         .details-score-line { font-family: 'Oswald'; font-size: 50px; color: #FF9500; line-height: 1; margin: 5px 0; display: flex; align-items: center; gap: 15px; }
-        .details-extra-line { color: #FFCC00; font-weight: 800; font-size: 16px; margin-top: 5px; }
+        .details-extra-line { color: #FF9500; font-weight: 800; font-size: 16px; margin-top: 5px; }
         .details-section-title { color: #777; font-size: 11px; font-weight: 900; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 1px; display: block; }
         
         .details-periods-grid { display: flex; flex-wrap: nowrap; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; justify-content: space-evenly; }
-        .detail-period-tag { background: #0a0a0a; padding: 8px 12px; border-radius: 10px; font-size: 12px; font-weight: 700; border-bottom: 3px solid #FFCC00; color: white; white-space: nowrap; flex: 1; text-align: center; }
+        .detail-period-tag { background: #0a0a0a; padding: 8px 12px; border-radius: 10px; font-size: 12px; font-weight: 700; border-bottom: 3px solid #FF9500; color: white; white-space: nowrap; flex: 1; text-align: center; }
 
         .events-container-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
         .events-column { display: flex; flex-direction: column; gap: 5px; }
-        .detail-event-box { background: #0a0a0a; padding: 10px; border-radius: 10px; font-size: 13px; font-weight: 700; border-left: 3px solid #FFCC00; display: flex; justify-content: space-between; align-items: center; color: white !important; }
-        .events-column.right .detail-event-box { border-left: none; border-right: 3px solid #FFCC00; flex-direction: row-reverse; }
+        .detail-event-box { background: #0a0a0a; padding: 10px; border-radius: 10px; font-size: 13px; font-weight: 700; border-left: 3px solid #FF9500; display: flex; justify-content: space-between; align-items: center; color: white !important; }
+        .events-column.right .detail-event-box { border-left: none; border-right: 3px solid #FF9500; flex-direction: row-reverse; }
 
         #admin-panel { position: fixed; top: 0; left: 100%; width: 100%; height: 100%; background: #12100e; z-index: 7000; transition: 0.4s; padding: 25px; display: flex; flex-direction: column; overflow-y: auto; }
         #admin-panel.active { left: 0; }
@@ -483,8 +573,7 @@
             document.getElementById('det-time').innerText = d.match_time ? new Date(d.match_time).toLocaleString() : ""; 
             document.getElementById('det-t1').innerText = d.t1 || t.team1; 
             document.getElementById('det-t2').innerText = d.t2 || t.team2; 
-            const liveIndicator = d.status === 'live' ? `<div class="live-dot-mini"></div>` : "";
-            document.getElementById('det-score').innerHTML = `${liveIndicator} ${d.score1||0} : ${d.score2||0} ${liveIndicator}`; 
+            document.getElementById('det-score').innerHTML = `${d.score1||0} : ${d.score2||0}`; 
             
             let ex = ""; 
             if(d.sport === "ODBOJKA") ex = `${d.p1||0} : ${d.p2||0}`; 
