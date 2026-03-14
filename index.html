@@ -56,9 +56,9 @@
         .settings-btn { position: absolute; top: 70px; right: 20px; z-index: 5500; width: 40px; height: 40px; background: rgba(0,0,0,0.5); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); }
         .settings-btn img { width: 20px; filter: invert(1); }
 
-        /* NOVI DIZAJN KARTICE PREMA SLICI */
+        /* NOVI DIZAJN KARTICE IZGLED KAO NA SLICI */
         .live-card-thin { 
-            background: rgba(15, 15, 15, 0.85);
+            background: rgba(15, 15, 15, 0.9);
             border: 2px solid #FF9500;
             border-radius: 18px;
             padding: 12px;
@@ -70,10 +70,9 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.8);
             position: relative;
             z-index: 25;
-            margin-bottom: 8px; /* Razmak za pointer */
+            margin-bottom: 12px;
         }
         
-        /* Pointer (strelica) na dnu kartice */
         .live-card-thin::after {
             content: '';
             position: absolute;
@@ -88,16 +87,13 @@
         }
         
         .zoom-near .live-card-thin { display: flex; }
-        
-        .status-live-wrapper .live-card-thin { 
-            box-shadow: 0 0 20px rgba(255,149,0,0.4);
-        }
+        .status-live-wrapper .live-card-thin { box-shadow: 0 0 20px rgba(255,149,0,0.4); }
 
         .card-league-row { 
             display: flex; 
             align-items: center; 
             gap: 6px; 
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             border-bottom: 1px solid rgba(255,255,255,0.1);
             padding-bottom: 6px;
         }
@@ -119,7 +115,6 @@
             align-items: center; 
             margin-bottom: 4px; 
             width: 100%;
-            padding: 2px 0;
         }
         
         .team-name-col { 
@@ -130,7 +125,7 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            max-width: 135px;
+            max-width: 130px;
         }
         
         .score-val-col { 
@@ -147,7 +142,7 @@
             display: flex; 
             justify-content: flex-start; 
             gap: 5px; 
-            margin-top: 8px;
+            margin-top: 5px;
         }
         
         .extra-val { 
@@ -168,7 +163,7 @@
             padding: 3px 8px;
             border-radius: 6px;
             text-transform: uppercase;
-            margin-top: 10px;
+            margin-top: 8px;
             text-align: center;
             animation: soft-blink 1.5s infinite;
             font-family: 'Oswald';
@@ -181,7 +176,7 @@
             color: #aaa; 
             font-weight: 700; 
             text-align: center; 
-            margin-top: 10px;
+            margin-top: 8px;
             letter-spacing: 0.5px;
             font-family: 'Oswald';
         }
