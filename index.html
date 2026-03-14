@@ -56,35 +56,48 @@
         .settings-btn { position: absolute; top: 70px; right: 20px; z-index: 5500; width: 40px; height: 40px; background: rgba(0,0,0,0.5); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); }
         .settings-btn img { width: 20px; filter: invert(1); }
 
-        /* REDIZAJN KARTICE PREMA SLICI */
+        /* NOVI DIZAJN KARTICE PREMA SLICI */
         .live-card-thin { 
-            background: rgba(18, 16, 14, 0.9);
-            border: 1px solid rgba(255, 149, 0, 0.5);
-            border-radius: 16px;
+            background: rgba(15, 15, 15, 0.85);
+            border: 2px solid #FF9500;
+            border-radius: 18px;
             padding: 12px;
             display: none;
             flex-direction: column;
-            width: 200px;
+            width: 190px;
             color: white;
             backdrop-filter: blur(15px);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
             position: relative;
             z-index: 25;
-            margin-bottom: 10px;
+            margin-bottom: 8px; /* Razmak za pointer */
+        }
+        
+        /* Pointer (strelica) na dnu kartice */
+        .live-card-thin::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 10px solid #FF9500;
         }
         
         .zoom-near .live-card-thin { display: flex; }
         
         .status-live-wrapper .live-card-thin { 
-            border-color: #FF9500;
-            box-shadow: 0 0 15px rgba(255,149,0,0.3);
+            box-shadow: 0 0 20px rgba(255,149,0,0.4);
         }
 
         .card-league-row { 
             display: flex; 
             align-items: center; 
             gap: 6px; 
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             border-bottom: 1px solid rgba(255,255,255,0.1);
             padding-bottom: 6px;
         }
@@ -106,42 +119,43 @@
             align-items: center; 
             margin-bottom: 4px; 
             width: 100%;
-            padding: 2px 4px;
+            padding: 2px 0;
         }
         
         .team-name-col { 
-            font-size: 13px; 
-            font-weight: 700; 
+            font-size: 14px; 
+            font-weight: 800; 
             text-transform: uppercase; 
             color: #fff;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            max-width: 130px;
+            max-width: 135px;
         }
         
         .score-val-col { 
             font-family: 'Oswald'; 
-            font-size: 20px; 
+            font-size: 22px; 
             color: #FF9500; 
             font-weight: 700; 
-            min-width: 25px;
+            min-width: 30px;
             text-align: right;
+            line-height: 1;
         }
 
         .extra-data-row { 
             display: flex; 
             justify-content: flex-start; 
             gap: 5px; 
-            margin-top: 6px;
+            margin-top: 8px;
         }
         
         .extra-val { 
             font-size: 10px; 
             font-family: 'Oswald'; 
-            background: rgba(255, 149, 0, 0.2); 
-            padding: 2px 6px; 
-            border-radius: 4px; 
+            background: rgba(255, 149, 0, 0.15); 
+            padding: 3px 7px; 
+            border-radius: 6px; 
             color: #FF9500;
             border: 1px solid rgba(255,149,0,0.3);
         }
@@ -150,24 +164,26 @@
             background: #FF9500;
             color: black;
             font-weight: 900;
-            font-size: 9px;
-            padding: 2px 6px;
-            border-radius: 4px;
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 6px;
             text-transform: uppercase;
-            margin-top: 8px;
+            margin-top: 10px;
             text-align: center;
             animation: soft-blink 1.5s infinite;
+            font-family: 'Oswald';
         }
         
-        @keyframes soft-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+        @keyframes soft-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
 
         .card-time-mini { 
-            font-size: 9px; 
-            color: #888; 
+            font-size: 10px; 
+            color: #aaa; 
             font-weight: 700; 
             text-align: center; 
-            margin-top: 8px;
+            margin-top: 10px;
             letter-spacing: 0.5px;
+            font-family: 'Oswald';
         }
 
         .leaflet-popup-content-wrapper { background: rgba(18, 16, 14, 0.95) !important; color: white !important; border: 1px solid #FF9500 !important; border-radius: 20px !important; backdrop-filter: blur(10px); }
@@ -200,9 +216,6 @@
         .marker-content-box > * { pointer-events: auto; }
         .zoom-near .marker-ball-only, .zoom-near .ball-halo { display: none; }
         
-        .marker-pointer { width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 10px solid rgba(255,149,0,0.6); display: none; z-index: 10; margin-top: -11px; }
-        .zoom-near .marker-pointer { display: block; }
-
         #match-details-view { position: fixed; bottom: -100%; left: 0; width: 100%; max-height: 90vh; background: #12100e; z-index: 8000; border-top: 3px solid #FF9500; border-radius: 30px 30px 0 0; padding: 20px; transition: 0.5s cubic-bezier(0.19, 1, 0.22, 1); overflow-y: auto; color: white; }
         #match-details-view.active { bottom: 0; }
         .details-header { text-align: center; margin-bottom: 20px; position: relative; }
@@ -512,8 +525,7 @@
                         </div>
                         ${extraRows}
                         ${timeInfo}
-                    </div>
-                    <div class="marker-pointer"></div>`;
+                    </div>`;
 
                 const html = `
                     <div class="sport-marker-wrapper ${isLive?'status-live-wrapper':''} ${zoomNear?'zoom-near':''} ${zoomFar?'zoom-far':''}">
