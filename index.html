@@ -225,7 +225,9 @@
             <div style="background:#1c1916; border:1px solid #FF9500; border-radius:20px; padding:20px; text-align:center; margin-bottom:15px;">
                 <div id="adm-main-score" style="font-size:55px; font-family:'Oswald'; color:#FF9500;">0 : 0</div>
                 <div id="adm-sub-display" style="color:#FFCC00; font-weight:900; font-family:'Oswald'; margin-top:10px;"></div>
+                <div id="adm-timer-display" style="color:#fff; font-size:18px; font-family:'Oswald'; margin-top:5px; display:none;">00:00</div>
             </div>
+            
             <div id="adm-sport-controls"></div>
             
             <div id="adm-events-manager" style="margin-bottom:15px; border-top:1px solid #333; padding-top:10px;"></div>
@@ -236,7 +238,7 @@
             </div>
             
             <button id="start-live-btn" class="admin-btn" style="background:#007AFF;" onclick="adminStatus('live')">KRENI UŽIVO</button>
-            <button id="end-match-btn" class="admin-btn" style="background:#FF9500; display:none;" onclick="triggerLogic('end')">ZAVRŠI MEČ</button>
+            <button id="end-match-btn" class="admin-btn" style="background:#FF9500; display:none;" onclick="adminStatus('ended')">ZAVRŠI MEČ</button>
             <button id="reset-match-btn" class="admin-btn" style="background:#ff9500; display:none;" onclick="resetMatch()">RESET / NOVI MEČ</button>
         </div>
         <div id="match-setup" style="display:none; flex-direction:column; gap:12px;">
@@ -284,14 +286,6 @@
             updateUILanguage(); 
             if(document.getElementById('lang-modal').style.display === 'flex') toggleLangModal(); 
             if(currentAdminKey) refreshAdminPanel(currentAdminKey);
-            
-            const openPopup = map && map.hasLayer(map._popup) ? map._popup : null;
-            if(openPopup) {
-                const latlng = openPopup.getLatLng();
-                if(document.getElementById('p_name')) {
-                    openTerenForm(latlng.lat, latlng.lng);
-                }
-            }
             renderMarkers(); 
         }
         
@@ -405,7 +399,7 @@
                 if(isLive || isEnded) {
                     if(d.sport === "TENIS") {
                         const pts1 = (d.g1===6 && d.g2===6) ? (d.p1||0) : (tennisPoints[d.p1]||"0");
-                        const pts2 = (d.g1===6 && d.g2===6) ? (d.p2||0) : (tennisPoints[d.p2]||"0");
+                        const pts2 = (d.g1===6 && d.g2===6) ? (d.p1||0) : (tennisPoints[d.p2]||"0");
                         extraRows = `<div class="extra-data-row"><span class="extra-val">${translations[currentLang].games}: ${d.g1||0}:${d.g2||0}</span><span class="extra-val">PTS: ${pts1}:${pts2}</span></div>`;
                     } else if(d.sport === "ODBOJKA") {
                         extraRows = `<div class="extra-data-row"><span class="extra-val">PTS: ${d.p1||0}:${d.p2||0}</span></div>`;
@@ -514,18 +508,42 @@
         function refreshAdminPanel(key) {
             const d = allTereni.find(x => x.key === key); if(!d) return; const t = translations[currentLang];
             document.getElementById('adm-name').innerText = d.name; document.getElementById('adm-main-score').innerText = `${d.score1 || 0} : ${d.score2 || 0}`;
+            
             let subS = d.sub_details ? Object.values(d.sub_details).join(' | ') : ""; 
             if(d.sport === "ODBOJKA") subS = t.points + `: ${d.p1 || 0}:${d.p2 || 0} | ` + subS; 
             if(d.sport === "TENIS") { const pts1 = (d.g1===6&&d.g2===6) ? (d.p1||0) : (tennisPoints[d.p1]||"0"); const pts2 = (d.g1===6&&d.g2===6) ? (d.p2||0) : (tennisPoints[d.p2]||"0"); subS = t.games + `: ${d.g1||0}:${d.g2||0} (${pts1}:${pts2}) | ` + subS; }
             document.getElementById('adm-sub-display').innerText = subS;
             
             const ctrl = document.getElementById('adm-sport-controls'); ctrl.innerHTML = "";
-            ctrl.innerHTML = `<div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:15px;">
-                <div style="text-align:center;"><div style="color:#aaa; font-size:11px; margin-bottom:5px;">${d.t1 || t.team1}</div><div style="display:flex; justify-content:center; gap:8px;"><button class="admin-btn" style="background:#444; width:50px;" onclick="proScore(1,-1)">-</button><button class="admin-btn" style="background:#28a745; width:50px;" onclick="proScore(1,1)">+</button></div></div>
-                <div style="text-align:center;"><div style="color:#aaa; font-size:11px; margin-bottom:5px;">${d.t2 || t.team2}</div><div style="display:flex; justify-content:center; gap:8px;"><button class="admin-btn" style="background:#444; width:50px;" onclick="proScore(2,-1)">-</button><button class="admin-btn" style="background:#28a745; width:50px;" onclick="proScore(2,1)">+</button></div></div>
-            </div>`;
 
-            if(d.sport === "FUDBAL") {
+            // DINAMIČKI KONTROLNI PANEL PO SPORTU
+            if(d.sport === "KOŠARKA") {
+                ctrl.innerHTML = `<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px;">
+                    <div style="text-align:center;"><div style="color:#aaa; font-size:11px; margin-bottom:5px;">${d.t1}</div>
+                        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px;">
+                            <button class="admin-btn" style="background:#28a745;" onclick="proScore(1,1)">+1</button>
+                            <button class="admin-btn" style="background:#28a745;" onclick="proScore(1,2)">+2</button>
+                            <button class="admin-btn" style="background:#28a745;" onclick="proScore(1,3)">+3</button>
+                            <button class="admin-btn" style="background:#444; grid-column:span 3;" onclick="proScore(1,-1)">PONISTI</button>
+                        </div>
+                    </div>
+                    <div style="text-align:center;"><div style="color:#aaa; font-size:11px; margin-bottom:5px;">${d.t2}</div>
+                        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px;">
+                            <button class="admin-btn" style="background:#28a745;" onclick="proScore(2,1)">+1</button>
+                            <button class="admin-btn" style="background:#28a745;" onclick="proScore(2,2)">+2</button>
+                            <button class="admin-btn" style="background:#28a745;" onclick="proScore(2,3)">+3</button>
+                            <button class="admin-btn" style="background:#444; grid-column:span 3;" onclick="proScore(2,-1)">PONISTI</button>
+                        </div>
+                    </div>
+                </div>`;
+            } else {
+                ctrl.innerHTML = `<div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:15px;">
+                    <div style="text-align:center;"><div style="color:#aaa; font-size:11px; margin-bottom:5px;">${d.t1 || t.team1}</div><div style="display:flex; justify-content:center; gap:8px;"><button class="admin-btn" style="background:#444; width:50px;" onclick="proScore(1,-1)">-</button><button class="admin-btn" style="background:#28a745; width:50px;" onclick="proScore(1,1)">+</button></div></div>
+                    <div style="text-align:center;"><div style="color:#aaa; font-size:11px; margin-bottom:5px;">${d.t2 || t.team2}</div><div style="display:flex; justify-content:center; gap:8px;"><button class="admin-btn" style="background:#444; width:50px;" onclick="proScore(2,-1)">-</button><button class="admin-btn" style="background:#28a745; width:50px;" onclick="proScore(2,1)">+</button></div></div>
+                </div>`;
+            }
+
+            if(d.sport === "FUDBAL" || d.sport === "RUKOMET") {
                 ctrl.innerHTML += `<div style="background:#111; padding:15px; border-radius:12px; margin-bottom:15px;"><input type="text" id="event-player" placeholder="${t.player}" style="width:100%; margin-bottom:8px;"><select id="event-team" style="width:100%; margin-bottom:8px;"><option value="1">${d.t1 || t.team1}</option><option value="2">${d.t2 || t.team2}</option></select><div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px;"><button onclick="addEvent('⚽')" class="admin-btn" style="background:#444;">${t.goal}</button><button onclick="addEvent('🟨')" class="admin-btn" style="background:#C0A000;">${t.yellow}</button><button onclick="addEvent('🟥')" class="admin-btn" style="background:#A00000;">${t.red}</button></div></div>`;
             }
 
@@ -541,15 +559,50 @@
 
         function proScore(team, sign) { 
             const d = allTereni.find(x => x.key === currentAdminKey); if(!d || d.status !== 'live') return; 
-            if(d.sport === "ODBOJKA") { let p1 = d.p1 || 0, p2 = d.p2 || 0; if(team === 1) p1 = Math.max(0, p1 + sign); else p2 = Math.max(0, p2 + sign); db.ref(`tereni/${currentAdminKey}`).update({ p1, p2 }); } 
-            else if(d.sport === "TENIS") { 
-                let p1 = d.p1 || 0, p2 = d.p2 || 0, g1 = d.g1 || 0, g2 = d.g2 || 0;
-                if(sign === 1) {
-                    if(team === 1) { if(p1 === 3 && p2 < 3) { g1++; p1=0; p2=0; } else if(p1 === 3 && p2 === 3) p1 = 4; else if(p1 === 3 && p2 === 4) p2 = 3; else if(p1 === 4) { g1++; p1=0; p2=0; } else p1++; }
-                    else { if(p2 === 3 && p1 < 3) { g2++; p1=0; p2=0; } else if(p2 === 3 && p1 === 3) p2 = 4; else if(p2 === 3 && p1 === 4) p1 = 3; else if(p2 === 4) { g2++; p1=0; p2=0; } else p2++; }
-                } else { p1 = Math.max(0, p1 - 1); p2 = Math.max(0, p2 - 1); }
-                db.ref(`tereni/${currentAdminKey}`).update({ p1, p2, g1, g2 });
-            } else { db.ref(`tereni/${currentAdminKey}`).update({ [`score${team}`]: Math.max(0, (d[`score${team}`] || 0) + sign) }); }
+            
+            if(d.sport === "ODBOJKA") { 
+                let p1 = d.p1 || 0, p2 = d.p2 || 0, s1 = d.score1 || 0, s2 = d.score2 || 0;
+                if(team === 1) p1 = Math.max(0, p1 + sign); else p2 = Math.max(0, p2 + sign);
+                
+                // Automatski set (25 poena, mora biti 2 razlike, ili 15 u 5. setu)
+                const target = (s1+s2 >= 4) ? 15 : 25;
+                if(p1 >= target && p1-p2 >= 2) { s1++; p1=0; p2=0; }
+                if(p2 >= target && p2-p1 >= 2) { s2++; p1=0; p2=0; }
+                db.ref(`tereni/${currentAdminKey}`).update({ p1, p2, score1: s1, score2: s2 }); 
+
+            } else if(d.sport === "TENIS") { 
+                let p1 = d.p1 || 0, p2 = d.p2 || 0, g1 = d.g1 || 0, g2 = d.g2 || 0, s1 = d.score1 || 0, s2 = d.score2 || 0;
+                if(sign > 0) {
+                    if(g1 === 6 && g2 === 6) { // Tie-break
+                        if(team === 1) p1++; else p2++;
+                        if(p1 >= 7 && p1-p2 >= 2) { g1++; p1=0; p2=0; }
+                        else if(p2 >= 7 && p2-p1 >= 2) { g2++; p1=0; p2=0; }
+                    } else {
+                        if(team === 1) { 
+                            if(p1 === 3 && p2 < 3) { g1++; p1=0; p2=0; } 
+                            else if(p1 === 3 && p2 === 3) p1 = 4; // AD
+                            else if(p1 === 3 && p2 === 4) p2 = 3; // Deuce
+                            else if(p1 === 4) { g1++; p1=0; p2=0; } 
+                            else p1++; 
+                        } else { 
+                            if(p2 === 3 && p1 < 3) { g2++; p1=0; p2=0; } 
+                            else if(p2 === 3 && p1 === 3) p2 = 4; 
+                            else if(p2 === 3 && p1 === 4) p1 = 3; 
+                            else if(p2 === 4) { g2++; p1=0; p2=0; } 
+                            else p2++; 
+                        }
+                    }
+                } else { p1 = 0; p2 = 0; } // Reset poena na minus
+
+                // Provera seta
+                if((g1 >= 6 && g1-g2 >= 2) || g1 === 7) { s1++; g1=0; g2=0; }
+                if((g2 >= 6 && g2-g1 >= 2) || g2 === 7) { s2++; g1=0; g2=0; }
+
+                db.ref(`tereni/${currentAdminKey}`).update({ p1, p2, g1, g2, score1: s1, score2: s2 });
+
+            } else { 
+                db.ref(`tereni/${currentAdminKey}`).update({ [`score${team}`]: Math.max(0, (d[`score${team}`] || 0) + sign) }); 
+            }
         }
 
         function triggerLogic(type) { 
@@ -561,31 +614,27 @@
                 let keys = Object.keys(sub);
                 let n = keys.length;
                 
-                // LOGIČKO OGRANIČENJE PERIODA
                 const maxPeriods = { "FUDBAL": 5, "RUKOMET": 5, "ODBOJKA": 5, "TENIS": 5, "KOŠARKA": 10, "OSTALO": 10 };
                 if(n >= (maxPeriods[d.sport] || 10)) { alert(t.limitPeriod); return; }
 
                 let pName = (document.getElementById('adm-period-name').value || (t.periods[d.sport][n] || "P"+(n+1))).toUpperCase();
                 let pScore1 = d.score1 || 0, pScore2 = d.score2 || 0;
 
-                if(n > 0) {
-                    keys.forEach(k => {
-                        let parts = sub[k].split(' ');
-                        let lastRes = parts[parts.length - 1].split(':');
-                        pScore1 -= parseInt(lastRes[0]); pScore2 -= parseInt(lastRes[1]);
-                    });
-                }
+                // Ako je tenis ili odbojka, period je zapravo set rezultat
+                if(d.sport === "TENIS") { pScore1 = d.g1; pScore2 = d.g2; }
+                if(d.sport === "ODBOJKA") { pScore1 = d.p1; pScore2 = d.p2; }
                 
                 sub["P"+n] = `${pName} ${pScore1}:${pScore2}`; 
                 db.ref(`tereni/${currentAdminKey}`).update({ sub_details: sub });
                 document.getElementById('adm-period-name').value = "";
-            } else if(type === 'end') db.ref(`tereni/${currentAdminKey}`).update({ status: 'ended' }); 
+            } 
         }
 
         function addEvent(emoji) { const p = document.getElementById('event-player').value.toUpperCase(), t = document.getElementById('event-team').value; if(!p) return; db.ref(`tereni/${currentAdminKey}/events`).push({ player: p, team: t, emoji: emoji }); document.getElementById('event-player').value = ""; }
         function adminStatus(s) { db.ref(`tereni/${currentAdminKey}`).update({ status: s }); }
         function adminDelete() { if(confirm(translations[currentLang].confirmDelete)) { db.ref(`tereni/${currentAdminKey}/`).remove(); closeAdmin(); } }
         function resetMatch() { db.ref(`tereni/${currentAdminKey}/`).update({ t1: null, t2: null, status: 'upcoming', score1: 0, score2: 0, sub_details: null, events: null, p1: 0, p2: 0, g1: 0, g2: 0 }); }
+        
         async function setupMatch() { 
             let l = document.getElementById('adm-league-input').value.toUpperCase(), t1 = document.getElementById('adm-t1').value.toUpperCase(), t2 = document.getElementById('adm-t2').value.toUpperCase(), time = document.getElementById('adm-time').value; 
             if(!t1 || !t2) return; 
