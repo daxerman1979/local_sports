@@ -60,60 +60,85 @@
         .live-card-bubble { 
             background: rgba(15, 15, 15, 0.95);
             border: 2px solid #FF9500;
-            border-radius: 40px; /* Povećan radius za pilulast izgled */
-            padding: 0 10px 0 0; /* Padding samo desno, visinu diktira lopta */
+            border-radius: 40px;
+            padding: 0 10px 0 0; /* Bez gornjeg paddinga, visinu diktiraju wrapper i lopta */
             display: none;
             flex-direction: row; 
-            width: 240px;
+            width: 280px; /* Povećana širina za više prostora */
+            height: 75px; /* Povećana fiksna visina za razmak oko lopte */
             color: white;
             backdrop-filter: blur(15px);
             box-shadow: 0 10px 30px rgba(0,0,0,0.8);
             position: relative;
             z-index: 25;
-            margin-bottom: 12px;
+            margin-bottom: 15px; /* Malo veći razmak odozdo */
             align-items: center;
-            overflow: hidden; /* Da krug lopte ne prelazi ivice ako zatreba */
+            overflow: visible; /* Kvačica mora biti vidljiva */
         }
         
-        /* Kvačica (rep) oblačića */
-        .live-card-bubble::after {
+        /* Kvačica (rep) oblačića sa vidljivim narandžastim rubom */
+        .live-card-bubble::after,
+        .live-card-bubble::before {
             content: '';
             position: absolute;
-            bottom: -12px;
+            bottom: -13px; /* Postavljena da bude vidljiva */
             left: 50%;
             transform: translateX(-50%);
             width: 0;
             height: 0;
-            border-left: 10px solid transparent;
-            border-right: 10px solid transparent;
-            border-top: 12px solid #FF9500;
+            border-left: 11px solid transparent;
+            border-right: 11px solid transparent;
+            z-index: 1; /* Iza ruba */
+        }
+        
+        /* Unutrašnji deo kvačice (providan) */
+        .live-card-bubble::after {
+            border-top: 13px solid rgba(15, 15, 15, 0.95);
+            bottom: -11px; /* Malo povučena ka unutra */
+            z-index: 2; /* Ispred narandžastog ruba */
+        }
+        
+        /* Narandžasti rub kvačice */
+        .live-card-bubble::before {
+            border-top: 13px solid #FF9500;
         }
         
         .zoom-near .live-card-bubble { display: flex; }
         .status-live-wrapper .live-card-bubble { border-color: #FF9500; box-shadow: 0 0 20px rgba(255,149,0,0.4); }
 
-        /* Leva strana - Lopta diktira VISINU cele kartice */
+        /* Leva strana - Kontejner koji pravi razmak oko lopte */
+        .card-left-wrapper {
+            flex: 0 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px; /* Simetričan razmak oko lopte */
+            height: 100%;
+        }
+
+        /* Sama lopta u krugu sa tankim rubom i unutrašnjim padding-om */
         .card-left-icon {
-            flex: 0 0 65px; /* Prečnik lopte */
-            height: 65px;   /* Visina kartice je sada fiksno 65px */
-            background: rgba(255,149,0,0.15);
+            width: 55px; /* Prečnik kruga sa loptom */
+            height: 55px;
+            background: rgba(255,149,0,0.1);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 42px; /* Još malo veća ikona */
-            margin-right: 12px;
-            border: 2px solid rgba(255,149,0,0.3);
+            font-size: 34px; /* Veličina ikone lopte */
+            border: 1px solid rgba(255,149,0,0.2);
+            padding: 5px; /* Unutrašnji razmak od ruba kruga do lopte */
         }
 
-        /* Desna strana - Info (Zbijenije da stane u visinu lopte) */
+        /* Desna strana - Info (Vertikalno centrirana, sa manje paddinga unutar redova) */
         .card-right-info {
             flex: 1;
             display: flex;
             flex-direction: column;
-            justify-content: center; /* Centriranje sadržaja po vertikali */
+            justify-content: center;
             overflow: hidden;
             height: 100%;
+            padding: 2px 0; /* Veoma mali vertikalni padding */
         }
 
         .card-league-mini { 
@@ -133,6 +158,7 @@
             justify-content: space-between; 
             align-items: center; 
             width: 100%;
+            margin-bottom: 1px; /* Smanjen razmak između redova */
         }
         
         .team-name-new { 
@@ -143,7 +169,7 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            max-width: 90px;
+            max-width: 110px; /* Povećano jer ima više mesta */
         }
         
         .score-val-new { 
@@ -163,7 +189,7 @@
         .extra-val { 
             font-size: 7px; 
             font-family: 'Oswald'; 
-            background: rgba(255, 149, 0, 0.2); 
+            background: rgba(255, 149, 0, 0.15); 
             padding: 0px 4px; 
             border-radius: 4px; 
             color: #FF9500;
@@ -181,6 +207,7 @@
             align-self: flex-start;
             animation: soft-blink 1.5s infinite;
             font-family: 'Oswald';
+            margin-top: 3px; /* Dodat mali razmak odozgo */
         }
         
         @keyframes soft-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
@@ -190,6 +217,7 @@
             color: #888; 
             font-weight: 700; 
             font-family: 'Oswald';
+            margin-top: 3px; /* Dodat mali razmak odozgo */
         }
 
         .leaflet-popup-content-wrapper { background: rgba(18, 16, 14, 0.95) !important; color: white !important; border: 1px solid #FF9500 !important; border-radius: 20px !important; backdrop-filter: blur(10px); }
