@@ -56,46 +56,47 @@
         .settings-btn { position: absolute; top: 70px; right: 20px; z-index: 5500; width: 40px; height: 40px; background: rgba(0,0,0,0.5); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); }
         .settings-btn img { width: 20px; filter: invert(1); }
 
-    /* NOVI DIZAJN KARTICE - LUKSUZNI STRIP OBLAČIĆ */
+    /* LUKSUZNI STRIP OBLAČIĆ - FINALNA VERZIJA */
     .live-card-bubble { 
-        background: linear-gradient(to bottom, #1c1916, #12100e); /* Gradijent sličan tvom primeru */
-        border: 2px solid #5a3d31; /* Braon-bronzana bordura */
-        border-radius: 60px; /* Potpuno zaobljene ivice (pilula) */
-        padding: 10px 20px;
+        background: linear-gradient(to bottom, #1c1916, #12100e);
+        border: 2px solid #5a3d31;
+        border-radius: 60px;
+        padding: 5px 15px;
         display: none;
         flex-direction: row; 
-        width: 320px; /* Širina iz tvog primera */
-        min-height: 90px;
+        width: 340px; /* Malo prošireno za bolju organizaciju */
+        height: 85px; /* Visina veća od visine lopte (70px) */
         color: white;
         backdrop-filter: blur(15px);
         box-shadow: 0 10px 30px rgba(0,0,0,0.8);
         position: relative;
         z-index: 25;
-        margin-bottom: 25px;
+        margin-bottom: 25px; /* Prostor za kvačicu iznad markera */
         align-items: center;
         overflow: visible;
     }
 
-    /* Kvačica (rep) - Postavljena desno kao na primeru */
+    /* Kvačica (rep) - Centrirana da pokazuje tačku klika */
     .live-card-bubble::after {
         content: '';
         position: absolute;
-        bottom: -20px;
-        right: 40px;
+        bottom: -19px;
+        left: 50%; /* Tačno na sredini kartice */
+        transform: translateX(-50%);
         width: 0;
         height: 0;
         border-left: 15px solid transparent;
         border-right: 15px solid transparent;
-        border-top: 20px solid #12100e; /* Boja dna kartice */
+        border-top: 20px solid #12100e;
         z-index: 2;
     }
 
-    /* Bordura za kvačicu */
     .live-card-bubble::before {
         content: '';
         position: absolute;
         bottom: -23px;
-        right: 38px;
+        left: 50%;
+        transform: translateX(-50%);
         width: 0;
         height: 0;
         border-left: 17px solid transparent;
@@ -106,30 +107,29 @@
 
     .zoom-near .live-card-bubble { display: flex; }
     
-    /* Leva strana - Lopta (Krug kao u primeru) */
+    /* LEVA STRANA - IKONA SPORTA */
     .card-left-icon {
         flex: 0 0 70px;
         height: 70px;
-        background-color: #FF9500; /* Tvoja narandžasta */
-        border: 3px solid #b35d1a;
+        background: radial-gradient(circle, #FF9500 0%, #b35d1a 100%);
+        border: 2px solid #5a3d31;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 38px;
-        margin-right: 15px;
+        font-size: 36px;
         flex-shrink: 0;
-        box-shadow: inset 0 0 15px rgba(0,0,0,0.2);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.4);
     }
 
-    /* Srednji deo - Tvoji podaci (Info) */
+    /* SREDINA - ORGANIZACIJA TEKSTA */
     .card-right-info {
         flex: 1;
         display: flex;
         flex-direction: column;
-        align-items: center; /* Centrirano kao u primeru */
+        justify-content: center;
+        padding: 0 15px;
         overflow: hidden;
-        text-align: center;
     }
 
     .card-league-mini { 
@@ -138,73 +138,66 @@
         font-weight: 800; 
         text-transform: uppercase;
         font-family: 'Oswald';
-        margin-bottom: 2px;
+        letter-spacing: 1px;
+    }
+
+    .score-row-new {
+        display: flex;
+        flex-direction: column; /* Timovi jedan ispod drugog za jasniji pregled */
+        gap: 0px;
     }
 
     .team-name-new { 
-        font-size: 14px; 
-        font-weight: 500; 
+        font-size: 13px; 
+        font-weight: 700; 
         text-transform: uppercase; 
         color: #fff;
-        white-space: nowrap;
+        line-height: 1.2;
     }
     
     .score-val-new { 
+        position: absolute; /* Rezultat fiksiran u sredini između ikona */
+        left: 50%;
+        transform: translateX(-50%);
         font-family: 'Oswald'; 
-        font-size: 24px; /* Istaknut rezultat */
+        font-size: 26px; 
         color: #FF9500; 
-        font-weight: 700; 
-        line-height: 1.1;
-        margin: 2px 0;
+        font-weight: 800;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.5);
     }
 
-    /* Donji red (Vreme i Extra data) */
-    .extra-data-row { 
-        display: flex; 
-        gap: 5px; 
+    /* DESNA STRANA - KORISTAN INFO (VREME/LIVE) */
+    .card-right-status {
+        flex: 0 0 60px;
+        height: 60px;
+        border: 2px solid rgba(255, 149, 0, 0.3);
+        border-radius: 50%;
+        display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
-    }
-    
-    .extra-val { 
-        font-size: 9px; 
-        font-family: 'Oswald'; 
-        background: rgba(255, 149, 0, 0.2); 
-        padding: 1px 6px; 
-        border-radius: 4px; 
-        color: #FF9500;
+        background: rgba(0,0,0,0.3);
+        flex-shrink: 0;
     }
 
     .card-time-mini { 
-        font-size: 9px; 
-        color: #888; 
-        font-weight: 700; 
+        font-size: 11px; 
+        color: #fff; 
+        font-weight: 800; 
         font-family: 'Oswald';
     }
 
     .blink-live { 
         font-size: 8px;
-        color: #FF9500;
+        background: #FF9500;
+        color: #000;
+        padding: 1px 5px;
+        border-radius: 3px;
         font-weight: 900;
-        text-transform: uppercase;
-        animation: soft-blink 1.5s infinite;
+        margin-top: 2px;
     }
 
-    /* Desna ikonica (kao Stadion u tvom primeru, ovde može biti logo ili fix ikona) */
-    .card-right-logo-placeholder {
-        flex: 0 0 50px;
-        height: 50px;
-        background: rgba(255,255,255,0.05);
-        border: 1px solid rgba(255,149,0,0.2);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 24px;
-        margin-left: 10px;
-    }
-
-    @keyframes soft-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    @keyframes soft-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
 
     /* Ostatak tvojih stilova (Leaflet, Modali, Admin) - NEPROMEnJENO */
     .leaflet-popup-content-wrapper { background: rgba(18, 16, 14, 0.95) !important; color: white !important; border: 1px solid #FF9500 !important; border-radius: 20px !important; backdrop-filter: blur(10px); }
