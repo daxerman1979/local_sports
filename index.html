@@ -135,83 +135,92 @@
     }
     .settings-btn img { width: 20px; filter: invert(1); }
 
-    /* --- TV PRO SCOREBOARD DIZAJN --- */
+    /* --- TV PRO SCOREBOARD NOVI DIZAJN --- */
     .live-card-thin { 
-        background: linear-gradient(180deg, #1a1a1a 0%, #0a0a0a 100%);
-        border-left: 5px solid #FF9500;
-        border-radius: 4px; 
+        background: linear-gradient(135deg, rgba(20,20,20,0.95) 0%, rgba(40,40,40,0.95) 100%);
+        border-left: 4px solid #FF9500;
+        border-radius: 8px; 
         padding: 0;
         display: none; 
         flex-direction: column;
-        width: 220px;
+        width: 240px;
         color: white;
-        box-shadow: 5px 5px 15px rgba(0,0,0,0.9);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.8), inset 0 0 20px rgba(255,255,255,0.05);
         position: relative;
         z-index: 100;
         margin-bottom: 15px;
         pointer-events: auto;
         overflow: hidden;
+        animation: cardAppear 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes cardAppear {
+        from { opacity: 0; transform: translateY(10px) scale(0.9); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
     }
     
-    /* Zaglavlje lige u TV stilu */
     .card-league-row { 
-        background: #FF9500;
+        background: linear-gradient(90deg, #FF9500 0%, #FFCC00 100%);
         display: flex; align-items: center; 
-        padding: 4px 10px;
-        gap: 6px; width: 100%;
+        padding: 6px 12px;
+        gap: 8px; width: 100%;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
     }
-    .league-ball-icon { font-size: 12px; filter: brightness(0); }
+    .league-ball-icon { font-size: 14px; filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.5)); }
     .card-league-mini { 
-        font-size: 10px; color: #000; font-weight: 900; 
-        letter-spacing: 1px; text-transform: uppercase;
-        font-family: 'Inter'; white-space: nowrap;
+        font-size: 11px; color: #000; font-weight: 900; 
+        letter-spacing: 0.5px; text-transform: uppercase;
+        font-family: 'Oswald'; white-space: nowrap;
     }
 
     .score-row { 
         display: flex; justify-content: space-between; 
-        align-items: center; padding: 6px 10px;
-        background: rgba(255,255,255,0.03);
+        align-items: center; padding: 8px 12px;
+        background: rgba(255,255,255,0.02);
         border-bottom: 1px solid rgba(255,255,255,0.05);
         width: 100%;
     }
     .team-name-col { 
-        font-size: 13px; font-weight: 700; text-transform: uppercase; 
-        color: #fff; overflow: hidden; text-overflow: ellipsis;
-        white-space: nowrap; max-width: 140px;
+        font-size: 14px; font-weight: 800; text-transform: uppercase; 
+        color: #efefef; overflow: hidden; text-overflow: ellipsis;
+        white-space: nowrap; max-width: 150px;
+        letter-spacing: 0.5px;
     }
     .score-val-col { 
-        font-family: 'Oswald'; font-size: 20px; color: #FF9500; 
-        font-weight: 700; min-width: 30px; text-align: right;
+        font-family: 'Oswald'; font-size: 22px; color: #FF9500; 
+        font-weight: 700; min-width: 35px; text-align: right;
+        text-shadow: 0 0 10px rgba(255,149,0,0.4);
     }
 
     .extra-data-row { 
-        display: flex; background: #222; justify-content: space-around;
-        padding: 4px; width: 100%;
+        display: flex; background: rgba(0,0,0,0.3); justify-content: space-around;
+        padding: 5px; width: 100%; border-top: 1px solid rgba(255,255,255,0.05);
     }
     .extra-val { 
         font-size: 10px; font-family: 'Oswald'; 
-        color: #FF9500; text-transform: uppercase;
+        color: #00CCFF; text-transform: uppercase; font-weight: 700;
     }
 
     .blink-live { 
-        background: #cc0000; color: white; font-weight: 900;
-        font-size: 9px; padding: 2px 8px;
+        background: #FF0000; color: white; font-weight: 900;
+        font-size: 10px; padding: 2px 10px;
         text-transform: uppercase; align-self: flex-start;
-        animation: tv-blink 1s infinite; font-family: 'Inter';
-        margin: 5px 10px; border-radius: 2px;
+        animation: tv-blink 1.2s infinite; font-family: 'Inter';
+        margin: 8px 12px; border-radius: 3px;
+        box-shadow: 0 0 10px rgba(255,0,0,0.5);
     }
-    @keyframes tv-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+    @keyframes tv-blink { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
 
     .card-time-mini { 
-        font-size: 10px; color: #888; font-weight: 700; 
-        padding: 5px 10px; font-family: 'Oswald';
+        font-size: 11px; color: #999; font-weight: 700; 
+        padding: 6px 12px; font-family: 'Oswald';
+        background: rgba(0,0,0,0.1);
     }
 
     /* POPUP I MODALI */
     .leaflet-popup-content-wrapper { 
-        background: rgba(18, 16, 14, 0.95) !important; color: white !important; 
-        border: 1px solid #FF9500 !important; border-radius: 20px !important; 
-        backdrop-filter: blur(10px); 
+        background: rgba(18, 16, 14, 0.98) !important; color: white !important; 
+        border: 2px solid #FF9500 !important; border-radius: 24px !important; 
+        backdrop-filter: blur(15px); box-shadow: 0 20px 50px rgba(0,0,0,0.5) !important;
     }
     .leaflet-popup-tip { background: #FF9500 !important; }
 
@@ -228,21 +237,21 @@
 
     /* MARKER STILOVI */
     .sport-marker-wrapper { display: flex; flex-direction: column; align-items: center; position: relative; }
-    .marker-ball-only { font-size: 20px; transition: 0.3s; filter: drop-shadow(0 0 5px rgba(255,149,0,0.5)); z-index: 5; }
+    .marker-ball-only { font-size: 22px; transition: 0.3s; filter: drop-shadow(0 0 8px rgba(255,149,0,0.6)); z-index: 5; }
     
     .ball-halo { 
         position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-        width: 35px; height: 35px; border-radius: 50%; 
-        background: radial-gradient(circle, rgba(255,149,0,0.4) 0%, rgba(255,149,0,0) 70%); 
+        width: 40px; height: 40px; border-radius: 50%; 
+        background: radial-gradient(circle, rgba(255,149,0,0.5) 0%, rgba(255,149,0,0) 70%); 
         z-index: 4; pointer-events: none; animation: halo-pulse 2s infinite ease-in-out; 
     }
     @keyframes halo-pulse {
         0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.3; }
-        50% { transform: translate(-50%, -50%) scale(1.3); opacity: 0.6; }
+        50% { transform: translate(-50%, -50%) scale(1.4); opacity: 0.7; }
         100% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.3; }
     }
     
-    .zoom-far .marker-ball-only { font-size: 14px; }
+    .zoom-far .marker-ball-only { font-size: 16px; }
     .zoom-near .live-card-thin { display: flex; }
     .marker-content-box { 
         position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); 
@@ -252,7 +261,21 @@
     
     .zoom-near .marker-ball-only, .zoom-near .ball-halo { display: none; }
 
-    /* MATCH DETAILS VIEW - Ovde su sada podaci BELI */
+    /* Mesto klika animacija */
+    .click-target-animation {
+        width: 60px; height: 60px;
+        border: 3px solid #FF9500;
+        border-radius: 50%;
+        position: absolute;
+        animation: clickPulse 1s ease-out infinite;
+        pointer-events: none;
+    }
+    @keyframes clickPulse {
+        0% { transform: scale(0.1); opacity: 1; border-width: 10px; }
+        100% { transform: scale(1.5); opacity: 0; border-width: 1px; }
+    }
+
+    /* MATCH DETAILS VIEW */
     #match-details-view { 
         position: fixed; bottom: -100%; left: 0; width: 100%; max-height: 90vh; 
         background: #12100e; z-index: 8000; border-top: 3px solid #FF9500; 
@@ -382,7 +405,7 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth(), db = firebase.database();
 
-        let map, userMarker, currentLat, currentLon, currentAdminKey = null, allTereni = [], rangeCircle = null;
+        let map, userMarker, currentLat, currentLon, currentAdminKey = null, allTereni = [], rangeCircle = null, clickPulseMarker = null;
         let currentLang = localStorage.getItem('lang') || 'sr';
         const sportEmojis = { "FUDBAL": "⚽", "KOŠARKA": "🏀", "ODBOJKA": "🏐", "TENIS": "🎾", "RUKOMET": "🤾", "OSTALO": "🏆" };
         const tennisPoints = ["0", "15", "30", "40", "AD"];
@@ -507,7 +530,7 @@
         function renderMarkers() {
             if (!map) return;
             const center = map.getCenter();
-            map.eachLayer(l => { if (l instanceof L.Marker && l !== userMarker) map.removeLayer(l); });
+            map.eachLayer(l => { if (l instanceof L.Marker && l !== userMarker && l !== clickPulseMarker) map.removeLayer(l); });
 
             const zoomNear = map.getZoom() >= 13;
             const zoomFar = map.getZoom() < 11;
@@ -576,13 +599,20 @@
             if (!auth.currentUser) return; 
             const clickPos = e.latlng; 
             if (allTereni.some(c => clickPos.distanceTo(L.latLng(c.lat, c.lng)) < 200)) { alert(translations[currentLang].zoneOccupied); return; } 
+            
+            // Dodajemo animaciju klika
+            if(clickPulseMarker) map.removeLayer(clickPulseMarker);
+            clickPulseMarker = L.marker(e.latlng, {
+                icon: L.divIcon({ className: 'click-target-animation', iconSize: [60, 60], iconAnchor: [30, 30] })
+            }).addTo(map);
+
             openTerenForm(e.latlng.lat, e.latlng.lng);
         }
 
         function openTerenForm(lat, lng) {
             const t = translations[currentLang];
             const html = `
-            <div style="display:flex; flex-direction:column; gap:10px; min-width:180px;">
+            <div style="display:flex; flex-direction:column; gap:10px; min-width:180px; padding: 5px;">
                 <select id="p_sport" onchange="toggleOtherSport(this.value)">
                     <option value="FUDBAL">${t.sportNames.FUDBAL}</option>
                     <option value="KOŠARKA">${t.sportNames.KOŠARKA}</option>
@@ -593,9 +623,13 @@
                 </select>
                 <input type="text" id="p_custom_sport" placeholder="${t.otherSport}" style="display:none;">
                 <input type="text" id="p_name" placeholder="${t.courtName}" maxlength="15">
-                <button onclick="saveTeren(${lat}, ${lng})" class="auth-btn" style="padding:10px;">${t.create}</button>
+                <button onclick="saveTeren(${lat}, ${lng})" class="auth-btn" style="padding:10px; border-radius: 8px;">${t.create}</button>
             </div>`; 
             L.popup().setLatLng([lat, lng]).setContent(html).openOn(map);
+            
+            map.on('popupclose', () => {
+                if(clickPulseMarker) { map.removeLayer(clickPulseMarker); clickPulseMarker = null; }
+            });
         }
 
         function toggleOtherSport(val) { document.getElementById('p_custom_sport').style.display = (val === 'OSTALO') ? 'block' : 'none'; }
