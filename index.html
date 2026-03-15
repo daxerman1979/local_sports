@@ -56,15 +56,15 @@
         .settings-btn { position: absolute; top: 70px; right: 20px; z-index: 5500; width: 40px; height: 40px; background: rgba(0,0,0,0.5); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); }
         .settings-btn img { width: 20px; filter: invert(1); }
 
-        /* NOVI DIZAJN KARTICE - OBLIK PILULE */
-        .live-card-thin { 
-            background: rgba(15, 15, 15, 0.9);
+        /* NOVI DIZAJN KARTICE - STRIP OBLAČIĆ */
+        .live-card-bubble { 
+            background: rgba(15, 15, 15, 0.95);
             border: 2px solid #FF9500;
-            border-radius: 60px; /* Oblik pilule */
-            padding: 8px 16px;
+            border-radius: 20px;
+            padding: 10px;
             display: none;
-            flex-direction: column;
-            width: 200px;
+            flex-direction: row; /* Horizontalni raspored */
+            width: 240px;
             color: white;
             backdrop-filter: blur(15px);
             box-shadow: 0 10px 30px rgba(0,0,0,0.8);
@@ -74,55 +74,66 @@
             align-items: center;
         }
         
-        .live-card-thin::after {
+        /* Kvačica (rep) oblačića */
+        .live-card-bubble::after {
             content: '';
             position: absolute;
-            bottom: -10px;
+            bottom: -12px;
             left: 50%;
             transform: translateX(-50%);
             width: 0;
             height: 0;
-            border-left: 8px solid transparent;
-            border-right: 8px solid transparent;
-            border-top: 10px solid #FF9500;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 12px solid #FF9500;
         }
         
-        .zoom-near .live-card-thin { display: flex; }
-        .status-live-wrapper .live-card-thin { box-shadow: 0 0 20px rgba(255,149,0,0.4); }
+        .zoom-near .live-card-bubble { display: flex; }
+        .status-live-wrapper .live-card-bubble { border-color: #FF9500; box-shadow: 0 0 20px rgba(255,149,0,0.4); }
 
-        .card-league-row { 
-            display: flex; 
-            align-items: center; 
+        /* Leva strana - Lopta */
+        .card-left-icon {
+            flex: 0 0 50px;
+            height: 50px;
+            background: rgba(255,149,0,0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
             justify-content: center;
-            gap: 6px; 
-            margin-bottom: 4px;
-            width: 100%;
+            font-size: 32px;
+            margin-right: 12px;
+            border: 1px solid rgba(255,149,0,0.2);
         }
-        
-        .league-ball-icon { font-size: 12px; }
-        
+
+        /* Desna strana - Info */
+        .card-right-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
         .card-league-mini { 
             font-size: 9px; 
             color: #FF9500; 
             font-weight: 800; 
-            letter-spacing: 1px; 
             text-transform: uppercase;
             font-family: 'Oswald';
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            margin-bottom: 4px;
         }
 
-        .score-row { 
+        .score-row-new { 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            margin-bottom: 2px; 
             width: 100%;
-            padding: 0 5px;
+            margin-bottom: 2px;
         }
         
-        .team-name-col { 
+        .team-name-new { 
             font-size: 13px; 
             font-weight: 800; 
             text-transform: uppercase; 
@@ -130,47 +141,44 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            max-width: 110px;
+            max-width: 100px;
         }
         
-        .score-val-col { 
+        .score-val-new { 
             font-family: 'Oswald'; 
-            font-size: 18px; 
+            font-size: 16px; 
             color: #FF9500; 
             font-weight: 700; 
-            min-width: 25px;
             text-align: right;
-            line-height: 1;
         }
 
         .extra-data-row { 
             display: flex; 
-            justify-content: center; 
             gap: 5px; 
-            margin-top: 3px;
-            width: 100%;
+            margin-top: 4px;
         }
         
         .extra-val { 
-            font-size: 9px; 
+            font-size: 8px; 
             font-family: 'Oswald'; 
             background: rgba(255, 149, 0, 0.15); 
-            padding: 2px 6px; 
-            border-radius: 10px; 
+            padding: 1px 5px; 
+            border-radius: 6px; 
             color: #FF9500;
-            border: 1px solid rgba(255,149,0,0.3);
+            border: 1px solid rgba(255,149,0,0.2);
         }
 
         .blink-live { 
             background: #FF9500;
             color: black;
             font-weight: 900;
-            font-size: 9px;
-            padding: 2px 10px;
-            border-radius: 10px;
+            font-size: 8px;
+            padding: 1px 8px;
+            border-radius: 4px;
             text-transform: uppercase;
-            margin-top: 6px;
-            text-align: center;
+            margin-top: 4px;
+            display: inline-block;
+            align-self: flex-start;
             animation: soft-blink 1.5s infinite;
             font-family: 'Oswald';
         }
@@ -179,11 +187,9 @@
 
         .card-time-mini { 
             font-size: 9px; 
-            color: #aaa; 
+            color: #888; 
             font-weight: 700; 
-            text-align: center; 
             margin-top: 4px;
-            letter-spacing: 0.5px;
             font-family: 'Oswald';
         }
 
@@ -363,7 +369,7 @@
 
         let map, userMarker, currentLat, currentLon, currentAdminKey = null, allTereni = [], rangeCircle = null;
         let currentLang = localStorage.getItem('lang') || 'sr';
-        const sportEmojis = { "FUDBAL": "⚽", "KOŠARKA": "🏀", "ODBOJKA": "ODBOJKA", "TENIS": "🎾", "RUKOMET": "🤾", "OSTALO": "🏆" };
+        const sportEmojis = { "FUDBAL": "⚽", "KOŠARKA": "🏀", "ODBOJKA": "🏐", "TENIS": "🎾", "RUKOMET": "🤾", "OSTALO": "🏆" };
         const tennisPoints = ["0", "15", "30", "40", "AD"];
 
         const translations = {
@@ -511,21 +517,21 @@
                 let timeInfo = isLive ? `<div class="blink-live">${translations[currentLang].live}</div>` : (d.match_time ? `<div class="card-time-mini">${new Date(d.match_time).toLocaleDateString([],{day:'2-digit',month:'2-digit'})} ${translations[currentLang].timeAt} ${new Date(d.match_time).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div>` : "");
 
                 let htmlContent = `
-                    <div class="live-card-thin">
-                        <div class="card-league-row">
-                            <div class="league-ball-icon">${ball}</div>
+                    <div class="live-card-bubble">
+                        <div class="card-left-icon">${ball}</div>
+                        <div class="card-right-info">
                             <div class="card-league-mini">${d.league || sportName}</div>
+                            <div class="score-row-new">
+                                <span class="team-name-new">${d.t1 || d.name}</span>
+                                <span class="score-val-new">${(isLive || isEnded) ? (d.score1 || 0) : ""}</span>
+                            </div>
+                            <div class="score-row-new">
+                                <span class="team-name-new">${d.t2 || ""}</span>
+                                <span class="score-val-new">${(isLive || isEnded) ? (d.score2 || 0) : ""}</span>
+                            </div>
+                            ${extraRows}
+                            ${timeInfo}
                         </div>
-                        <div class="score-row">
-                            <span class="team-name-col">${d.t1 || d.name}</span>
-                            <span class="score-val-col">${(isLive || isEnded) ? (d.score1 || 0) : ""}</span>
-                        </div>
-                        <div class="score-row">
-                            <span class="team-name-col">${d.t2 || ""}</span>
-                            <span class="score-val-col">${(isLive || isEnded) ? (d.score2 || 0) : ""}</span>
-                        </div>
-                        ${extraRows}
-                        ${timeInfo}
                     </div>`;
 
                 const html = `
