@@ -484,65 +484,103 @@
         }
 
         function renderMarkers() {
-            if (!map) return;
-            const center = map.getCenter();
-            map.eachLayer(l => { if(l instanceof L.Marker && l !== userMarker) map.removeLayer(l); });
-            
-            const zoomNear = map.getZoom() > 14;
-            const zoomFar = map.getZoom() < 11;
+    if (!map) return;
+    
+    const center = map.getCenter();
+    
+    // Uklanjanje svih markera osim korisničkog markera
+    map.eachLayer(l => { 
+        if (l instanceof L.Marker && l !== userMarker) map.removeLayer(l); 
+    });
 
-            allTereni.forEach(d => {
-                if (map.distance(center, [d.lat, d.lng]) > 30000) return;
-                const isLive = d.status === 'live', isEnded = d.status === 'ended';
-                const ball = sportEmojis[d.sport] || '⚽';
-                const sportName = d.custom_sport || (translations[currentLang].sportNames[d.sport] || d.sport);
+    const zoomNear = map.getZoom() > 14;
+    const zoomFar = map.getZoom() < 11;
 
-                let extraRows = "";
-                if(isLive || isEnded) {
-                    if(d.sport === "TENIS") {
-                        const pts1 = (d.g1===6 && d.g2===6) ? (d.p1||0) : (tennisPoints[d.p1]||"0");
-                        const pts2 = (d.g1===6 && d.g2===6) ? (d.p2||0) : (tennisPoints[d.p2]||"0");
-                        extraRows = `<div class="extra-data-row"><span class="extra-val">GEMS: ${d.g1||0}:${d.g2||0}</span><span class="extra-val">PTS: ${pts1}:${pts2}</span></div>`;
-                    } else if(d.sport === "ODBOJKA") {
-                        extraRows = `<div class="extra-data-row"><span class="extra-val">PTS: ${d.p1||0}:${d.p2||0}</span></div>`;
-                    }
-                }
+    allTereni.forEach(d => {
+        // Filtriranje po distanci (30km)
+        if (map.distance(center, [d.lat, d.lng]) > 30000) return;
 
-                let timeInfo = isLive ? `<div class="blink-live">${translations[currentLang].live}</div>` : (d.match_time ? `<div class="card-time-mini">${new Date(d.match_time).toLocaleDateString([],{day:'2-digit',month:'2-digit'})} ${translations[currentLang].timeAt} ${new Date(d.match_time).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div>` : "");
+        const isLive = d.status === 'live', isEnded = d.status === 'ended';
+        const ball = sportEmojis[d.sport] || '⚽';
+        const sportName = d.custom_sport || (translations[currentLang].sportNames[d.sport] || d.sport);
 
-                let htmlContent = `
-                    <div class="live-card-thin">
-                        <div class="card-league-row">
-                            <div class="league-ball-icon">${ball}</div>
-                            <div class="card-league-mini">${d.league || sportName}</div>
-                        </div>
-                        <div class="score-row">
-                            <span class="team-name-col">${d.t1 || d.name}</span>
-                            <span class="score-val-col">${(isLive || isEnded) ? (d.score1 || 0) : ""}</span>
-                        </div>
-                        <div class="score-row">
-                            <span class="team-name-col">${d.t2 || ""}</span>
-                            <span class="score-val-col">${(isLive || isEnded) ? (d.score2 || 0) : ""}</span>
-                        </div>
-                        ${extraRows}
-                        ${timeInfo}
+        // --- Logika za dodatne redove (Tenis i Odbojka) ---
+        let extraRows = "";
+        if (isLive || isEnded) {
+            if (d.sport === "TENIS") {
+                const pts1 = (d.g1 === 6 && d.g2 === 6) ? (d.p1 || 0) : (tennisPoints[d.p1] || "0");
+                const pts2 = (d.g1 === 6 && d.g2 === 6) ? (d.p2 || 0) : (tennisPoints[d.p2] || "0");
+                extraRows = `
+                    <div class="extra-data-row">
+                        <span class="extra-val">GEMS: ${d.g1 || 0}:${d.g2 || 0}</span>
+                        <span class="extra-val">PTS: ${pts1}:${pts2}</span>
                     </div>`;
-
-                const html = `
-                    <div class="sport-marker-wrapper ${isLive?'status-live-wrapper':''} ${zoomNear?'zoom-near':''} ${zoomFar?'zoom-far':''}">
-                        <div class="marker-content-box">
-                            <div class="ball-halo"></div>
-                            <div class="marker-ball-only">${ball}</div>
-                            ${htmlContent}
-                        </div>
-                    </div>`;
-                
-                L.marker([d.lat, d.lng], { icon: L.divIcon({ className: '', html, iconSize: [0,0], iconAnchor: [0, 0] }) }).addTo(map).on('click', e => { 
-                    L.DomEvent.stopPropagation(e); 
-                    if (auth.currentUser && d.owner === auth.currentUser.uid) openAdmin(d.key); else openDetails(d.key); 
-                });
-            });
+            } else if (d.sport === "ODBOJKA") {
+                extraRows = `<div class="extra-data-row"><span class="extra-val">PTS: ${d.p1 || 0}:${d.p2 || 0}</span></div>`;
+            }
         }
+
+        // --- Logika za vreme meča ---
+        let timeInfo = "";
+        if (isLive) {
+            timeInfo = `<div class="blink-live">${translations[currentLang].live}</div>`;
+        } else if (d.match_time) {
+            const mTime = new Date(d.match_time);
+            const dateStr = mTime.toLocaleDateString([], { day: '2-digit', month: '2-digit' });
+            const timeStr = mTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            timeInfo = `<div class="card-time-mini">${dateStr} ${translations[currentLang].timeAt} ${timeStr}</div>`;
+        }
+
+        // --- Glavni sadržaj kartice (Marker Content) ---
+        let htmlContent = `
+            <div class="live-card-thin">
+                <div class="card-league-row">
+                    <div class="league-ball-icon">${ball}</div>
+                    <div class="card-league-mini">${d.league || sportName}</div>
+                </div>
+                <div class="score-row">
+                    <span class="team-name-col">${d.t1 || d.name}</span>
+                    <span class="score-val-col">${(isLive || isEnded) ? (d.score1 || 0) : ""}</span>
+                </div>
+                <div class="score-row">
+                    <span class="team-name-col">${d.t2 || ""}</span>
+                    <span class="score-val-col">${(isLive || isEnded) ? (d.score2 || 0) : ""}</span>
+                </div>
+                ${extraRows}
+                ${timeInfo}
+            </div>`;
+
+        // --- Finalni HTML za L.divIcon ---
+        const html = `
+            <div class="sport-marker-wrapper ${isLive ? 'status-live-wrapper' : ''} ${zoomNear ? 'zoom-near' : ''} ${zoomFar ? 'zoom-far' : ''}">
+                <div class="marker-content-box">
+                    <div class="ball-halo"></div>
+                    <div class="marker-ball-only">${ball}</div>
+                    ${htmlContent}
+                </div>
+            </div>`;
+
+        // --- Kreiranje i dodavanje markera na mapu ---
+        L.marker([d.lat, d.lng], { 
+            icon: L.divIcon({ 
+                className: '', 
+                html: html, 
+                iconSize: [0, 0], 
+                iconAnchor: [0, 0] 
+            }) 
+        })
+        .addTo(map)
+        .on('click', e => {
+            L.DomEvent.stopPropagation(e);
+            // Provera vlasništva i otvaranje odgovarajućeg prozora
+            if (auth.currentUser && d.owner === auth.currentUser.uid) {
+                openAdmin(d.key);
+            } else {
+                openDetails(d.key);
+            }
+        });
+    });
+}
 
         function handleMapClick(e) { 
             if (!auth.currentUser) return; 
