@@ -56,137 +56,119 @@
         .settings-btn { position: absolute; top: 70px; right: 20px; z-index: 5500; width: 40px; height: 40px; background: rgba(0,0,0,0.5); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); }
         .settings-btn img { width: 20px; filter: invert(1); }
 
-        /* NOVI DIZAJN KARTICE - OBLIK PILULE */
+        /* PROFESIONALNI TV DIZAJN KARTICE */
         .live-card-thin { 
-            background: rgba(15, 15, 15, 0.9);
-            border: 2px solid #FF9500;
-            border-radius: 60px; /* Oblik pilule */
-            padding: 8px 16px;
+            background: linear-gradient(180deg, rgba(30, 30, 35, 0.95) 0%, rgba(10, 10, 12, 0.98) 100%);
+            border-left: 4px solid #FF9500;
+            border-radius: 4px;
+            padding: 0;
             display: none;
             flex-direction: column;
-            width: 200px;
+            width: 220px;
             color: white;
-            backdrop-filter: blur(15px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
             position: relative;
             z-index: 25;
-            margin-bottom: 12px;
-            align-items: center;
-        }
-        
-        .live-card-thin::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 0;
-            border-left: 8px solid transparent;
-            border-right: 8px solid transparent;
-            border-top: 10px solid #FF9500;
+            margin-bottom: 15px;
+            overflow: hidden;
+            border-top: 1px solid rgba(255,255,255,0.1);
         }
         
         .zoom-near .live-card-thin { display: flex; }
-        .status-live-wrapper .live-card-thin { box-shadow: 0 0 20px rgba(255,149,0,0.4); }
 
-        .card-league-row { 
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-            gap: 6px; 
-            margin-bottom: 4px;
-            width: 100%;
+        .card-header-tv {
+            background: rgba(255, 149, 0, 0.1);
+            padding: 6px 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
-        
-        .league-ball-icon { font-size: 12px; }
-        
+
         .card-league-mini { 
-            font-size: 9px; 
+            font-size: 10px; 
             color: #FF9500; 
-            font-weight: 800; 
-            letter-spacing: 1px; 
+            font-weight: 900; 
+            letter-spacing: 1.5px; 
             text-transform: uppercase;
             font-family: 'Oswald';
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+        }
+
+        .tv-score-container {
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
         }
 
         .score-row { 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            margin-bottom: 2px; 
             width: 100%;
-            padding: 0 5px;
         }
         
         .team-name-col { 
-            font-size: 13px; 
-            font-weight: 800; 
+            font-size: 14px; 
+            font-weight: 700; 
             text-transform: uppercase; 
-            color: #fff;
+            color: #efefef;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            max-width: 110px;
+            max-width: 140px;
+            letter-spacing: 0.5px;
         }
         
         .score-val-col { 
             font-family: 'Oswald'; 
-            font-size: 18px; 
-            color: #FF9500; 
+            font-size: 20px; 
+            color: #fff; 
             font-weight: 700; 
-            min-width: 25px;
+            min-width: 30px;
             text-align: right;
             line-height: 1;
         }
 
-        .extra-data-row { 
-            display: flex; 
-            justify-content: center; 
-            gap: 5px; 
-            margin-top: 3px;
-            width: 100%;
-        }
-        
-        .extra-val { 
-            font-size: 9px; 
-            font-family: 'Oswald'; 
-            background: rgba(255, 149, 0, 0.15); 
-            padding: 2px 6px; 
-            border-radius: 10px; 
-            color: #FF9500;
-            border: 1px solid rgba(255,149,0,0.3);
-        }
-
-        .blink-live { 
-            background: #FF9500;
-            color: black;
-            font-weight: 900;
-            font-size: 9px;
-            padding: 2px 10px;
-            border-radius: 10px;
-            text-transform: uppercase;
-            margin-top: 6px;
-            text-align: center;
-            animation: soft-blink 1.5s infinite;
+        .tv-footer-meta {
+            background: rgba(0,0,0,0.3);
+            padding: 5px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             font-family: 'Oswald';
         }
+
+        .extra-val { 
+            font-size: 10px; 
+            color: rgba(255, 149, 0, 0.9);
+            font-weight: 500;
+        }
+
+        .blink-live-tv { 
+            background: #FF9500;
+            color: #000;
+            font-weight: 900;
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 2px;
+            text-transform: uppercase;
+            animation: tv-blink 1s infinite;
+        }
         
-        @keyframes soft-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+        @keyframes tv-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
 
         .card-time-mini { 
-            font-size: 9px; 
-            color: #aaa; 
-            font-weight: 700; 
-            text-align: center; 
-            margin-top: 4px;
-            letter-spacing: 0.5px;
-            font-family: 'Oswald';
+            font-size: 10px; 
+            color: #888; 
+            font-weight: 500; 
         }
 
+        /* OSTATAK STILA */
         .leaflet-popup-content-wrapper { background: rgba(18, 16, 14, 0.95) !important; color: white !important; border: 1px solid #FF9500 !important; border-radius: 20px !important; backdrop-filter: blur(10px); }
         .leaflet-popup-tip { background: #FF9500 !important; }
         .leaflet-popup-content { margin: 15px !important; width: 220px !important; }
@@ -363,7 +345,7 @@
 
         let map, userMarker, currentLat, currentLon, currentAdminKey = null, allTereni = [], rangeCircle = null;
         let currentLang = localStorage.getItem('lang') || 'sr';
-        const sportEmojis = { "FUDBAL": "⚽", "KOŠARKA": "🏀", "ODBOJKA": "ODBOJKA", "TENIS": "🎾", "RUKOMET": "🤾", "OSTALO": "🏆" };
+        const sportEmojis = { "FUDBAL": "⚽", "KOŠARKA": "🏀", "ODBOJKA": "🏐", "TENIS": "🎾", "RUKOMET": "🤾", "OSTALO": "🏆" };
         const tennisPoints = ["0", "15", "30", "40", "AD"];
 
         const translations = {
@@ -497,39 +479,43 @@
                 const ball = sportEmojis[d.sport] || '⚽';
                 const sportName = d.custom_sport || (translations[currentLang].sportNames[d.sport] || d.sport);
 
-                let extraRows = "";
+                let extraMeta = "";
                 if(isLive || isEnded) {
                     if(d.sport === "TENIS") {
                         const pts1 = (d.g1===6 && d.g2===6) ? (d.p1||0) : (tennisPoints[d.p1]||"0");
                         const pts2 = (d.g1===6 && d.g2===6) ? (d.p2||0) : (tennisPoints[d.p2]||"0");
-                        extraRows = `<div class="extra-data-row"><span class="extra-val">GEMS: ${d.g1||0}:${d.g2||0}</span><span class="extra-val">PTS: ${pts1}:${pts2}</span></div>`;
+                        extraMeta = `<span class="extra-val">G: ${d.g1||0}:${d.g2||0} | P: ${pts1}:${pts2}</span>`;
                     } else if(d.sport === "ODBOJKA") {
-                        extraRows = `<div class="extra-data-row"><span class="extra-val">PTS: ${d.p1||0}:${d.p2||0}</span></div>`;
+                        extraMeta = `<span class="extra-val">PTS: ${d.p1||0}:${d.p2||0}</span>`;
                     }
                 }
 
-                let timeInfo = isLive ? `<div class="blink-live">${translations[currentLang].live}</div>` : (d.match_time ? `<div class="card-time-mini">${new Date(d.match_time).toLocaleDateString([],{day:'2-digit',month:'2-digit'})} ${translations[currentLang].timeAt} ${new Date(d.match_time).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div>` : "");
+                let timeInfo = isLive ? `<div class="blink-live-tv">${translations[currentLang].live}</div>` : (d.match_time ? `<div class="card-time-mini">${new Date(d.match_time).toLocaleDateString([],{day:'2-digit',month:'2-digit'})} ${new Date(d.match_time).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div>` : "");
 
                 let htmlContent = `
                     <div class="live-card-thin">
-                        <div class="card-league-row">
-                            <div class="league-ball-icon">${ball}</div>
+                        <div class="card-header-tv">
                             <div class="card-league-mini">${d.league || sportName}</div>
+                            <div style="font-size:12px;">${ball}</div>
                         </div>
-                        <div class="score-row">
-                            <span class="team-name-col">${d.t1 || d.name}</span>
-                            <span class="score-val-col">${(isLive || isEnded) ? (d.score1 || 0) : ""}</span>
+                        <div class="tv-score-container">
+                            <div class="score-row">
+                                <span class="team-name-col">${d.t1 || d.name}</span>
+                                <span class="score-val-col">${(isLive || isEnded) ? (d.score1 || 0) : "-"}</span>
+                            </div>
+                            <div class="score-row">
+                                <span class="team-name-col">${d.t2 || "..."}</span>
+                                <span class="score-val-col">${(isLive || isEnded) ? (d.score2 || 0) : "-"}</span>
+                            </div>
                         </div>
-                        <div class="score-row">
-                            <span class="team-name-col">${d.t2 || ""}</span>
-                            <span class="score-val-col">${(isLive || isEnded) ? (d.score2 || 0) : ""}</span>
+                        <div class="tv-footer-meta">
+                            ${extraMeta}
+                            ${timeInfo}
                         </div>
-                        ${extraRows}
-                        ${timeInfo}
                     </div>`;
 
                 const html = `
-                    <div class="sport-marker-wrapper ${isLive?'status-live-wrapper':''} ${zoomNear?'zoom-near':''} ${zoomFar?'zoom-far':''}">
+                    <div class="sport-marker-wrapper ${zoomNear?'zoom-near':''} ${zoomFar?'zoom-far':''}">
                         <div class="marker-content-box">
                             <div class="ball-halo"></div>
                             <div class="marker-ball-only">${ball}</div>
