@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover">
-    <title>ScoreCompass - Rezultati Uživo</title>
+    <title>MAPOINT - Rezultati Uživo</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -135,90 +135,76 @@
     }
     .settings-btn img { width: 20px; filter: invert(1); }
 
-    /* --- NOVI DIZAJN KARTICE (PILULA) --- */
+    /* --- TV PRO SCOREBOARD DIZAJN --- */
     .live-card-thin { 
-        background: rgba(15, 15, 15, 0.95);
-        border: 2px solid #FF9500;
-        border-radius: 25px; 
-        padding: 12px 16px;
-        display: none; /* Inicijalno sakriveno, zoom kontroliše ovo */
+        background: linear-gradient(180deg, #1a1a1a 0%, #0a0a0a 100%);
+        border-left: 5px solid #FF9500;
+        border-radius: 4px; 
+        padding: 0;
+        display: none; 
         flex-direction: column;
-        width: 200px;
+        width: 220px;
         color: white;
-        backdrop-filter: blur(15px);
-        box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        box-shadow: 5px 5px 15px rgba(0,0,0,0.9);
         position: relative;
         z-index: 100;
         margin-bottom: 15px;
         pointer-events: auto;
+        overflow: hidden;
     }
     
-    .live-card-thin::after {
-        content: '';
-        position: absolute;
-        bottom: -10px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 0;
-        height: 0;
-        border-left: 8px solid transparent;
-        border-right: 8px solid transparent;
-        border-top: 10px solid #FF9500;
-    }
-    
-    /* Aktiviraj karticu kad je zoom blizu */
-    .zoom-near .live-card-thin { display: flex; }
-    .status-live-wrapper .live-card-thin { box-shadow: 0 0 20px rgba(255,149,0,0.5); }
-
+    /* Zaglavlje lige u TV stilu */
     .card-league-row { 
-        display: flex; align-items: center; justify-content: center;
-        gap: 6px; margin-bottom: 8px; width: 100%;
+        background: #FF9500;
+        display: flex; align-items: center; 
+        padding: 4px 10px;
+        gap: 6px; width: 100%;
     }
-    .league-ball-icon { font-size: 14px; }
+    .league-ball-icon { font-size: 12px; filter: brightness(0); }
     .card-league-mini { 
-        font-size: 11px; color: #FF9500; font-weight: 800; 
+        font-size: 10px; color: #000; font-weight: 900; 
         letter-spacing: 1px; text-transform: uppercase;
-        font-family: 'Oswald'; white-space: nowrap;
+        font-family: 'Inter'; white-space: nowrap;
     }
 
     .score-row { 
         display: flex; justify-content: space-between; 
-        align-items: center; margin-bottom: 4px; 
+        align-items: center; padding: 6px 10px;
+        background: rgba(255,255,255,0.03);
+        border-bottom: 1px solid rgba(255,255,255,0.05);
         width: 100%;
     }
     .team-name-col { 
-        font-size: 13px; font-weight: 800; text-transform: uppercase; 
+        font-size: 13px; font-weight: 700; text-transform: uppercase; 
         color: #fff; overflow: hidden; text-overflow: ellipsis;
-        white-space: nowrap; max-width: 130px;
+        white-space: nowrap; max-width: 140px;
     }
     .score-val-col { 
-        font-family: 'Oswald'; font-size: 18px; color: #FF9500; 
-        font-weight: 700; min-width: 25px; text-align: right;
+        font-family: 'Oswald'; font-size: 20px; color: #FF9500; 
+        font-weight: 700; min-width: 30px; text-align: right;
     }
 
     .extra-data-row { 
-        display: flex; justify-content: center; gap: 5px; 
-        margin-top: 6px; width: 100%; border-top: 1px solid rgba(255,255,255,0.1);
-        padding-top: 6px;
+        display: flex; background: #222; justify-content: space-around;
+        padding: 4px; width: 100%;
     }
     .extra-val { 
         font-size: 10px; font-family: 'Oswald'; 
-        background: rgba(255, 149, 0, 0.15); padding: 2px 6px; 
-        border-radius: 10px; color: #FF9500;
-        border: 1px solid rgba(255,149,0,0.3);
+        color: #FF9500; text-transform: uppercase;
     }
 
     .blink-live { 
-        background: #FF9500; color: black; font-weight: 900;
-        font-size: 10px; padding: 2px 10px; border-radius: 10px;
-        text-transform: uppercase; margin-top: 8px; align-self: center;
-        animation: soft-blink 1.5s infinite; font-family: 'Oswald';
+        background: #cc0000; color: white; font-weight: 900;
+        font-size: 9px; padding: 2px 8px;
+        text-transform: uppercase; align-self: flex-start;
+        animation: tv-blink 1s infinite; font-family: 'Inter';
+        margin: 5px 10px; border-radius: 2px;
     }
-    @keyframes soft-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    @keyframes tv-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
 
     .card-time-mini { 
-        font-size: 10px; color: #aaa; font-weight: 700; 
-        text-align: center; margin-top: 5px; font-family: 'Oswald';
+        font-size: 10px; color: #888; font-weight: 700; 
+        padding: 5px 10px; font-family: 'Oswald';
     }
 
     /* POPUP I MODALI */
@@ -257,16 +243,16 @@
     }
     
     .zoom-far .marker-ball-only { font-size: 14px; }
+    .zoom-near .live-card-thin { display: flex; }
     .marker-content-box { 
         position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); 
         display: flex; flex-direction: column; align-items: center; 
-        pointer-events: none; /* Dozvoli klik kroz kontejner osim na pilulu */
+        pointer-events: none;
     }
     
-    /* Sakrij lopticu kad je zumirano blizu jer se vidi pilula */
     .zoom-near .marker-ball-only, .zoom-near .ball-halo { display: none; }
 
-    /* MATCH DETAILS VIEW */
+    /* MATCH DETAILS VIEW - Ovde su sada podaci BELI */
     #match-details-view { 
         position: fixed; bottom: -100%; left: 0; width: 100%; max-height: 90vh; 
         background: #12100e; z-index: 8000; border-top: 3px solid #FF9500; 
@@ -274,6 +260,7 @@
         transition: 0.5s cubic-bezier(0.19, 1, 0.22, 1); overflow-y: auto; color: white; 
     }
     #match-details-view.active { bottom: 0; }
+    #det-events-home, #det-events-away { color: #ffffff !important; font-weight: 500; }
 
     /* ADMIN & USER DOT */
     #admin-panel { position: fixed; top: 0; left: 100%; width: 100%; height: 100%; background: #12100e; z-index: 7000; transition: 0.4s; padding: 25px; overflow-y: auto; }
@@ -298,7 +285,7 @@
     </div>
 
     <div id="hero">
-        <div class="hero-logo">ScoreCompass</div>
+        <div class="hero-logo">MAPOINT</div>
         <div class="hero-subtitle" id="txt-subtitle">Result Tracker</div>
         <div class="auth-box">
             <input type="email" id="email" placeholder="EMAIL">
@@ -522,7 +509,7 @@
             const center = map.getCenter();
             map.eachLayer(l => { if (l instanceof L.Marker && l !== userMarker) map.removeLayer(l); });
 
-            const zoomNear = map.getZoom() >= 13; // Donja granica za prikaz "pilule"
+            const zoomNear = map.getZoom() >= 13;
             const zoomFar = map.getZoom() < 11;
 
             allTereni.forEach(d => {
@@ -532,7 +519,6 @@
                 const ball = sportEmojis[d.sport] || '⚽';
                 const sportName = d.custom_sport || (translations[currentLang].sportNames[d.sport] || d.sport);
 
-                // Ekstra podaci za Tenis/Odbojku
                 let extraHtml = "";
                 if (isLive || isEnded) {
                     if (d.sport === "TENIS") {
@@ -544,7 +530,6 @@
                     }
                 }
 
-                // Vreme ili LIVE status
                 let timeHtml = "";
                 if (isLive) {
                     timeHtml = `<div class="blink-live">${translations[currentLang].live}</div>`;
@@ -554,7 +539,7 @@
                 }
 
                 const markerHtml = `
-                    <div class="sport-marker-wrapper ${isLive ? 'status-live-wrapper' : ''} ${zoomNear ? 'zoom-near' : ''} ${zoomFar ? 'zoom-far' : ''}">
+                    <div class="sport-marker-wrapper ${zoomNear ? 'zoom-near' : ''} ${zoomFar ? 'zoom-far' : ''}">
                         <div class="marker-content-box">
                             <div class="live-card-thin">
                                 <div class="card-league-row">
@@ -644,13 +629,13 @@
             
             document.getElementById('det-extra-info').innerText = ex; 
             let pDiv = document.getElementById('det-periods'); pDiv.innerHTML = ""; 
-            if(d.sub_details) Object.values(d.sub_details).forEach(v => { pDiv.innerHTML += `<div style="background:#333; padding:5px 10px; border-radius:10px; font-size:12px;">${v}</div>`; }); 
+            if(d.sub_details) Object.values(d.sub_details).forEach(v => { pDiv.innerHTML += `<div style="background:#333; padding:5px 10px; border-radius:10px; font-size:12px; color:white;">${v}</div>`; }); 
             
             let eHome = document.getElementById('det-events-home'), eAway = document.getElementById('det-events-away'); 
             eHome.innerHTML = ""; eAway.innerHTML = ""; 
             if(d.events) { 
                 document.getElementById('det-stats-container').style.display = 'block'; 
-                Object.values(d.events).forEach(ev => { const row = `<div style="font-size:12px; margin-bottom:3px;">${ev.emoji} ${ev.player}</div>`; if(ev.team == 1) eHome.innerHTML += row; else eAway.innerHTML += row; }); 
+                Object.values(d.events).forEach(ev => { const row = `<div style="font-size:13px; margin-bottom:5px; color:white;">${ev.emoji} ${ev.player}</div>`; if(ev.team == 1) eHome.innerHTML += row; else eAway.innerHTML += row; }); 
             } else document.getElementById('det-stats-container').style.display = 'none'; 
             document.getElementById('match-details-view').classList.add('active'); 
         }
@@ -707,7 +692,7 @@
             let evM = document.getElementById('adm-events-manager'); evM.innerHTML = "";
             if(d.events) {
                 Object.entries(d.events).forEach(([id, ev]) => {
-                    evM.innerHTML += `<div style="display:flex; justify-content:space-between; background:#111; padding:8px; border-radius:8px; margin-bottom:5px;">
+                    evM.innerHTML += `<div style="display:flex; justify-content:space-between; background:#111; padding:8px; border-radius:8px; margin-bottom:5px; color:white;">
                         <span>${ev.emoji} ${ev.player}</span>
                         <span onclick="removeEvent('${id}')" style="cursor:pointer;">🗑️</span>
                     </div>`;
