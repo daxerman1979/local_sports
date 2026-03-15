@@ -60,10 +60,10 @@
         .live-card-bubble { 
             background: rgba(15, 15, 15, 0.95);
             border: 2px solid #FF9500;
-            border-radius: 20px;
-            padding: 10px;
+            border-radius: 40px; /* Povećan radius za pilulast izgled */
+            padding: 0 10px 0 0; /* Padding samo desno, visinu diktira lopta */
             display: none;
-            flex-direction: row; /* Horizontalni raspored */
+            flex-direction: row; 
             width: 240px;
             color: white;
             backdrop-filter: blur(15px);
@@ -72,6 +72,7 @@
             z-index: 25;
             margin-bottom: 12px;
             align-items: center;
+            overflow: hidden; /* Da krug lopte ne prelazi ivice ako zatreba */
         }
         
         /* Kvačica (rep) oblačića */
@@ -91,30 +92,32 @@
         .zoom-near .live-card-bubble { display: flex; }
         .status-live-wrapper .live-card-bubble { border-color: #FF9500; box-shadow: 0 0 20px rgba(255,149,0,0.4); }
 
-        /* Leva strana - Lopta (Kružni dizajn i veća veličina) */
+        /* Leva strana - Lopta diktira VISINU cele kartice */
         .card-left-icon {
-            flex: 0 0 55px; /* Blago povećano sa 50px */
-            height: 55px;
-            background: rgba(255,149,0,0.1);
-            border-radius: 50%; /* Promenjeno na krug */
+            flex: 0 0 65px; /* Prečnik lopte */
+            height: 65px;   /* Visina kartice je sada fiksno 65px */
+            background: rgba(255,149,0,0.15);
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 38px; /* Povećana lopta sa 32px */
+            font-size: 42px; /* Još malo veća ikona */
             margin-right: 12px;
-            border: 1px solid rgba(255,149,0,0.2);
+            border: 2px solid rgba(255,149,0,0.3);
         }
 
-        /* Desna strana - Info */
+        /* Desna strana - Info (Zbijenije da stane u visinu lopte) */
         .card-right-info {
             flex: 1;
             display: flex;
             flex-direction: column;
+            justify-content: center; /* Centriranje sadržaja po vertikali */
             overflow: hidden;
+            height: 100%;
         }
 
         .card-league-mini { 
-            font-size: 9px; 
+            font-size: 8px; 
             color: #FF9500; 
             font-weight: 800; 
             text-transform: uppercase;
@@ -122,7 +125,7 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
 
         .score-row-new { 
@@ -130,23 +133,22 @@
             justify-content: space-between; 
             align-items: center; 
             width: 100%;
-            margin-bottom: 2px;
         }
         
         .team-name-new { 
-            font-size: 13px; 
+            font-size: 12px; 
             font-weight: 800; 
             text-transform: uppercase; 
             color: #fff;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            max-width: 100px;
+            max-width: 90px;
         }
         
         .score-val-new { 
             font-family: 'Oswald'; 
-            font-size: 16px; 
+            font-size: 15px; 
             color: #FF9500; 
             font-weight: 700; 
             text-align: right;
@@ -154,29 +156,27 @@
 
         .extra-data-row { 
             display: flex; 
-            gap: 5px; 
-            margin-top: 4px;
+            gap: 3px; 
+            margin-top: 2px;
         }
         
         .extra-val { 
-            font-size: 8px; 
+            font-size: 7px; 
             font-family: 'Oswald'; 
-            background: rgba(255, 149, 0, 0.15); 
-            padding: 1px 5px; 
-            border-radius: 6px; 
+            background: rgba(255, 149, 0, 0.2); 
+            padding: 0px 4px; 
+            border-radius: 4px; 
             color: #FF9500;
-            border: 1px solid rgba(255,149,0,0.2);
         }
 
         .blink-live { 
             background: #FF9500;
             color: black;
             font-weight: 900;
-            font-size: 8px;
-            padding: 1px 8px;
-            border-radius: 4px;
+            font-size: 7px;
+            padding: 0px 6px;
+            border-radius: 3px;
             text-transform: uppercase;
-            margin-top: 4px;
             display: inline-block;
             align-self: flex-start;
             animation: soft-blink 1.5s infinite;
@@ -186,10 +186,9 @@
         @keyframes soft-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
 
         .card-time-mini { 
-            font-size: 9px; 
+            font-size: 8px; 
             color: #888; 
             font-weight: 700; 
-            margin-top: 4px;
             font-family: 'Oswald';
         }
 
