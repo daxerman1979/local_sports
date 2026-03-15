@@ -27,7 +27,7 @@
     }
     html, body { 
         margin: 0; padding: 0; height: 100%; width: 100%; 
-        overflow: hidden; background: #000; 
+        overflow: hidden; background: #050a14; 
         font-family: 'Inter', sans-serif; position: fixed; 
     }
     
@@ -35,7 +35,7 @@
     input, select, textarea, datalist { 
         font-size: 16px !important; outline: none !important; 
         text-transform: uppercase; 
-        background: #1a1a1a; color: white; border: 1px solid #333; 
+        background: #0f172a; color: white; border: 1px solid #1e293b; 
         padding: 12px; border-radius: 12px; font-family: 'Inter'; width: 100%;
     }
     
@@ -46,17 +46,17 @@
     }
     button:active { transform: scale(0.96); opacity: 0.8; }
 
-    /* SEARCH KONTEJNER */
+    /* SEARCH KONTEJNER - PLAVO BELI DIZAJN */
     #search-container { 
         position: absolute; top: 20px; left: 20px; z-index: 5000; 
         display: flex; align-items: center; transition: all 0.4s ease; 
-        width: 40px; height: 40px; background: rgba(18, 16, 14, 0.6); 
-        border-radius: 20px; backdrop-filter: blur(10px); 
-        overflow: hidden; border: 1px solid rgba(255,149,0,0.3); 
+        width: 40px; height: 40px; background: rgba(15, 23, 42, 0.7); 
+        border-radius: 20px; backdrop-filter: blur(15px); 
+        overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.2); 
     }
     #search-container.expanded { 
-        width: calc(100% - 80px); background: rgba(10,8,5,0.95); 
-        border: 1px solid #FF9500; 
+        width: calc(100% - 80px); background: #0f172a; 
+        border: 1px solid #3b82f6; 
     }
     #city-search { 
         width: 100%; border: none; background: transparent; 
@@ -71,193 +71,140 @@
         cursor: pointer; z-index: 5001; 
     }
 
-    /* HERO SEKCIJA */
+    /* HERO SEKCIJA - PROFESIONALNI GRADIENT */
     #hero { 
         position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-        background: linear-gradient(rgba(18,16,14,0.5), rgba(18,16,14,0.9)), 
+        background: linear-gradient(135deg, rgba(7, 13, 31, 0.9), rgba(15, 23, 42, 0.95)), 
         url('https://images.unsplash.com/photo-1519861531473-9200262188bf?q=80&w=1500&auto=format&fit=crop') center/cover; 
         display: flex; flex-direction: column; justify-content: center; 
         align-items: center; z-index: 6000; color: white; padding: 20px; 
     }
     .hero-logo { 
         font-family: 'Permanent Marker', cursive; font-size: 72px; 
-        color: #FF9500; text-shadow: 4px 4px 0px #000; 
-        transform: rotate(-2deg); margin-bottom: 0; 
+        color: #f8fafc; text-shadow: 4px 4px 0px #ef4444; 
+        transform: rotate(-1deg); margin-bottom: 0; 
     }
     .hero-subtitle { 
         font-family: 'Oswald'; font-weight: 700; font-size: 18px; 
-        text-transform: uppercase; letter-spacing: 5px; color: #fff; 
+        text-transform: uppercase; letter-spacing: 5px; color: #94a3b8; 
         margin-bottom: 30px; margin-top: -10px; 
     }
     .auth-box { 
-        background: rgba(18,16,14,0.95); backdrop-filter: blur(25px); 
+        background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(25px); 
         padding: 35px; border-radius: 30px; width: 100%; max-width: 360px; 
         display: flex; flex-direction: column; gap: 15px; 
-        border: 1px solid rgba(255,149,0,0.4); 
+        border: 1px solid rgba(255, 255, 255, 0.1); 
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
     }
     .auth-btn { 
-        background: #FF9500; color: white; border: none; padding: 16px; 
+        background: #3b82f6; color: white; border: none; padding: 16px; 
         font-weight: 900; cursor: pointer; text-transform: uppercase; 
         border-radius: 12px; font-family: 'Oswald'; 
-        box-shadow: 0 4px 15px rgba(255,149,0,0.3); 
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); 
     }
 
     .home-lang-switch { display: flex; gap: 15px; justify-content: center; margin-top: 15px; }
     .home-lang-btn { 
-        background: #1a1a1a; border: 1px solid #333; padding: 8px 15px; 
+        background: #1e293b; border: 1px solid #334155; padding: 8px 15px; 
         border-radius: 10px; font-size: 20px; cursor: pointer; 
-        display: flex; align-items: center; justify-content: center; 
     }
-    .home-lang-btn.active { border-color: #FF9500; background: #222; }
+    .home-lang-btn.active { border-color: #3b82f6; background: #334155; }
 
     /* MAPA I NAVIGACIJA */
-    #map { width: 100vw; height: 100vh; background: #111; display: none; }
+    #map { width: 100vw; height: 100vh; background: #020617; display: none; }
     .location-btn { 
         position: absolute; bottom: 40px; right: 20px; z-index: 5500; 
-        width: 55px; height: 55px; background: #FF9500; border-radius: 50%; 
+        width: 55px; height: 55px; background: #ef4444; border-radius: 50%; 
         display: flex; justify-content: center; align-items: center; 
-        cursor: pointer; box-shadow: 0 4px 20px rgba(255,149,0,0.4); border: 2px solid white; 
+        cursor: pointer; box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4); border: 2px solid white; 
     }
     .location-btn img { filter: brightness(0) invert(1); width: 24px; }
-    .back-btn { 
-        position: absolute; top: 20px; right: 20px; z-index: 5500; 
-        width: 40px; height: 40px; background: rgba(0,0,0,0.5); 
+    .back-btn, .settings-btn { 
+        position: absolute; right: 20px; z-index: 5500; 
+        width: 40px; height: 40px; background: rgba(15, 23, 42, 0.7); 
         border-radius: 50%; display: flex; justify-content: center; 
         align-items: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); 
-        color: white; font-weight: bold; 
+        color: white; backdrop-filter: blur(10px);
     }
-    .back-btn img { width: 18px; filter: invert(1); }
-    .settings-btn { 
-        position: absolute; top: 70px; right: 20px; z-index: 5500; 
-        width: 40px; height: 40px; background: rgba(0,0,0,0.5); border-radius: 50%; 
-        display: flex; justify-content: center; align-items: center; 
-        cursor: pointer; border: 1px solid rgba(255,255,255,0.2); 
-    }
-    .settings-btn img { width: 20px; filter: invert(1); }
+    .back-btn { top: 20px; }
+    .settings-btn { top: 70px; }
+    .back-btn img, .settings-btn img { width: 18px; filter: invert(1); }
 
-    /* --- TV PRO SCOREBOARD NOVI GLASS DIZAJN --- */
+    /* --- TV PRO SCOREBOARD (PLAVO-BELA TEMA) --- */
     .live-card-thin { 
-        /* Glassmorphism pozadina */
-        background: linear-gradient(135deg, rgba(20, 20, 20, 0.7) 0%, rgba(0, 0, 0, 0.85) 100%);
-        backdrop-filter: blur(15px) saturate(180%);
-        -webkit-backdrop-filter: blur(15px) saturate(180%);
-        
-        /* Ivice i senke */
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-left: 4px solid #FF9500;
-        border-radius: 12px; 
-        
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(30, 41, 59, 0.95) 100%);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-left: 5px solid #3b82f6;
+        border-radius: 14px; 
         padding: 0;
         display: none; 
         flex-direction: column;
-        width: 250px;
+        width: 260px;
         color: white;
-        box-shadow: 0 15px 35px rgba(0,0,0,0.6), inset 0 0 15px rgba(255,255,255,0.03);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.6);
         position: relative;
         z-index: 100;
         margin-bottom: 20px;
-        pointer-events: auto;
         overflow: hidden;
-
-        /* Profi animacija pojavljivanja (wobble/drop) */
         animation: cardWobbleAppear 0.6s cubic-bezier(0.23, 1, 0.32, 1) both;
     }
 
     @keyframes cardWobbleAppear {
-        0% { opacity: 0; transform: translateY(30px) scale(0.8) rotateX(-20deg); }
-        60% { opacity: 1; transform: translateY(-5px) scale(1.03) rotateX(5deg); }
-        80% { transform: translateY(2px) scale(0.98) rotateX(-2deg); }
-        100% { transform: translateY(0) scale(1) rotateX(0deg); }
+        0% { opacity: 0; transform: translateY(30px) scale(0.8); }
+        100% { opacity: 1; transform: translateY(0) scale(1); }
     }
     
     .card-league-row { 
-        /* Suptilniji glass gradijent za ligu */
-        background: linear-gradient(90deg, rgba(255, 149, 0, 0.15) 0%, rgba(255, 204, 0, 0.05) 100%);
+        background: rgba(59, 130, 246, 0.1);
         border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         display: flex; align-items: center; 
-        padding: 8px 14px;
-        gap: 9px; width: 100%;
+        padding: 10px 14px;
+        gap: 9px; 
     }
-    .league-ball-icon { font-size: 15px; filter: drop-shadow(0 0 5px rgba(255,149,0,0.4)); }
     .card-league-mini { 
-        font-size: 12px; color: rgba(255,255,255,0.9); font-weight: 700; 
-        letter-spacing: 0.8px; text-transform: uppercase;
-        font-family: 'Oswald'; white-space: nowrap;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        font-size: 11px; color: #94a3b8; font-weight: 800; 
+        letter-spacing: 1px; text-transform: uppercase;
+        font-family: 'Inter';
     }
 
     .score-row { 
         display: flex; justify-content: space-between; 
-        align-items: center; padding: 10px 14px;
-        background: rgba(255,255,255,0.01);
-        border-bottom: 1px solid rgba(255,255,255,0.03);
-        width: 100%;
+        align-items: center; padding: 12px 14px;
+        background: rgba(255,255,255,0.02);
     }
     .team-name-col { 
-        font-size: 15px; font-weight: 800; text-transform: uppercase; 
-        color: #FFFFFF; overflow: hidden; text-overflow: ellipsis;
-        white-space: nowrap; max-width: 160px;
-        letter-spacing: 0.4px;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        font-size: 14px; font-weight: 700; text-transform: uppercase; 
+        color: #f8fafc; letter-spacing: 0.5px;
     }
     .score-val-col { 
-        font-family: 'Oswald'; font-size: 26px; color: #FFCC00; /* Zlatnija boja */
+        font-family: 'Oswald'; font-size: 24px; color: #ffffff;
         font-weight: 700; min-width: 40px; text-align: right;
-        text-shadow: 0 0 15px rgba(255,204,0,0.5), 0 2px 4px rgba(0,0,0,0.5);
-        line-height: 1;
+        text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
     }
 
     .extra-data-row { 
         display: flex; background: rgba(0,0,0,0.2); justify-content: space-around;
-        padding: 6px; width: 100%; border-top: 1px solid rgba(255,255,255,0.03);
+        padding: 6px; width: 100%; border-top: 1px solid rgba(255,255,255,0.05);
     }
     .extra-val { 
-        font-size: 11px; font-family: 'Oswald'; 
-        color: #00E6FF; text-transform: uppercase; font-weight: 700;
-        text-shadow: 0 0 10px rgba(0,230,255,0.4);
+        font-size: 10px; font-family: 'Oswald'; 
+        color: #60a5fa; text-transform: uppercase; font-weight: 700;
     }
 
     .blink-live { 
-        background: rgba(255, 0, 0, 0.8); color: white; font-weight: 900;
-        font-size: 10px; padding: 3px 12px;
+        background: #ef4444; color: white; font-weight: 900;
+        font-size: 9px; padding: 3px 10px;
         text-transform: uppercase; align-self: flex-start;
-        animation: tv-blink 1.5s infinite; font-family: 'Inter';
+        animation: tv-blink 1.5s infinite;
         margin: 10px 14px; border-radius: 4px;
-        box-shadow: 0 0 15px rgba(255,0,0,0.6);
-        letter-spacing: 1px;
+        box-shadow: 0 0 12px rgba(239, 68, 68, 0.5);
     }
-    @keyframes tv-blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+    @keyframes tv-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
-    .card-time-mini { 
-        font-size: 12px; color: rgba(255,255,255,0.7); font-weight: 600; 
-        padding: 8px 14px; font-family: 'Oswald';
-        background: rgba(0,0,0,0.15);
-        border-top: 1px solid rgba(255,255,255,0.03);
-    }
-
-    /* POPUP I MODALI */
-    .leaflet-popup-content-wrapper { 
-        background: rgba(10, 10, 10, 0.8) !important; color: white !important; 
-        border: 1px solid rgba(255, 149, 0, 0.5) !important; border-radius: 20px !important; 
-        backdrop-filter: blur(20px) !important; box-shadow: 0 20px 50px rgba(0,0,0,0.7) !important;
-    }
-    .leaflet-popup-tip { background: rgba(255, 149, 0, 0.8) !important; backdrop-filter: blur(20px); }
-
-    #disclaimer-modal { 
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-        background: rgba(0,0,0,0.95); backdrop-filter: blur(20px); 
-        z-index: 10000; display: none; justify-content: center; 
-        align-items: center; padding: 20px; 
-    }
-    .disclaimer-box { 
-        background: #12100e; padding: 30px; border-radius: 30px; 
-        border: 1px solid #FF9500; width: 100%; max-width: 400px; text-align: center; 
-    }
-
-    /* --- NOVI UNIFICIRANI MARKER DIZAJN (Profi Glass Čioda) --- */
+    /* MARKER DIZAJN - PLAVO BELA ČIODA */
     .sport-marker-wrapper { display: flex; flex-direction: column; align-items: center; position: relative; }
-    
-    /* Dodata lebdeća animacija za celu čiodu */
     .marker-pin-floating-wrapper {
         display: flex; flex-direction: column; align-items: center;
         animation: markerFloat 2s ease-in-out infinite;
@@ -267,100 +214,62 @@
         50% { transform: translateY(-8px); }
     }
 
-    /* Glava čiode (Glassmorphism krug) */
     .marker-pin-head {
-        width: 36px; height: 36px;
+        width: 38px; height: 38px;
         border-radius: 50%;
-        /* Glass efekt */
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        
-        /* Ivice */
-        border: 2px solid rgba(255, 255, 255, 0.15);
-        /* Spoljni plavi prsten (iz iste palete kao i pre, ali sjaniji) */
-        box-shadow: 0 0 0 3px #007BFF, 0 8px 20px rgba(0,0,0,0.6), inset 0 0 10px rgba(255,255,255,0.1);
-        
+        background: #ffffff;
+        border: 3px solid #1e40af; /* Tamno plava */
+        box-shadow: 0 8px 15px rgba(0,0,0,0.4);
         display: flex; justify-content: center; align-items: center;
-        font-size: 20px;
+        font-size: 18px;
         z-index: 6;
-        position: relative;
     }
 
-    /* Donji trougao (Ostaje čvrst, Crveni) */
     .marker-pin-tip {
         width: 0; height: 0;
-        border-left: 9px solid transparent;
-        border-right: 9px solid transparent;
-        border-top: 17px solid #DC3545; /* Jaka crvena */
-        margin-top: -5px; /* Da se preklopi sa krugom */
+        border-left: 8px solid transparent;
+        border-right: 8px solid transparent;
+        border-top: 15px solid #1e40af;
+        margin-top: -4px;
         z-index: 5;
-        filter: drop-shadow(0 6px 6px rgba(0,0,0,0.5));
     }
     
-    /* UKLONJENA .marker-pin-dot (Crvena tačka) */
-
     .ball-halo { 
         position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-        width: 55px; height: 55px; border-radius: 50%; 
-        /* Plavi halo, odgovara prstenu */
-        background: radial-gradient(circle, rgba(0,123,255,0.25) 0%, rgba(0,123,255,0) 70%); 
-        z-index: 4; pointer-events: none; animation: halo-pulse 2.5s infinite ease-in-out; 
+        width: 60px; height: 60px; border-radius: 50%; 
+        background: radial-gradient(circle, rgba(59, 130, 246, 0.3) 0%, rgba(59, 130, 246, 0) 70%); 
+        z-index: 4; animation: halo-pulse 2s infinite ease-in-out; 
     }
     @keyframes halo-pulse {
         0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.2; }
-        50% { transform: translate(-50%, -50%) scale(1.4); opacity: 0.6; }
+        50% { transform: translate(-50%, -50%) scale(1.3); opacity: 0.5; }
         100% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.2; }
     }
-    
-    /* Prilagođavanje za daleki zoom */
-    .zoom-far .marker-pin-head { width: 24px; height: 24px; border-width: 1px; font-size: 14px; box-shadow: 0 0 0 2px #007BFF, 0 5px 10px rgba(0,0,0,0.5); }
-    .zoom-far .marker-pin-floating-wrapper { animation: none; } /* Isključujemo animaciju kad je daleko */
-    .zoom-far .marker-pin-tip { border-top-width: 12px; border-left-width: 6px; border-right-width: 6px; margin-top: -3px; }
 
-    .zoom-near .live-card-thin { display: flex; }
-    .marker-content-box { 
-        position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); 
-        display: flex; flex-direction: column; align-items: center; 
-        pointer-events: none;
-    }
-    
-    /* Kada je zumirano blizu, sakrivamo čiodu, ostaje samo kartica */
-    .zoom-near .marker-pin-floating-wrapper, .zoom-near .ball-halo { display: none; }
-
-    /* Mesto klika animacija */
-    .click-target-animation {
-        width: 60px; height: 60px;
-        border: 3px solid #FF9500;
-        border-radius: 50%;
-        position: absolute;
-        animation: clickPulse 1s ease-out infinite;
-        pointer-events: none;
-    }
-    @keyframes clickPulse {
-        0% { transform: scale(0.1); opacity: 1; border-width: 10px; }
-        100% { transform: scale(1.5); opacity: 0; border-width: 1px; }
-    }
-
-    /* MATCH DETAILS VIEW */
+    /* MATCH DETAILS VIEW - CLEAN WHITE/BLUE */
     #match-details-view { 
-        position: fixed; bottom: -100%; left: 0; width: 100%; max-height: 90vh; 
-        background: rgba(10, 10, 10, 0.9); backdrop-filter: blur(20px);
-        z-index: 8000; border-top: 3px solid #FF9500; 
+        position: fixed; bottom: -100%; left: 0; width: 100%; max-height: 85vh; 
+        background: #ffffff;
+        z-index: 8000; border-top: 5px solid #1e40af; 
         border-radius: 30px 30px 0 0; padding: 25px; 
-        transition: 0.5s cubic-bezier(0.19, 1, 0.22, 1); overflow-y: auto; color: white; 
-        border: 1px solid rgba(255,255,255,0.05);
+        transition: 0.5s cubic-bezier(0.19, 1, 0.22, 1); overflow-y: auto; color: #0f172a; 
     }
     #match-details-view.active { bottom: 0; }
-    #det-events-home, #det-events-away { color: #ffffff !important; font-weight: 500; }
+    #det-events-home, #det-events-away { color: #1e293b !important; font-weight: 500; }
 
-    /* ADMIN & USER DOT */
-    #admin-panel { position: fixed; top: 0; left: 100%; width: 100%; height: 100%; background: #12100e; z-index: 7000; transition: 0.4s; padding: 25px; overflow-y: auto; }
-    #admin-panel.active { left: 0; }
-    .user-location-dot { background: #007AFF; width: 14px; height: 14px; border: 2px solid white; border-radius: 50%; box-shadow: 0 0 20px #007AFF; }
-    .animated-range-circle { animation: pulse-circle 4s infinite ease-in-out; }
-    @keyframes pulse-circle { 0% { stroke-opacity: 0.8; } 50% { stroke-opacity: 0.3; } 100% { stroke-opacity: 0.8; } }
-    </style>
+    /* DISCLAIMER */
+    #disclaimer-modal { 
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+        background: rgba(7, 13, 31, 0.98); backdrop-filter: blur(20px); 
+        z-index: 10000; display: none; justify-content: center; 
+        align-items: center; padding: 20px; 
+    }
+    .disclaimer-box { 
+        background: #ffffff; padding: 35px; border-radius: 24px; 
+        border: none; width: 100%; max-width: 400px; text-align: center; color: #0f172a;
+        box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+    }
+</style>
 </head>
 <body>
 
