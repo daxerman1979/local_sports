@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover">
-    <title>ScoreCompass - Rezultati Uživo</title>
+    <title>MAPOINT - Rezultati Uživo</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -56,7 +56,7 @@
         .settings-btn { position: absolute; top: 70px; right: 20px; z-index: 5500; width: 40px; height: 40px; background: rgba(0,0,0,0.5); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); }
         .settings-btn img { width: 20px; filter: invert(1); }
 
-        /* NOVI DIZAJN KARTICE - STRIP OBLAČIĆ */
+    /* NOVI DIZAJN KARTICE - STRIP OBLAČIĆ */
         .live-card-bubble { 
             background: rgba(15, 15, 15, 0.95);
             border: 2px solid #FF9500;
@@ -91,16 +91,16 @@
         .zoom-near .live-card-bubble { display: flex; }
         .status-live-wrapper .live-card-bubble { border-color: #FF9500; box-shadow: 0 0 20px rgba(255,149,0,0.4); }
 
-        /* Leva strana - Lopta */
+        /* Leva strana - Lopta (Kružni dizajn i veća veličina) */
         .card-left-icon {
-            flex: 0 0 50px;
-            height: 50px;
+            flex: 0 0 55px; /* Blago povećano sa 50px */
+            height: 55px;
             background: rgba(255,149,0,0.1);
-            border-radius: 12px;
+            border-radius: 50%; /* Promenjeno na krug */
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 32px;
+            font-size: 38px; /* Povećana lopta sa 32px */
             margin-right: 12px;
             border: 1px solid rgba(255,149,0,0.2);
         }
@@ -266,7 +266,7 @@
     </div>
 
     <div id="hero">
-        <div class="hero-logo">ScoreCompass</div>
+        <div class="hero-logo">MAPOINT</div>
         <div class="hero-subtitle" id="txt-subtitle">Result Tracker</div>
         <div class="auth-box">
             <input type="email" id="email" placeholder="EMAIL">
