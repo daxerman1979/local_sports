@@ -135,7 +135,7 @@
     }
     .settings-btn img { width: 20px; filter: invert(1); }
 
-    /* --- TV PRO SCOREBOARD NOVI DIZAJN --- */
+    /* --- TV PRO SCOREBOARD DIZAJN --- */
     .live-card-thin { 
         background: linear-gradient(135deg, rgba(20,20,20,0.95) 0%, rgba(40,40,40,0.95) 100%);
         border-left: 4px solid #FF9500;
@@ -151,11 +151,7 @@
         margin-bottom: 15px;
         pointer-events: auto;
         overflow: hidden;
-        animation: cardAppear 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-    @keyframes cardAppear {
-        from { opacity: 0; transform: translateY(10px) scale(0.9); }
-        to { opacity: 1; transform: translateY(0) scale(1); }
+        /* UKLONJENA ANIMACIJA cardAppear */
     }
     
     .card-league-row { 
@@ -235,14 +231,45 @@
         border: 1px solid #FF9500; width: 100%; max-width: 400px; text-align: center; 
     }
 
-    /* MARKER STILOVI */
+    /* --- NOVI MARKER DIZAJN (Plava, Bela, Crvena "Čioda") --- */
     .sport-marker-wrapper { display: flex; flex-direction: column; align-items: center; position: relative; }
-    .marker-ball-only { font-size: 22px; transition: 0.3s; filter: drop-shadow(0 0 8px rgba(255,149,0,0.6)); z-index: 5; }
     
+    /* Glava čiode (Gornji krug) */
+    .marker-pin-head {
+        width: 32px; height: 32px;
+        border-radius: 50%;
+        background: #FFFFFF; /* Bela osnova */
+        border: 3px solid #0056B3; /* Plavi prsten */
+        display: flex; justify-content: center; align-items: center;
+        font-size: 18px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        z-index: 6;
+        transition: transform 0.2s ease-out;
+    }
+    /* Donji trougao koji pokazuje tačku */
+    .marker-pin-tip {
+        width: 0; height: 0;
+        border-left: 8px solid transparent;
+        border-right: 8px solid transparent;
+        border-top: 15px solid #0056B3; /* Plavi trougao */
+        margin-top: -6px; /* Da se preklopi sa krugom */
+        z-index: 5;
+        filter: drop-shadow(0 4px 4px rgba(0,0,0,0.5));
+    }
+    /* Unutrašnja tačka (Crvena) */
+    .marker-pin-dot {
+        width: 8px; height: 8px;
+        border-radius: 50%;
+        background: #FF0000; /* Crvena tačka */
+        position: absolute;
+        top: 12px; /* Centrirano unutar glave */
+        z-index: 7;
+    }
+
     .ball-halo { 
         position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-        width: 40px; height: 40px; border-radius: 50%; 
-        background: radial-gradient(circle, rgba(255,149,0,0.5) 0%, rgba(255,149,0,0) 70%); 
+        width: 45px; height: 45px; border-radius: 50%; 
+        background: radial-gradient(circle, rgba(0,86,179,0.3) 0%, rgba(0,86,179,0) 70%); /* Plavi halo */
         z-index: 4; pointer-events: none; animation: halo-pulse 2s infinite ease-in-out; 
     }
     @keyframes halo-pulse {
@@ -251,15 +278,20 @@
         100% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.3; }
     }
     
-    .zoom-far .marker-ball-only { font-size: 16px; }
+    .zoom-far .marker-pin-head { width: 22px; height: 22px; border-width: 2px; font-size: 12px; }
+    .zoom-far .marker-pin-tip { border-top-width: 10px; border-left-width: 5px; border-right-width: 5px; margin-top: -4px; }
+    .zoom-far .marker-pin-dot { width: 5px; height: 5px; top: 8px; }
+
     .zoom-near .live-card-thin { display: flex; }
     .marker-content-box { 
         position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); 
         display: flex; flex-direction: column; align-items: center; 
         pointer-events: none;
+        /* UKLONJENA tranzicija kako se kartica ne bi "cimala" */
     }
     
-    .zoom-near .marker-ball-only, .zoom-near .ball-halo { display: none; }
+    /* Kada je zumirano blizu, sakrivamo čiodu, ostaje samo kartica */
+    .zoom-near .marker-pin-head, .zoom-near .marker-pin-tip, .zoom-near .marker-pin-dot, .zoom-near .ball-halo { display: none; }
 
     /* Mesto klika animacija */
     .click-target-animation {
@@ -561,9 +593,11 @@
                     timeHtml = `<div class="card-time-mini">${mt.toLocaleDateString([], {day:'2-digit', month:'2-digit'})} ${translations[currentLang].timeAt} ${mt.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>`;
                 }
 
+                /* --- KREIRANJE MARKERA U OBLIKU ČIODE (Pin) --- */
                 const markerHtml = `
                     <div class="sport-marker-wrapper ${zoomNear ? 'zoom-near' : ''} ${zoomFar ? 'zoom-far' : ''}">
                         <div class="marker-content-box">
+                            
                             <div class="live-card-thin">
                                 <div class="card-league-row">
                                     <span class="league-ball-icon">${ball}</span>
@@ -580,11 +614,14 @@
                                 ${extraHtml}
                                 ${timeHtml}
                             </div>
+                            
                             <div class="ball-halo"></div>
-                            <div class="marker-ball-only">${ball}</div>
-                        </div>
+                            <div class="marker-pin-head">
+                                ${ball} </div>
+                            <div class="marker-pin-dot"></div> <div class="marker-pin-tip"></div> </div>
                     </div>`;
 
+                // Postavljamo anchor na dno trougla [0, 0] u wrapperu, ali wrapper je centriran
                 L.marker([d.lat, d.lng], {
                     icon: L.divIcon({ className: '', html: markerHtml, iconSize: [0, 0], iconAnchor: [0, 0] })
                 }).addTo(map).on('click', (e) => {
