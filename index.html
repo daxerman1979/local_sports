@@ -22,6 +22,7 @@
         
         button { font-size: 16px !important; outline: none !important; transition: transform 0.1s active, opacity 0.2s; position: relative; overflow: hidden; }
         button:active { transform: scale(0.96); opacity: 0.8; }
+        button:disabled { opacity: 0.3; filter: grayscale(1); pointer-events: none; }
 
         /* Search & UI */
         #search-container { position: absolute; top: 20px; left: 20px; z-index: 5000; display: flex; align-items: center; transition: all 0.4s ease; width: 40px; height: 40px; background: rgba(0,0,0,0.4); border-radius: 20px; backdrop-filter: blur(10px); overflow: hidden; border: 1px solid rgba(255,255,255,0.2); }
@@ -45,13 +46,12 @@
         .settings-btn { position: absolute; top: 70px; right: 20px; z-index: 5500; width: 40px; height: 40px; background: rgba(0,0,0,0.5); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); }
         .settings-btn img { width: 20px; filter: invert(1); }
 
-        /* --- PROFI POPUP DIZAJN --- */
+        /* Popup & Markers */
         .leaflet-popup-content-wrapper { background: linear-gradient(180deg, #2d232e 0%, #140f19 100%); border: 1px solid #ff9500; border-radius: 20px; color: white; padding: 5px; }
         .leaflet-popup-tip { background: #140f19; border: 1px solid #ff9500; }
         .popup-card { display: flex; flex-direction: column; gap: 12px; min-width: 200px; padding: 10px; }
         .popup-btn { background: #ff9500; color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 900; font-family: 'Oswald'; text-transform: uppercase; cursor: pointer; }
 
-        /* --- PROFI PILL DIZAJN KARTICA NA MAPI --- */
         .live-card-thin { 
             background: linear-gradient(180deg, rgba(45, 35, 46, 0.95) 0%, rgba(20, 15, 25, 0.98) 100%);
             border: 2px solid #FF9500; border-radius: 25px; padding: 10px 15px;
@@ -78,7 +78,6 @@
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         @keyframes soft-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
-        /* Markers & Range */
         .sport-marker-wrapper { display: flex; flex-direction: column; align-items: center; width: auto; position: relative; }
         .marker-content-box { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; }
         .marker-ball-only { font-size: 16px; filter: drop-shadow(0 0 5px #ffcc00); display: block; }
@@ -94,7 +93,10 @@
         #match-details-view.active { bottom: 0; }
         .periods-horizontal { display: flex; gap: 10px; overflow-x: auto; padding: 10px 0; scrollbar-width: none; }
         .period-pill { background: rgba(255,149,0,0.1); border: 1px solid rgba(255,149,0,0.3); padding: 8px 15px; border-radius: 15px; font-family: 'Orbitron'; color: #f1c40f; font-size: 12px; }
+        
+        /* Admin Button Styles */
         .admin-btn { padding: 12px; border: none; font-weight: 900; color: white; text-transform: uppercase; width: 100%; border-radius: 12px; cursor: pointer; font-family: 'Oswald'; margin-bottom: 8px; }
+        .small-score-btn { padding: 8px; font-size: 12px !important; border-radius: 8px; }
     </style>
 </head>
 <body>
@@ -148,13 +150,16 @@
         <div id="adm-score-view">
             <div style="background:#151515; border:1px solid #ff9500; border-radius:20px; padding:20px; text-align:center; margin-bottom:15px;">
                 <div id="adm-main-score" style="font-size:55px; font-family:'Orbitron'; color:#ff9500;">0 : 0</div>
-                <div id="adm-sub-display" style="color:#ffcc00; font-weight:900;"></div>
+                <div id="adm-status-badge" style="display:inline-block; font-size:10px; padding:2px 8px; border-radius:10px; margin-top:5px; font-weight:bold; text-transform:uppercase;"></div>
             </div>
+            
             <div id="adm-sport-controls"></div>
-            <button class="admin-btn" style="background:#444;" onclick="savePeriod()">SAČUVAJ PERIOD / SET</button>
+            
+            <button id="btn-save-period" class="admin-btn" style="background:#444;" onclick="savePeriod()">SAČUVAJ PERIOD / SET</button>
             <button id="start-live-btn" class="admin-btn" style="background:#007AFF;" onclick="adminStatus('live')">KRENI UŽIVO</button>
-            <button class="admin-btn" style="background:#ff3b30;" onclick="adminStatus('ended')">ZAVRŠI MEČ</button>
+            <button id="end-live-btn" class="admin-btn" style="background:#ff3b30;" onclick="adminStatus('ended')">ZAVRŠI MEČ</button>
         </div>
+
         <div id="match-setup" style="display:none; flex-direction:column; gap:12px;">
             <input type="text" id="adm-league-input" placeholder="LIGA">
             <input type="text" id="adm-t1" placeholder="TIM 1">
@@ -262,22 +267,36 @@
             map.closePopup(); 
         }
 
-        /* --- LOGIKA ZA SPORTIĆE (STARO VRAĆENO) --- */
+        /* --- LOGIKA ZA ADMIN PANEL (POBOLJŠANA) --- */
         function refreshAdminPanel(key) {
             const d = allTereni.find(x => x.key === key); if(!d) return;
             currentAdminKey = key;
             document.getElementById('adm-name').innerText = d.name;
+            
+            const isLive = d.status === 'live';
+            const isEnded = d.status === 'ended';
+            
             let s1 = d.score1 || 0, s2 = d.score2 || 0;
             if(d.sport === "TENIS") { s1 = tennisPoints[d.score1] || "0"; s2 = tennisPoints[d.score2] || "0"; }
             document.getElementById('adm-main-score').innerText = `${s1} : ${s2}`;
             
+            const badge = document.getElementById('adm-status-badge');
+            badge.innerText = d.status;
+            badge.style.background = isLive ? '#ff3b30' : (isEnded ? '#444' : '#007AFF');
+            badge.style.color = 'white';
+
             const ctrl = document.getElementById('adm-sport-controls');
-            ctrl.innerHTML = `<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px;">
-                <button class="admin-btn" style="background:#28a745" onclick="changeScore(1, 1)">T1 +</button>
-                <button class="admin-btn" style="background:#28a745" onclick="changeScore(2, 1)">T2 +</button>
-                <button class="admin-btn" style="background:#444" onclick="changeScore(1, -1)">T1 -</button>
-                <button class="admin-btn" style="background:#444" onclick="changeScore(2, -1)">T2 -</button>
+            // Manja dugmad i zaključavanje (disabled ako nije live)
+            ctrl.innerHTML = `<div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:15px;">
+                <button class="admin-btn small-score-btn" style="background:#28a745" onclick="changeScore(1, 1)" ${!isLive ? 'disabled' : ''}>T1 +</button>
+                <button class="admin-btn small-score-btn" style="background:#28a745" onclick="changeScore(2, 1)" ${!isLive ? 'disabled' : ''}>T2 +</button>
+                <button class="admin-btn small-score-btn" style="background:#444" onclick="changeScore(1, -1)" ${!isLive ? 'disabled' : ''}>T1 -</button>
+                <button class="admin-btn small-score-btn" style="background:#444" onclick="changeScore(2, -1)" ${!isLive ? 'disabled' : ''}>T2 -</button>
             </div>`;
+
+            document.getElementById('btn-save-period').disabled = !isLive;
+            document.getElementById('start-live-btn').style.display = (d.status === 'upcoming') ? 'block' : 'none';
+            document.getElementById('end-live-btn').style.display = (isLive) ? 'block' : 'none';
 
             if(d.t1) { document.getElementById('adm-score-view').style.display = 'block'; document.getElementById('match-setup').style.display = 'none'; }
             else { document.getElementById('adm-score-view').style.display = 'none'; document.getElementById('match-setup').style.display = 'flex'; }
@@ -285,6 +304,7 @@
 
         function changeScore(team, val) {
             const d = allTereni.find(x => x.key === currentAdminKey);
+            if (d.status !== 'live') return;
             let current = d[`score${team}`] || 0;
             let newVal = current + val;
             if(d.sport === "TENIS") { if(newVal < 0) newVal = 0; if(newVal > 4) newVal = 4; }
@@ -294,6 +314,7 @@
 
         function savePeriod() {
             const d = allTereni.find(x => x.key === currentAdminKey);
+            if (d.status !== 'live') return;
             let sub = d.sub_details || {};
             let n = Object.keys(sub).length + 1;
             let s1 = d.score1, s2 = d.score2;
@@ -325,7 +346,6 @@
         }
         function closeDetails() { document.getElementById('match-details-view').classList.remove('active'); }
 
-        /* Auth & Explore */
         function exploreMap() { document.getElementById('hero').style.display = 'none'; document.getElementById('map').style.display = 'block'; document.getElementById('ui-controls').style.display = 'block'; initMap(); }
         function goBackToLogin() { auth.signOut(); location.reload(); }
         async function handleAuth() { let e = document.getElementById('email').value.toUpperCase(), p = document.getElementById('password').value; try { await auth.signInWithEmailAndPassword(e, p); } catch { try { await auth.createUserWithEmailAndPassword(e, p); } catch(err) { alert(err.message); } } }
