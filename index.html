@@ -15,7 +15,6 @@
   }
 </script>
 
-
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;700;900&family=Permanent+Marker&display=swap" rel="stylesheet">
     
@@ -94,22 +93,6 @@
         .score-val-col { font-family: 'Oswald'; font-size: 22px; color: #ffcc00; font-weight: 700; text-align: right; min-width: 30px; }
         .status-live-wrapper .score-val-col { color: #ff3b30; }
         .card-time-mini { font-size: 9px; color: #ffcc00; font-weight: 900; text-align: center; border-top: 1px solid #222; padding-top: 4px; margin-top: 4px; position: relative; z-index: 1; }
-
-        /* OGLASI SPECIJALNI STIL */
-        .ad-marker-full { 
-            display: none; align-items: center; background: rgba(0,0,0,0.95); border: 2px solid #ffcc00; border-radius: 20px; padding: 5px 12px; gap: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.8); white-space: nowrap; margin-bottom: -1px; z-index: 25;
-        }
-        .zoom-near .ad-marker-full { display: flex; }
-        .ad-ball-only { font-size: 22px; filter: drop-shadow(0 0 5px #ffcc00); display: block; }
-        .zoom-near .ad-ball-only { display: none; }
-        .ad-label-name { color: #fff; font-size: 12px; font-weight: 900; text-transform: uppercase; font-family: 'Inter'; }
-        .ad-choice-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 10px; }
-        .ad-type-btn { background: #1a1a1a; border: 1px solid #333; border-radius: 10px; padding: 10px; text-align: center; cursor: pointer; font-size: 20px; }
-        
-        /* Popup Oglasa Stil */
-        .ad-popup-images { display: flex; gap: 5px; overflow-x: auto; margin-top: 10px; padding-bottom: 5px; }
-        .ad-popup-images img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid #333; flex-shrink: 0; }
-        .ad-popup-btn-web { background: #ffcc00; color: #000; font-weight: bold; border: none; padding: 8px; border-radius: 8px; width: 100%; margin-top: 10px; cursor: pointer; text-decoration: none; display: block; text-align: center; font-size: 12px; }
 
         #match-details-view { position: fixed; bottom: -100%; left: 0; width: 100%; max-height: 90vh; background: #0a0a0a; z-index: 8000; border-top: 3px solid #ff3b30; border-radius: 30px 30px 0 0; padding: 20px; transition: 0.5s cubic-bezier(0.19, 1, 0.22, 1); overflow-y: auto; color: white; }
         #match-details-view.active { bottom: 0; }
@@ -238,15 +221,14 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth(), db = firebase.database();
 
-        let map, userMarker, currentLat, currentLon, currentAdminKey = null, allTereni = [], allAds = [], rangeCircle = null;
+        let map, userMarker, currentLat, currentLon, currentAdminKey = null, allTereni = [], rangeCircle = null;
         let currentLang = localStorage.getItem('lang') || 'sr';
         const sportEmojis = { "FUDBAL": "⚽", "KOŠARKA": "🏀", "ODBOJKA": "🏐", "TENIS": "🎾", "RUKOMET": "🤾" };
-        const adEmojis = { "CAFFE": "☕", "RESTORAN": "🍴", "FIRMA": "🏢" };
         const tennisPoints = ["0", "15", "30", "40", "AD"];
 
         const translations = {
-            sr: { subtitle: "Result Tracker", login: "ULAZ U SISTEM", explore: "ISTRAŽI MAPU", search: "Pretraži...", periodRes: "Rezultat po periodima", matchEvents: "Događaji na meču", adminTitle: "ADMIN TABLA", savePeriod: "SAČUVAJ PERIOD / SET", goLive: "KRENI UŽIVO", endMatch: "ZAVRŠI MEČ", resetMatch: "RESET / NOVI MEČ", schedule: "ZAKAŽI MEČ", deleteCourt: "OBRIŠI TEREN", zoneOccupied: "ZONA ZAUZETA!", create: "KRENI", courtName: "NAZIV TERENA", player: "IME IGRAČA", team: "TIM", loggedAs: "ULOGOVAN KAO:", localMatch: "LOKALNI MEČ", points: "POENI", games: "GEMOVI", league: "LIGA (NOVA)", team1: "TIM 1", team2: "TIM 2", goal: "GOL", yellow: "ŽUTI", red: "CRVENI", confirmDelete: "OBRISATI?", timeAt: "U", live: "UŽIVO", limitReached: "LIMIT OD 3 TERENA JE DOSTIGNUT!", addCourt: "DODAJ TEREN", addAd: "DODAJ REKLAMU", adTitle: "DODAVANJE REKLAME", adNamePlaceholder: "NAZIV OBJEKTA", adDescPlaceholder: "OPIS (DO 20 REČI)", adWebPlaceholder: "WEB ADRESA (URL)", periods: { FUDBAL: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "PROD"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } },
-            en: { subtitle: "Result Tracker", login: "ENTER SYSTEM", explore: "EXPLORE MAP", search: "Search...", periodRes: "Period Results", matchEvents: "Match Events", adminTitle: "ADMIN PANEL", savePeriod: "SAVE PERIOD / SET", goLive: "GO LIVE", endMatch: "END MATCH", resetMatch: "RESET / NEW MATCH", schedule: "SCHEDULE MATCH", deleteCourt: "DELETE COURT", zoneOccupied: "ZONE OCCUPIED!", create: "CREATE", courtName: "COURT NAME", player: "PLAYER NAME", team: "TEAM", loggedAs: "LOGGED AS:", localMatch: "LOCAL MATCH", points: "POINTS", games: "GAMES", league: "LEAGUE (NEW)", team1: "TEAM 1", team2: "TEAM 2", goal: "GOAL", yellow: "YELLOW", red: "RED", confirmDelete: "DELETE?", timeAt: "AT", live: "LIVE", limitReached: "LIMIT OF 3 COURTS REACHED!", addCourt: "ADD COURT", addAd: "ADD AD", adTitle: "ADD ADVERTISEMENT", adNamePlaceholder: "OBJECT NAME", adDescPlaceholder: "DESCRIPTION (MAX 20 WORDS)", adWebPlaceholder: "WEBSITE (URL)", periods: { FUDBAL: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "OT"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } }
+            sr: { subtitle: "Result Tracker", login: "ULAZ U SISTEM", explore: "ISTRAŽI MAPU", search: "Pretraži...", periodRes: "Rezultat po periodima", matchEvents: "Događaji na meču", adminTitle: "ADMIN TABLA", savePeriod: "SAČUVAJ PERIOD / SET", goLive: "KRENI UŽIVO", endMatch: "ZAVRŠI MEČ", resetMatch: "RESET / NOVI MEČ", schedule: "ZAKAŽI MEČ", deleteCourt: "OBRIŠI TEREN", zoneOccupied: "ZONA ZAUZETA!", create: "KRENI", courtName: "NAZIV TERENA", player: "IME IGRAČA", team: "TIM", loggedAs: "ULOGOVAN KAO:", localMatch: "LOKALNI MEČ", points: "POENI", games: "GEMOVI", league: "LIGA (NOVA)", team1: "TIM 1", team2: "TIM 2", goal: "GOL", yellow: "ŽUTI", red: "CRVENI", confirmDelete: "OBRISATI?", timeAt: "U", live: "UŽIVO", limitReached: "LIMIT OD 3 TERENA JE DOSTIGNUT!", addCourt: "DODAJ TEREN", periods: { FUDBAL: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "PROD"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } },
+            en: { subtitle: "Result Tracker", login: "ENTER SYSTEM", explore: "EXPLORE MAP", search: "Search...", periodRes: "Period Results", matchEvents: "Match Events", adminTitle: "ADMIN PANEL", savePeriod: "SAVE PERIOD / SET", goLive: "GO LIVE", endMatch: "END MATCH", resetMatch: "RESET / NEW MATCH", schedule: "SCHEDULE MATCH", deleteCourt: "DELETE COURT", zoneOccupied: "ZONE OCCUPIED!", create: "CREATE", courtName: "COURT NAME", player: "PLAYER NAME", team: "TEAM", loggedAs: "LOGGED AS:", localMatch: "LOCAL MATCH", points: "POINTS", games: "GAMES", league: "LEAGUE (NEW)", team1: "TEAM 1", team2: "TEAM 2", goal: "GOAL", yellow: "YELLOW", red: "RED", confirmDelete: "DELETE?", timeAt: "AT", live: "LIVE", limitReached: "LIMIT OF 3 COURTS REACHED!", addCourt: "ADD COURT", periods: { FUDBAL: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "OT"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } }
         };
 
         function setLanguage(lang) { currentLang = lang; localStorage.setItem('lang', lang); updateUILanguage(); if(document.getElementById('lang-modal').style.display === 'flex') toggleLangModal(); if(currentAdminKey) refreshAdminPanel(currentAdminKey); renderMarkers(); }
@@ -279,7 +261,6 @@
             map.on('click', handleMapClick);
             
             db.ref('tereni').on('value', snap => { allTereni = []; snap.forEach(c => { let d = c.val(); d.key = c.key; allTereni.push(d); }); renderMarkers(); if(currentAdminKey) refreshAdminPanel(currentAdminKey); });
-            db.ref('oglasi').on('value', snap => { allAds = []; snap.forEach(c => { let d = c.val(); d.key = c.key; allAds.push(d); }); renderMarkers(); });
             
             trackGPS();
         }
@@ -304,42 +285,6 @@
                 const html = `<div class="sport-marker-wrapper ${isLive?'status-live-wrapper':''} ${zoomNear?'zoom-near':''}"><div class="marker-content-box"><div class="marker-ball-only">${ball}</div>${cardBody}</div></div>`;
                 L.marker([d.lat, d.lng], { icon: L.divIcon({ className: '', html, iconSize: [0,0], iconAnchor: [0, 0] }) }).addTo(map).on('click', e => { L.DomEvent.stopPropagation(e); if (auth.currentUser && d.owner === auth.currentUser.uid) openAdmin(d.key); else openDetails(d.key); });
             });
-
-            allAds.forEach(a => {
-                if (map.distance(center, [a.lat, a.lng]) > 30000) return;
-                const icon = adEmojis[a.type] || '🏢';
-                const html = `
-                <div class="sport-marker-wrapper ${zoomNear?'zoom-near':''}">
-                    <div class="marker-content-box">
-                        <div class="ad-ball-only">${icon}</div>
-                        <div class="ad-marker-full">
-                            <div class="ad-icon-circle">${icon}</div>
-                            <div class="ad-label-name">${a.name}</div>
-                        </div>
-                        <div class="marker-pointer" style="border-top-color:#ffcc00;"></div>
-                    </div>
-                </div>`;
-                L.marker([a.lat, a.lng], { icon: L.divIcon({ className: '', html, iconSize: [0,0], iconAnchor: [0, 0] }) }).addTo(map).on('click', (e) => { 
-                    L.DomEvent.stopPropagation(e);
-                    
-                    let imagesHtml = "";
-                    if(a.images) {
-                        imagesHtml = `<div class="ad-popup-images">`;
-                        a.images.forEach(img => imagesHtml += `<img src="${img}">`);
-                        imagesHtml += `</div>`;
-                    }
-
-                    const webBtn = a.web ? `<a href="${a.web}" target="_blank" class="ad-popup-btn-web">POSETI SAJT</a>` : "";
-
-                    const h = `<div style="padding:10px; color:#fff; background:#111; border-radius:15px; width:220px; font-family:'Inter';">
-                        <div style="font-weight:900; font-size:16px; color:#ffcc00; margin-bottom:5px; text-transform:uppercase;">${a.name}</div>
-                        <div style="font-size:11px; line-height:1.4; color:#ccc;">${a.desc || ""}</div>
-                        ${imagesHtml}
-                        ${webBtn}
-                    </div>`;
-                    L.popup().setLatLng([a.lat, a.lng]).setContent(h).openOn(map); 
-                });
-            });
         }
 
         function handleMapClick(e) { 
@@ -359,68 +304,9 @@
 
             const choiceHtml = `<div style="padding:15px; display:flex; flex-direction:column; gap:10px; min-width:160px;">
                 <button onclick="openTerenForm(${e.latlng.lat}, ${e.latlng.lng})" style="width:100%; background:#ff3b30; color:white; border:none; padding:12px; font-weight:bold; border-radius:12px; font-family:'Inter';">${t.addCourt}</button>
-                <button onclick="openAdChoice(${e.latlng.lat}, ${e.latlng.lng})" style="width:100%; background:#ffcc00; color:black; border:none; padding:12px; font-weight:bold; border-radius:12px; font-family:'Inter';">${t.addAd}</button>
             </div>`;
 
             L.popup().setLatLng(e.latlng).setContent(choiceHtml).openOn(map); 
-        }
-
-        function openAdChoice(lat, lng) {
-            const h = `<div class="ad-choice-grid">
-                <div class="ad-type-btn" onclick="openAdFinalForm(${lat}, ${lng}, 'CAFFE')">☕</div>
-                <div class="ad-type-btn" onclick="openAdFinalForm(${lat}, ${lng}, 'RESTORAN')">🍴</div>
-                <div class="ad-type-btn" onclick="openAdFinalForm(${lat}, ${lng}, 'FIRMA')">🏢</div>
-            </div>`;
-            L.popup().setLatLng([lat, lng]).setContent(h).openOn(map);
-        }
-
-        function openAdFinalForm(lat, lng, type) {
-            const t = translations[currentLang];
-            const h = `<div style="padding:15px; width:260px; display:flex; flex-direction:column; gap:8px;">
-                <div style="color:#ffcc00; font-weight:900; text-align:center; font-size:14px;">${t.adTitle} (${type})</div>
-                <input type="text" id="ad_name_input" placeholder="${t.adNamePlaceholder}">
-                <textarea id="ad_desc_input" placeholder="${t.adDescPlaceholder}" rows="2" style="resize:none;"></textarea>
-                <input type="url" id="ad_web_input" placeholder="${t.adWebPlaceholder}">
-                <div style="font-size:10px; color:#aaa;">UČITAJ DO 3 SLIKE:</div>
-                <input type="file" id="ad_files" accept="image/*" multiple style="font-size:10px; padding:5px;">
-                <button onclick="processAd(${lat}, ${lng}, '${type}')" style="background:#ffcc00; color:black; width:100%; padding:12px; border-radius:12px; font-weight:bold; border:none; cursor:pointer;">${t.create}</button>
-            </div>`;
-            L.popup().setLatLng([lat, lng]).setContent(h).openOn(map);
-        }
-
-        async function processAd(lat, lng, type) {
-            const name = document.getElementById('ad_name_input').value.toUpperCase();
-            const desc = document.getElementById('ad_desc_input').value;
-            const web = document.getElementById('ad_web_input').value;
-            const fileInput = document.getElementById('ad_files');
-            
-            if(!name) return;
-
-            let images = [];
-            if(fileInput.files.length > 0) {
-                const files = Array.from(fileInput.files).slice(0, 3);
-                for(let file of files) {
-                    const base64 = await convertBase64(file);
-                    images.push(base64);
-                }
-            }
-
-            saveAd(lat, lng, type, name, desc, web, images);
-        }
-
-        function convertBase64(file) {
-            return new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-            });
-        }
-
-        function saveAd(lat, lng, type, name, desc, web, images) {
-            db.ref('oglasi').push({ 
-                name, lat, lng, type, desc, web, images,
-                owner: auth.currentUser.uid 
-            }).then(() => map.closePopup());
         }
 
         function openTerenForm(lat, lng) {
