@@ -66,7 +66,7 @@
         }
 
         .card-league-row { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
-        .league-ball-icon { width: 16px; height: 16px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23FF9500' stroke='black' stroke-width='4'/%3E%3Cpath d='M50,2 V98 M2,50 H98 M15,15 Q50,50 85,85 M15,85 Q50,50 85,15' fill='none' stroke='black' stroke-width='6'/%3E%3C/svg%3E"); background-size: contain; animation: spin 8s linear infinite; }
+        .league-ball-icon { width: 16px; height: 16px; background-size: contain; background-repeat: no-repeat; animation: spin 8s linear infinite; }
         .card-league-mini { font-family: 'Oswald'; font-size: 9px; color: #FF9500; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
 
         .score-row { display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 12px; margin-bottom: 3px; }
@@ -181,7 +181,16 @@
 
         let map, userMarker, currentLat, currentLon, currentAdminKey = null, allTereni = [], rangeCircle = null;
         let currentLang = localStorage.getItem('lang') || 'sr';
+        
         const sportEmojis = { "FUDBAL": "⚽", "KOŠARKA": "🏀", "ODBOJKA": "🏐", "TENIS": "🎾", "RUKOMET": "🤾" };
+        const sportBallIcons = {
+            "FUDBAL": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='white' stroke='black' stroke-width='2'/%3E%3Cpath d='M50,2 L50,98 M2,50 L98,50' stroke='black' stroke-width='1'/%3E%3Cpath d='M50,50 L70,30 L85,35 L90,50 L85,65 L70,70 L50,50 Z' fill='black'/%3E%3Cpath d='M50,50 L30,30 L15,35 L10,50 L15,65 L30,70 L50,50 Z' fill='black'/%3E%3Cpath d='M50,50 L50,20 L65,10 L75,10 L85,20 L50,50 Z' fill='black'/%3E%3C/svg%3E",
+            "KOŠARKA": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23e67e22' stroke='black' stroke-width='2'/%3E%3Cpath d='M2,50 Q50,50 98,50 M50,2 Q50,50 50,98 M15,15 Q50,50 85,85 M15,85 Q50,50 85,15' fill='none' stroke='black' stroke-width='3'/%3E%3C/svg%3E",
+            "ODBOJKA": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23f1c40f' stroke='%232980b9' stroke-width='2'/%3E%3Cpath d='M50,2 A48,48 0 0,1 98,50 M50,2 A48,48 0 0,0 2,50 M50,98 A48,48 0 0,1 2,50 M50,98 A48,48 0 0,0 98,50' fill='none' stroke='white' stroke-width='2'/%3E%3C/svg%3E",
+            "TENIS": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23ccff00' stroke='black' stroke-width='1'/%3E%3Cpath d='M30,2 Q50,50 30,98 M70,2 Q50,50 70,98' fill='none' stroke='white' stroke-width='4'/%3E%3C/svg%3E",
+            "RUKOMET": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23d35400' stroke='black' stroke-width='2'/%3E%3Cpath d='M20,20 L80,80 M20,80 L80,20 M50,2 L50,98 M2,50 L98,50' stroke='rgba(0,0,0,0.3)' stroke-width='2'/%3E%3C/svg%3E"
+        };
+
         const tennisPoints = ["0", "15", "30", "40", "AD"];
 
         const translations = {
@@ -226,6 +235,7 @@
             allTereni.forEach(d => {
                 if (map.distance(map.getCenter(), [d.lat, d.lng]) > 30000) return;
                 const ball = sportEmojis[d.sport] || '⚽';
+                const ballSvg = sportBallIcons[d.sport] || sportBallIcons["FUDBAL"];
                 const isLive = d.status === 'live', isEnded = d.status === 'ended';
                 
                 let score1 = d.score1 || 0, score2 = d.score2 || 0;
@@ -236,7 +246,10 @@
                         <div class="marker-content-box">
                             <div class="marker-ball-only">${ball}</div>
                             <div class="live-card-thin">
-                                <div class="card-league-row"><div class="league-ball-icon"></div><span class="card-league-mini">${d.league || translations[currentLang].localMatch}</span></div>
+                                <div class="card-league-row">
+                                    <div class="league-ball-icon" style="background-image: url('${ballSvg}')"></div>
+                                    <span class="card-league-mini">${d.league || translations[currentLang].localMatch}</span>
+                                </div>
                                 <div class="score-row"><span class="team-name-col">${d.t1 || d.name}</span><span class="score-val-col">${score1}</span></div>
                                 <div class="score-row"><span class="team-name-col">${d.t2 || '...'}</span><span class="score-val-col">${score2}</span></div>
                                 ${isLive ? `<div class="blink-live">${translations[currentLang].live}</div>` : ''}
@@ -267,7 +280,7 @@
             map.closePopup(); 
         }
 
-        /* --- LOGIKA ZA ADMIN PANEL (POBOLJŠANA) --- */
+        /* --- LOGIKA ZA ADMIN PANEL --- */
         function refreshAdminPanel(key) {
             const d = allTereni.find(x => x.key === key); if(!d) return;
             currentAdminKey = key;
@@ -286,7 +299,6 @@
             badge.style.color = 'white';
 
             const ctrl = document.getElementById('adm-sport-controls');
-            // Manja dugmad i zaključavanje (disabled ako nije live)
             ctrl.innerHTML = `<div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:15px;">
                 <button class="admin-btn small-score-btn" style="background:#28a745" onclick="changeScore(1, 1)" ${!isLive ? 'disabled' : ''}>T1 +</button>
                 <button class="admin-btn small-score-btn" style="background:#28a745" onclick="changeScore(2, 1)" ${!isLive ? 'disabled' : ''}>T2 +</button>
@@ -304,22 +316,31 @@
 
         function changeScore(team, val) {
             const d = allTereni.find(x => x.key === currentAdminKey);
-            if (d.status !== 'live') return;
+            if (!d || d.status !== 'live') return;
             let current = d[`score${team}`] || 0;
             let newVal = current + val;
-            if(d.sport === "TENIS") { if(newVal < 0) newVal = 0; if(newVal > 4) newVal = 4; }
-            else { if(newVal < 0) newVal = 0; }
+            
+            if(d.sport === "TENIS") { 
+                if(newVal < 0) newVal = 0; 
+                if(newVal > 4) newVal = 4; 
+            } else { 
+                if(newVal < 0) newVal = 0; 
+            }
             db.ref(`tereni/${currentAdminKey}`).update({ [`score${team}`]: newVal });
         }
 
         function savePeriod() {
             const d = allTereni.find(x => x.key === currentAdminKey);
-            if (d.status !== 'live') return;
+            if (!d || d.status !== 'live') return;
             let sub = d.sub_details || {};
             let n = Object.keys(sub).length + 1;
             let s1 = d.score1, s2 = d.score2;
+            
             if(d.sport === "TENIS") { s1 = tennisPoints[s1]; s2 = tennisPoints[s2]; }
-            sub["P"+n] = `${d.sport === "ODBOJKA" || d.sport === "TENIS" ? 'SET' : 'P'}${n} (${s1}:${s2})`;
+            
+            let label = (d.sport === "ODBOJKA" || d.sport === "TENIS") ? "SET" : "P";
+            sub["P"+n] = `${label}${n} (${s1}:${s2})`;
+            
             db.ref(`tereni/${currentAdminKey}`).update({ sub_details: sub, score1: 0, score2: 0 });
         }
 
@@ -327,6 +348,7 @@
         function closeAdmin() { document.getElementById('admin-panel').classList.remove('active'); currentAdminKey = null; }
         function adminStatus(s) { db.ref(`tereni/${currentAdminKey}`).update({ status: s }); }
         function adminDelete() { if(confirm("OBRISATI?")) { db.ref(`tereni/${currentAdminKey}`).remove(); closeAdmin(); } }
+        
         async function setupMatch() { 
             const l = document.getElementById('adm-league-input').value.toUpperCase(), t1 = document.getElementById('adm-t1').value.toUpperCase(), t2 = document.getElementById('adm-t2').value.toUpperCase();
             await db.ref(`tereni/${currentAdminKey}`).update({ league: l, t1, t2, status: 'upcoming', score1: 0, score2: 0 }); 
@@ -346,11 +368,29 @@
         }
         function closeDetails() { document.getElementById('match-details-view').classList.remove('active'); }
 
-        function exploreMap() { document.getElementById('hero').style.display = 'none'; document.getElementById('map').style.display = 'block'; document.getElementById('ui-controls').style.display = 'block'; initMap(); }
+        function exploreMap() { 
+            document.getElementById('hero').style.display = 'none'; 
+            document.getElementById('map').style.display = 'block'; 
+            document.getElementById('ui-controls').style.display = 'block'; 
+            initMap(); 
+        }
         function goBackToLogin() { auth.signOut(); location.reload(); }
-        async function handleAuth() { let e = document.getElementById('email').value.toUpperCase(), p = document.getElementById('password').value; try { await auth.signInWithEmailAndPassword(e, p); } catch { try { await auth.createUserWithEmailAndPassword(e, p); } catch(err) { alert(err.message); } } }
+        async function handleAuth() { 
+            let e = document.getElementById('email').value.toUpperCase(), p = document.getElementById('password').value; 
+            try { await auth.signInWithEmailAndPassword(e, p); } catch { 
+                try { await auth.createUserWithEmailAndPassword(e, p); } catch(err) { alert(err.message); } 
+            } 
+        }
         auth.onAuthStateChanged(user => { if (user) exploreMap(); });
-        function trackGPS() { if(!navigator.geolocation) return; navigator.geolocation.watchPosition(pos => { currentLat = pos.coords.latitude; currentLon = pos.coords.longitude; if(!userMarker) { userMarker = L.marker([currentLat, currentLon], { icon: L.divIcon({ className: 'user-location-dot', iconSize: [14, 14] }) }).addTo(map); } else userMarker.setLatLng([currentLat, currentLon]); }, null, { enableHighAccuracy: true }); }
+        function trackGPS() { 
+            if(!navigator.geolocation) return; 
+            navigator.geolocation.watchPosition(pos => { 
+                currentLat = pos.coords.latitude; currentLon = pos.coords.longitude; 
+                if(!userMarker) { 
+                    userMarker = L.marker([currentLat, currentLon], { icon: L.divIcon({ className: 'user-location-dot', iconSize: [14, 14] }) }).addTo(map); 
+                } else userMarker.setLatLng([currentLat, currentLon]); 
+            }, null, { enableHighAccuracy: true }); 
+        }
         function goToMyLocation() { if(currentLat) map.flyTo([currentLat, currentLon], 18); }
         function handleSearch(event) { if(event.key === "Enter") { fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${event.target.value}`).then(r => r.json()).then(data => { if(data[0]) { map.flyTo([data[0].lat, data[0].lon], 15); toggleSearch(); } }); } }
     </script>
