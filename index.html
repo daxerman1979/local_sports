@@ -110,7 +110,7 @@
             padding: 1px 6px; border-radius: 2px; animation: soft-blink 1.5s infinite; 
         }
 
-        /* CARD POINTER (KVAČICA) */
+        /* CARD POINTER */
         .marker-pointer {
             width: 0; height: 0;
             border-left: 8px solid transparent;
@@ -306,8 +306,15 @@
                     if(d.sub_details) {
                         periodHtml = `<div class="card-periods-row">`;
                         Object.values(d.sub_details).forEach(v => {
-                            let p = v.split(' ');
-                            periodHtml += `<div class="mini-period-tag">${p[0]}<span>${p[1]||''}</span></div>`;
+                            // Popravljena logika za izvlačenje naziva i rezultata (npr. "1.POL 1:0")
+                            const spaceIndex = v.indexOf(' ');
+                            if (spaceIndex !== -1) {
+                                const label = v.substring(0, spaceIndex);
+                                const score = v.substring(spaceIndex + 1);
+                                periodHtml += `<div class="mini-period-tag">${label}<span>${score}</span></div>`;
+                            } else {
+                                periodHtml += `<div class="mini-period-tag">${v}</div>`;
+                            }
                         });
                         periodHtml += `</div>`;
                     }
@@ -374,10 +381,14 @@
             pDiv.innerHTML = ""; 
             if(d.sub_details) {
                 Object.values(d.sub_details).forEach(v => { 
-                    const parts = v.split(' ');
-                    const label = parts[0];
-                    const score = parts[1] || "";
-                    pDiv.innerHTML += `<div class="detail-period-tag"><span>${label}</span><span style="color:#ffcc00">${score}</span></div>`; 
+                    const spaceIndex = v.indexOf(' ');
+                    if (spaceIndex !== -1) {
+                        const label = v.substring(0, spaceIndex);
+                        const score = v.substring(spaceIndex + 1);
+                        pDiv.innerHTML += `<div class="detail-period-tag"><span>${label}</span><span style="color:#ffcc00">${score}</span></div>`; 
+                    } else {
+                        pDiv.innerHTML += `<div class="detail-period-tag"><span>${v}</span></div>`;
+                    }
                 }); 
             }
             
