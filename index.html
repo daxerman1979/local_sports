@@ -66,9 +66,9 @@
         .zoom-near .marker-ball-only { display: none; }
 
         .live-card-thin { 
-            background: #000; border-radius: 4px; display: none; flex-direction: column; width: 180px; 
-            color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.8); position: relative; border-left: 4px solid #ff9500; 
-            overflow: hidden; z-index: 25; margin-bottom: 5px;
+            background: #000; border-radius: 6px; display: none; flex-direction: column; width: 190px; 
+            color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.9); position: relative; border-left: 4px solid #ff9500; 
+            overflow: hidden; z-index: 25; margin-bottom: 2px;
         }
         .zoom-near .live-card-thin { display: flex; }
         
@@ -90,6 +90,17 @@
             background: #1a1a1a; min-width: 35px; text-align: center; border-radius: 2px; margin-left: 10px;
         }
 
+        /* PRO PERIODS ON CARDS */
+        .card-periods-row {
+            display: flex; gap: 4px; padding: 4px 10px; background: #080808; overflow-x: auto;
+            border-bottom: 1px solid #1a1a1a;
+        }
+        .mini-period-tag {
+            font-size: 8px; font-weight: 900; color: #888; background: #111;
+            padding: 2px 5px; border-radius: 2px; border: 1px solid #222; white-space: nowrap;
+        }
+        .mini-period-tag span { color: #ff9500; margin-left: 3px; }
+
         .card-footer-info {
             display: flex; justify-content: space-between; align-items: center; padding: 4px 10px; background: #000;
         }
@@ -98,6 +109,17 @@
             background: #ffcc00; color: #000; font-size: 9px; font-weight: 900; 
             padding: 1px 6px; border-radius: 2px; animation: soft-blink 1.5s infinite; 
         }
+
+        /* CARD POINTER (KVAČICA) */
+        .marker-pointer {
+            width: 0; height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 10px solid #ff9500;
+            display: none; margin-bottom: 10px;
+        }
+        .zoom-near .marker-pointer { display: block; }
+        .status-live-wrapper .marker-pointer { border-top-color: #ffcc00; }
 
         @keyframes soft-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
@@ -120,6 +142,7 @@
         #admin-panel { position: fixed; top: 0; left: 100%; width: 100%; height: 100%; background: #000; z-index: 7000; transition: 0.4s; padding: 25px; display: flex; flex-direction: column; overflow-y: auto; }
         #admin-panel.active { left: 0; }
         .admin-btn { padding: 15px; border: none; font-weight: 900; color: white; text-transform: uppercase; width: 100%; border-radius: 4px; cursor: pointer; font-family: 'Oswald'; margin-bottom: 8px; border-bottom: 3px solid rgba(0,0,0,0.3); }
+        .admin-btn:disabled { opacity: 0.3; cursor: not-allowed; border-bottom: none; }
         .user-location-dot { background: #007AFF; width: 14px; height: 14px; border: 2px solid white; border-radius: 50%; box-shadow: 0 0 20px #007AFF; }
 
         @keyframes pulse-circle {
@@ -278,6 +301,17 @@
                 if (isLive || isEnded || isUpcoming) {
                     let s1 = (isLive || isEnded) ? (d.score1 || 0) : "-";
                     let s2 = (isLive || isEnded) ? (d.score2 || 0) : "-";
+                    
+                    let periodHtml = "";
+                    if(d.sub_details) {
+                        periodHtml = `<div class="card-periods-row">`;
+                        Object.values(d.sub_details).forEach(v => {
+                            let p = v.split(' ');
+                            periodHtml += `<div class="mini-period-tag">${p[0]}<span>${p[1]||''}</span></div>`;
+                        });
+                        periodHtml += `</div>`;
+                    }
+
                     let footer = isLive ? `<div class="blink-live-tag">${translations[currentLang].live}</div>` : (d.match_time ? `<div class="card-time-mini">${new Date(d.match_time).toLocaleDateString([],{day:'2-digit',month:'2-digit'})} ${translations[currentLang].timeAt} ${new Date(d.match_time).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div>` : "");
                     
                     cardBody = `
@@ -285,13 +319,14 @@
                         <div class="card-league-mini">${d.league || translations[currentLang].localMatch}</div>
                         <div class="score-row"><span class="team-name-col">${d.t1}</span><span class="score-val-col">${s1}</span></div>
                         <div class="score-row" style="border:none;"><span class="team-name-col">${d.t2}</span><span class="score-val-col">${s2}</span></div>
+                        ${periodHtml}
                         <div class="card-footer-info">
                             <span style="font-size:10px;">${ball}</span>
                             ${footer}
                         </div>
-                    </div>`;
+                    </div><div class="marker-pointer"></div>`;
                 } else {
-                    cardBody = `<div class="live-card-thin" style="padding:10px; text-align:center; font-weight:900; font-size:12px; color:#ffcc00; border-left:4px solid #333;">${ball} ${d.name}</div>`;
+                    cardBody = `<div class="live-card-thin" style="padding:10px; text-align:center; font-weight:900; font-size:12px; color:#ffcc00; border-left:4px solid #333;">${ball} ${d.name}</div><div class="marker-pointer"></div>`;
                 }
 
                 const html = `<div class="sport-marker-wrapper ${isLive?'status-live-wrapper':''} ${zoomNear?'zoom-near':''}"><div class="marker-content-box"><div class="marker-ball-only">${ball}</div>${cardBody}</div></div>`;
@@ -366,6 +401,10 @@
             document.getElementById('adm-name').innerText = d.name; document.getElementById('adm-main-score').innerText = `${d.score1 || 0} : ${d.score2 || 0}`;
             let subS = d.sub_details ? Object.values(d.sub_details).join(' | ') : ""; if(d.sport === "ODBOJKA") subS = t.points + `: ${d.p1 || 0}:${d.p2 || 0} | ` + subS; if(d.sport === "TENIS") { const isTB = (d.g1 === 6 && d.g2 === 6); const pts1 = isTB ? (d.p1 || 0) : (tennisPoints[d.p1] || "0"); const pts2 = isTB ? (d.p2 || 0) : (tennisPoints[d.p2] || "0"); subS = t.games + `: ${d.g1 || 0}:${d.g2 || 0} (${pts1}:${pts2}) | ` + subS; }
             document.getElementById('adm-sub-display').innerText = subS;
+            
+            const saveBtn = document.getElementById('btn-save-period');
+            saveBtn.disabled = (d.status !== 'live');
+
             const ctrl = document.getElementById('adm-sport-controls'); ctrl.innerHTML = "";
             if(d.sport === "FUDBAL" || d.sport === "RUKOMET") {
                 ctrl.innerHTML = `<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px;"><div style="display:flex; justify-content:center; gap:5px;"><button class="admin-btn" style="background:#333; width:45px;" onclick="proScore(1,-1)">-</button><button class="admin-btn" style="background:#ffcc00; color:#000; width:45px;" onclick="proScore(1,1)">+</button></div><div style="display:flex; justify-content:center; gap:5px;"><button class="admin-btn" style="background:#333; width:45px;" onclick="proScore(2,-1)">-</button><button class="admin-btn" style="background:#ffcc00; color:#000; width:45px;" onclick="proScore(2,1)">+</button></div></div>`;
@@ -439,10 +478,10 @@
         function triggerLogic(type) { 
             const d = allTereni.find(x => x.key === currentAdminKey); 
             if(type === 'period') { 
+                if (d.status !== 'live') return;
                 let sub = d.sub_details || {}; 
                 let n = Object.keys(sub).length; 
                 
-                // OGRANIČENJE PERIODA PO SPORTU
                 const limits = { "FUDBAL": 5, "KOŠARKA": 5, "ODBOJKA": 5, "TENIS": 5, "RUKOMET": 5 };
                 if (n >= (limits[d.sport] || 5)) return;
 
