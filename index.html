@@ -36,15 +36,29 @@
         /* HERO / AUTH SECTION REDESIGN */
         #hero { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.9) 100%), 
-                        url('https://images.unsplash.com/photo-1540747913346-19e3adbb17c3?q=80&w=1500&auto=format&fit=crop') center/cover; 
+            background: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.9) 100%), 
+                        url('https://images.unsplash.com/photo-1504450758481-7338eba7524a?q=80&w=1500&auto=format&fit=crop') center/cover; 
             display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 6000; color: white; padding: 20px; 
         }
-        .hero-logo { font-family: 'Permanent Marker', cursive; font-size: 64px; color: #ffcc00; text-shadow: 0 10px 20px rgba(0,0,0,0.5); transform: rotate(-2deg); margin-bottom: 5px; letter-spacing: -2px; }
-        .hero-subtitle { font-family: 'Oswald'; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 6px; color: #ffffff; margin-bottom: 40px; opacity: 0.8; }
+        
+        /* STILIZOVAN LOGO ZA MOBILNI */
+        .hero-logo { 
+            font-family: 'Permanent Marker', cursive; 
+            font-size: clamp(38px, 12vw, 56px); 
+            color: #ffcc00; 
+            text-shadow: 0 10px 20px rgba(0,0,0,0.5); 
+            transform: rotate(-1deg); 
+            margin-bottom: 5px; 
+            letter-spacing: -1px;
+            white-space: nowrap;
+            width: 100%;
+            text-align: center;
+        }
+
+        .hero-subtitle { font-family: 'Oswald'; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 5px; color: #ffffff; margin-bottom: 40px; opacity: 0.8; }
         
         .auth-box { 
-            background: rgba(20, 20, 20, 0.7); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            background: rgba(20, 20, 20, 0.75); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
             padding: 30px; border-radius: 28px; width: 100%; max-width: 380px; 
             display: flex; flex-direction: column; gap: 15px; border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
