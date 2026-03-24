@@ -16,7 +16,7 @@
 </script>
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;700;900&family=Permanent+Marker&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;600;800;900&family=Permanent+Marker&display=swap" rel="stylesheet">
     
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; touch-action: pan-x pan-y; }
@@ -24,28 +24,47 @@
         
         input, select, textarea, datalist { 
             font-size: 16px !important; outline: none !important; text-transform: uppercase; 
-            background: #1a1a1a; color: white; border: 1px solid #333; 
-            padding: 12px; border-radius: 12px; font-family: 'Inter'; width: 100%;
+            background: rgba(255, 255, 255, 0.05); color: white; border: 1px solid rgba(255, 255, 255, 0.1); 
+            padding: 14px; border-radius: 12px; font-family: 'Inter'; width: 100%;
+            transition: all 0.3s ease;
         }
+        input:focus { border-color: #ffcc00; background: rgba(255, 255, 255, 0.1); }
         
         button { font-size: 16px !important; outline: none !important; transition: transform 0.1s active, opacity 0.2s; position: relative; overflow: hidden; }
         button:active { transform: scale(0.96); opacity: 0.8; }
 
+        /* HERO / AUTH SECTION REDESIGN */
+        #hero { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.9) 100%), 
+                        url('https://images.unsplash.com/photo-1540747913346-19e3adbb17c3?q=80&w=1500&auto=format&fit=crop') center/cover; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 6000; color: white; padding: 20px; 
+        }
+        .hero-logo { font-family: 'Permanent Marker', cursive; font-size: 64px; color: #ffcc00; text-shadow: 0 10px 20px rgba(0,0,0,0.5); transform: rotate(-2deg); margin-bottom: 5px; letter-spacing: -2px; }
+        .hero-subtitle { font-family: 'Oswald'; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 6px; color: #ffffff; margin-bottom: 40px; opacity: 0.8; }
+        
+        .auth-box { 
+            background: rgba(20, 20, 20, 0.7); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            padding: 30px; border-radius: 28px; width: 100%; max-width: 380px; 
+            display: flex; flex-direction: column; gap: 15px; border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        .auth-btn { 
+            background: #ffcc00; color: #000; border: none; padding: 18px; font-weight: 900; 
+            cursor: pointer; text-transform: uppercase; border-radius: 14px; font-family: 'Oswald'; 
+            box-shadow: 0 10px 20px rgba(255, 204, 0, 0.2); font-size: 18px !important;
+        }
+
+        .home-lang-switch { display: flex; gap: 10px; justify-content: center; margin-top: 10px; }
+        .home-lang-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #888; padding: 10px 20px; border-radius: 12px; font-size: 11px; font-weight: 800; cursor: pointer; transition: 0.3s; }
+        .home-lang-btn.active { border-color: #ffcc00; color: #ffcc00; background: rgba(255, 204, 0, 0.1); }
+
+        /* UI CONTROLS */
         #search-container { position: absolute; top: 20px; left: 20px; z-index: 5000; display: flex; align-items: center; transition: all 0.4s ease; width: 40px; height: 40px; background: rgba(0,0,0,0.6); border-radius: 20px; backdrop-filter: blur(10px); overflow: hidden; border: 1px solid rgba(255,255,255,0.2); }
         #search-container.expanded { width: calc(100% - 80px); background: rgba(0,0,0,0.95); border: 1px solid #ffcc00; }
         #city-search { width: 100%; border: none; background: transparent; color: white; padding: 12px 15px 12px 40px; font-size: 16px; outline: none; opacity: 0; transition: 0.3s; pointer-events: none; }
         #search-container.expanded #city-search { opacity: 1; pointer-events: all; }
         .search-icon { position: absolute; left: 10px; width: 20px; height: 20px; filter: brightness(0) invert(1); opacity: 0.8; cursor: pointer; z-index: 5001; }
-
-        #hero { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1519861531473-9200262188bf?q=80&w=1500&auto=format&fit=crop') center/cover; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 6000; color: white; padding: 20px; }
-        .hero-logo { font-family: 'Permanent Marker', cursive; font-size: 72px; color: #ffcc00; text-shadow: 4px 4px 0px #000; transform: rotate(-2deg); margin-bottom: 0; }
-        .hero-subtitle { font-family: 'Oswald'; font-weight: 700; font-size: 18px; text-transform: uppercase; letter-spacing: 5px; color: #fff; margin-bottom: 30px; margin-top: -10px; }
-        .auth-box { background: rgba(10,10,10,0.95); backdrop-filter: blur(25px); padding: 35px; border-radius: 30px; width: 100%; max-width: 360px; display: flex; flex-direction: column; gap: 15px; border: 1px solid rgba(255,204,0,0.5); }
-        .auth-btn { background: #ffcc00; color: #000; border: none; padding: 16px; font-weight: 900; cursor: pointer; text-transform: uppercase; border-radius: 12px; font-family: 'Oswald'; box-shadow: 0 4px 15px rgba(255,204,0,0.3); }
-
-        .home-lang-switch { display: flex; gap: 15px; justify-content: center; margin-top: 15px; }
-        .home-lang-btn { background: #1a1a1a; border: 1px solid #333; color: #aaa; padding: 8px 15px; border-radius: 10px; font-size: 12px; font-weight: 900; cursor: pointer; }
-        .home-lang-btn.active { border-color: #ffcc00; color: white; background: #222; }
 
         #map { width: 100vw; height: 100vh; background: #111; display: none; }
         .location-btn { position: absolute; bottom: 40px; right: 20px; z-index: 5500; width: 55px; height: 55px; background: #ffcc00; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 20px rgba(255,204,0,0.5); border: 2px solid #000; }
@@ -190,7 +209,6 @@
         .admin-btn { padding: 15px; border: none; font-weight: 900; color: white; text-transform: uppercase; width: 100%; border-radius: 4px; cursor: pointer; font-family: 'Oswald'; margin-bottom: 8px; border-bottom: 3px solid rgba(0,0,0,0.3); }
         .admin-btn:disabled { opacity: 0.3; cursor: not-allowed; border-bottom: none; }
 
-        /* NOVA LISTA DOGAĐAJA U ADMINU */
         .adm-event-list { display: flex; flex-direction: column; gap: 5px; margin-top: 10px; max-height: 200px; overflow-y: auto; }
         .adm-event-item { background: #1a1a1a; padding: 8px 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #333; }
         .adm-event-item span { font-size: 13px; font-weight: bold; color: #fff; text-transform: uppercase; }
@@ -212,16 +230,28 @@
     <div id="hero">
         <div class="hero-logo">SCOREPUNKT</div>
         <div class="hero-subtitle" id="txt-subtitle">Result Tracker</div>
+        
         <div class="auth-box">
-            <input type="email" id="email" placeholder="EMAIL">
-            <input type="password" id="password" placeholder="PASSWORD">
+            <div style="position:relative;">
+                <input type="email" id="email" placeholder="EMAIL ADDRESS">
+            </div>
+            <div style="position:relative;">
+                <input type="password" id="password" placeholder="PASSWORD">
+            </div>
+            
             <button class="auth-btn" id="btn-login" onclick="handleAuth()">ULAZ U SISTEM</button>
-            <button id="btn-explore" onclick="exploreMap()" style="background:none; border:none; color:#aaa; cursor:pointer; font-weight:bold; margin-top:10px; text-decoration: underline;">ISTRAŽI MAPU</button>
+            
+            <button id="btn-explore" onclick="exploreMap()" style="background:none; border:none; color:#ffcc00; cursor:pointer; font-weight:800; margin-top:5px; font-size:13px; text-transform:uppercase; letter-spacing:1px;">
+                ISTRAŽI MAPU BEZ PRIJAVE
+            </button>
+
             <div class="home-lang-switch">
                 <div class="home-lang-btn" id="h-lang-sr" onclick="setLanguage('sr')">SRB</div>
                 <div class="home-lang-btn" id="h-lang-en" onclick="setLanguage('en')">ENG</div>
             </div>
         </div>
+        
+        <div style="margin-top:40px; color:rgba(255,255,255,0.4); font-size:10px; letter-spacing:2px; font-weight:800;">© 2026 SCOREPUNKT MOBILE</div>
     </div>
 
     <div id="map"></div>
@@ -310,12 +340,12 @@
 
         let map, userMarker, currentLat, currentLon, currentAdminKey = null, allTereni = [], rangeCircle = null;
         let currentLang = localStorage.getItem('lang') || 'sr';
-        const sportEmojis = { "FUDBAL": "⚽", "KOŠARKA": "🏀", "ODBOJKA": "🏐", "TENIS": "🎾", "RUKOMET": "©" };
+        const sportEmojis = { "FUDBAL": "⚽", "KOŠARKA": "🏀", "ODBOJKA": "🏐", "TENIS": "🎾", "RUKOMET": "🤾" };
         const tennisPoints = ["0", "15", "30", "40", "AD"];
 
         const translations = {
-            sr: { subtitle: "Result Tracker", login: "ULAZ U SISTEM", explore: "ISTRAŽI MAPU", search: "Pretraži...", periodRes: "Rezultat po periodima", matchEvents: "Događaji na meču", adminTitle: "ADMIN TABLA", savePeriod: "SAČUVAJ PERIOD / SET", goLive: "KRENI UŽIVO", endMatch: "ZAVRŠI MEČ", resetMatch: "RESET / NOVI MEČ", schedule: "ZAKAŽI MEČ", deleteCourt: "OBRIŠI TEREN", zoneOccupied: "ZONA ZAUZETA!", create: "KRENI", courtName: "NAZIV TERENA", player: "IME IGRAČA", team: "TIM", loggedAs: "ULOGOVAN KAO:", localMatch: "LOKALNI MEČ", points: "POENI", games: "GEMOVI", league: "LIGA (NOVA)", team1: "TIM 1", team2: "TIM 2", goal: "GOL", yellow: "ŽUTI", red: "CRVENI", confirmDelete: "OBRISATI?", timeAt: "U", live: "UŽIVO", limitReached: "LIMIT OD 3 TERENA JE DOSTIGNUT!", addCourt: "DODAJ TEREN", periods: { FUDBAL: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "PROD"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } },
-            en: { subtitle: "Result Tracker", login: "ENTER SYSTEM", explore: "EXPLORE MAP", search: "Search...", periodRes: "Period Results", matchEvents: "Match Events", adminTitle: "ADMIN PANEL", savePeriod: "SAVE PERIOD / SET", goLive: "GO LIVE", endMatch: "END MATCH", resetMatch: "RESET / NEW MATCH", schedule: "SCHEDULE MATCH", deleteCourt: "DELETE COURT", zoneOccupied: "ZONE OCCUPIED!", create: "CREATE", courtName: "COURT NAME", player: "PLAYER NAME", team: "TEAM", loggedAs: "LOGGED AS:", localMatch: "LOCAL MATCH", points: "POINTS", games: "GAMES", league: "LEAGUE (NEW)", team1: "TEAM 1", team2: "TEAM 2", goal: "GOAL", yellow: "YELLOW", red: "RED", confirmDelete: "DELETE?", timeAt: "AT", live: "LIVE", limitReached: "LIMIT OF 3 COURTS REACHED!", addCourt: "ADD COURT", periods: { FUDBAL: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "OT"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } }
+            sr: { subtitle: "Result Tracker", login: "ULAZ U SISTEM", explore: "ISTRAŽI MAPU BEZ PRIJAVE", search: "Pretraži...", periodRes: "Rezultat po periodima", matchEvents: "Događaji na meču", adminTitle: "ADMIN TABLA", savePeriod: "SAČUVAJ PERIOD / SET", goLive: "KRENI UŽIVO", endMatch: "ZAVRŠI MEČ", resetMatch: "RESET / NOVI MEČ", schedule: "ZAKAŽI MEČ", deleteCourt: "OBRIŠI TEREN", zoneOccupied: "ZONA ZAUZETA!", create: "KRENI", courtName: "NAZIV TERENA", player: "IME IGRAČA", team: "TIM", loggedAs: "ULOGOVAN KAO:", localMatch: "LOKALNI MEČ", points: "POENI", games: "GEMOVI", league: "LIGA (NOVA)", team1: "TIM 1", team2: "TIM 2", goal: "GOL", yellow: "ŽUTI", red: "CRVENI", confirmDelete: "OBRISATI?", timeAt: "U", live: "UŽIVO", limitReached: "LIMIT OD 3 TERENA JE DOSTIGNUT!", addCourt: "DODAJ TEREN", periods: { FUDBAL: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "PROD"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } },
+            en: { subtitle: "Result Tracker", login: "ENTER SYSTEM", explore: "EXPLORE MAP WITHOUT LOGIN", search: "Search...", periodRes: "Period Results", matchEvents: "Match Events", adminTitle: "ADMIN PANEL", savePeriod: "SAVE PERIOD / SET", goLive: "GO LIVE", endMatch: "END MATCH", resetMatch: "RESET / NEW MATCH", schedule: "SCHEDULE MATCH", deleteCourt: "DELETE COURT", zoneOccupied: "ZONE OCCUPIED!", create: "CREATE", courtName: "COURT NAME", player: "PLAYER NAME", team: "TEAM", loggedAs: "LOGGED AS:", localMatch: "LOCAL MATCH", points: "POINTS", games: "GAMES", league: "LEAGUE (NEW)", team1: "TEAM 1", team2: "TEAM 2", goal: "GOAL", yellow: "YELLOW", red: "RED", confirmDelete: "DELETE?", timeAt: "AT", live: "LIVE", limitReached: "LIMIT OF 3 COURTS REACHED!", addCourt: "ADD COURT", periods: { FUDBAL: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "OT"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } }
         };
 
         function setLanguage(lang) { currentLang = lang; localStorage.setItem('lang', lang); updateUILanguage(); if(document.getElementById('lang-modal').style.display === 'flex') toggleLangModal(); if(currentAdminKey) refreshAdminPanel(currentAdminKey); }
