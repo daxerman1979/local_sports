@@ -66,7 +66,7 @@
         .zoom-near .marker-ball-only { display: none; }
 
         .live-card-thin { 
-            background: #000; border-radius: 6px; display: none; flex-direction: column; width: 190px; 
+            background: #000; border-radius: 6px; display: none; flex-direction: column; width: 160px; 
             color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.9); position: relative; border-left: 4px solid #ff9500; 
             overflow: hidden; z-index: 25; margin-bottom: 2px;
         }
@@ -77,29 +77,18 @@
         
         .card-league-mini { 
             font-size: 9px; background: #222; color: #ffcc00; font-weight: 900; padding: 3px 8px; 
-            text-transform: uppercase; letter-spacing: 1px; width: 100%;
+            text-transform: uppercase; letter-spacing: 1px; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
 
         .score-row { 
             display: flex; justify-content: space-between; align-items: center; 
             padding: 6px 10px; border-bottom: 1px solid #1a1a1a; background: linear-gradient(90deg, #000, #111);
         }
-        .team-name-col { font-size: 13px; font-weight: 800; text-transform: uppercase; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+        .team-name-col { font-size: 12px; font-weight: 800; text-transform: uppercase; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
         .score-val-col { 
-            font-family: 'Oswald'; font-size: 18px; color: #ffcc00; font-weight: 700; 
-            background: #1a1a1a; min-width: 35px; text-align: center; border-radius: 2px; margin-left: 10px;
+            font-family: 'Oswald'; font-size: 16px; color: #ffcc00; font-weight: 700; 
+            background: #1a1a1a; min-width: 30px; text-align: center; border-radius: 2px; margin-left: 10px;
         }
-
-        /* PRO PERIODS ON CARDS */
-        .card-periods-row {
-            display: flex; gap: 4px; padding: 4px 10px; background: #080808; overflow-x: auto;
-            border-bottom: 1px solid #1a1a1a;
-        }
-        .mini-period-tag {
-            font-size: 8px; font-weight: 900; color: #888; background: #111;
-            padding: 2px 5px; border-radius: 2px; border: 1px solid #222; white-space: nowrap;
-        }
-        .mini-period-tag span { color: #ff9500; margin-left: 3px; }
 
         .card-footer-info {
             display: flex; justify-content: space-between; align-items: center; padding: 4px 10px; background: #000;
@@ -110,7 +99,6 @@
             padding: 1px 6px; border-radius: 2px; animation: soft-blink 1.5s infinite; 
         }
 
-        /* CARD POINTER */
         .marker-pointer {
             width: 0; height: 0;
             border-left: 8px solid transparent;
@@ -130,15 +118,14 @@
         .details-top-bar { background: #111; padding: 15px; text-align: center; border-bottom: 1px solid #222; }
         .details-league { color: #ffcc00; font-weight: 900; font-size: 14px; letter-spacing: 2px; text-transform: uppercase; display: block; }
         
-        .details-scoreboard { background: linear-gradient(#111, #000); padding: 30px 20px; display: flex; justify-content: space-around; align-items: center; border-bottom: 1px solid #1a1a1a; }
-        .det-team-box { flex: 1; text-align: center; }
-        .det-team-name { font-size: 20px; font-weight: 900; text-transform: uppercase; color: #fff; }
-        .det-score-main { font-family: 'Oswald'; font-size: 60px; font-weight: 700; color: #ffcc00; margin: 0 20px; }
+        .details-scoreboard { background: linear-gradient(#111, #000); padding: 30px 10px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1a1a1a; }
+        .det-team-box { flex: 1; display: flex; align-items: center; justify-content: center; }
+        .det-team-name { font-size: 16px; font-weight: 900; text-transform: uppercase; color: #fff; text-align: center; width: 100%; overflow-wrap: break-word; }
+        .det-score-main { font-family: 'Oswald'; font-size: 48px; font-weight: 700; color: #ffcc00; margin: 0 10px; min-width: 100px; text-align: center; }
         
         .details-content { padding: 20px; }
         .detail-period-tag { background: #111; padding: 12px; border-radius: 4px; font-size: 13px; font-weight: 700; border-bottom: 2px solid #ff9500; margin-bottom: 5px; display: flex; justify-content: space-between; }
         
-        /* ADMIN PANEL */
         #admin-panel { position: fixed; top: 0; left: 100%; width: 100%; height: 100%; background: #000; z-index: 7000; transition: 0.4s; padding: 25px; display: flex; flex-direction: column; overflow-y: auto; }
         #admin-panel.active { left: 0; }
         .admin-btn { padding: 15px; border: none; font-weight: 900; color: white; text-transform: uppercase; width: 100%; border-radius: 4px; cursor: pointer; font-family: 'Oswald'; margin-bottom: 8px; border-bottom: 3px solid rgba(0,0,0,0.3); }
@@ -302,23 +289,6 @@
                     let s1 = (isLive || isEnded) ? (d.score1 || 0) : "-";
                     let s2 = (isLive || isEnded) ? (d.score2 || 0) : "-";
                     
-                    let periodHtml = "";
-                    if(d.sub_details) {
-                        periodHtml = `<div class="card-periods-row">`;
-                        Object.values(d.sub_details).forEach(v => {
-                            // Popravljena logika za izvlačenje naziva i rezultata (npr. "1.POL 1:0")
-                            const spaceIndex = v.indexOf(' ');
-                            if (spaceIndex !== -1) {
-                                const label = v.substring(0, spaceIndex);
-                                const score = v.substring(spaceIndex + 1);
-                                periodHtml += `<div class="mini-period-tag">${label}<span>${score}</span></div>`;
-                            } else {
-                                periodHtml += `<div class="mini-period-tag">${v}</div>`;
-                            }
-                        });
-                        periodHtml += `</div>`;
-                    }
-
                     let footer = isLive ? `<div class="blink-live-tag">${translations[currentLang].live}</div>` : (d.match_time ? `<div class="card-time-mini">${new Date(d.match_time).toLocaleDateString([],{day:'2-digit',month:'2-digit'})} ${translations[currentLang].timeAt} ${new Date(d.match_time).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div>` : "");
                     
                     cardBody = `
@@ -326,7 +296,6 @@
                         <div class="card-league-mini">${d.league || translations[currentLang].localMatch}</div>
                         <div class="score-row"><span class="team-name-col">${d.t1}</span><span class="score-val-col">${s1}</span></div>
                         <div class="score-row" style="border:none;"><span class="team-name-col">${d.t2}</span><span class="score-val-col">${s2}</span></div>
-                        ${periodHtml}
                         <div class="card-footer-info">
                             <span style="font-size:10px;">${ball}</span>
                             ${footer}
