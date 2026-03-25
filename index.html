@@ -363,7 +363,30 @@
         };
 
         function setLanguage(lang) { currentLang = lang; localStorage.setItem('lang', lang); updateUILanguage(); if(document.getElementById('lang-modal').style.display === 'flex') toggleLangModal(); if(currentAdminKey) refreshAdminPanel(currentAdminKey); }
-        function updateUILanguage() { const t = translations[currentLang]; document.getElementById('txt-subtitle').innerText = t.subtitle; document.getElementById('btn-login').innerText = t.login; document.getElementById('btn-explore').innerText = t.explore; document.getElementById('city-search').placeholder = t.search; document.getElementById('txt-period-res').innerText = t.periodRes; document.getElementById('txt-match-events').innerText = t.matchEvents; document.getElementById('adm-name').innerText = t.adminTitle; document.getElementById('btn-save-period').innerText = t.savePeriod; document.getElementById('start-live-btn').innerText = t.goLive; document.getElementById('end-match-btn').innerText = t.endMatch; document.getElementById('reset-match-btn').innerText = t.resetMatch; document.getElementById('btn-schedule').innerText = t.schedule; document.getElementById('btn-delete-court').innerText = t.deleteCourt; document.getElementById('adm-league-input').placeholder = t.league; document.getElementById('adm-t1').placeholder = t.team1 + " (MAX 10)"; document.getElementById('adm-t2').placeholder = t.team2 + " (MAX 10)"; document.getElementById('h-lang-sr').classList.toggle('active', currentLang === 'sr'); document.getElementById('h-lang-en').classList.toggle('active', currentLang === 'en'); if(auth.currentUser) document.getElementById('user-indicator').innerText = `${t.loggedAs} ${auth.currentUser.email}`; }
+        
+        function updateUILanguage() { 
+            const t = translations[currentLang]; 
+            document.getElementById('txt-subtitle').innerText = t.subtitle; 
+            document.getElementById('btn-login').innerText = t.login; 
+            document.getElementById('btn-explore').innerText = t.explore; 
+            document.getElementById('city-search').placeholder = t.search; 
+            document.getElementById('txt-period-res').innerText = t.periodRes; 
+            document.getElementById('txt-match-events').innerText = t.matchEvents; 
+            document.getElementById('adm-name').innerText = t.adminTitle; 
+            document.getElementById('btn-save-period').innerText = t.savePeriod; 
+            document.getElementById('start-live-btn').innerText = t.goLive; 
+            document.getElementById('end-match-btn').innerText = t.endMatch; 
+            document.getElementById('reset-match-btn').innerText = t.resetMatch; 
+            document.getElementById('btn-schedule').innerText = t.schedule; 
+            document.getElementById('btn-delete-court').innerText = t.deleteCourt; 
+            document.getElementById('adm-league-input').placeholder = t.league; 
+            document.getElementById('adm-t1').placeholder = t.team1 + " (MAX 10)"; 
+            document.getElementById('adm-t2').placeholder = t.team2 + " (MAX 10)"; 
+            document.getElementById('h-lang-sr').classList.toggle('active', currentLang === 'sr'); 
+            document.getElementById('h-lang-en').classList.toggle('active', currentLang === 'en'); 
+            if(auth.currentUser) document.getElementById('user-indicator').innerText = `${t.loggedAs} ${auth.currentUser.email}`; 
+        }
+
         function toggleLangModal() { let m = document.getElementById('lang-modal'); m.style.display = (m.style.display === 'flex') ? 'none' : 'flex'; }
         function exploreMap() { document.getElementById('hero').style.display = 'none'; document.getElementById('map').style.display = 'block'; document.getElementById('ui-controls').style.display = 'block'; initMap(); updateUILanguage(); loadSuggestions(); }
         function goBackToLogin() { auth.signOut(); location.reload(); }
@@ -433,8 +456,8 @@
             document.getElementById('det-t2').innerText = d.t2 || t.team2; 
             document.getElementById('det-score').innerText = `${d.score1||0} : ${d.score2||0}`; 
             let ex = ""; 
-            if(d.sport === "ODBOJKA") ex = `POENI: ${d.p1||0} : ${d.p2||0}`; 
-            if(d.sport === "TENIS") { const isTB = (d.g1 === 6 && d.g2 === 6); const pts1 = isTB ? (d.p1||0) : (tennisPoints[d.p1]||"0"); const pts2 = isTB ? (d.p2||0) : (tennisPoints[d.p2]||"0"); ex = `GEMOVI: ${d.g1||0}:${d.g2||0} (${pts1}:${pts2})`; } 
+            if(d.sport === "ODBOJKA") ex = `${t.points}: ${d.p1||0} : ${d.p2||0}`; 
+            if(d.sport === "TENIS") { const isTB = (d.g1 === 6 && d.g2 === 6); const pts1 = isTB ? (d.p1||0) : (tennisPoints[d.p1]||"0"); const pts2 = isTB ? (d.p2||0) : (tennisPoints[d.p2]||"0"); ex = `${t.games}: ${d.g1||0}:${d.g2||0} (${pts1}:${pts2})`; } 
             document.getElementById('det-extra-info').innerText = ex; 
             let pDiv = document.getElementById('det-periods'); pDiv.innerHTML = ""; 
             if(d.sub_details) { Object.values(d.sub_details).forEach(v => { const spaceIndex = v.indexOf(' '); if (spaceIndex !== -1) { const label = v.substring(0, spaceIndex); const score = v.substring(spaceIndex + 1); pDiv.innerHTML += `<div class="detail-period-tag"><span>${label}</span><span style="color:#ffcc00">${score}</span></div>`; } else { pDiv.innerHTML += `<div class="detail-period-tag"><span>${v}</span></div>`; } }); } 
@@ -465,7 +488,6 @@
             if(d.events) {
                 Object.keys(d.events).forEach(ekey => {
                     const ev = d.events[ekey];
-                    const side = ev.team == 1 ? "LEFT" : "RIGHT";
                     evMgr.innerHTML += `<div class="adm-event-item"><span>${ev.emoji} ${ev.player}</span><div class="adm-event-remove" onclick="removeEvent('${ekey}')">&times;</div></div>`;
                 });
             }
@@ -543,7 +565,7 @@
         }
 
         function addEvent(emoji) { const p = document.getElementById('event-player').value.toUpperCase(), t = document.getElementById('event-team').value; if(!p) return; db.ref(`tereni/${currentAdminKey}/events`).push({ player: p, team: t, emoji: emoji }); document.getElementById('event-player').value = ""; }
-        function removeEvent(ekey) { if(!ekey) return; if(confirm(currentLang==='sr'?'OBRISATI?':'REMOVE?')) db.ref(`tereni/${currentAdminKey}/events/${ekey}`).remove(); }
+        function removeEvent(ekey) { if(!ekey) return; const t = translations[currentLang]; if(confirm(t.confirmDelete)) db.ref(`tereni/${currentAdminKey}/events/${ekey}`).remove(); }
         async function setupMatch() { 
             let l = document.getElementById('adm-league-input').value.toUpperCase(), 
                 t1 = document.getElementById('adm-t1').value.toUpperCase().substring(0, 10), 
