@@ -22,6 +22,9 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; touch-action: pan-x pan-y; }
         html, body { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background: #000; font-family: 'Inter', sans-serif; position: fixed; }
         
+        /* Hiding scrollbar for native app feel */
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+
         input, select, textarea, datalist { 
             font-size: 16px !important; outline: none !important; text-transform: uppercase; 
             background: rgba(255, 255, 255, 0.05); color: white; border: 1px solid rgba(255, 255, 255, 0.1); 
@@ -32,6 +35,7 @@
         
         button { font-size: 16px !important; outline: none !important; transition: transform 0.1s active, opacity 0.2s; position: relative; overflow: hidden; }
         button:active { transform: scale(0.96); opacity: 0.8; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
         /* HERO / AUTH SECTION REDESIGN */
         #hero { 
@@ -237,9 +241,22 @@
         .animated-range-circle { animation: pulse-circle 4s infinite ease-in-out; }
         .leaflet-popup-content-wrapper { background: #000; color: white; border-radius: 8px; border: 1px solid #ffcc00; }
         .leaflet-popup-tip { background: #000; border: 1px solid #ffcc00; }
+
+        /* CUSTOM TOAST NOTIFICATIONS */
+        .toast { 
+            position: fixed; top: -50px; left: 50%; transform: translateX(-50%); 
+            background: #ffcc00; color: #000; padding: 12px 24px; border-radius: 24px; 
+            font-weight: 800; z-index: 10000; transition: 0.4s cubic-bezier(0.19, 1, 0.22, 1); 
+            opacity: 0; font-family: 'Inter', sans-serif; box-shadow: 0 10px 20px rgba(0,0,0,0.5); 
+            text-transform: uppercase; font-size: 14px; white-space: nowrap; pointer-events: none;
+        }
+        .toast.show { top: 40px; opacity: 1; }
+
     </style>
 </head>
 <body>
+
+    <div id="toast" class="toast">Poruka</div>
 
     <div id="hero">
         <div class="hero-logo">SCOREPUNKT</div>
@@ -362,6 +379,14 @@
             en: { subtitle: "Result Tracker", login: "ENTER SYSTEM", explore: "EXPLORE MAP WITHOUT LOGIN", search: "Search...", periodRes: "Period Results", matchEvents: "Match Events", adminTitle: "ADMIN PANEL", savePeriod: "SAVE PERIOD / SET", goLive: "GO LIVE", endMatch: "END MATCH", resetMatch: "RESET / NEW MATCH", schedule: "SCHEDULE MATCH", deleteCourt: "DELETE COURT", zoneOccupied: "ZONE OCCUPIED!", create: "CREATE", courtName: "COURT NAME", player: "PLAYER NAME", team: "TEAM", loggedAs: "LOGGED AS:", localMatch: "LOCAL MATCH", points: "POINTS", games: "GAMES", league: "LEAGUE (NEW)", team1: "TEAM 1", team2: "TEAM 2", goal: "GOAL", yellow: "YELLOW", red: "RED", confirmDelete: "DELETE?", timeAt: "AT", live: "LIVE", limitReached: "LIMIT OF 3 COURTS REACHED!", addCourt: "ADD COURT", periods: { FUDBAL: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "OT"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } }
         };
 
+        // Custom Toast Function
+        function showToast(msg) {
+            let t = document.getElementById('toast');
+            t.innerText = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
         function setLanguage(lang) { currentLang = lang; localStorage.setItem('lang', lang); updateUILanguage(); if(document.getElementById('lang-modal').style.display === 'flex') toggleLangModal(); if(currentAdminKey) refreshAdminPanel(currentAdminKey); }
         
         function updateUILanguage() { 
@@ -441,7 +466,7 @@
             const t = translations[currentLang]; 
             const clickPos = e.latlng; 
             const isTooClose = allTereni.some(court => { const courtLatLng = L.latLng(court.lat, court.lng); return clickPos.distanceTo(courtLatLng) < 200; });
-            if (isTooClose) { alert(t.zoneOccupied); return; } 
+            if (isTooClose) { showToast(t.zoneOccupied); return; } 
             const html = `<div style="padding:10px;"><select id="p_sport"><option value="FUDBAL">FUDBAL</option><option value="KOŠARKA">KOŠARKA</option><option value="ODBOJKA">ODBOJKA</option><option value="TENIS">TENIS</option><option value="RUKOMET">RUKOMET</option></select><input type="text" id="p_name" placeholder="${t.courtName}" maxlength="15" style="margin:10px 0; width:100%;"><button onclick="saveTeren(${e.latlng.lat}, ${e.latlng.lng})" style="width:100%; background:#ffcc00; color:#000; border:none; padding:10px; font-weight:bold; border-radius:4px;">${t.create}</button></div>`; 
             L.popup().setLatLng(e.latlng).setContent(html).openOn(map); 
         }
@@ -579,12 +604,31 @@
         function trackGPS() { if(!navigator.geolocation) return; navigator.geolocation.watchPosition(pos => { currentLat = pos.coords.latitude; currentLon = pos.coords.longitude; if(!userMarker) { userMarker = L.marker([currentLat, currentLon], { icon: L.divIcon({ className: 'user-location-dot', iconSize: [14, 14] }) }).addTo(map); } else userMarker.setLatLng([currentLat, currentLon]); }, null, { enableHighAccuracy: true }); }
         function goToMyLocation() { if(currentLat) map.flyTo([currentLat, currentLon], 18); }
         function handleSearch(e) { if(e.key === "Enter") { fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${e.target.value}`).then(r => r.json()).then(data => { if(data[0]) { map.flyTo([data[0].lat, data[0].lon], 15); toggleSearch(); } }); } }
-        async function handleAuth() { let e = document.getElementById('email').value.toUpperCase(), p = document.getElementById('password').value; try { await auth.signInWithEmailAndPassword(e, p); } catch { try { await auth.createUserWithEmailAndPassword(e, p); } catch(err) { alert(err.message); } } }
+        
+        async function handleAuth() { 
+            let e = document.getElementById('email').value.toUpperCase(), p = document.getElementById('password').value; 
+            if (!e || !p) { showToast(translations[currentLang].login + " INFO?"); return; }
+            let btn = document.getElementById('btn-login');
+            let oldTxt = btn.innerText;
+            btn.innerText = "UČITAVANJE...";
+            btn.disabled = true;
+            try { 
+                await auth.signInWithEmailAndPassword(e, p); 
+            } catch { 
+                try { 
+                    await auth.createUserWithEmailAndPassword(e, p); 
+                } catch(err) { 
+                    showToast(err.message); 
+                    btn.innerText = oldTxt;
+                    btn.disabled = false;
+                } 
+            } 
+        }
 
         async function saveTeren(lat, lng) { 
             const n = document.getElementById('p_name').value.toUpperCase();
             const myCourts = allTereni.filter(t => t.owner === auth.currentUser.uid);
-            if (myCourts.length >= 3) { alert(translations[currentLang].limitReached); return; }
+            if (myCourts.length >= 3) { showToast(translations[currentLang].limitReached); return; }
             await db.ref('tereni').push({ name: n, lat, lng, owner: auth.currentUser.uid, sport: document.getElementById('p_sport').value, status: 'upcoming', score1: 0, score2: 0 }); 
             map.closePopup(); 
         }
