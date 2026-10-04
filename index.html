@@ -23,8 +23,8 @@
             --primary: #ffcc00;
             --primary-glow: rgba(255, 204, 0, 0.4);
             --bg-dark: #09090b;
-            --glass-bg: rgba(20, 20, 25, 0.65);
-            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-bg: rgba(20, 20, 25, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.1);
             --danger: #ff3b30;
             --danger-glow: rgba(255, 59, 48, 0.4);
             --text-main: #ffffff;
@@ -48,38 +48,54 @@
 
         .glass-panel {
             background: var(--glass-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
-            border-radius: 20px;
+            border-radius: 24px;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
         }
 
         input, select, textarea, datalist { 
             font-size: 15px !important; outline: none !important; text-transform: uppercase; 
-            background: rgba(0, 0, 0, 0.4); color: white; border: 1px solid var(--glass-border); 
-            padding: 16px; border-radius: 14px; font-family: 'Inter'; width: 100%;
-            transition: all 0.3s ease;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+            background: rgba(0, 0, 0, 0.5); color: white; border: 1px solid var(--glass-border); 
+            padding: 16px; border-radius: 14px; font-family: 'Inter', sans-serif; width: 100%;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.3);
+            -webkit-appearance: none; /* Uklanja native stilove na iOS/Android */
         }
         
         input:focus, select:focus { 
             border-color: var(--primary); 
-            background: rgba(255, 204, 0, 0.05); 
-            box-shadow: 0 0 0 3px var(--primary-glow);
+            background: rgba(255, 204, 0, 0.08); 
+            box-shadow: 0 0 0 3px var(--primary-glow), inset 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        /* Rešavanje sistemskih belih pozadina u padajućim menijima i autofill-u */
+        select option {
+            background-color: #1a1a1f;
+            color: #ffffff;
+            font-weight: 500;
+        }
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover, 
+        input:-webkit-autofill:focus, 
+        input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 30px #1a1a1f inset !important;
+            -webkit-text-fill-color: white !important;
+            transition: background-color 5000s ease-in-out 0s;
         }
         
         button { 
             font-family: 'Inter', sans-serif;
             font-size: 16px !important; outline: none !important; 
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease, background-color 0.2s ease; 
             position: relative; overflow: hidden; 
             cursor: pointer;
             border-radius: 14px;
             display: flex; justify-content: center; align-items: center; gap: 8px;
         }
-        button:active { transform: scale(0.95); }
-        button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        button:active { transform: scale(0.96); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
 
         .btn-primary {
             background: linear-gradient(135deg, #ffcc00 0%, #d4a900 100%);
@@ -87,6 +103,9 @@
             text-transform: uppercase; font-family: 'Oswald', sans-serif; 
             box-shadow: 0 10px 20px var(--primary-glow);
             letter-spacing: 0.5px;
+        }
+        .btn-primary:active {
+            box-shadow: 0 5px 10px var(--primary-glow);
         }
 
         .btn-secondary {
@@ -136,7 +155,7 @@
         .home-lang-btn { 
             background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); 
             color: var(--text-muted); padding: 10px 24px; border-radius: 12px; 
-            font-size: 12px; font-weight: 800; cursor: pointer; transition: 0.3s; 
+            font-size: 12px; font-weight: 800; cursor: pointer; transition: 0.3s ease; 
         }
         .home-lang-btn.active { 
             border-color: var(--primary); color: var(--primary); 
@@ -170,7 +189,7 @@
             cursor: pointer; backdrop-filter: blur(12px);
             box-shadow: 0 8px 24px rgba(0,0,0,0.4);
             border-radius: 50%; border: 1px solid var(--glass-border);
-            transition: transform 0.2s;
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .floating-action-btn:active { transform: scale(0.9); }
         
@@ -263,7 +282,7 @@
 
         #match-details-view { 
             position: fixed; bottom: -100%; left: 0; width: 100%; max-height: 90vh; 
-            background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            background: var(--glass-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
             z-index: 8000; border-top: 1px solid var(--glass-border); 
             border-radius: 28px 28px 0 0; padding: 0; 
             transition: bottom 0.5s cubic-bezier(0.32, 0.72, 0, 1); 
@@ -283,8 +302,9 @@
             position: absolute; right: 20px; top: 0px; width: 36px; height: 36px;
             background: rgba(255,255,255,0.1); border-radius: 50%;
             display: flex; justify-content: center; align-items: center;
-            font-size: 20px; color: var(--text-muted); cursor: pointer;
+            font-size: 20px; color: var(--text-muted); cursor: pointer; transition: 0.2s;
         }
+        .close-btn-sheet:active { background: rgba(255,255,255,0.2); transform: scale(0.9); }
         .details-league { color: var(--primary); font-weight: 900; font-size: 14px; letter-spacing: 2px; text-transform: uppercase; }
         
         .details-scoreboard { 
@@ -338,7 +358,7 @@
         .admin-header {
             padding: 20px 24px; background: rgba(0,0,0,0.5); border-bottom: 1px solid var(--glass-border);
             display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(20px);
         }
         
         .admin-content-scroll { padding: 24px; display: flex; flex-direction: column; gap: 16px; flex-grow: 1; }
@@ -361,7 +381,7 @@
         
         .team-ctrl-card {
             background: var(--glass-bg); border: 1px solid var(--glass-border);
-            border-radius: 16px; padding: 16px; text-align: center;
+            border-radius: 16px; padding: 16px; text-align: center; box-shadow: 0 10px 20px rgba(0,0,0,0.3);
         }
         
         .team-ctrl-lbl {
@@ -371,7 +391,7 @@
         }
 
         .ctrl-btn-group {
-            display: flex; justify-content: center; gap: 8px;
+            display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;
         }
 
         .btn-ctrl {
@@ -383,7 +403,7 @@
         .btn-ctrl.minus { background: rgba(255,255,255,0.1); color: white; }
         .btn-ctrl.minus:active { background: rgba(255,255,255,0.2); transform: scale(0.9); }
         .btn-ctrl.plus { background: var(--primary); color: #000; box-shadow: 0 4px 15px var(--primary-glow); }
-        .btn-ctrl.plus:active { transform: scale(0.9); }
+        .btn-ctrl.plus:active { transform: scale(0.9); box-shadow: 0 2px 8px var(--primary-glow); }
 
         .adm-event-list { display: flex; flex-direction: column; gap: 8px; max-height: 250px; overflow-y: auto; }
         .adm-event-item { 
@@ -415,10 +435,40 @@
         }
         .animated-range-circle { animation: pulse-circle 4s infinite ease-in-out; }
         
-        .leaflet-popup-content-wrapper { background: var(--glass-bg); backdrop-filter: blur(15px); color: white; border-radius: 16px; border: 1px solid var(--glass-border); padding: 0; overflow: hidden; }
-        .leaflet-popup-tip { background: var(--glass-bg); }
-        .leaflet-popup-content { margin: 0; }
-        
+        /* ---------------- LEAFLET POPUP STYLES (PROFI & SMOOTH) ---------------- */
+        .leaflet-popup-content-wrapper { 
+            background: rgba(20, 20, 25, 0.95); 
+            backdrop-filter: blur(25px); 
+            -webkit-backdrop-filter: blur(25px);
+            color: white; 
+            border-radius: 24px; 
+            border: 1px solid var(--glass-border); 
+            padding: 5px; 
+            overflow: hidden; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8) !important;
+        }
+        .leaflet-popup-tip { 
+            background: rgba(20, 20, 25, 0.95); 
+            border: 1px solid var(--glass-border); 
+        }
+        .leaflet-popup-content { 
+            margin: 10px; 
+            min-width: 220px !important;
+        }
+        .leaflet-popup-close-button {
+            color: var(--text-muted) !important;
+            font-size: 24px !important;
+            padding: 10px !important;
+            width: 36px !important;
+            height: 36px !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s;
+        }
+        .leaflet-popup-close-button:hover { color: white !important; }
+        /* ------------------------------------------------------------------------ */
+
         #lang-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); z-index: 10000; display: none; justify-content: center; align-items: center; }
         .lang-box { background: var(--bg-dark); padding: 32px; border-radius: 24px; border: 1px solid var(--glass-border); width: 85%; max-width: 320px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
     </style>
@@ -464,7 +514,7 @@
             <img src="https://cdn-icons-png.flaticon.com/512/1865/1865269.png" alt="Location">
         </div>
         
-        <div id="user-indicator" style="position:fixed; bottom:15px; left:15px; color:var(--primary); font-size:11px; font-weight:800; z-index:5000; opacity: 0.7; background: rgba(0,0,0,0.5); padding: 6px 12px; border-radius: 20px; backdrop-filter: blur(4px);"></div>
+        <div id="user-indicator" style="position:fixed; bottom:15px; left:15px; color:var(--primary); font-size:11px; font-weight:800; z-index:5000; opacity: 0.8; background: rgba(0,0,0,0.6); padding: 8px 14px; border-radius: 20px; backdrop-filter: blur(10px); border: 1px solid var(--glass-border); box-shadow: 0 4px 15px rgba(0,0,0,0.5);"></div>
     </div>
 
     <div id="lang-modal" onclick="toggleLangModal()">
@@ -726,17 +776,17 @@
             if (isTooClose) { alert(t.zoneOccupied); return; } 
             
             const html = `
-                <div style="padding:16px; text-align:center;">
-                    <h3 style="margin-bottom:16px; font-family:'Oswald'; color:white; font-size:16px;">${t.addCourt || 'DODAJ TEREN'}</h3>
-                    <select id="p_sport" class="mb-3">
+                <div style="padding:8px 4px; text-align:center; display: flex; flex-direction: column; gap: 14px;">
+                    <h3 style="margin: 0; font-family:'Oswald', sans-serif; color:var(--primary); font-size:16px; letter-spacing: 1px;">${t.addCourt || 'DODAJ TEREN'}</h3>
+                    <select id="p_sport" style="width: 100%; margin: 0; padding: 12px; font-size:14px!important;">
                         <option value="FUDBAL">⚽ FUDBAL</option>
                         <option value="KOŠARKA">🏀 KOŠARKA</option>
                         <option value="ODBOJKA">🏐 ODBOJKA</option>
                         <option value="TENIS">🎾 TENIS</option>
                         <option value="RUKOMET">🤾 RUKOMET</option>
                     </select>
-                    <input type="text" id="p_name" placeholder="${t.courtName}" maxlength="15" class="mb-3">
-                    <button onclick="saveTeren(${e.latlng.lat}, ${e.latlng.lng})" class="btn-primary w-full">${t.create}</button>
+                    <input type="text" id="p_name" placeholder="${t.courtName}" maxlength="15" style="width: 100%; margin: 0; padding: 12px; font-size:14px!important;">
+                    <button onclick="saveTeren(${e.latlng.lat}, ${e.latlng.lng})" class="btn-primary" style="width: 100%; margin: 0; padding: 14px; font-size:15px!important;">${t.create}</button>
                 </div>`; 
             L.popup().setLatLng(e.latlng).setContent(html).openOn(map); 
         }
@@ -832,7 +882,7 @@
                     <div class="score-ctrl-grid mb-3">
                         <div class="team-ctrl-card">
                             <div class="team-ctrl-lbl">${d.t1 || t.team1}</div>
-                            <div class="ctrl-btn-group" style="flex-wrap: wrap;">
+                            <div class="ctrl-btn-group">
                                 <button class="btn-ctrl minus" onclick="proScore(1,-1)">-1</button>
                                 <button class="btn-ctrl plus" onclick="proScore(1,1)">+1</button>
                                 <button class="btn-ctrl plus" onclick="proScore(1,2)">+2</button>
@@ -841,7 +891,7 @@
                         </div>
                         <div class="team-ctrl-card">
                             <div class="team-ctrl-lbl">${d.t2 || t.team2}</div>
-                            <div class="ctrl-btn-group" style="flex-wrap: wrap;">
+                            <div class="ctrl-btn-group">
                                 <button class="btn-ctrl minus" onclick="proScore(2,-1)">-1</button>
                                 <button class="btn-ctrl plus" onclick="proScore(2,1)">+1</button>
                                 <button class="btn-ctrl plus" onclick="proScore(2,2)">+2</button>
@@ -871,7 +921,7 @@
                 if(d.sport === "FUDBAL") { 
                     ctrl.innerHTML += `
                         <div class="glass-panel" style="padding: 16px;">
-                            <input type="text" id="event-player" placeholder="${t.player}" class="mb-2">
+                            <input type="text" id="event-player" placeholder="${t.player}" class="mb-3">
                             <select id="event-team" class="mb-3">
                                 <option value="1">${d.t1 || t.team1}</option>
                                 <option value="2">${d.t2 || t.team2}</option>
