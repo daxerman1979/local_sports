@@ -24,7 +24,7 @@
             --primary: #ccff00; /* Neon Volt Green */
             --primary-glow: rgba(204, 255, 0, 0.4);
             --bg-dark: #09090b;
-            --glass-bg: rgba(20, 20, 25, 0.75);
+            --glass-bg: rgba(20, 20, 25, 0.85);
             --glass-border: rgba(255, 255, 255, 0.1);
             --danger: #ff2a2a; /* Live Red */
             --danger-glow: rgba(255, 42, 42, 0.4);
@@ -53,7 +53,7 @@
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
             border-radius: 24px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
         }
 
         input, select, textarea, datalist { 
@@ -216,9 +216,9 @@
         .status-live-wrapper .marker-ball-only { border-color: var(--primary); box-shadow: 0 0 15px var(--primary-glow); }
 
         .live-card-thin { 
-            background: var(--glass-bg); backdrop-filter: blur(12px); border-radius: 12px; 
-            display: none; flex-direction: column; width: 230px; /* Šire za preglednost */
-            color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.8); position: relative; 
+            background: var(--glass-bg); backdrop-filter: blur(15px); border-radius: 12px; 
+            display: none; flex-direction: column; width: 240px;
+            color: white; box-shadow: 0 15px 35px rgba(0,0,0,0.9); position: relative; 
             border: 1px solid var(--glass-border); border-left: 4px solid #ff9500; 
             overflow: hidden; z-index: 25; margin-bottom: 4px; padding-bottom: 4px;
         }
@@ -237,7 +237,7 @@
         .score-row { 
             display: flex; justify-content: space-between; align-items: center; 
             padding: 6px 10px; border-bottom: 1px solid rgba(255,255,255,0.03); 
-            background: rgba(0,0,0,0.3); gap: 8px;
+            background: rgba(0,0,0,0.4); gap: 8px;
         }
         .team-name-col { 
             font-size: 13px; font-weight: 700; text-transform: uppercase; color: #fff; 
@@ -245,13 +245,13 @@
         }
         .score-val-col { 
             font-family: 'Oswald', sans-serif; font-size: 18px; color: var(--text-main); 
-            font-weight: 700; background: rgba(0,0,0,0.6); width: 36px; height: 32px;
+            font-weight: 700; background: rgba(0,0,0,0.7); width: 36px; height: 32px;
             display: flex; justify-content: center; align-items: center; 
-            border-radius: 6px; flex-shrink: 0; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+            border-radius: 6px; flex-shrink: 0; box-shadow: inset 0 2px 4px rgba(0,0,0,0.8);
         }
         .status-live-wrapper .score-val-col { color: var(--primary); }
 
-        .card-footer-info { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px 2px; }
+        .card-footer-info { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px 4px; }
         .card-time-mini { font-size: 10px; color: #a1a1aa; font-weight: 700; }
         
         .blink-live-tag { 
@@ -305,11 +305,6 @@
         .det-score-main { font-family: 'Oswald'; font-size: 42px; font-weight: 900; color: var(--primary); letter-spacing: 6px; white-space: nowrap; text-shadow: 0 0 20px var(--primary-glow); }
         
         .details-content { padding: 24px; }
-        .detail-period-tag { 
-            background: rgba(0,0,0,0.3); padding: 14px 16px; border-radius: 12px; font-size: 14px; font-weight: 700; 
-            border: 1px solid var(--glass-border); border-left: 4px solid var(--primary); margin-bottom: 8px; 
-            display: flex; justify-content: space-between; align-items: center;
-        }
         
         #admin-panel { 
             position: fixed; top: 0; left: 100%; width: 100%; height: 100%; background: var(--bg-dark); z-index: 9000; 
@@ -345,7 +340,7 @@
         .anim-score { animation: pulse-score 0.6s ease-out; }
 
         .score-ctrl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-        .team-ctrl-card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 16px; padding: 16px; text-align: center; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+        .team-ctrl-card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 16px; padding: 16px; text-align: center; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
         .team-ctrl-lbl { font-size: 13px; color: var(--text-muted); font-weight: 800; text-transform: uppercase; margin-bottom: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .ctrl-btn-group { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
 
@@ -359,7 +354,7 @@
         .btn-ctrl.plus:active { transform: scale(0.9); box-shadow: 0 2px 8px var(--primary-glow); }
 
         .adm-event-list { display: flex; flex-direction: column; gap: 8px; max-height: 250px; overflow-y: auto; }
-        .adm-event-item { background: rgba(0,0,0,0.3); padding: 12px 16px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--glass-border); border-left: 3px solid var(--primary); }
+        .adm-event-item { background: rgba(0,0,0,0.5); padding: 12px 16px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--glass-border); border-left: 3px solid var(--primary); }
         .adm-event-item span { font-size: 14px; font-weight: 700; color: #fff; text-transform: uppercase; }
         .adm-event-remove { color: var(--danger); font-size: 22px; cursor: pointer; width: 32px; height: 32px; display: flex; justify-content: center; align-items: center; background: rgba(255,42,42,0.1); border-radius: 8px; transition: 0.2s; }
         .adm-event-remove:active { transform: scale(0.9); background: rgba(255,42,42,0.3); }
@@ -377,7 +372,7 @@
             #admin-panel { width: 450px; left: auto; right: -450px; border-left: 1px solid var(--glass-border); box-shadow: -15px 0 40px rgba(0,0,0,0.6); }
             #admin-panel.active { right: 0; left: auto; }
             #match-details-view { 
-                width: 420px; left: auto; right: 20px; bottom: -100%; border-radius: 24px; max-height: 85vh; 
+                width: 450px; left: auto; right: 20px; bottom: -100%; border-radius: 24px; max-height: 85vh; 
                 border: 1px solid var(--glass-border); box-shadow: 0 20px 50px rgba(0,0,0,0.8);
             }
             #match-details-view.active { bottom: 20px; }
@@ -476,16 +471,12 @@
         <div class="details-content">
             <div id="det-extra-info" style="text-align:center; color:var(--primary); font-weight:800; margin-bottom:24px; font-family:'Oswald'; font-size: 16px;"></div>
             
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                <span class="details-league" style="font-size:12px; color:var(--text-muted);" id="txt-period-res">Rezultat po periodima</span>
-            </div>
             <div id="det-periods"></div>
             
             <div id="det-stats-container" style="display:none; margin-top:32px;">
-                <span class="details-league" style="font-size:12px; color:var(--text-muted); margin-bottom:16px; display:block;" id="txt-match-events">Događaji na meču</span>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                     <div id="det-events-home" style="display:flex; flex-direction:column; gap:8px;"></div>
-                    <div id="det-events-away" style="display:flex; flex-direction:column; gap:8px; text-align:right;"></div>
+                    <div id="det-events-away" style="display:flex; flex-direction:column; gap:8px;"></div>
                 </div>
             </div>
         </div>
@@ -577,8 +568,6 @@
             document.getElementById('btn-login').innerText = t.login; 
             document.getElementById('btn-explore').innerText = t.explore; 
             document.getElementById('city-search').placeholder = t.search; 
-            document.getElementById('txt-period-res').innerText = t.periodRes; 
-            document.getElementById('txt-match-events').innerText = t.matchEvents; 
             document.getElementById('adm-name').innerText = t.adminTitle; 
             document.getElementById('btn-save-period').innerText = t.savePeriod; 
             document.getElementById('start-live-btn').innerText = t.goLive; 
@@ -628,9 +617,20 @@
         function initMap() {
             if (map) return;
             const sLat = localStorage.getItem('lastLat') || 44.7866, sLng = localStorage.getItem('lastLng') || 20.4489, sZoom = localStorage.getItem('lastZoom') || 13;
-            map = L.map('map', { zoomControl: false, tap: false }).setView([sLat, sLng], sZoom);
-            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
-            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', { opacity: 0.8 }).addTo(map);
+            
+            // Fiksiranje mape da se ne ponavlja u nedogled
+            const bounds = [ [-90, -180], [90, 180] ];
+            
+            map = L.map('map', { 
+                zoomControl: false, tap: false, minZoom: 3, maxBounds: bounds, maxBoundsViscosity: 1.0 
+            }).setView([sLat, sLng], sZoom);
+            
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                noWrap: true, bounds: bounds
+            }).addTo(map);
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', { 
+                opacity: 0.8, noWrap: true, bounds: bounds
+            }).addTo(map);
             
             rangeCircle = L.circle([sLat, sLng], { radius: 30000, color: 'var(--primary)', weight: 1, fillOpacity: 0.03, interactive: false, className: 'animated-range-circle' }).addTo(map);
 
@@ -669,11 +669,17 @@
                     
                     let periodHtml = "";
                     if (d.sub_details) {
-                        periodHtml = `<div style="display:flex; gap:6px; font-size:10px; color:var(--text-muted); margin:6px 10px 0; overflow-x:auto; padding-bottom:4px; font-weight:700;">`;
+                        periodHtml = `<div style="display:flex; flex-direction:column; gap:4px; font-size:11px; color:white; font-weight:700; margin:6px 10px 0; background:rgba(0,0,0,0.6); padding:8px; border-radius:8px; border:1px solid var(--glass-border);">`;
+                        let r1 = `<div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:4px;"><span style="color:var(--text-muted);">${d.t1.substring(0,3)}</span><div style="display:flex; gap:12px;">`; 
+                        let r2 = `<div style="display:flex; justify-content:space-between; padding-top:2px;"><span style="color:var(--text-muted);">${d.t2.substring(0,3)}</span><div style="display:flex; gap:12px;">`;
                         Object.values(d.sub_details).forEach(v => {
-                            periodHtml += `<span style="background:rgba(255,255,255,0.1); padding:3px 6px; border-radius:4px; white-space:nowrap;">${v}</span>`;
+                            let pts1 = v.split(' ')[1] ? v.split(' ')[1].split(':')[0] : '-';
+                            let pts2 = v.split(' ')[1] ? v.split(' ')[1].split(':')[1] : '-';
+                            r1 += `<span style="width:14px; text-align:center;">${pts1}</span>`;
+                            r2 += `<span style="width:14px; text-align:center;">${pts2}</span>`;
                         });
-                        periodHtml += `</div>`;
+                        r1 += `</div></div>`; r2 += `</div></div>`;
+                        periodHtml += r1 + r2 + `</div>`;
                     }
 
                     let currentPts = "";
@@ -682,7 +688,7 @@
                             const isTB = (d.g1 === 6 && d.g2 === 6);
                             const pt1 = isTB ? (d.p1||0) : (tennisPoints[d.p1]||"0");
                             const pt2 = isTB ? (d.p2||0) : (tennisPoints[d.p2]||"0");
-                            currentPts = `<div style="text-align:center; font-size:12px; color:var(--primary); font-weight:900; margin-top:6px; margin-bottom:4px; letter-spacing:1px;">${pt1} : ${pt2}</div>`;
+                            currentPts = `<div style="text-align:center; font-size:12px; color:var(--primary); font-weight:900; margin-top:6px; margin-bottom:4px; letter-spacing:1px;">${pt1} - ${pt2}</div>`;
                         } else if (d.sport === "ODBOJKA") {
                             currentPts = `<div style="text-align:center; font-size:12px; color:var(--primary); font-weight:900; margin-top:6px; margin-bottom:4px; letter-spacing:1px;">PTS ${d.p1||0} : ${d.p2||0}</div>`;
                         }
@@ -751,27 +757,56 @@
             } 
             document.getElementById('det-extra-info').innerText = ex; 
             
+            // TV Style period grid
             let pDiv = document.getElementById('det-periods'); pDiv.innerHTML = ""; 
             if(d.sub_details) { 
+                let periodHtml = `
+                <div style="background:rgba(0,0,0,0.6); border-radius:16px; padding:16px; margin-bottom:24px; border: 1px solid var(--glass-border); box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);">
+                    <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:8px; margin-bottom:8px;">
+                        <div style="flex:2; text-align:left; color:var(--text-muted); font-size:12px; font-weight:800; letter-spacing:1px;">TIM</div>
+                `;
                 Object.values(d.sub_details).forEach(v => { 
-                    const spaceIndex = v.indexOf(' '); 
-                    if (spaceIndex !== -1) { 
-                        const label = v.substring(0, spaceIndex); 
-                        const score = v.substring(spaceIndex + 1); 
-                        pDiv.innerHTML += `<div class="detail-period-tag"><span>${label}</span><span style="color:var(--primary); font-size:18px;">${score}</span></div>`; 
-                    } else { 
-                        pDiv.innerHTML += `<div class="detail-period-tag"><span>${v}</span></div>`; 
-                    } 
-                }); 
+                    let pName = v.split(' ')[0];
+                    periodHtml += `<div style="flex:1; text-align:center; color:var(--primary); font-size:12px; font-weight:800;">${pName}</div>`;
+                });
+                periodHtml += `</div>`;
+                
+                // Red tima 1
+                periodHtml += `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <div style="flex:2; text-align:left; color:white; font-size:14px; font-weight:900; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${d.t1}</div>`;
+                Object.values(d.sub_details).forEach(v => { 
+                    let score = v.split(' ')[1] ? v.split(' ')[1].split(':')[0] : '-';
+                    periodHtml += `<div style="flex:1; text-align:center; color:white; font-size:15px; font-weight:700;">${score}</div>`;
+                });
+                periodHtml += `</div>`;
+
+                // Red tima 2
+                periodHtml += `<div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div style="flex:2; text-align:left; color:white; font-size:14px; font-weight:900; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${d.t2}</div>`;
+                Object.values(d.sub_details).forEach(v => { 
+                    let score = v.split(' ')[1] ? v.split(' ')[1].split(':')[1] : '-';
+                    periodHtml += `<div style="flex:1; text-align:center; color:white; font-size:15px; font-weight:700;">${score}</div>`;
+                });
+                periodHtml += `</div></div>`;
+                
+                pDiv.innerHTML = periodHtml;
             } 
             
+            // TV Style Events Organization
             let eHome = document.getElementById('det-events-home'), eAway = document.getElementById('det-events-away'); 
             eHome.innerHTML = ""; eAway.innerHTML = ""; 
             if(d.events) { 
                 document.getElementById('det-stats-container').style.display = 'block'; 
+                
+                eHome.innerHTML = `<div style="font-size:12px; color:var(--text-muted); font-weight:800; margin-bottom:10px; text-transform:uppercase; border-bottom:1px solid var(--glass-border); padding-bottom:6px;">${d.t1}</div>`;
+                eAway.innerHTML = `<div style="font-size:12px; color:var(--text-muted); font-weight:800; margin-bottom:10px; text-transform:uppercase; border-bottom:1px solid var(--glass-border); padding-bottom:6px; text-align:right;">${d.t2}</div>`;
+
                 Object.values(d.events).forEach(ev => { 
-                    const row = `<div style="font-size:13px; font-weight:700; color:#fff; padding:8px; background:rgba(255,255,255,0.05); border-radius:8px; border:1px solid rgba(255,255,255,0.05);">${ev.emoji} ${ev.player}</div>`; 
-                    if(ev.team == 1) eHome.innerHTML += row; else eAway.innerHTML += row; 
+                    if(ev.team == 1) {
+                        eHome.innerHTML += `<div style="font-size:13px; font-weight:700; color:#fff; padding:6px 0; display:flex; align-items:center; gap:8px;"><span style="font-size:18px;">${ev.emoji}</span> <span>${ev.player}</span></div>`; 
+                    } else {
+                        eAway.innerHTML += `<div style="font-size:13px; font-weight:700; color:#fff; padding:6px 0; display:flex; align-items:center; justify-content:flex-end; gap:8px;"><span>${ev.player}</span> <span style="font-size:18px;">${ev.emoji}</span></div>`; 
+                    }
                 }); 
             } else document.getElementById('det-stats-container').style.display = 'none'; 
             
@@ -791,7 +826,7 @@
         function triggerGoalAnim() {
             const el = document.getElementById('admin-score-container');
             el.classList.remove('anim-score');
-            void el.offsetWidth; // trigger reflow
+            void el.offsetWidth;
             el.classList.add('anim-score');
         }
 
@@ -846,7 +881,23 @@
                             </div>
                         </div>
                     </div>`;
-            } else if(d.sport === "FUDBAL" || d.sport === "RUKOMET") {
+            } else if(d.sport === "FUDBAL") {
+                // Za Fudbal izbaceni plusevi i minusi, samo events
+                ctrl.innerHTML = `
+                    <div class="glass-panel" style="padding: 24px; box-shadow: 0 10px 20px rgba(0,0,0,0.5);">
+                        <h4 style="color:var(--text-main); font-family:'Oswald'; text-align:center; margin-bottom:16px; font-size:15px; letter-spacing:1px;">UNOS DOGAĐAJA (GOL AUTOMATSKI MENJA REZULTAT)</h4>
+                        <input type="text" id="event-player" placeholder="${t.player}" class="mb-3">
+                        <select id="event-team" class="mb-3">
+                            <option value="1">${d.t1 || t.team1}</option>
+                            <option value="2">${d.t2 || t.team2}</option>
+                        </select>
+                        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;">
+                            <button onclick="addEvent('⚽')" class="btn-secondary" style="font-size:14px!important; padding:14px; border-color:var(--primary); color:var(--primary); font-weight:900;">⚽ ${t.goal}</button>
+                            <button onclick="addEvent('🟨')" class="btn-secondary" style="font-size:14px!important; padding:14px; color:#ffcc00; border-color:rgba(255,204,0,0.3);">🟨 ${t.yellow}</button>
+                            <button onclick="addEvent('🟥')" class="btn-secondary" style="font-size:14px!important; padding:14px; color:var(--danger); border-color:rgba(255,42,42,0.3);">🟥 ${t.red}</button>
+                        </div>
+                    </div>`;
+            } else if(d.sport === "RUKOMET") {
                 ctrl.innerHTML = `
                     <div class="score-ctrl-grid mb-3">
                         <div class="team-ctrl-card">
@@ -864,22 +915,6 @@
                             </div>
                         </div>
                     </div>`;
-                    
-                if(d.sport === "FUDBAL") { 
-                    ctrl.innerHTML += `
-                        <div class="glass-panel" style="padding: 20px;">
-                            <input type="text" id="event-player" placeholder="${t.player}" class="mb-3">
-                            <select id="event-team" class="mb-3">
-                                <option value="1">${d.t1 || t.team1}</option>
-                                <option value="2">${d.t2 || t.team2}</option>
-                            </select>
-                            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
-                                <button onclick="addEvent('⚽')" class="btn-secondary" style="font-size:14px!important; padding:12px; border-color:var(--primary); color:var(--primary);">⚽ ${t.goal}</button>
-                                <button onclick="addEvent('🟨')" class="btn-secondary" style="font-size:14px!important; padding:12px; color:#ffcc00; border-color:rgba(255,204,0,0.3);">🟨 ${t.yellow}</button>
-                                <button onclick="addEvent('🟥')" class="btn-secondary" style="font-size:14px!important; padding:12px; color:var(--danger); border-color:rgba(255,42,42,0.3);">🟥 ${t.red}</button>
-                            </div>
-                        </div>`; 
-                }
             } else {
                 ctrl.innerHTML = `
                     <div class="score-ctrl-grid mb-3">
