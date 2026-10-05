@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover">
-    <title>SCOREPUNKT LIVE</title>
+    <title>MAPLAY LIVE</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -24,7 +24,7 @@
             --primary: #ccff00; /* Neon Volt Green */
             --primary-glow: rgba(204, 255, 0, 0.4);
             --bg-dark: #09090b;
-            --glass-bg: rgba(20, 20, 25, 0.85);
+            --glass-bg: rgba(15, 15, 20, 0.85);
             --glass-border: rgba(255, 255, 255, 0.1);
             --danger: #ff2a2a; /* Live Red */
             --danger-glow: rgba(255, 42, 42, 0.4);
@@ -128,7 +128,7 @@
         
         .hero-logo { 
             font-family: 'Oswald', sans-serif; 
-            font-size: clamp(42px, 12vw, 72px); 
+            font-size: clamp(48px, 15vw, 84px); 
             font-weight: 900;
             color: var(--text-main); 
             text-shadow: 0 10px 30px rgba(0,0,0,0.8); 
@@ -215,58 +215,117 @@
         .zoom-near .marker-ball-only { display: none; }
         .status-live-wrapper .marker-ball-only { border-color: var(--primary); box-shadow: 0 0 15px var(--primary-glow); }
 
-        .live-card-thin { 
-            background: var(--glass-bg); backdrop-filter: blur(15px); border-radius: 12px; 
-            display: none; flex-direction: column; width: 240px;
-            color: white; box-shadow: 0 15px 35px rgba(0,0,0,0.9); position: relative; 
-            border: 1px solid var(--glass-border); border-left: 4px solid #ff9500; 
-            overflow: hidden; z-index: 25; margin-bottom: 4px; padding-bottom: 4px;
+        /* ---------------- TV SCORE BUG STYLES (MAPLAY PRO) ---------------- */
+        .tv-card {
+            background: rgba(15, 15, 20, 0.95);
+            backdrop-filter: blur(15px);
+            border-radius: 8px; 
+            display: none; 
+            flex-direction: column;
+            color: white; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.9); 
+            position: relative; 
+            border: 1px solid var(--glass-border);
+            overflow: hidden; 
+            z-index: 25; 
+            margin-bottom: 4px;
+            min-width: 180px;
+            width: max-content;
         }
-        .zoom-near .live-card-thin { display: flex; animation: slideUpFade 0.3s ease-out; }
+        .zoom-near .tv-card { display: flex; animation: slideUpFade 0.3s ease-out; }
         
-        .status-live-wrapper .live-card-thin { border-left-color: var(--danger); border-top-color: rgba(255,42,42,0.2); }
-        .status-live-wrapper .card-league-mini { background: rgba(255, 42, 42, 0.1); color: var(--danger); border-bottom: 1px solid rgba(255,42,42,0.1); }
+        .tv-live { border-top: 3px solid var(--danger); }
         
-        .card-league-mini { 
-            font-size: 10px; background: rgba(0,0,0,0.5); color: var(--text-muted); 
-            font-weight: 800; padding: 6px 10px; text-transform: uppercase; 
-            letter-spacing: 1px; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-            border-bottom: 1px solid var(--glass-border);
+        .tv-league {
+            background: rgba(255,255,255,0.05);
+            color: var(--text-muted);
+            font-size: 10px;
+            font-weight: 800;
+            padding: 4px 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-
-        .score-row { 
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 6px 10px; border-bottom: 1px solid rgba(255,255,255,0.03); 
-            background: rgba(0,0,0,0.4); gap: 8px;
-        }
-        .team-name-col { 
-            font-size: 13px; font-weight: 700; text-transform: uppercase; color: #fff; 
-            overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; 
-        }
-        .score-val-col { 
-            font-family: 'Oswald', sans-serif; font-size: 18px; color: var(--text-main); 
-            font-weight: 700; background: rgba(0,0,0,0.7); width: 36px; height: 32px;
-            display: flex; justify-content: center; align-items: center; 
-            border-radius: 6px; flex-shrink: 0; box-shadow: inset 0 2px 4px rgba(0,0,0,0.8);
-        }
-        .status-live-wrapper .score-val-col { color: var(--primary); }
-
-        .card-footer-info { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px 4px; }
-        .card-time-mini { font-size: 10px; color: #a1a1aa; font-weight: 700; }
+        .tv-live .tv-league { background: rgba(255,42,42,0.15); color: var(--danger); }
         
-        .blink-live-tag { 
-            background: rgba(255, 42, 42, 0.15); color: var(--danger); font-size: 10px; font-weight: 900; 
-            padding: 3px 8px; border-radius: 4px; border: 1px solid rgba(255, 42, 42, 0.3);
-            animation: pulse-live 1.5s infinite; letter-spacing: 1px;
+        .tv-team-row {
+            display: flex;
+            align-items: stretch;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            background: rgba(0,0,0,0.4);
+        }
+        .tv-team-name {
+            flex: 1;
+            padding: 6px 10px;
+            color: white;
+            font-weight: 800;
+            font-size: 14px;
+            font-family: 'Oswald', sans-serif;
+            letter-spacing: 0.5px;
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis;
+            display: flex;
+            align-items: center;
+        }
+        .tv-team-score {
+            background: rgba(0,0,0,0.8);
+            padding: 6px 12px;
+            font-size: 16px;
+            font-weight: 900;
+            color: white;
+            min-width: 36px;
+            text-align: center;
+            border-left: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Oswald', sans-serif;
+        }
+        .tv-live .tv-team-score { color: var(--primary); }
+        
+        .tv-period-score {
+            padding: 6px 10px;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-muted);
+            border-left: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .tv-curr-score {
+            padding: 6px 10px;
+            font-size: 14px;
+            font-weight: 900;
+            color: #ff9500;
+            border-left: 1px solid rgba(255,255,255,0.05);
+            background: rgba(255, 149, 0, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .tv-bottom-bar {
+            background: rgba(0,0,0,0.6);
+            padding: 5px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
         }
 
         .marker-pointer {
             width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent;
-            border-top: 10px solid #ff9500; display: none; margin-bottom: 10px;
+            border-top: 10px solid #a1a1aa; display: none; margin-bottom: 10px;
             filter: drop-shadow(0 4px 4px rgba(0,0,0,0.5));
         }
         .zoom-near .marker-pointer { display: block; }
         .status-live-wrapper .marker-pointer { border-top-color: var(--danger); }
+
+        @keyframes pulse-live { 0%, 100% { opacity: 1; text-shadow: 0 0 5px rgba(255,42,42,0.5); } 50% { opacity: 0.5; text-shadow: 0 0 15px rgba(255,42,42,0.8); } }
+        /* ------------------------------------------------------------------ */
 
         #match-details-view { 
             position: fixed; bottom: -100%; left: 0; width: 100%; max-height: 90vh; 
@@ -360,7 +419,6 @@
         .adm-event-remove:active { transform: scale(0.9); background: rgba(255,42,42,0.3); }
         .action-btn-row { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
 
-        @keyframes pulse-live { 0%, 100% { opacity: 1; box-shadow: 0 0 5px rgba(255,42,42,0.5); } 50% { opacity: 0.5; box-shadow: 0 0 15px rgba(255,42,42,0.8); } }
         @keyframes slideUpFade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
         .user-location-dot { background: #0a84ff; width: 16px; height: 16px; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 15px #0a84ff; }
@@ -400,8 +458,8 @@
 <body>
 
     <div id="hero">
-        <div class="hero-logo">SCORE<span>PUNKT</span></div>
-        <div class="hero-subtitle" id="txt-subtitle">Live Result Tracker</div>
+        <div class="hero-logo">MA<span>PLAY</span></div>
+        <div class="hero-subtitle" id="txt-subtitle">Live Sports Tracker</div>
         
         <div class="auth-box glass-panel">
             <input type="email" id="email" placeholder="EMAIL ADDRESS">
@@ -419,7 +477,7 @@
             </div>
         </div>
         
-        <div style="margin-top:auto; color:rgba(255,255,255,0.2); font-size:10px; letter-spacing:3px; font-weight:800;">© 2026 SCOREPUNKT PRO</div>
+        <div style="margin-top:auto; color:rgba(255,255,255,0.2); font-size:10px; letter-spacing:3px; font-weight:800;">© 2026 MAPLAY APP</div>
     </div>
 
     <div id="map"></div>
@@ -476,7 +534,7 @@
             <div id="det-stats-container" style="display:none; margin-top:32px;">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                     <div id="det-events-home" style="display:flex; flex-direction:column; gap:8px;"></div>
-                    <div id="det-events-away" style="display:flex; flex-direction:column; gap:8px;"></div>
+                    <div id="det-events-away" style="display:flex; flex-direction:column; gap:8px; text-align:right;"></div>
                 </div>
             </div>
         </div>
@@ -665,46 +723,55 @@
                 if (isLive || isEnded || isUpcoming) {
                     let s1 = (isLive || isEnded) ? (d.score1 || 0) : "-";
                     let s2 = (isLive || isEnded) ? (d.score2 || 0) : "-";
-                    let footer = isLive ? `<div class="blink-live-tag">${t.live}</div>` : (d.match_time ? `<div class="card-time-mini">${new Date(d.match_time).toLocaleDateString([],{day:'2-digit',month:'2-digit'})} ${t.timeAt} ${new Date(d.match_time).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div>` : "");
+                    let statusText = isLive ? `<span style="color:var(--danger); animation: pulse-live 1.5s infinite;">● UŽIVO</span>` : (isEnded ? "KRAJ" : new Date(d.match_time).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}));
                     
-                    let periodHtml = "";
+                    let p1Html = "", p2Html = "";
                     if (d.sub_details) {
-                        periodHtml = `<div style="display:flex; flex-direction:column; gap:4px; font-size:11px; color:white; font-weight:700; margin:6px 10px 0; background:rgba(0,0,0,0.6); padding:8px; border-radius:8px; border:1px solid var(--glass-border);">`;
-                        let r1 = `<div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:4px;"><span style="color:var(--text-muted);">${d.t1.substring(0,3)}</span><div style="display:flex; gap:12px;">`; 
-                        let r2 = `<div style="display:flex; justify-content:space-between; padding-top:2px;"><span style="color:var(--text-muted);">${d.t2.substring(0,3)}</span><div style="display:flex; gap:12px;">`;
                         Object.values(d.sub_details).forEach(v => {
-                            let pts1 = v.split(' ')[1] ? v.split(' ')[1].split(':')[0] : '-';
-                            let pts2 = v.split(' ')[1] ? v.split(' ')[1].split(':')[1] : '-';
-                            r1 += `<span style="width:14px; text-align:center;">${pts1}</span>`;
-                            r2 += `<span style="width:14px; text-align:center;">${pts2}</span>`;
+                            let match = v.match(/(\d+):(\d+)$/);
+                            let pts1 = match ? match[1] : '-';
+                            let pts2 = match ? match[2] : '-';
+                            p1Html += `<div class="tv-period-score">${pts1}</div>`;
+                            p2Html += `<div class="tv-period-score">${pts2}</div>`;
                         });
-                        r1 += `</div></div>`; r2 += `</div></div>`;
-                        periodHtml += r1 + r2 + `</div>`;
                     }
 
-                    let currentPts = "";
-                    if (isLive) {
-                        if (d.sport === "TENIS") {
-                            const isTB = (d.g1 === 6 && d.g2 === 6);
-                            const pt1 = isTB ? (d.p1||0) : (tennisPoints[d.p1]||"0");
-                            const pt2 = isTB ? (d.p2||0) : (tennisPoints[d.p2]||"0");
-                            currentPts = `<div style="text-align:center; font-size:12px; color:var(--primary); font-weight:900; margin-top:6px; margin-bottom:4px; letter-spacing:1px;">${pt1} - ${pt2}</div>`;
-                        } else if (d.sport === "ODBOJKA") {
-                            currentPts = `<div style="text-align:center; font-size:12px; color:var(--primary); font-weight:900; margin-top:6px; margin-bottom:4px; letter-spacing:1px;">PTS ${d.p1||0} : ${d.p2||0}</div>`;
-                        }
+                    let curr1 = "", curr2 = "";
+                    if (isLive && (d.sport === "TENIS" || d.sport === "ODBOJKA")) {
+                        const isTB = (d.g1 === 6 && d.g2 === 6);
+                        const pt1 = d.sport === "TENIS" ? (isTB ? (d.p1||0) : (tennisPoints[d.p1]||"0")) : (d.p1||0);
+                        const pt2 = d.sport === "TENIS" ? (isTB ? (d.p2||0) : (tennisPoints[d.p2]||"0")) : (d.p2||0);
+                        curr1 = `<div class="tv-curr-score">${pt1}</div>`;
+                        curr2 = `<div class="tv-curr-score">${pt2}</div>`;
                     }
 
-                    cardBody = `<div class="live-card-thin">
-                                    <div class="card-league-mini">${d.league || t.localMatch}</div>
-                                    <div class="score-row"><span class="team-name-col">${d.t1}</span><span class="score-val-col">${s1}</span></div>
-                                    <div class="score-row" style="border:none;"><span class="team-name-col">${d.t2}</span><span class="score-val-col">${s2}</span></div>
-                                    ${periodHtml}
-                                    ${currentPts}
-                                    <div class="card-footer-info" style="${(!periodHtml && !currentPts) ? 'margin-top:6px;' : ''}"><span style="font-size:12px;">${ball}</span>${footer}</div>
-                                </div><div class="marker-pointer"></div>`;
+                    cardBody = `
+                    <div class="tv-card ${isLive?'tv-live':''}">
+                        <div class="tv-league">${d.league || t.localMatch}</div>
+                        <div class="tv-team-row">
+                            <div class="tv-team-name">${(d.t1 || 'TIM 1').substring(0,10)}</div>
+                            <div class="tv-team-score">${s1}</div>
+                            ${p1Html}
+                            ${curr1}
+                        </div>
+                        <div class="tv-team-row" style="border-bottom:none;">
+                            <div class="tv-team-name">${(d.t2 || 'TIM 2').substring(0,10)}</div>
+                            <div class="tv-team-score">${s2}</div>
+                            ${p2Html}
+                            ${curr2}
+                        </div>
+                        <div class="tv-bottom-bar">
+                            <span style="display:flex; align-items:center; gap:4px;">${ball} ${d.sport}</span>
+                            <span>${statusText}</span>
+                        </div>
+                    </div><div class="marker-pointer"></div>`;
                 } else {
-                    cardBody = `<div class="live-card-thin" style="padding:14px; text-align:center; font-weight:800; font-size:13px; color:var(--primary); border-left:4px solid rgba(255,255,255,0.2);">${ball} ${d.name}</div><div class="marker-pointer"></div>`;
+                    cardBody = `
+                    <div class="tv-card" style="padding:14px; text-align:center; font-weight:800; font-size:13px; color:var(--primary); border-left:4px solid rgba(255,255,255,0.2);">
+                        ${ball} ${d.name}
+                    </div><div class="marker-pointer"></div>`;
                 }
+                
                 const html = `<div class="sport-marker-wrapper ${isLive?'status-live-wrapper':''} ${zoomNear?'zoom-near':''}"><div class="marker-content-box"><div class="marker-ball-only">${ball}</div>${cardBody}</div></div>`;
                 L.marker([d.lat, d.lng], { icon: L.divIcon({ className: '', html, iconSize: [0,0], iconAnchor: [0, 0] }) }).addTo(map).on('click', e => { 
                     L.DomEvent.stopPropagation(e); 
@@ -757,35 +824,37 @@
             } 
             document.getElementById('det-extra-info').innerText = ex; 
             
-            // TV Style period grid
+            // TV Style period grid popravljen od "undefined" greške
             let pDiv = document.getElementById('det-periods'); pDiv.innerHTML = ""; 
             if(d.sub_details) { 
                 let periodHtml = `
-                <div style="background:rgba(0,0,0,0.6); border-radius:16px; padding:16px; margin-bottom:24px; border: 1px solid var(--glass-border); box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);">
+                <div style="background:rgba(0,0,0,0.6); border-radius:12px; padding:12px; margin-bottom:24px; border: 1px solid var(--glass-border); box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);">
                     <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:8px; margin-bottom:8px;">
-                        <div style="flex:2; text-align:left; color:var(--text-muted); font-size:12px; font-weight:800; letter-spacing:1px;">TIM</div>
+                        <div style="flex:2; text-align:left; color:var(--text-muted); font-size:11px; font-weight:800; letter-spacing:1px;">TIM</div>
                 `;
                 Object.values(d.sub_details).forEach(v => { 
-                    let pName = v.split(' ')[0];
-                    periodHtml += `<div style="flex:1; text-align:center; color:var(--primary); font-size:12px; font-weight:800;">${pName}</div>`;
+                    let pName = v.split(' ')[0] || '-';
+                    periodHtml += `<div style="flex:1; text-align:center; color:var(--primary); font-size:11px; font-weight:800;">${pName}</div>`;
                 });
                 periodHtml += `</div>`;
                 
                 // Red tima 1
                 periodHtml += `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                    <div style="flex:2; text-align:left; color:white; font-size:14px; font-weight:900; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${d.t1}</div>`;
+                    <div style="flex:2; text-align:left; color:white; font-size:14px; font-weight:900; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${d.t1 || 'T1'}</div>`;
                 Object.values(d.sub_details).forEach(v => { 
-                    let score = v.split(' ')[1] ? v.split(' ')[1].split(':')[0] : '-';
-                    periodHtml += `<div style="flex:1; text-align:center; color:white; font-size:15px; font-weight:700;">${score}</div>`;
+                    let match = v.match(/(\d+):(\d+)$/);
+                    let pts1 = match ? match[1] : '-';
+                    periodHtml += `<div style="flex:1; text-align:center; color:white; font-size:15px; font-weight:700;">${pts1}</div>`;
                 });
                 periodHtml += `</div>`;
 
                 // Red tima 2
                 periodHtml += `<div style="display:flex; justify-content:space-between; align-items:center;">
-                    <div style="flex:2; text-align:left; color:white; font-size:14px; font-weight:900; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${d.t2}</div>`;
+                    <div style="flex:2; text-align:left; color:white; font-size:14px; font-weight:900; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${d.t2 || 'T2'}</div>`;
                 Object.values(d.sub_details).forEach(v => { 
-                    let score = v.split(' ')[1] ? v.split(' ')[1].split(':')[1] : '-';
-                    periodHtml += `<div style="flex:1; text-align:center; color:white; font-size:15px; font-weight:700;">${score}</div>`;
+                    let match = v.match(/(\d+):(\d+)$/);
+                    let pts2 = match ? match[2] : '-';
+                    periodHtml += `<div style="flex:1; text-align:center; color:white; font-size:15px; font-weight:700;">${pts2}</div>`;
                 });
                 periodHtml += `</div></div>`;
                 
@@ -798,8 +867,8 @@
             if(d.events) { 
                 document.getElementById('det-stats-container').style.display = 'block'; 
                 
-                eHome.innerHTML = `<div style="font-size:12px; color:var(--text-muted); font-weight:800; margin-bottom:10px; text-transform:uppercase; border-bottom:1px solid var(--glass-border); padding-bottom:6px;">${d.t1}</div>`;
-                eAway.innerHTML = `<div style="font-size:12px; color:var(--text-muted); font-weight:800; margin-bottom:10px; text-transform:uppercase; border-bottom:1px solid var(--glass-border); padding-bottom:6px; text-align:right;">${d.t2}</div>`;
+                eHome.innerHTML = `<div style="font-size:12px; color:var(--text-muted); font-weight:800; margin-bottom:10px; text-transform:uppercase; border-bottom:1px solid var(--glass-border); padding-bottom:6px;">${d.t1 || 'T1'}</div>`;
+                eAway.innerHTML = `<div style="font-size:12px; color:var(--text-muted); font-weight:800; margin-bottom:10px; text-transform:uppercase; border-bottom:1px solid var(--glass-border); padding-bottom:6px; text-align:right;">${d.t2 || 'T2'}</div>`;
 
                 Object.values(d.events).forEach(ev => { 
                     if(ev.team == 1) {
@@ -882,10 +951,9 @@
                         </div>
                     </div>`;
             } else if(d.sport === "FUDBAL") {
-                // Za Fudbal izbaceni plusevi i minusi, samo events
                 ctrl.innerHTML = `
                     <div class="glass-panel" style="padding: 24px; box-shadow: 0 10px 20px rgba(0,0,0,0.5);">
-                        <h4 style="color:var(--text-main); font-family:'Oswald'; text-align:center; margin-bottom:16px; font-size:15px; letter-spacing:1px;">UNOS DOGAĐAJA (GOL AUTOMATSKI MENJA REZULTAT)</h4>
+                        <h4 style="color:var(--text-main); font-family:'Oswald'; text-align:center; margin-bottom:16px; font-size:15px; letter-spacing:1px;">UNOS DOGAĐAJA</h4>
                         <input type="text" id="event-player" placeholder="${t.player}" class="mb-3">
                         <select id="event-team" class="mb-3">
                             <option value="1">${d.t1 || t.team1}</option>
@@ -895,24 +963,6 @@
                             <button onclick="addEvent('⚽')" class="btn-secondary" style="font-size:14px!important; padding:14px; border-color:var(--primary); color:var(--primary); font-weight:900;">⚽ ${t.goal}</button>
                             <button onclick="addEvent('🟨')" class="btn-secondary" style="font-size:14px!important; padding:14px; color:#ffcc00; border-color:rgba(255,204,0,0.3);">🟨 ${t.yellow}</button>
                             <button onclick="addEvent('🟥')" class="btn-secondary" style="font-size:14px!important; padding:14px; color:var(--danger); border-color:rgba(255,42,42,0.3);">🟥 ${t.red}</button>
-                        </div>
-                    </div>`;
-            } else if(d.sport === "RUKOMET") {
-                ctrl.innerHTML = `
-                    <div class="score-ctrl-grid mb-3">
-                        <div class="team-ctrl-card">
-                            <div class="team-ctrl-lbl">${d.t1 || t.team1}</div>
-                            <div class="ctrl-btn-group">
-                                <button class="btn-ctrl minus" onclick="proScore(1,-1)">-</button>
-                                <button class="btn-ctrl plus" onclick="proScore(1,1)">+</button>
-                            </div>
-                        </div>
-                        <div class="team-ctrl-card">
-                            <div class="team-ctrl-lbl">${d.t2 || t.team2}</div>
-                            <div class="ctrl-btn-group">
-                                <button class="btn-ctrl minus" onclick="proScore(2,-1)">-</button>
-                                <button class="btn-ctrl plus" onclick="proScore(2,1)">+</button>
-                            </div>
                         </div>
                     </div>`;
             } else {
@@ -1027,7 +1077,10 @@
                 if (n >= (limits[d.sport] || 5)) return;
                 const label = translations[currentLang].periods[d.sport][n] || "P"+(n+1); 
                 let ph = 0, pa = 0; 
-                Object.values(sub).forEach(v => { const match = v.match(/(\d+):(\d+)$/); if(match) { ph += parseInt(match[1]); pa += parseInt(match[2]); } }); 
+                Object.values(sub).forEach(v => { 
+                    let match = v.match(/(\d+):(\d+)$/); 
+                    if(match) { ph += parseInt(match[1]); pa += parseInt(match[2]); } 
+                }); 
                 sub["P"+n] = `${label} ${(d.score1||0)-ph}:${(d.score2||0)-pa}`; 
                 db.ref(`tereni/${currentAdminKey}`).update({ sub_details: sub }); 
             } else if(type === 'end') {
