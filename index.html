@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover">
-    <title>SCOREPUNKT</title>
+    <title>SCOREPUNKT LIVE</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -20,13 +20,14 @@
     
     <style>
         :root {
-            --primary: #ffcc00;
-            --primary-glow: rgba(255, 204, 0, 0.4);
+            /* Pro Sports Colors */
+            --primary: #ccff00; /* Neon Volt Green */
+            --primary-glow: rgba(204, 255, 0, 0.4);
             --bg-dark: #09090b;
             --glass-bg: rgba(20, 20, 25, 0.75);
             --glass-border: rgba(255, 255, 255, 0.1);
-            --danger: #ff3b30;
-            --danger-glow: rgba(255, 59, 48, 0.4);
+            --danger: #ff2a2a; /* Live Red */
+            --danger-glow: rgba(255, 42, 42, 0.4);
             --text-main: #ffffff;
             --text-muted: #a1a1aa;
         }
@@ -61,25 +62,17 @@
             padding: 16px; border-radius: 14px; font-family: 'Inter', sans-serif; width: 100%;
             transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
             box-shadow: inset 0 2px 5px rgba(0,0,0,0.3);
-            -webkit-appearance: none; /* Uklanja native stilove na iOS/Android */
+            -webkit-appearance: none;
         }
         
         input:focus, select:focus { 
             border-color: var(--primary); 
-            background: rgba(255, 204, 0, 0.08); 
+            background: rgba(204, 255, 0, 0.05); 
             box-shadow: 0 0 0 3px var(--primary-glow), inset 0 2px 5px rgba(0,0,0,0.2);
         }
 
-        /* Rešavanje sistemskih belih pozadina u padajućim menijima i autofill-u */
-        select option {
-            background-color: #1a1a1f;
-            color: #ffffff;
-            font-weight: 500;
-        }
-        input:-webkit-autofill,
-        input:-webkit-autofill:hover, 
-        input:-webkit-autofill:focus, 
-        input:-webkit-autofill:active {
+        select option { background-color: #1a1a1f; color: #ffffff; font-weight: 500; }
+        input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus, input:-webkit-autofill:active {
             -webkit-box-shadow: 0 0 0 30px #1a1a1f inset !important;
             -webkit-text-fill-color: white !important;
             transition: background-color 5000s ease-in-out 0s;
@@ -98,15 +91,13 @@
         button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
 
         .btn-primary {
-            background: linear-gradient(135deg, #ffcc00 0%, #d4a900 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, #aacc00 100%);
             color: #000; border: none; padding: 18px; font-weight: 900; 
             text-transform: uppercase; font-family: 'Oswald', sans-serif; 
             box-shadow: 0 10px 20px var(--primary-glow);
             letter-spacing: 0.5px;
         }
-        .btn-primary:active {
-            box-shadow: 0 5px 10px var(--primary-glow);
-        }
+        .btn-primary:active { box-shadow: 0 5px 10px var(--primary-glow); }
 
         .btn-secondary {
             background: rgba(255, 255, 255, 0.05);
@@ -120,29 +111,36 @@
         .mt-3 { margin-top: 12px; }
         .w-full { width: 100%; }
 
+        /* Pure CSS Sports Hero Background */
         #hero { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: linear-gradient(180deg, rgba(9, 9, 11, 0.4) 0%, rgba(9, 9, 11, 0.95) 100%), 
-                        url('https://images.unsplash.com/photo-1504450758481-7338eba7524a?q=80&w=1500&auto=format&fit=crop') center/cover; 
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(204, 255, 0, 0.15) 0%, transparent 60%),
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 40px 40px, 40px 40px;
+            background-position: top center;
             display: flex; flex-direction: column; justify-content: center; align-items: center; 
             z-index: 6000; padding: 24px; 
             transition: opacity 0.5s ease;
         }
         
         .hero-logo { 
-            font-family: 'Permanent Marker', cursive; 
-            font-size: clamp(42px, 12vw, 64px); 
-            color: var(--primary); 
-            text-shadow: 0 10px 30px rgba(0,0,0,0.8), 0 0 20px var(--primary-glow); 
-            transform: rotate(-2deg); 
+            font-family: 'Oswald', sans-serif; 
+            font-size: clamp(42px, 12vw, 72px); 
+            font-weight: 900;
+            color: var(--text-main); 
+            text-shadow: 0 10px 30px rgba(0,0,0,0.8); 
             margin-bottom: 0px; 
-            letter-spacing: -1px;
+            letter-spacing: 2px;
             text-align: center;
         }
+        .hero-logo span { color: var(--primary); text-shadow: 0 0 20px var(--primary-glow); }
 
         .hero-subtitle { 
-            font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 13px; 
-            text-transform: uppercase; letter-spacing: 6px; color: var(--text-muted); 
+            font-family: 'Inter', sans-serif; font-weight: 800; font-size: 12px; 
+            text-transform: uppercase; letter-spacing: 8px; color: var(--text-muted); 
             margin-bottom: 40px; 
         }
         
@@ -159,7 +157,7 @@
         }
         .home-lang-btn.active { 
             border-color: var(--primary); color: var(--primary); 
-            background: rgba(255, 204, 0, 0.1); box-shadow: 0 0 15px rgba(255, 204, 0, 0.1);
+            background: rgba(204, 255, 0, 0.1); box-shadow: 0 0 15px rgba(204, 255, 0, 0.1);
         }
 
         #search-container { 
@@ -200,18 +198,12 @@
         }
         .location-btn img { filter: brightness(0); width: 24px; }
         
-        .back-btn { 
-            top: 20px; width: 48px; height: 48px; 
-            background: var(--glass-bg); color: white; font-weight: bold; font-size: 18px;
-        }
-        .settings-btn { 
-            top: 80px; width: 48px; height: 48px; 
-            background: var(--glass-bg); 
-        }
+        .back-btn { top: 20px; width: 48px; height: 48px; background: var(--glass-bg); color: white; font-weight: bold; font-size: 18px; }
+        .settings-btn { top: 80px; width: 48px; height: 48px; background: var(--glass-bg); }
         .settings-btn img { width: 22px; filter: invert(1); opacity: 0.9; }
 
         .sport-marker-wrapper { display: flex; flex-direction: column; align-items: center; position: relative; }
-        .marker-content-box { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; pointer-events: none; }
+        .marker-content-box { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; pointer-events: none; z-index: 30;}
         .marker-content-box > * { pointer-events: auto; }
 
         .marker-ball-only { 
@@ -225,15 +217,15 @@
 
         .live-card-thin { 
             background: var(--glass-bg); backdrop-filter: blur(12px); border-radius: 12px; 
-            display: none; flex-direction: column; width: 180px; 
+            display: none; flex-direction: column; width: 230px; /* Šire za preglednost */
             color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.8); position: relative; 
             border: 1px solid var(--glass-border); border-left: 4px solid #ff9500; 
-            overflow: hidden; z-index: 25; margin-bottom: 4px;
+            overflow: hidden; z-index: 25; margin-bottom: 4px; padding-bottom: 4px;
         }
         .zoom-near .live-card-thin { display: flex; animation: slideUpFade 0.3s ease-out; }
         
-        .status-live-wrapper .live-card-thin { border-left-color: var(--primary); border-top-color: rgba(255,204,0,0.2); }
-        .status-live-wrapper .card-league-mini { background: rgba(255, 204, 0, 0.1); color: var(--primary); border-bottom: 1px solid rgba(255,204,0,0.1); }
+        .status-live-wrapper .live-card-thin { border-left-color: var(--danger); border-top-color: rgba(255,42,42,0.2); }
+        .status-live-wrapper .card-league-mini { background: rgba(255, 42, 42, 0.1); color: var(--danger); border-bottom: 1px solid rgba(255,42,42,0.1); }
         
         .card-league-mini { 
             font-size: 10px; background: rgba(0,0,0,0.5); color: var(--text-muted); 
@@ -244,41 +236,37 @@
 
         .score-row { 
             display: flex; justify-content: space-between; align-items: center; 
-            padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); 
-            background: rgba(0,0,0,0.2); gap: 8px;
+            padding: 6px 10px; border-bottom: 1px solid rgba(255,255,255,0.03); 
+            background: rgba(0,0,0,0.3); gap: 8px;
         }
         .team-name-col { 
-            font-size: 12px; font-weight: 700; text-transform: uppercase; color: #fff; 
+            font-size: 13px; font-weight: 700; text-transform: uppercase; color: #fff; 
             overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; 
         }
         .score-val-col { 
-            font-family: 'Oswald', sans-serif; font-size: 16px; color: var(--primary); 
-            font-weight: 700; background: rgba(0,0,0,0.4); width: 32px; height: 28px;
+            font-family: 'Oswald', sans-serif; font-size: 18px; color: var(--text-main); 
+            font-weight: 700; background: rgba(0,0,0,0.6); width: 36px; height: 32px;
             display: flex; justify-content: center; align-items: center; 
             border-radius: 6px; flex-shrink: 0; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
         }
+        .status-live-wrapper .score-val-col { color: var(--primary); }
 
-        .card-footer-info {
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 6px 10px; background: rgba(0,0,0,0.6);
-        }
-        .card-time-mini { font-size: 10px; color: #ff9500; font-weight: 700; }
+        .card-footer-info { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px 2px; }
+        .card-time-mini { font-size: 10px; color: #a1a1aa; font-weight: 700; }
+        
         .blink-live-tag { 
-            background: rgba(255, 204, 0, 0.15); color: var(--primary); font-size: 10px; font-weight: 900; 
-            padding: 2px 8px; border-radius: 4px; border: 1px solid rgba(255, 204, 0, 0.3);
-            animation: soft-blink 2s infinite; 
+            background: rgba(255, 42, 42, 0.15); color: var(--danger); font-size: 10px; font-weight: 900; 
+            padding: 3px 8px; border-radius: 4px; border: 1px solid rgba(255, 42, 42, 0.3);
+            animation: pulse-live 1.5s infinite; letter-spacing: 1px;
         }
 
         .marker-pointer {
-            width: 0; height: 0;
-            border-left: 8px solid transparent;
-            border-right: 8px solid transparent;
-            border-top: 10px solid #ff9500;
-            display: none; margin-bottom: 10px;
+            width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent;
+            border-top: 10px solid #ff9500; display: none; margin-bottom: 10px;
             filter: drop-shadow(0 4px 4px rgba(0,0,0,0.5));
         }
         .zoom-near .marker-pointer { display: block; }
-        .status-live-wrapper .marker-pointer { border-top-color: var(--primary); }
+        .status-live-wrapper .marker-pointer { border-top-color: var(--danger); }
 
         #match-details-view { 
             position: fixed; bottom: -100%; left: 0; width: 100%; max-height: 90vh; 
@@ -290,73 +278,48 @@
         }
         #match-details-view.active { bottom: 0; }
         
-        .drag-handle {
-            width: 40px; height: 5px; background: rgba(255,255,255,0.2); 
-            border-radius: 3px; margin: 12px auto;
-        }
+        .drag-handle { width: 40px; height: 5px; background: rgba(255,255,255,0.2); border-radius: 3px; margin: 12px auto; }
 
-        .details-top-bar { 
-            padding: 0 20px 15px; text-align: center; border-bottom: 1px solid var(--glass-border); position: relative; 
-        }
+        .details-top-bar { padding: 0 20px 15px; text-align: center; border-bottom: 1px solid var(--glass-border); position: relative; }
         .close-btn-sheet {
             position: absolute; right: 20px; top: 0px; width: 36px; height: 36px;
-            background: rgba(255,255,255,0.1); border-radius: 50%;
-            display: flex; justify-content: center; align-items: center;
+            background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; justify-content: center; align-items: center;
             font-size: 20px; color: var(--text-muted); cursor: pointer; transition: 0.2s;
         }
         .close-btn-sheet:active { background: rgba(255,255,255,0.2); transform: scale(0.9); }
         .details-league { color: var(--primary); font-weight: 900; font-size: 14px; letter-spacing: 2px; text-transform: uppercase; }
         
         .details-scoreboard { 
-            padding: 30px 20px; display: flex; flex-direction: column; align-items: center; 
-            border-bottom: 1px solid var(--glass-border);
+            padding: 30px 20px; display: flex; flex-direction: column; align-items: center; border-bottom: 1px solid var(--glass-border);
             background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, transparent 100%);
         }
-        .det-teams-row { 
-            display: flex; justify-content: space-between; align-items: center; 
-            width: 100%; max-width: 500px; margin-bottom: 20px; gap: 15px;
-        }
+        .det-teams-row { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 500px; margin-bottom: 20px; gap: 15px; }
         .det-team-box { flex: 1; min-width: 0; text-align: center; }
-        .det-team-name { 
-            font-size: 16px; font-weight: 900; text-transform: uppercase; color: #fff; 
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
-        }
-        .det-vs-label { 
-            font-family: 'Oswald'; font-size: 14px; color: var(--text-muted); 
-            font-weight: 700; width: 30px; text-align: center; flex-shrink: 0;
-            background: rgba(255,255,255,0.1); padding: 4px 0; border-radius: 6px;
-        }
+        .det-team-name { font-size: 16px; font-weight: 900; text-transform: uppercase; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+        .det-vs-label { font-family: 'Oswald'; font-size: 14px; color: var(--text-muted); font-weight: 700; width: 30px; text-align: center; flex-shrink: 0; background: rgba(255,255,255,0.1); padding: 4px 0; border-radius: 6px; }
 
         .det-score-row { 
-            background: rgba(0,0,0,0.4); border-radius: 16px; padding: 10px 40px; 
-            display: flex; justify-content: center; align-items: center; 
-            border: 1px solid rgba(255, 204, 0, 0.2); box-shadow: inset 0 2px 10px rgba(0,0,0,0.5), 0 10px 30px rgba(0,0,0,0.3);
+            background: rgba(0,0,0,0.6); border-radius: 16px; padding: 10px 40px; display: flex; justify-content: center; align-items: center; 
+            border: 1px solid rgba(204, 255, 0, 0.2); box-shadow: inset 0 2px 10px rgba(0,0,0,0.5), 0 10px 30px rgba(0,0,0,0.3); transition: 0.3s;
         }
-        .det-score-main { 
-            font-family: 'Oswald'; font-size: 42px; font-weight: 900; 
-            color: var(--primary); letter-spacing: 6px; white-space: nowrap;
-            text-shadow: 0 0 20px var(--primary-glow);
-        }
+        .det-score-main { font-family: 'Oswald'; font-size: 42px; font-weight: 900; color: var(--primary); letter-spacing: 6px; white-space: nowrap; text-shadow: 0 0 20px var(--primary-glow); }
         
         .details-content { padding: 24px; }
         .detail-period-tag { 
-            background: rgba(0,0,0,0.3); padding: 14px 16px; border-radius: 12px; 
-            font-size: 14px; font-weight: 700; border: 1px solid var(--glass-border); 
-            border-left: 4px solid var(--primary); margin-bottom: 8px; 
+            background: rgba(0,0,0,0.3); padding: 14px 16px; border-radius: 12px; font-size: 14px; font-weight: 700; 
+            border: 1px solid var(--glass-border); border-left: 4px solid var(--primary); margin-bottom: 8px; 
             display: flex; justify-content: space-between; align-items: center;
         }
         
         #admin-panel { 
-            position: fixed; top: 0; left: 100%; width: 100%; height: 100%; 
-            background: var(--bg-dark); z-index: 9000; 
-            transition: left 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); 
+            position: fixed; top: 0; left: 100%; width: 100%; height: 100%; background: var(--bg-dark); z-index: 9000; 
+            transition: left 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); 
             display: flex; flex-direction: column; overflow-y: auto; 
         }
         #admin-panel.active { left: 0; }
 
         .admin-header {
-            padding: 20px 24px; background: rgba(0,0,0,0.5); border-bottom: 1px solid var(--glass-border);
+            padding: 20px 24px; background: rgba(0,0,0,0.7); border-bottom: 1px solid var(--glass-border);
             display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10;
             backdrop-filter: blur(20px);
         }
@@ -365,109 +328,75 @@
 
         .admin-score-hero {
             background: linear-gradient(145deg, rgba(30,30,35,1) 0%, rgba(15,15,20,1) 100%);
-            border: 1px solid var(--primary); padding: 30px 20px; text-align: center; 
-            border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.5), inset 0 2px 0 rgba(255,255,255,0.05);
-            position: relative; overflow: hidden;
+            border: 1px solid var(--primary); padding: 30px 20px; text-align: center; border-radius: 20px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5), inset 0 2px 0 rgba(255,255,255,0.05); position: relative; overflow: hidden; transition: 0.3s;
         }
         .admin-score-hero::before {
             content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-            background: radial-gradient(circle, var(--primary-glow) 0%, transparent 60%);
-            opacity: 0.1; pointer-events: none;
+            background: radial-gradient(circle, var(--primary-glow) 0%, transparent 60%); opacity: 0.1; pointer-events: none;
         }
 
-        .score-ctrl-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+        /* Animirani efekat gola / poena */
+        @keyframes pulse-score {
+            0% { transform: scale(1); box-shadow: inset 0 0 0px var(--primary-glow); }
+            50% { transform: scale(1.05); box-shadow: inset 0 0 30px var(--primary-glow); border-color: #fff; }
+            100% { transform: scale(1); box-shadow: inset 0 0 0px var(--primary-glow); }
         }
-        
-        .team-ctrl-card {
-            background: var(--glass-bg); border: 1px solid var(--glass-border);
-            border-radius: 16px; padding: 16px; text-align: center; box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-        }
-        
-        .team-ctrl-lbl {
-            font-size: 13px; color: var(--text-muted); font-weight: 800; 
-            text-transform: uppercase; margin-bottom: 12px;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        }
+        .anim-score { animation: pulse-score 0.6s ease-out; }
 
-        .ctrl-btn-group {
-            display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;
-        }
+        .score-ctrl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .team-ctrl-card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 16px; padding: 16px; text-align: center; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+        .team-ctrl-lbl { font-size: 13px; color: var(--text-muted); font-weight: 800; text-transform: uppercase; margin-bottom: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .ctrl-btn-group { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
 
         .btn-ctrl {
-            width: 50px; height: 50px; border-radius: 12px; font-size: 24px !important;
-            font-family: 'Oswald', sans-serif; font-weight: 500;
-            display: flex; justify-content: center; align-items: center; border: none;
-            cursor: pointer; transition: transform 0.1s, background 0.2s;
+            width: 50px; height: 50px; border-radius: 12px; font-size: 24px !important; font-family: 'Oswald', sans-serif; font-weight: 500;
+            display: flex; justify-content: center; align-items: center; border: none; cursor: pointer; transition: transform 0.1s, background 0.2s;
         }
         .btn-ctrl.minus { background: rgba(255,255,255,0.1); color: white; }
         .btn-ctrl.minus:active { background: rgba(255,255,255,0.2); transform: scale(0.9); }
-        .btn-ctrl.plus { background: var(--primary); color: #000; box-shadow: 0 4px 15px var(--primary-glow); }
+        .btn-ctrl.plus { background: var(--primary); color: #000; box-shadow: 0 4px 15px var(--primary-glow); font-weight: bold; }
         .btn-ctrl.plus:active { transform: scale(0.9); box-shadow: 0 2px 8px var(--primary-glow); }
 
         .adm-event-list { display: flex; flex-direction: column; gap: 8px; max-height: 250px; overflow-y: auto; }
-        .adm-event-item { 
-            background: rgba(0,0,0,0.3); padding: 12px 16px; border-radius: 12px; 
-            display: flex; justify-content: space-between; align-items: center; 
-            border: 1px solid var(--glass-border); border-left: 3px solid var(--primary);
-        }
+        .adm-event-item { background: rgba(0,0,0,0.3); padding: 12px 16px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--glass-border); border-left: 3px solid var(--primary); }
         .adm-event-item span { font-size: 14px; font-weight: 700; color: #fff; text-transform: uppercase; }
-        .adm-event-remove { 
-            color: var(--danger); font-size: 22px; cursor: pointer; 
-            width: 32px; height: 32px; display: flex; justify-content: center; align-items: center;
-            background: rgba(255,59,48,0.1); border-radius: 8px; transition: 0.2s;
-        }
-        .adm-event-remove:active { transform: scale(0.9); background: rgba(255,59,48,0.3); }
-
+        .adm-event-remove { color: var(--danger); font-size: 22px; cursor: pointer; width: 32px; height: 32px; display: flex; justify-content: center; align-items: center; background: rgba(255,42,42,0.1); border-radius: 8px; transition: 0.2s; }
+        .adm-event-remove:active { transform: scale(0.9); background: rgba(255,42,42,0.3); }
         .action-btn-row { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
 
-        @keyframes soft-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        @keyframes pulse-live { 0%, 100% { opacity: 1; box-shadow: 0 0 5px rgba(255,42,42,0.5); } 50% { opacity: 0.5; box-shadow: 0 0 15px rgba(255,42,42,0.8); } }
         @keyframes slideUpFade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        .user-location-dot { 
-            background: #0a84ff; width: 16px; height: 16px; 
-            border: 3px solid white; border-radius: 50%; box-shadow: 0 0 15px #0a84ff; 
-        }
-        @keyframes pulse-circle {
-            0% { stroke-opacity: 0.8; stroke-width: 1px; }
-            50% { stroke-opacity: 0.3; stroke-width: 3px; }
-            100% { stroke-opacity: 0.8; stroke-width: 1px; }
-        }
+        .user-location-dot { background: #0a84ff; width: 16px; height: 16px; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 15px #0a84ff; }
+        @keyframes pulse-circle { 0% { stroke-opacity: 0.8; stroke-width: 1px; } 50% { stroke-opacity: 0.3; stroke-width: 3px; } 100% { stroke-opacity: 0.8; stroke-width: 1px; } }
         .animated-range-circle { animation: pulse-circle 4s infinite ease-in-out; }
         
-        /* ---------------- LEAFLET POPUP STYLES (PROFI & SMOOTH) ---------------- */
+        /* DESKTOP OPTIMIZACIJE - OGRANIČAVANJE MENIJA */
+        @media (min-width: 768px) {
+            #admin-panel { width: 450px; left: auto; right: -450px; border-left: 1px solid var(--glass-border); box-shadow: -15px 0 40px rgba(0,0,0,0.6); }
+            #admin-panel.active { right: 0; left: auto; }
+            #match-details-view { 
+                width: 420px; left: auto; right: 20px; bottom: -100%; border-radius: 24px; max-height: 85vh; 
+                border: 1px solid var(--glass-border); box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            }
+            #match-details-view.active { bottom: 20px; }
+            #search-container.expanded { width: 350px; }
+        }
+
+        /* ---------------- LEAFLET POPUP PROFI STYLES ---------------- */
         .leaflet-popup-content-wrapper { 
-            background: rgba(20, 20, 25, 0.95); 
-            backdrop-filter: blur(25px); 
-            -webkit-backdrop-filter: blur(25px);
-            color: white; 
-            border-radius: 24px; 
-            border: 1px solid var(--glass-border); 
-            padding: 5px; 
-            overflow: hidden; 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.8) !important;
+            background: rgba(15, 15, 20, 0.95); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            color: white; border-radius: 24px; border: 1px solid var(--glass-border); padding: 5px; 
+            overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.9) !important;
         }
-        .leaflet-popup-tip { 
-            background: rgba(20, 20, 25, 0.95); 
-            border: 1px solid var(--glass-border); 
-        }
-        .leaflet-popup-content { 
-            margin: 10px; 
-            min-width: 220px !important;
-        }
+        .leaflet-popup-tip { background: rgba(15, 15, 20, 0.95); border: 1px solid var(--glass-border); }
+        .leaflet-popup-content { margin: 15px; min-width: 240px !important; }
         .leaflet-popup-close-button {
-            color: var(--text-muted) !important;
-            font-size: 24px !important;
-            padding: 10px !important;
-            width: 36px !important;
-            height: 36px !important;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: color 0.2s;
+            color: var(--text-muted) !important; font-size: 28px !important; padding: 10px !important; width: 40px !important; height: 40px !important;
+            display: flex; align-items: center; justify-content: center; transition: color 0.2s;
         }
         .leaflet-popup-close-button:hover { color: white !important; }
-        /* ------------------------------------------------------------------------ */
 
         #lang-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); z-index: 10000; display: none; justify-content: center; align-items: center; }
         .lang-box { background: var(--bg-dark); padding: 32px; border-radius: 24px; border: 1px solid var(--glass-border); width: 85%; max-width: 320px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
@@ -476,8 +405,8 @@
 <body>
 
     <div id="hero">
-        <div class="hero-logo">SCOREPUNKT</div>
-        <div class="hero-subtitle" id="txt-subtitle">Result Tracker</div>
+        <div class="hero-logo">SCORE<span>PUNKT</span></div>
+        <div class="hero-subtitle" id="txt-subtitle">Live Result Tracker</div>
         
         <div class="auth-box glass-panel">
             <input type="email" id="email" placeholder="EMAIL ADDRESS">
@@ -495,7 +424,7 @@
             </div>
         </div>
         
-        <div style="margin-top:auto; color:rgba(255,255,255,0.3); font-size:10px; letter-spacing:2px; font-weight:700;">© 2026 SCOREPUNKT MOBILE</div>
+        <div style="margin-top:auto; color:rgba(255,255,255,0.2); font-size:10px; letter-spacing:3px; font-weight:800;">© 2026 SCOREPUNKT PRO</div>
     </div>
 
     <div id="map"></div>
@@ -514,7 +443,7 @@
             <img src="https://cdn-icons-png.flaticon.com/512/1865/1865269.png" alt="Location">
         </div>
         
-        <div id="user-indicator" style="position:fixed; bottom:15px; left:15px; color:var(--primary); font-size:11px; font-weight:800; z-index:5000; opacity: 0.8; background: rgba(0,0,0,0.6); padding: 8px 14px; border-radius: 20px; backdrop-filter: blur(10px); border: 1px solid var(--glass-border); box-shadow: 0 4px 15px rgba(0,0,0,0.5);"></div>
+        <div id="user-indicator" style="position:fixed; bottom:15px; left:15px; color:var(--primary); font-size:11px; font-weight:800; z-index:5000; opacity: 0.9; background: rgba(0,0,0,0.7); padding: 8px 14px; border-radius: 20px; backdrop-filter: blur(10px); border: 1px solid var(--glass-border); box-shadow: 0 4px 15px rgba(0,0,0,0.5);"></div>
     </div>
 
     <div id="lang-modal" onclick="toggleLangModal()">
@@ -539,13 +468,13 @@
                 <div class="det-vs-label">VS</div>
                 <div class="det-team-box"><div id="det-t2" class="det-team-name"></div></div>
             </div>
-            <div class="det-score-row">
+            <div class="det-score-row" id="det-score-container">
                 <div id="det-score" class="det-score-main">0 : 0</div>
             </div>
         </div>
 
         <div class="details-content">
-            <div id="det-extra-info" style="text-align:center; color:#ff9500; font-weight:800; margin-bottom:24px; font-family:'Oswald'; font-size: 16px;"></div>
+            <div id="det-extra-info" style="text-align:center; color:var(--primary); font-weight:800; margin-bottom:24px; font-family:'Oswald'; font-size: 16px;"></div>
             
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                 <span class="details-league" style="font-size:12px; color:var(--text-muted);" id="txt-period-res">Rezultat po periodima</span>
@@ -571,9 +500,9 @@
         <div class="admin-content-scroll">
             <div id="adm-score-view" style="display:none; flex-direction:column;">
                 
-                <div class="admin-score-hero mb-3">
+                <div class="admin-score-hero mb-3" id="admin-score-container">
                     <div id="adm-main-score" style="font-size:64px; font-family:'Oswald'; font-weight:900; color:var(--primary); line-height:1.1;">0 : 0</div>
-                    <div id="adm-sub-display" style="color:#ff9500; font-weight:800; font-family:'Oswald'; margin-top:12px; letter-spacing:1px; font-size: 14px;"></div>
+                    <div id="adm-sub-display" style="color:var(--text-main); font-weight:800; font-family:'Oswald'; margin-top:12px; letter-spacing:1px; font-size: 14px;"></div>
                 </div>
                 
                 <div id="adm-sport-controls"></div>
@@ -581,7 +510,7 @@
                 <div id="adm-events-manager" class="adm-event-list mt-3"></div>
                 
                 <div class="action-btn-row mt-3">
-                    <button class="btn-secondary" style="border-color: rgba(255,149,0,0.5); color:#ff9500;" onclick="triggerLogic('period')" id="btn-save-period">SAČUVAJ PERIOD / SET</button>
+                    <button class="btn-secondary" style="border-color: rgba(204,255,0,0.4); color:var(--primary);" onclick="triggerLogic('period')" id="btn-save-period">SAČUVAJ PERIOD / SET</button>
                     <button id="start-live-btn" class="btn-primary" onclick="adminStatus('live')">KRENI UŽIVO</button>
                     <button id="end-match-btn" class="btn-primary" style="background:var(--danger); color:white; box-shadow: 0 10px 20px var(--danger-glow); display:none;" onclick="triggerLogic('end')">ZAVRŠI MEČ</button>
                     <button id="reset-match-btn" class="btn-secondary" style="display:none;" onclick="resetMatch()">RESET / NOVI MEČ</button>
@@ -606,7 +535,7 @@
                 </div>
             </div>
             
-            <button class="btn-secondary" style="margin-top:auto; color: var(--danger); border-color: rgba(255,59,48,0.2);" onclick="adminDelete()" id="btn-delete-court">OBRIŠI TEREN</button>
+            <button class="btn-secondary" style="margin-top:auto; color: var(--danger); border-color: rgba(255,42,42,0.2);" onclick="adminDelete()" id="btn-delete-court">OBRIŠI TEREN</button>
         </div>
     </div>
 
@@ -631,16 +560,15 @@
         const tennisPoints = ["0", "15", "30", "40", "AD"];
 
         const translations = {
-            sr: { subtitle: "Result Tracker", login: "ULAZ U SISTEM", explore: "ISTRAŽI MAPU BEZ PRIJAVE", search: "Pretraži...", periodRes: "Rezultat po periodima", matchEvents: "Događaji na meču", adminTitle: "ADMIN TABLA", savePeriod: "SAČUVAJ PERIOD / SET", goLive: "KRENI UŽIVO", endMatch: "ZAVRŠI MEČ", resetMatch: "RESET / NOVI MEČ", schedule: "ZAKAŽI MEČ", deleteCourt: "OBRIŠI TEREN", zoneOccupied: "ZONA ZAUZETA!", create: "KRENI", courtName: "NAZIV TERENA", player: "IME IGRAČA", team: "TIM", loggedAs: "ULOGOVAN KAO:", localMatch: "LOKALNI MEČ", points: "POENI", games: "GEMOVI", league: "LIGA (NOVA)", team1: "TIM 1", team2: "TIM 2", goal: "GOL", yellow: "ŽUTI", red: "CRVENI", confirmDelete: "OBRISATI?", timeAt: "U", live: "UŽIVO", limitReached: "LIMIT OD 3 TERENA JE DOSTIGNUT!", addCourt: "DODAJ TEREN", periods: { FUDBAL: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "PROD"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } },
-            en: { subtitle: "Result Tracker", login: "ENTER SYSTEM", explore: "EXPLORE MAP WITHOUT LOGIN", search: "Search...", periodRes: "Period Results", matchEvents: "Match Events", adminTitle: "ADMIN PANEL", savePeriod: "SAVE PERIOD / SET", goLive: "GO LIVE", endMatch: "END MATCH", resetMatch: "RESET / NEW MATCH", schedule: "SCHEDULE MATCH", deleteCourt: "DELETE COURT", zoneOccupied: "ZONE OCCUPIED!", create: "CREATE", courtName: "COURT NAME", player: "PLAYER NAME", team: "TEAM", loggedAs: "LOGGED AS:", localMatch: "LOCAL MATCH", points: "POINTS", games: "GAMES", league: "LEAGUE (NEW)", team1: "TEAM 1", team2: "TEAM 2", goal: "GOAL", yellow: "YELLOW", red: "RED", confirmDelete: "DELETE?", timeAt: "AT", live: "LIVE", limitReached: "LIMIT OF 3 COURTS REACHED!", addCourt: "ADD COURT", periods: { FUDBAL: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "OT"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } }
+            sr: { subtitle: "Live Result Tracker", login: "ULAZ U SISTEM", explore: "ISTRAŽI MAPU BEZ PRIJAVE", search: "Pretraži...", periodRes: "Rezultat po periodima", matchEvents: "Događaji na meču", adminTitle: "ADMIN TABLA", savePeriod: "SAČUVAJ PERIOD / SET", goLive: "KRENI UŽIVO", endMatch: "ZAVRŠI MEČ", resetMatch: "RESET / NOVI MEČ", schedule: "ZAKAŽI MEČ", deleteCourt: "OBRIŠI TEREN", zoneOccupied: "ZONA ZAUZETA!", create: "KRENI", courtName: "NAZIV TERENA", player: "IME IGRAČA", team: "TIM", loggedAs: "ULOGOVAN KAO:", localMatch: "LOKALNI MEČ", points: "POENI", games: "GEMOVI", league: "LIGA (NOVA)", team1: "TIM 1", team2: "TIM 2", goal: "GOL", yellow: "ŽUTI", red: "CRVENI", confirmDelete: "OBRISATI?", timeAt: "U", live: "UŽIVO", limitReached: "LIMIT OD 3 TERENA JE DOSTIGNUT!", addCourt: "DODAJ TEREN", periods: { FUDBAL: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "PROD"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } },
+            en: { subtitle: "Live Result Tracker", login: "ENTER SYSTEM", explore: "EXPLORE MAP WITHOUT LOGIN", search: "Search...", periodRes: "Period Results", matchEvents: "Match Events", adminTitle: "ADMIN PANEL", savePeriod: "SAVE PERIOD / SET", goLive: "GO LIVE", endMatch: "END MATCH", resetMatch: "RESET / NEW MATCH", schedule: "SCHEDULE MATCH", deleteCourt: "DELETE COURT", zoneOccupied: "ZONE OCCUPIED!", create: "CREATE", courtName: "COURT NAME", player: "PLAYER NAME", team: "TEAM", loggedAs: "LOGGED AS:", localMatch: "LOCAL MATCH", points: "POINTS", games: "GAMES", league: "LEAGUE (NEW)", team1: "TEAM 1", team2: "TEAM 2", goal: "GOAL", yellow: "YELLOW", red: "RED", confirmDelete: "DELETE?", timeAt: "AT", live: "LIVE", limitReached: "LIMIT OF 3 COURTS REACHED!", addCourt: "ADD COURT", periods: { FUDBAL: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "OT"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } }
         };
 
         function setLanguage(lang) { 
-            currentLang = lang; 
-            localStorage.setItem('lang', lang); 
-            updateUILanguage(); 
+            currentLang = lang; localStorage.setItem('lang', lang); updateUILanguage(); 
             if(document.getElementById('lang-modal').style.display === 'flex') toggleLangModal(); 
             if(currentAdminKey) refreshAdminPanel(currentAdminKey); 
+            renderMarkers();
         }
         
         function updateUILanguage() { 
@@ -666,10 +594,7 @@
             if(auth.currentUser) document.getElementById('user-indicator').innerText = `${t.loggedAs} ${auth.currentUser.email}`; 
         }
 
-        function toggleLangModal() { 
-            let m = document.getElementById('lang-modal'); 
-            m.style.display = (m.style.display === 'flex') ? 'none' : 'flex'; 
-        }
+        function toggleLangModal() { let m = document.getElementById('lang-modal'); m.style.display = (m.style.display === 'flex') ? 'none' : 'flex'; }
         
         function exploreMap() { 
             document.getElementById('hero').style.opacity = '0'; 
@@ -677,9 +602,7 @@
                 document.getElementById('hero').style.display = 'none'; 
                 document.getElementById('map').style.display = 'block'; 
                 document.getElementById('ui-controls').style.display = 'block'; 
-                initMap(); 
-                updateUILanguage(); 
-                loadSuggestions(); 
+                initMap(); updateUILanguage(); loadSuggestions(); 
             }, 500);
         }
         
@@ -698,12 +621,8 @@
         }
         
         function saveSuggestion(type, value) { 
-            if(!value) return; 
-            const ref = db.ref(`suggestions/${type}`); 
-            ref.once('value', snap => { 
-                let ex = false; snap.forEach(s => { if(s.val() === value) ex = true; }); 
-                if(!ex) ref.push(value); 
-            }); 
+            if(!value) return; const ref = db.ref(`suggestions/${type}`); 
+            ref.once('value', snap => { let ex = false; snap.forEach(s => { if(s.val() === value) ex = true; }); if(!ex) ref.push(value); }); 
         }
 
         function initMap() {
@@ -713,28 +632,19 @@
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', { opacity: 0.8 }).addTo(map);
             
-            rangeCircle = L.circle([sLat, sLng], { 
-                radius: 30000, color: 'var(--primary)', weight: 1, fillOpacity: 0.03, interactive: false, className: 'animated-range-circle' 
-            }).addTo(map);
+            rangeCircle = L.circle([sLat, sLng], { radius: 30000, color: 'var(--primary)', weight: 1, fillOpacity: 0.03, interactive: false, className: 'animated-range-circle' }).addTo(map);
 
             map.on('move', () => { 
                 let c = map.getCenter(); rangeCircle.setLatLng(c); 
-                if(map.getZoom() > 10) rangeCircle.setStyle({opacity: 0, fillOpacity: 0}); 
-                else rangeCircle.setStyle({opacity: 1, fillOpacity: 0.03}); 
+                if(map.getZoom() > 10) rangeCircle.setStyle({opacity: 0, fillOpacity: 0}); else rangeCircle.setStyle({opacity: 1, fillOpacity: 0.03}); 
             });
             map.on('moveend', () => { 
-                let c = map.getCenter(); 
-                localStorage.setItem('lastLat', c.lat); 
-                localStorage.setItem('lastLng', c.lng); 
-                localStorage.setItem('lastZoom', map.getZoom()); 
-                renderMarkers(); 
+                let c = map.getCenter(); localStorage.setItem('lastLat', c.lat); localStorage.setItem('lastLng', c.lng); localStorage.setItem('lastZoom', map.getZoom()); renderMarkers(); 
             });
             map.on('click', handleMapClick);
             db.ref('tereni').on('value', snap => { 
-                allTereni = []; 
-                snap.forEach(c => { let d = c.val(); d.key = c.key; allTereni.push(d); }); 
-                renderMarkers(); 
-                if(currentAdminKey) refreshAdminPanel(currentAdminKey); 
+                allTereni = []; snap.forEach(c => { let d = c.val(); d.key = c.key; allTereni.push(d); }); 
+                renderMarkers(); if(currentAdminKey) refreshAdminPanel(currentAdminKey); 
             });
             trackGPS();
         }
@@ -744,6 +654,7 @@
             const center = map.getCenter();
             map.eachLayer(l => { if(l instanceof L.Marker && l !== userMarker) map.removeLayer(l); });
             const zoomNear = map.getZoom() > 12;
+            const t = translations[currentLang];
             
             allTereni.forEach(d => {
                 if (map.distance(center, [d.lat, d.lng]) > 30000) return;
@@ -754,10 +665,39 @@
                 if (isLive || isEnded || isUpcoming) {
                     let s1 = (isLive || isEnded) ? (d.score1 || 0) : "-";
                     let s2 = (isLive || isEnded) ? (d.score2 || 0) : "-";
-                    let footer = isLive ? `<div class="blink-live-tag">${translations[currentLang].live}</div>` : (d.match_time ? `<div class="card-time-mini">${new Date(d.match_time).toLocaleDateString([],{day:'2-digit',month:'2-digit'})} ${translations[currentLang].timeAt} ${new Date(d.match_time).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div>` : "");
-                    cardBody = `<div class="live-card-thin"><div class="card-league-mini">${d.league || translations[currentLang].localMatch}</div><div class="score-row"><span class="team-name-col">${d.t1}</span><span class="score-val-col">${s1}</span></div><div class="score-row" style="border:none;"><span class="team-name-col">${d.t2}</span><span class="score-val-col">${s2}</span></div><div class="card-footer-info"><span style="font-size:12px;">${ball}</span>${footer}</div></div><div class="marker-pointer"></div>`;
+                    let footer = isLive ? `<div class="blink-live-tag">${t.live}</div>` : (d.match_time ? `<div class="card-time-mini">${new Date(d.match_time).toLocaleDateString([],{day:'2-digit',month:'2-digit'})} ${t.timeAt} ${new Date(d.match_time).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div>` : "");
+                    
+                    let periodHtml = "";
+                    if (d.sub_details) {
+                        periodHtml = `<div style="display:flex; gap:6px; font-size:10px; color:var(--text-muted); margin:6px 10px 0; overflow-x:auto; padding-bottom:4px; font-weight:700;">`;
+                        Object.values(d.sub_details).forEach(v => {
+                            periodHtml += `<span style="background:rgba(255,255,255,0.1); padding:3px 6px; border-radius:4px; white-space:nowrap;">${v}</span>`;
+                        });
+                        periodHtml += `</div>`;
+                    }
+
+                    let currentPts = "";
+                    if (isLive) {
+                        if (d.sport === "TENIS") {
+                            const isTB = (d.g1 === 6 && d.g2 === 6);
+                            const pt1 = isTB ? (d.p1||0) : (tennisPoints[d.p1]||"0");
+                            const pt2 = isTB ? (d.p2||0) : (tennisPoints[d.p2]||"0");
+                            currentPts = `<div style="text-align:center; font-size:12px; color:var(--primary); font-weight:900; margin-top:6px; margin-bottom:4px; letter-spacing:1px;">${pt1} : ${pt2}</div>`;
+                        } else if (d.sport === "ODBOJKA") {
+                            currentPts = `<div style="text-align:center; font-size:12px; color:var(--primary); font-weight:900; margin-top:6px; margin-bottom:4px; letter-spacing:1px;">PTS ${d.p1||0} : ${d.p2||0}</div>`;
+                        }
+                    }
+
+                    cardBody = `<div class="live-card-thin">
+                                    <div class="card-league-mini">${d.league || t.localMatch}</div>
+                                    <div class="score-row"><span class="team-name-col">${d.t1}</span><span class="score-val-col">${s1}</span></div>
+                                    <div class="score-row" style="border:none;"><span class="team-name-col">${d.t2}</span><span class="score-val-col">${s2}</span></div>
+                                    ${periodHtml}
+                                    ${currentPts}
+                                    <div class="card-footer-info" style="${(!periodHtml && !currentPts) ? 'margin-top:6px;' : ''}"><span style="font-size:12px;">${ball}</span>${footer}</div>
+                                </div><div class="marker-pointer"></div>`;
                 } else {
-                    cardBody = `<div class="live-card-thin" style="padding:12px; text-align:center; font-weight:800; font-size:12px; color:var(--primary); border-left:4px solid rgba(255,255,255,0.2);">${ball} ${d.name}</div><div class="marker-pointer"></div>`;
+                    cardBody = `<div class="live-card-thin" style="padding:14px; text-align:center; font-weight:800; font-size:13px; color:var(--primary); border-left:4px solid rgba(255,255,255,0.2);">${ball} ${d.name}</div><div class="marker-pointer"></div>`;
                 }
                 const html = `<div class="sport-marker-wrapper ${isLive?'status-live-wrapper':''} ${zoomNear?'zoom-near':''}"><div class="marker-content-box"><div class="marker-ball-only">${ball}</div>${cardBody}</div></div>`;
                 L.marker([d.lat, d.lng], { icon: L.divIcon({ className: '', html, iconSize: [0,0], iconAnchor: [0, 0] }) }).addTo(map).on('click', e => { 
@@ -776,17 +716,17 @@
             if (isTooClose) { alert(t.zoneOccupied); return; } 
             
             const html = `
-                <div style="padding:8px 4px; text-align:center; display: flex; flex-direction: column; gap: 14px;">
-                    <h3 style="margin: 0; font-family:'Oswald', sans-serif; color:var(--primary); font-size:16px; letter-spacing: 1px;">${t.addCourt || 'DODAJ TEREN'}</h3>
-                    <select id="p_sport" style="width: 100%; margin: 0; padding: 12px; font-size:14px!important;">
+                <div style="padding:12px 6px; text-align:center; display: flex; flex-direction: column; gap: 16px;">
+                    <h3 style="margin: 0; font-family:'Oswald', sans-serif; color:var(--primary); font-size:18px; letter-spacing: 1px;">${t.addCourt || 'DODAJ TEREN'}</h3>
+                    <select id="p_sport" style="width: 100%; margin: 0; padding: 14px; font-size:15px!important; border-radius:12px;">
                         <option value="FUDBAL">⚽ FUDBAL</option>
                         <option value="KOŠARKA">🏀 KOŠARKA</option>
                         <option value="ODBOJKA">🏐 ODBOJKA</option>
                         <option value="TENIS">🎾 TENIS</option>
                         <option value="RUKOMET">🤾 RUKOMET</option>
                     </select>
-                    <input type="text" id="p_name" placeholder="${t.courtName}" maxlength="15" style="width: 100%; margin: 0; padding: 12px; font-size:14px!important;">
-                    <button onclick="saveTeren(${e.latlng.lat}, ${e.latlng.lng})" class="btn-primary" style="width: 100%; margin: 0; padding: 14px; font-size:15px!important;">${t.create}</button>
+                    <input type="text" id="p_name" placeholder="${t.courtName}" maxlength="15" style="width: 100%; margin: 0; padding: 14px; font-size:15px!important; border-radius:12px;">
+                    <button onclick="saveTeren(${e.latlng.lat}, ${e.latlng.lng})" class="btn-primary" style="width: 100%; margin: 0; padding: 16px; font-size:16px!important; border-radius:12px;">${t.create}</button>
                 </div>`; 
             L.popup().setLatLng(e.latlng).setContent(html).openOn(map); 
         }
@@ -818,7 +758,7 @@
                     if (spaceIndex !== -1) { 
                         const label = v.substring(0, spaceIndex); 
                         const score = v.substring(spaceIndex + 1); 
-                        pDiv.innerHTML += `<div class="detail-period-tag"><span>${label}</span><span style="color:var(--primary); font-size:16px;">${score}</span></div>`; 
+                        pDiv.innerHTML += `<div class="detail-period-tag"><span>${label}</span><span style="color:var(--primary); font-size:18px;">${score}</span></div>`; 
                     } else { 
                         pDiv.innerHTML += `<div class="detail-period-tag"><span>${v}</span></div>`; 
                     } 
@@ -830,7 +770,7 @@
             if(d.events) { 
                 document.getElementById('det-stats-container').style.display = 'block'; 
                 Object.values(d.events).forEach(ev => { 
-                    const row = `<div style="font-size:13px; font-weight:700; color:#fff; padding:6px; background:rgba(255,255,255,0.05); border-radius:6px; border:1px solid rgba(255,255,255,0.05);">${ev.emoji} ${ev.player}</div>`; 
+                    const row = `<div style="font-size:13px; font-weight:700; color:#fff; padding:8px; background:rgba(255,255,255,0.05); border-radius:8px; border:1px solid rgba(255,255,255,0.05);">${ev.emoji} ${ev.player}</div>`; 
                     if(ev.team == 1) eHome.innerHTML += row; else eAway.innerHTML += row; 
                 }); 
             } else document.getElementById('det-stats-container').style.display = 'none'; 
@@ -848,6 +788,13 @@
             currentAdminKey = null; 
         }
         
+        function triggerGoalAnim() {
+            const el = document.getElementById('admin-score-container');
+            el.classList.remove('anim-score');
+            void el.offsetWidth; // trigger reflow
+            el.classList.add('anim-score');
+        }
+
         function refreshAdminPanel(key) {
             const d = allTereni.find(x => x.key === key); if(!d) return; 
             const t = translations[currentLang];
@@ -882,7 +829,7 @@
                     <div class="score-ctrl-grid mb-3">
                         <div class="team-ctrl-card">
                             <div class="team-ctrl-lbl">${d.t1 || t.team1}</div>
-                            <div class="ctrl-btn-group">
+                            <div class="ctrl-btn-group" style="flex-wrap: wrap;">
                                 <button class="btn-ctrl minus" onclick="proScore(1,-1)">-1</button>
                                 <button class="btn-ctrl plus" onclick="proScore(1,1)">+1</button>
                                 <button class="btn-ctrl plus" onclick="proScore(1,2)">+2</button>
@@ -891,7 +838,7 @@
                         </div>
                         <div class="team-ctrl-card">
                             <div class="team-ctrl-lbl">${d.t2 || t.team2}</div>
-                            <div class="ctrl-btn-group">
+                            <div class="ctrl-btn-group" style="flex-wrap: wrap;">
                                 <button class="btn-ctrl minus" onclick="proScore(2,-1)">-1</button>
                                 <button class="btn-ctrl plus" onclick="proScore(2,1)">+1</button>
                                 <button class="btn-ctrl plus" onclick="proScore(2,2)">+2</button>
@@ -920,16 +867,16 @@
                     
                 if(d.sport === "FUDBAL") { 
                     ctrl.innerHTML += `
-                        <div class="glass-panel" style="padding: 16px;">
+                        <div class="glass-panel" style="padding: 20px;">
                             <input type="text" id="event-player" placeholder="${t.player}" class="mb-3">
                             <select id="event-team" class="mb-3">
                                 <option value="1">${d.t1 || t.team1}</option>
                                 <option value="2">${d.t2 || t.team2}</option>
                             </select>
-                            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
-                                <button onclick="addEvent('⚽')" class="btn-secondary" style="font-size:14px!important; padding:12px;">⚽ ${t.goal}</button>
+                            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
+                                <button onclick="addEvent('⚽')" class="btn-secondary" style="font-size:14px!important; padding:12px; border-color:var(--primary); color:var(--primary);">⚽ ${t.goal}</button>
                                 <button onclick="addEvent('🟨')" class="btn-secondary" style="font-size:14px!important; padding:12px; color:#ffcc00; border-color:rgba(255,204,0,0.3);">🟨 ${t.yellow}</button>
-                                <button onclick="addEvent('🟥')" class="btn-secondary" style="font-size:14px!important; padding:12px; color:var(--danger); border-color:rgba(255,59,48,0.3);">🟥 ${t.red}</button>
+                                <button onclick="addEvent('🟥')" class="btn-secondary" style="font-size:14px!important; padding:12px; color:var(--danger); border-color:rgba(255,42,42,0.3);">🟥 ${t.red}</button>
                             </div>
                         </div>`; 
                 }
@@ -981,6 +928,8 @@
             const d = allTereni.find(x => x.key === currentAdminKey); 
             if(!d || d.status !== 'live') return; 
             
+            if (sign > 0) triggerGoalAnim();
+
             if(d.sport === "ODBOJKA") { 
                 let p1 = d.p1 || 0, p2 = d.p2 || 0; 
                 if(team === 1) p1 = Math.max(0, p1 + sign); else p2 = Math.max(0, p2 + sign); 
@@ -1104,15 +1053,7 @@
         
         async function handleAuth() { 
             let e = document.getElementById('email').value, p = document.getElementById('password').value; 
-            try { 
-                await auth.signInWithEmailAndPassword(e, p); 
-            } catch { 
-                try { 
-                    await auth.createUserWithEmailAndPassword(e, p); 
-                } catch(err) { 
-                    alert(err.message); 
-                } 
-            } 
+            try { await auth.signInWithEmailAndPassword(e, p); } catch { try { await auth.createUserWithEmailAndPassword(e, p); } catch(err) { alert(err.message); } } 
         }
 
         async function saveTeren(lat, lng) { 
@@ -1124,16 +1065,8 @@
         }
         
         function adminStatus(s) { db.ref(`tereni/${currentAdminKey}`).update({ status: s }); }
-        
-        function adminDelete() { 
-            if(confirm(translations[currentLang].confirmDelete)) { 
-                db.ref(`tereni/${currentAdminKey}`).remove(); closeAdmin(); 
-            } 
-        }
-        
-        function resetMatch() { 
-            db.ref(`tereni/${currentAdminKey}`).update({ status: 'upcoming', score1: 0, score2: 0, sub_details: null, events: null, p1: 0, p2: 0, g1: 0, g2: 0 }); 
-        }
+        function adminDelete() { if(confirm(translations[currentLang].confirmDelete)) { db.ref(`tereni/${currentAdminKey}`).remove(); closeAdmin(); } }
+        function resetMatch() { db.ref(`tereni/${currentAdminKey}`).update({ status: 'upcoming', score1: 0, score2: 0, sub_details: null, events: null, p1: 0, p2: 0, g1: 0, g2: 0 }); }
         
         function toggleSearch() { 
             document.getElementById('search-container').classList.toggle('expanded'); 
