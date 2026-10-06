@@ -619,8 +619,16 @@
         const tennisPoints = ["0", "15", "30", "40", "AD"];
 
         const translations = {
-            sr: { subtitle: "Live Sports Tracker", login: "ULAZ U SISTEM", explore: "ISTRAŽI MAPU BEZ PRIJAVE", search: "Pretraži...", periodRes: "Rezultat po periodima", matchEvents: "Događaji na meču", adminTitle: "ADMIN TABLA", savePeriod: "SAČUVAJ PERIOD / SET", goLive: "KRENI UŽIVO", endMatch: "ZAVRŠI MEČ", resetMatch: "RESET / NOVI MEČ", schedule: "ZAKAŽI MEČ", deleteCourt: "OBRIŠI TEREN", zoneOccupied: "ZONA ZAUZETA!", create: "KRENI", courtName: "NAZIV TERENA", player: "IME IGRAČA", team: "TIM", loggedAs: "ULOGOVAN KAO:", localMatch: "LOKALNI MEČ", points: "POENI", games: "GEMOVI", league: "LIGA (NOVA)", team1: "TIM 1", team2: "TIM 2", goal: "GOL", yellow: "ŽUTI", red: "CRVENI", confirmDelete: "OBRISATI?", timeAt: "U", live: "UŽIVO", ended: "KRAJ", limitReached: "LIMIT OD 3 TERENA JE DOSTIGNUT!", addCourt: "DODAJ TEREN", periods: { FUDBAL: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "PROD"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } },
-            en: { subtitle: "Live Sports Tracker", login: "ENTER SYSTEM", explore: "EXPLORE MAP WITHOUT LOGIN", search: "Search...", periodRes: "Period Results", matchEvents: "Match Events", adminTitle: "ADMIN PANEL", savePeriod: "SAVE PERIOD / SET", goLive: "GO LIVE", endMatch: "END MATCH", resetMatch: "RESET / NEW MATCH", schedule: "SCHEDULE MATCH", deleteCourt: "DELETE COURT", zoneOccupied: "ZONE OCCUPIED!", create: "CREATE", courtName: "COURT NAME", player: "PLAYER NAME", team: "TEAM", loggedAs: "LOGGED AS:", localMatch: "LOCAL MATCH", points: "POINTS", games: "GAMES", league: "LEAGUE (NEW)", team1: "TEAM 1", team2: "TEAM 2", goal: "GOAL", yellow: "YELLOW", red: "RED", confirmDelete: "DELETE?", timeAt: "AT", live: "LIVE", ended: "ENDED", limitReached: "LIMIT OF 3 COURTS REACHED!", addCourt: "ADD COURT", periods: { FUDBAL: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "OT"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } }
+            sr: { 
+                subtitle: "Live Sports Tracker", login: "ULAZ U SISTEM", explore: "ISTRAŽI MAPU BEZ PRIJAVE", search: "Pretraži...", periodRes: "Rezultat po periodima", matchEvents: "Događaji na meču", adminTitle: "ADMIN TABLA", savePeriod: "SAČUVAJ PERIOD / SET", goLive: "KRENI UŽIVO", endMatch: "ZAVRŠI MEČ", resetMatch: "RESET / NOVI MEČ", schedule: "ZAKAŽI MEČ", deleteCourt: "OBRIŠI TEREN", zoneOccupied: "ZONA ZAUZETA!", create: "KRENI", courtName: "NAZIV TERENA", player: "IME IGRAČA", team: "TIM", loggedAs: "ULOGOVAN KAO:", localMatch: "LOKALNI MEČ", points: "POENI", games: "GEMOVI", league: "LIGA (NOVA)", team1: "TIM 1", team2: "TIM 2", goal: "GOL", yellow: "ŽUTI", red: "CRVENI", confirmDelete: "OBRISATI?", timeAt: "U", live: "UŽIVO", ended: "KRAJ", limitReached: "LIMIT OD 3 TERENA JE DOSTIGNUT!", addCourt: "DODAJ TEREN", 
+                sports: { "FUDBAL": "FUDBAL", "KOŠARKA": "KOŠARKA", "ODBOJKA": "ODBOJKA", "TENIS": "TENIS", "RUKOMET": "RUKOMET" },
+                periods: { FUDBAL: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "PROD"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } 
+            },
+            en: { 
+                subtitle: "Live Sports Tracker", login: "ENTER SYSTEM", explore: "EXPLORE MAP WITHOUT LOGIN", search: "Search...", periodRes: "Period Results", matchEvents: "Match Events", adminTitle: "ADMIN PANEL", savePeriod: "SAVE PERIOD / SET", goLive: "GO LIVE", endMatch: "END MATCH", resetMatch: "RESET / NEW MATCH", schedule: "SCHEDULE MATCH", deleteCourt: "DELETE COURT", zoneOccupied: "ZONE OCCUPIED!", create: "CREATE", courtName: "COURT NAME", player: "PLAYER NAME", team: "TEAM", loggedAs: "LOGGED AS:", localMatch: "LOCAL MATCH", points: "POINTS", games: "GAMES", league: "LEAGUE (NEW)", team1: "TEAM 1", team2: "TEAM 2", goal: "GOAL", yellow: "YELLOW", red: "RED", confirmDelete: "DELETE?", timeAt: "AT", live: "LIVE", ended: "ENDED", limitReached: "LIMIT OF 3 COURTS REACHED!", addCourt: "ADD COURT", 
+                sports: { "FUDBAL": "FOOTBALL", "KOŠARKA": "BASKETBALL", "ODBOJKA": "VOLLEYBALL", "TENIS": "TENNIS", "RUKOMET": "HANDBALL" },
+                periods: { FUDBAL: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "OT"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } 
+            }
         };
 
         function setLanguage(lang) { 
@@ -763,9 +771,18 @@
                         const isTB = (d.g1 === 6 && d.g2 === 6);
                         const pt1 = d.sport === "TENIS" ? (isTB ? (d.p1||0) : (tennisPoints[d.p1]||"0")) : (d.p1||0);
                         const pt2 = d.sport === "TENIS" ? (isTB ? (d.p2||0) : (tennisPoints[d.p2]||"0")) : (d.p2||0);
+                        
+                        // Za tenis dodajemo trenutne gemove prije poena
+                        if (d.sport === "TENIS") {
+                            p1Html += `<div class="tv-period-score" style="color: white;">${d.g1||0}</div>`;
+                            p2Html += `<div class="tv-period-score" style="color: white;">${d.g2||0}</div>`;
+                        }
+
                         curr1 = `<div class="tv-curr-score">${pt1}</div>`;
                         curr2 = `<div class="tv-curr-score">${pt2}</div>`;
                     }
+
+                    const sportName = (t.sports && t.sports[d.sport]) ? t.sports[d.sport] : d.sport;
 
                     cardBody = `
                     <div class="tv-card ${isLive?'tv-live':''}">
@@ -783,7 +800,7 @@
                             ${curr2}
                         </div>
                         <div class="tv-bottom-bar">
-                            <span style="display:flex; align-items:center; gap:4px;">${ball} ${d.sport}</span>
+                            <span style="display:flex; align-items:center; gap:4px;">${ball} ${sportName}</span>
                             <span>${statusText}</span>
                         </div>
                     </div><div class="marker-pointer"></div>`;
@@ -810,15 +827,17 @@
             const isTooClose = allTereni.some(court => { const courtLatLng = L.latLng(court.lat, court.lng); return clickPos.distanceTo(courtLatLng) < 200; });
             if (isTooClose) { alert(t.zoneOccupied); return; } 
             
+            const sp = t.sports || { "FUDBAL": "FUDBAL", "KOŠARKA": "KOŠARKA", "ODBOJKA": "ODBOJKA", "TENIS": "TENIS", "RUKOMET": "RUKOMET" };
+
             const html = `
                 <div style="padding:12px 6px; text-align:center; display: flex; flex-direction: column; gap: 16px;">
                     <h3 style="margin: 0; font-family:'Oswald', sans-serif; color:var(--primary); font-size:18px; letter-spacing: 1px;">${t.addCourt || 'DODAJ TEREN'}</h3>
                     <select id="p_sport" style="width: 100%; margin: 0; padding: 14px; font-size:15px!important; border-radius:12px;">
-                        <option value="FUDBAL">⚽ FUDBAL</option>
-                        <option value="KOŠARKA">🏀 KOŠARKA</option>
-                        <option value="ODBOJKA">🏐 ODBOJKA</option>
-                        <option value="TENIS">🎾 TENIS</option>
-                        <option value="RUKOMET">🤾 RUKOMET</option>
+                        <option value="FUDBAL">⚽ ${sp.FUDBAL}</option>
+                        <option value="KOŠARKA">🏀 ${sp.KOŠARKA}</option>
+                        <option value="ODBOJKA">🏐 ${sp.ODBOJKA}</option>
+                        <option value="TENIS">🎾 ${sp.TENIS}</option>
+                        <option value="RUKOMET">🤾 ${sp.RUKOMET}</option>
                     </select>
                     <input type="text" id="p_name" placeholder="${t.courtName}" maxlength="15" style="width: 100%; margin: 0; padding: 14px; font-size:15px!important; border-radius:12px;">
                     <button onclick="saveTeren(${e.latlng.lat}, ${e.latlng.lng})" class="btn-primary" style="width: 100%; margin: 0; padding: 16px; font-size:16px!important; border-radius:12px;">${t.create}</button>
