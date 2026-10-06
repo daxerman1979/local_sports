@@ -228,7 +228,7 @@
             border: 1px solid var(--glass-border);
             overflow: hidden; 
             z-index: 25; 
-            margin-bottom: 4px;
+            margin-bottom: 2px; /* Smanjen razmak do pokazivača */
             min-width: 180px;
             width: max-content;
         }
@@ -316,13 +316,21 @@
             color: var(--text-muted);
         }
 
+        /* Uočljiviji pokazivač markera */
         .marker-pointer {
-            width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent;
-            border-top: 10px solid #a1a1aa; display: none; margin-bottom: 10px;
-            filter: drop-shadow(0 4px 4px rgba(0,0,0,0.5));
+            width: 0; height: 0; 
+            border-left: 12px solid transparent; 
+            border-right: 12px solid transparent;
+            border-top: 14px solid var(--text-main); 
+            display: none; 
+            margin-bottom: 4px;
+            filter: drop-shadow(0 5px 8px rgba(0,0,0,0.8));
         }
         .zoom-near .marker-pointer { display: block; }
-        .status-live-wrapper .marker-pointer { border-top-color: var(--danger); }
+        .status-live-wrapper .marker-pointer { 
+            border-top-color: var(--danger); 
+            filter: drop-shadow(0 5px 10px rgba(255,42,42,0.6));
+        }
 
         @keyframes pulse-live { 0%, 100% { opacity: 1; text-shadow: 0 0 5px rgba(255,42,42,0.5); } 50% { opacity: 0.5; text-shadow: 0 0 15px rgba(255,42,42,0.8); } }
         /* ------------------------------------------------------------------ */
@@ -488,7 +496,9 @@
             <input type="text" id="city-search" placeholder="Pretraži..." onkeypress="handleSearch(event)">
         </div>
         
-        <div class="floating-action-btn back-btn" onclick="goBackToLogin()">&#10006;</div>
+        <div class="floating-action-btn back-btn" onclick="goBackToLogin()" id="btn-back-icon">
+            <!-- Ikonica se dinamički popunjava u JS -->
+        </div>
         <div class="floating-action-btn settings-btn" onclick="toggleLangModal()">
             <img src="https://cdn-icons-png.flaticon.com/512/126/126472.png" alt="Settings">
         </div>
@@ -609,8 +619,8 @@
         const tennisPoints = ["0", "15", "30", "40", "AD"];
 
         const translations = {
-            sr: { subtitle: "Live Result Tracker", login: "ULAZ U SISTEM", explore: "ISTRAŽI MAPU BEZ PRIJAVE", search: "Pretraži...", periodRes: "Rezultat po periodima", matchEvents: "Događaji na meču", adminTitle: "ADMIN TABLA", savePeriod: "SAČUVAJ PERIOD / SET", goLive: "KRENI UŽIVO", endMatch: "ZAVRŠI MEČ", resetMatch: "RESET / NOVI MEČ", schedule: "ZAKAŽI MEČ", deleteCourt: "OBRIŠI TEREN", zoneOccupied: "ZONA ZAUZETA!", create: "KRENI", courtName: "NAZIV TERENA", player: "IME IGRAČA", team: "TIM", loggedAs: "ULOGOVAN KAO:", localMatch: "LOKALNI MEČ", points: "POENI", games: "GEMOVI", league: "LIGA (NOVA)", team1: "TIM 1", team2: "TIM 2", goal: "GOL", yellow: "ŽUTI", red: "CRVENI", confirmDelete: "OBRISATI?", timeAt: "U", live: "UŽIVO", limitReached: "LIMIT OD 3 TERENA JE DOSTIGNUT!", addCourt: "DODAJ TEREN", periods: { FUDBAL: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "PROD"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } },
-            en: { subtitle: "Live Result Tracker", login: "ENTER SYSTEM", explore: "EXPLORE MAP WITHOUT LOGIN", search: "Search...", periodRes: "Period Results", matchEvents: "Match Events", adminTitle: "ADMIN PANEL", savePeriod: "SAVE PERIOD / SET", goLive: "GO LIVE", endMatch: "END MATCH", resetMatch: "RESET / NEW MATCH", schedule: "SCHEDULE MATCH", deleteCourt: "DELETE COURT", zoneOccupied: "ZONE OCCUPIED!", create: "CREATE", courtName: "COURT NAME", player: "PLAYER NAME", team: "TEAM", loggedAs: "LOGGED AS:", localMatch: "LOCAL MATCH", points: "POINTS", games: "GAMES", league: "LEAGUE (NEW)", team1: "TEAM 1", team2: "TEAM 2", goal: "GOAL", yellow: "YELLOW", red: "RED", confirmDelete: "DELETE?", timeAt: "AT", live: "LIVE", limitReached: "LIMIT OF 3 COURTS REACHED!", addCourt: "ADD COURT", periods: { FUDBAL: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "OT"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } }
+            sr: { subtitle: "Live Sports Tracker", login: "ULAZ U SISTEM", explore: "ISTRAŽI MAPU BEZ PRIJAVE", search: "Pretraži...", periodRes: "Rezultat po periodima", matchEvents: "Događaji na meču", adminTitle: "ADMIN TABLA", savePeriod: "SAČUVAJ PERIOD / SET", goLive: "KRENI UŽIVO", endMatch: "ZAVRŠI MEČ", resetMatch: "RESET / NOVI MEČ", schedule: "ZAKAŽI MEČ", deleteCourt: "OBRIŠI TEREN", zoneOccupied: "ZONA ZAUZETA!", create: "KRENI", courtName: "NAZIV TERENA", player: "IME IGRAČA", team: "TIM", loggedAs: "ULOGOVAN KAO:", localMatch: "LOKALNI MEČ", points: "POENI", games: "GEMOVI", league: "LIGA (NOVA)", team1: "TIM 1", team2: "TIM 2", goal: "GOL", yellow: "ŽUTI", red: "CRVENI", confirmDelete: "OBRISATI?", timeAt: "U", live: "UŽIVO", ended: "KRAJ", limitReached: "LIMIT OD 3 TERENA JE DOSTIGNUT!", addCourt: "DODAJ TEREN", periods: { FUDBAL: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "PROD"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } },
+            en: { subtitle: "Live Sports Tracker", login: "ENTER SYSTEM", explore: "EXPLORE MAP WITHOUT LOGIN", search: "Search...", periodRes: "Period Results", matchEvents: "Match Events", adminTitle: "ADMIN PANEL", savePeriod: "SAVE PERIOD / SET", goLive: "GO LIVE", endMatch: "END MATCH", resetMatch: "RESET / NEW MATCH", schedule: "SCHEDULE MATCH", deleteCourt: "DELETE COURT", zoneOccupied: "ZONE OCCUPIED!", create: "CREATE", courtName: "COURT NAME", player: "PLAYER NAME", team: "TEAM", loggedAs: "LOGGED AS:", localMatch: "LOCAL MATCH", points: "POINTS", games: "GAMES", league: "LEAGUE (NEW)", team1: "TEAM 1", team2: "TEAM 2", goal: "GOAL", yellow: "YELLOW", red: "RED", confirmDelete: "DELETE?", timeAt: "AT", live: "LIVE", ended: "ENDED", limitReached: "LIMIT OF 3 COURTS REACHED!", addCourt: "ADD COURT", periods: { FUDBAL: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "OT"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } }
         };
 
         function setLanguage(lang) { 
@@ -654,7 +664,19 @@
         }
         
         function goBackToLogin() { auth.signOut(); location.reload(); }
-        auth.onAuthStateChanged(user => { if (user) exploreMap(); else updateUILanguage(); });
+        
+        auth.onAuthStateChanged(user => { 
+            const backBtnIcon = document.getElementById('btn-back-icon');
+            if (user) { 
+                exploreMap(); 
+                // Otvorena vrata - SVG za Logout
+                backBtnIcon.innerHTML = `<svg viewBox="0 0 24 24" width="22" height="22" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>`;
+            } else { 
+                updateUILanguage(); 
+                // Strelica unazad - SVG za Back/Login
+                backBtnIcon.innerHTML = `<svg viewBox="0 0 24 24" width="22" height="22" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>`;
+            } 
+        });
         
         function loadSuggestions() { 
             db.ref('suggestions/leagues').on('value', snap => { 
@@ -723,7 +745,7 @@
                 if (isLive || isEnded || isUpcoming) {
                     let s1 = (isLive || isEnded) ? (d.score1 || 0) : "-";
                     let s2 = (isLive || isEnded) ? (d.score2 || 0) : "-";
-                    let statusText = isLive ? `<span style="color:var(--danger); animation: pulse-live 1.5s infinite;">● UŽIVO</span>` : (isEnded ? "KRAJ" : new Date(d.match_time).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}));
+                    let statusText = isLive ? `<span style="color:var(--danger); animation: pulse-live 1.5s infinite;">● ${t.live}</span>` : (isEnded ? t.ended : new Date(d.match_time).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}));
                     
                     let p1Html = "", p2Html = "";
                     if (d.sub_details) {
@@ -749,13 +771,13 @@
                     <div class="tv-card ${isLive?'tv-live':''}">
                         <div class="tv-league">${d.league || t.localMatch}</div>
                         <div class="tv-team-row">
-                            <div class="tv-team-name">${(d.t1 || 'TIM 1').substring(0,10)}</div>
+                            <div class="tv-team-name">${(d.t1 || t.team1).substring(0,10)}</div>
                             <div class="tv-team-score">${s1}</div>
                             ${p1Html}
                             ${curr1}
                         </div>
                         <div class="tv-team-row" style="border-bottom:none;">
-                            <div class="tv-team-name">${(d.t2 || 'TIM 2').substring(0,10)}</div>
+                            <div class="tv-team-name">${(d.t2 || t.team2).substring(0,10)}</div>
                             <div class="tv-team-score">${s2}</div>
                             ${p2Html}
                             ${curr2}
@@ -830,7 +852,7 @@
                 let periodHtml = `
                 <div style="background:rgba(0,0,0,0.6); border-radius:12px; padding:12px; margin-bottom:24px; border: 1px solid var(--glass-border); box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);">
                     <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:8px; margin-bottom:8px;">
-                        <div style="flex:2; text-align:left; color:var(--text-muted); font-size:11px; font-weight:800; letter-spacing:1px;">TIM</div>
+                        <div style="flex:2; text-align:left; color:var(--text-muted); font-size:11px; font-weight:800; letter-spacing:1px;">${t.team}</div>
                 `;
                 Object.values(d.sub_details).forEach(v => { 
                     let pName = v.split(' ')[0] || '-';
@@ -840,7 +862,7 @@
                 
                 // Red tima 1
                 periodHtml += `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                    <div style="flex:2; text-align:left; color:white; font-size:14px; font-weight:900; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${d.t1 || 'T1'}</div>`;
+                    <div style="flex:2; text-align:left; color:white; font-size:14px; font-weight:900; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${d.t1 || t.team1}</div>`;
                 Object.values(d.sub_details).forEach(v => { 
                     let match = v.match(/(\d+):(\d+)$/);
                     let pts1 = match ? match[1] : '-';
@@ -850,7 +872,7 @@
 
                 // Red tima 2
                 periodHtml += `<div style="display:flex; justify-content:space-between; align-items:center;">
-                    <div style="flex:2; text-align:left; color:white; font-size:14px; font-weight:900; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${d.t2 || 'T2'}</div>`;
+                    <div style="flex:2; text-align:left; color:white; font-size:14px; font-weight:900; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${d.t2 || t.team2}</div>`;
                 Object.values(d.sub_details).forEach(v => { 
                     let match = v.match(/(\d+):(\d+)$/);
                     let pts2 = match ? match[2] : '-';
@@ -867,8 +889,8 @@
             if(d.events) { 
                 document.getElementById('det-stats-container').style.display = 'block'; 
                 
-                eHome.innerHTML = `<div style="font-size:12px; color:var(--text-muted); font-weight:800; margin-bottom:10px; text-transform:uppercase; border-bottom:1px solid var(--glass-border); padding-bottom:6px;">${d.t1 || 'T1'}</div>`;
-                eAway.innerHTML = `<div style="font-size:12px; color:var(--text-muted); font-weight:800; margin-bottom:10px; text-transform:uppercase; border-bottom:1px solid var(--glass-border); padding-bottom:6px; text-align:right;">${d.t2 || 'T2'}</div>`;
+                eHome.innerHTML = `<div style="font-size:12px; color:var(--text-muted); font-weight:800; margin-bottom:10px; text-transform:uppercase; border-bottom:1px solid var(--glass-border); padding-bottom:6px;">${d.t1 || t.team1}</div>`;
+                eAway.innerHTML = `<div style="font-size:12px; color:var(--text-muted); font-weight:800; margin-bottom:10px; text-transform:uppercase; border-bottom:1px solid var(--glass-border); padding-bottom:6px; text-align:right;">${d.t2 || t.team2}</div>`;
 
                 Object.values(d.events).forEach(ev => { 
                     if(ev.team == 1) {
