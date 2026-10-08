@@ -147,7 +147,8 @@
         #search-container.expanded { width: calc(100% - 90px); border-color: var(--primary); background: rgba(10,10,15,0.9); }
         #city-search { 
             width: 100%; border: none; background: transparent; color: white; 
-            padding: 12px 15px 12px 48px; font-size: 16px; outline: none; 
+            padding: 12px 60px 12px 48px; /* Ostavlja prostor za GO dugme */
+            font-size: 16px; outline: none; 
             opacity: 0; transition: 0.3s; pointer-events: none; box-shadow: none;
         }
         #search-container.expanded #city-search { opacity: 1; pointer-events: all; }
@@ -155,27 +156,36 @@
             position: absolute; left: 14px; width: 20px; height: 20px; 
             filter: brightness(0) invert(1); opacity: 0.8; cursor: pointer; z-index: 5001; 
         }
+        
+        /* DUGME GO */
+        .search-go-btn {
+            position: absolute; right: 5px; top: 5px; bottom: 5px;
+            background: var(--primary); color: #000; border: none; border-radius: 20px;
+            padding: 0 14px; font-weight: 900; font-family: 'Oswald', sans-serif;
+            font-size: 12px !important; cursor: pointer;
+            opacity: 0; pointer-events: none; transition: 0.3s;
+        }
+        #search-container.expanded .search-go-btn { opacity: 1; pointer-events: all; }
+        .search-go-btn:active { transform: scale(0.9); }
 
         #map { width: 100vw; height: 100vh; background: #09090b; display: block; }
         
-        /* -------------- BLAGO ZATAMNJENJE MAPE -------------- */
+        /* -------------- BLAGO ZATAMNJENJE MAPE BEZ KRUGA -------------- */
         .leaflet-tile-pane {
             filter: brightness(80%) contrast(105%);
             transition: filter 0.5s ease;
         }
         /* ------------------------------------------------------------- */
-
-        /* -------------- MEKANI PRELAZ (VINJETA) ZA PRETRAGU -------------- */
-        #map-vignette {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            pointer-events: none; /* Ne blokira dodir i klikanje mape */
-            z-index: 4000; /* Ispod UI kontrola, a preko markera i mape */
-            /* Uža sredina (15%), nagli prijelaz u jaku tamu prema rubovima (95%) */
-            background: radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0) 15%, rgba(0, 0, 0, 0.75) 55%, rgba(0, 0, 0, 0.95) 100%);
+        
+        /* INFO TOAST ZA ZUMIRANJE I 30KM */
+        #info-toast {
+            position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.6); color: white; font-size: 11px; font-weight: 700;
+            padding: 8px 16px; border-radius: 20px; border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px); z-index: 4500; pointer-events: none;
+            text-align: center; white-space: nowrap; font-family: 'Inter', sans-serif;
+            letter-spacing: 0.5px;
         }
-        /* ----------------------------------------------------------------- */
 
         .floating-action-btn {
             position: absolute; right: 20px; z-index: 5500;
@@ -522,13 +532,13 @@
 
     <div id="map"></div>
     
-    <!-- MEKANI PRELAZ (VINJETA) PREKO MAPE -->
-    <div id="map-vignette"></div>
-    
     <div id="ui-controls">
+        <div id="info-toast">ZOOM IN TO REVEAL (MATCHES WITHIN 30KM)</div>
+
         <div id="search-container">
             <img src="https://cdn-icons-png.flaticon.com/512/622/622669.png" class="search-icon" onclick="toggleSearch()" alt="Search">
             <input type="text" id="city-search" placeholder="Pretraži..." onkeypress="handleSearch(event)">
+            <button class="search-go-btn" onclick="executeSearch()">GO</button>
         </div>
         
         <div class="floating-action-btn back-btn" onclick="goBackToLogin()" id="btn-back-icon" style="display:none;">
@@ -670,11 +680,13 @@
 
         const translations = {
             sr: { 
+                infoToast: "ZUMIRAJTE MAPU (PRIKAZ DO 30KM OD CENTRA)",
                 subtitle: "Live Sports Tracker", login: "ULAZ U SISTEM", explore: "ISTRAŽI MAPU BEZ PRIJAVE", search: "Pretraži...", periodRes: "Rezultat po periodima", matchEvents: "Događaji na meču", adminTitle: "ADMIN TABLA", savePeriod: "SAČUVAJ PERIOD / SET", goLive: "KRENI UŽIVO", endMatch: "ZAVRŠI MEČ", resetMatch: "RESET / NOVI MEČ", schedule: "ZAKAŽI MEČ", deleteCourt: "OBRIŠI TEREN", zoneOccupied: "ZONA ZAUZETA!", create: "KRENI", courtName: "NAZIV TERENA", player: "IME IGRAČA", team: "TIM", loggedAs: "ULOGOVAN KAO:", localMatch: "LOKALNI MEČ", points: "POENI", games: "GEMOVI", league: "LIGA (NOVA)", team1: "TIM 1", team2: "TIM 2", goal: "GOL", yellow: "ŽUTI", red: "CRVENI", confirmDelete: "OBRISATI?", timeAt: "U", live: "UŽIVO", ended: "KRAJ", limitReached: "LIMIT OD 3 TERENA JE DOSTIGNUT!", addCourt: "DODAJ TEREN", 
                 sports: { "FUDBAL": "FUDBAL", "KOŠARKA": "KOŠARKA", "ODBOJKA": "ODBOJKA", "TENIS": "TENIS", "RUKOMET": "RUKOMET" },
                 periods: { FUDBAL: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "PROD"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } 
             },
             en: { 
+                infoToast: "ZOOM IN TO REVEAL (MATCHES WITHIN 30KM)",
                 subtitle: "Live Sports Tracker", login: "ENTER SYSTEM", explore: "EXPLORE MAP WITHOUT LOGIN", search: "Search...", periodRes: "Period Results", matchEvents: "Match Events", adminTitle: "ADMIN PANEL", savePeriod: "SAVE PERIOD / SET", goLive: "GO LIVE", endMatch: "END MATCH", resetMatch: "RESET / NEW MATCH", schedule: "SCHEDULE MATCH", deleteCourt: "DELETE COURT", zoneOccupied: "ZONE OCCUPIED!", create: "CREATE", courtName: "COURT NAME", player: "PLAYER NAME", team: "TEAM", loggedAs: "LOGGED AS:", localMatch: "LOCAL MATCH", points: "POINTS", games: "GAMES", league: "LEAGUE (NEW)", team1: "TEAM 1", team2: "TEAM 2", goal: "GOAL", yellow: "YELLOW", red: "RED", confirmDelete: "DELETE?", timeAt: "AT", live: "LIVE", ended: "ENDED", limitReached: "LIMIT OF 3 COURTS REACHED!", addCourt: "ADD COURT", 
                 sports: { "FUDBAL": "FOOTBALL", "KOŠARKA": "BASKETBALL", "ODBOJKA": "VOLLEYBALL", "TENIS": "TENNIS", "RUKOMET": "HANDBALL" },
                 periods: { FUDBAL: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "OT"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } 
@@ -708,6 +720,7 @@
             const flag = currentLang === 'en' ? '🇬🇧 ENG' : '🇷🇸 SRB';
             document.getElementById('current-lang-text').innerText = flag;
 
+            document.getElementById('info-toast').innerText = t.infoToast;
             document.getElementById('btn-login').innerText = t.login; 
             document.getElementById('city-search').placeholder = t.search; 
             document.getElementById('adm-name').innerText = t.adminTitle; 
@@ -808,7 +821,6 @@
             const t = translations[currentLang];
             
             allTereni.forEach(d => {
-                // Utakmice se sada ne učitavaju van 30km od centra ekrana
                 if (map.distance(center, [d.lat, d.lng]) > 30000) return;
                 
                 const isLive = d.status === 'live', isEnded = d.status === 'ended', isUpcoming = d.status === 'upcoming' && d.t1;
@@ -1231,12 +1243,18 @@
         
         function goToMyLocation() { if(currentLat) map.flyTo([currentLat, currentLon], 18); }
         
+        function executeSearch() {
+            let val = document.getElementById('city-search').value;
+            if(!val) return;
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${val}`)
+            .then(r => r.json()).then(data => { 
+                if(data[0]) { map.flyTo([data[0].lat, data[0].lon], 15); toggleSearch(); } 
+            }); 
+        }
+
         function handleSearch(e) { 
             if(e.key === "Enter") { 
-                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${e.target.value}`)
-                .then(r => r.json()).then(data => { 
-                    if(data[0]) { map.flyTo([data[0].lat, data[0].lon], 15); toggleSearch(); } 
-                }); 
+                executeSearch();
             } 
         }
         
