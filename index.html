@@ -158,12 +158,23 @@
 
         #map { width: 100vw; height: 100vh; background: #09090b; display: block; }
         
-        /* -------------- FILTER ZA TAKTIČKU / NOĆNU MAPU -------------- */
+        /* -------------- BLAGO ZATAMNJENJE MAPE -------------- */
         .leaflet-tile-pane {
-            filter: grayscale(95%) brightness(35%) contrast(110%);
+            filter: brightness(80%) contrast(105%);
             transition: filter 0.5s ease;
         }
         /* ------------------------------------------------------------- */
+
+        /* -------------- MEKANI PRELAZ (VINJETA) ZA PRETRAGU -------------- */
+        #map-vignette {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            pointer-events: none; /* Ne blokira dodir i klikanje mape */
+            z-index: 4000; /* Ispod UI kontrola, a preko markera i mape */
+            background: radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0) 30%, rgba(0, 0, 0, 0.6) 100%);
+        }
+        /* ----------------------------------------------------------------- */
 
         .floating-action-btn {
             position: absolute; right: 20px; z-index: 5500;
@@ -385,19 +396,6 @@
 
         @keyframes pulse-live { 0%, 100% { opacity: 1; text-shadow: 0 0 5px rgba(255,42,42,0.5); } 50% { opacity: 0.5; text-shadow: 0 0 15px rgba(255,42,42,0.8); } }
 
-        /* -------------- ANIMACIJA ATRAKTIVNOG RADARA -------------- */
-        .animated-range-circle path {
-            stroke-dasharray: 12 18;
-            stroke-linecap: round;
-            animation: radar-scan 4s infinite linear;
-        }
-        @keyframes radar-scan { 
-            0% { stroke-opacity: 0.8; fill-opacity: 0.02; stroke-dashoffset: 0; filter: drop-shadow(0 0 5px var(--primary-glow)); } 
-            50% { stroke-opacity: 0.3; fill-opacity: 0.08; filter: drop-shadow(0 0 15px var(--primary)); } 
-            100% { stroke-opacity: 0.8; fill-opacity: 0.02; stroke-dashoffset: -60; filter: drop-shadow(0 0 5px var(--primary-glow)); } 
-        }
-        /* ---------------------------------------------------------- */
-
         #match-details-view { 
             position: fixed; bottom: -100%; left: 0; width: 100%; max-height: 90vh; 
             background: var(--glass-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
@@ -503,11 +501,28 @@
             #match-details-view.active { bottom: 20px; }
             #search-container.expanded { width: 350px; }
         }
+
+        .leaflet-popup-content-wrapper { 
+            background: rgba(15, 15, 20, 0.95); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            color: white; border-radius: 24px; border: 1px solid var(--glass-border); padding: 5px; 
+            overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.9) !important;
+        }
+        .leaflet-popup-tip { background: rgba(15, 15, 20, 0.95); border: 1px solid var(--glass-border); }
+        .leaflet-popup-content { margin: 15px; min-width: 240px !important; }
+        .leaflet-popup-close-button {
+            color: var(--text-muted) !important; font-size: 28px !important; padding: 10px !important; width: 40px !important; height: 40px !important;
+            display: flex; align-items: center; justify-content: center; transition: color 0.2s;
+        }
+        .leaflet-popup-close-button:hover { color: white !important; }
+
     </style>
 </head>
 <body>
 
     <div id="map"></div>
+    
+    <!-- MEKANI PRELAZ (VINJETA) PREKO MAPE -->
+    <div id="map-vignette"></div>
     
     <div id="ui-controls">
         <div id="search-container">
@@ -647,7 +662,7 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth(), db = firebase.database();
 
-        let map, userMarker, currentLat, currentLon, currentAdminKey = null, allTereni = [], rangeCircle = null;
+        let map, userMarker, currentLat, currentLon, currentAdminKey = null, allTereni = [];
         let currentLang = localStorage.getItem('lang') || 'en'; 
         const sportEmojis = { "FUDBAL": "⚽", "KOŠARKA": "🏀", "ODBOJKA": "🏐", "TENIS": "🎾", "RUKOMET": "🤾" };
         const tennisPoints = ["0", "15", "30", "40", "AD"];
@@ -766,16 +781,6 @@
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', { 
                 opacity: 0.8, noWrap: true, bounds: bounds
             }).addTo(map);
-            
-            rangeCircle = L.circle([sLat, sLng], { 
-                radius: 30000, 
-                color: 'var(--primary)', 
-                weight: 2, 
-                fillColor: 'var(--primary)', 
-                fillOpacity: 0.05, 
-                interactive: false, 
-                className: 'animated-range-circle' 
-            }).addTo(map);
 
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(pos => {
@@ -783,10 +788,6 @@
                 }, () => {}, { timeout: 5000 });
             }
 
-            map.on('move', () => { 
-                let c = map.getCenter(); rangeCircle.setLatLng(c); 
-                if(map.getZoom() > 10) rangeCircle.setStyle({opacity: 0, fillOpacity: 0}); else rangeCircle.setStyle({opacity: 1, fillOpacity: 0.05}); 
-            });
             map.on('moveend', () => { 
                 let c = map.getCenter(); localStorage.setItem('lastLat', c.lat); localStorage.setItem('lastLng', c.lng); localStorage.setItem('lastZoom', map.getZoom()); renderMarkers(); 
             });
@@ -806,7 +807,9 @@
             const t = translations[currentLang];
             
             allTereni.forEach(d => {
+                // Utakmice se sada ne učitavaju van 30km od centra ekrana
                 if (map.distance(center, [d.lat, d.lng]) > 30000) return;
+                
                 const isLive = d.status === 'live', isEnded = d.status === 'ended', isUpcoming = d.status === 'upcoming' && d.t1;
                 const ball = sportEmojis[d.sport] || '⚽';
                 let cardBody = "";
