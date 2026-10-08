@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover">
-    <title>MAPLAY LIVE</title>
+    <title>SCOREPUNKT</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -158,6 +158,13 @@
 
         #map { width: 100vw; height: 100vh; background: #09090b; display: block; }
         
+        /* -------------- FILTER ZA TAKTIČKU / NOĆNU MAPU -------------- */
+        .leaflet-tile-pane {
+            filter: grayscale(95%) brightness(35%) contrast(110%);
+            transition: filter 0.5s ease;
+        }
+        /* ------------------------------------------------------------- */
+
         .floating-action-btn {
             position: absolute; right: 20px; z-index: 5500;
             display: flex; justify-content: center; align-items: center; 
@@ -192,7 +199,7 @@
         }
 
         #login-widget.collapsed {
-            transform: translateY(calc(100% - 52px)); /* Sakriva panel, ostavlja samo zaglavlje od 52px */
+            transform: translateY(calc(100% - 52px));
         }
 
         .login-header-tab {
@@ -378,6 +385,19 @@
 
         @keyframes pulse-live { 0%, 100% { opacity: 1; text-shadow: 0 0 5px rgba(255,42,42,0.5); } 50% { opacity: 0.5; text-shadow: 0 0 15px rgba(255,42,42,0.8); } }
 
+        /* -------------- ANIMACIJA ATRAKTIVNOG RADARA -------------- */
+        .animated-range-circle path {
+            stroke-dasharray: 12 18;
+            stroke-linecap: round;
+            animation: radar-scan 4s infinite linear;
+        }
+        @keyframes radar-scan { 
+            0% { stroke-opacity: 0.8; fill-opacity: 0.02; stroke-dashoffset: 0; filter: drop-shadow(0 0 5px var(--primary-glow)); } 
+            50% { stroke-opacity: 0.3; fill-opacity: 0.08; filter: drop-shadow(0 0 15px var(--primary)); } 
+            100% { stroke-opacity: 0.8; fill-opacity: 0.02; stroke-dashoffset: -60; filter: drop-shadow(0 0 5px var(--primary-glow)); } 
+        }
+        /* ---------------------------------------------------------- */
+
         #match-details-view { 
             position: fixed; bottom: -100%; left: 0; width: 100%; max-height: 90vh; 
             background: var(--glass-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
@@ -472,8 +492,6 @@
         @keyframes slideUpFade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
         .user-location-dot { background: #0a84ff; width: 16px; height: 16px; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 15px #0a84ff; }
-        @keyframes pulse-circle { 0% { stroke-opacity: 0.8; stroke-width: 1px; } 50% { stroke-opacity: 0.3; stroke-width: 3px; } 100% { stroke-opacity: 0.8; stroke-width: 1px; } }
-        .animated-range-circle { animation: pulse-circle 4s infinite ease-in-out; }
         
         @media (min-width: 768px) {
             #admin-panel { width: 450px; left: auto; right: -450px; border-left: 1px solid var(--glass-border); box-shadow: -15px 0 40px rgba(0,0,0,0.6); }
@@ -485,20 +503,6 @@
             #match-details-view.active { bottom: 20px; }
             #search-container.expanded { width: 350px; }
         }
-
-        .leaflet-popup-content-wrapper { 
-            background: rgba(15, 15, 20, 0.95); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            color: white; border-radius: 24px; border: 1px solid var(--glass-border); padding: 5px; 
-            overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.9) !important;
-        }
-        .leaflet-popup-tip { background: rgba(15, 15, 20, 0.95); border: 1px solid var(--glass-border); }
-        .leaflet-popup-content { margin: 15px; min-width: 240px !important; }
-        .leaflet-popup-close-button {
-            color: var(--text-muted) !important; font-size: 28px !important; padding: 10px !important; width: 40px !important; height: 40px !important;
-            display: flex; align-items: center; justify-content: center; transition: color 0.2s;
-        }
-        .leaflet-popup-close-button:hover { color: white !important; }
-
     </style>
 </head>
 <body>
@@ -512,7 +516,6 @@
         </div>
         
         <div class="floating-action-btn back-btn" onclick="goBackToLogin()" id="btn-back-icon" style="display:none;">
-            <!-- Ikonica se dinamički popunjava u JS -->
         </div>
         <div class="floating-action-btn location-btn" onclick="goToMyLocation()">
             <img src="https://cdn-icons-png.flaticon.com/512/1865/1865269.png" alt="Location">
@@ -520,12 +523,11 @@
         
         <div id="user-indicator" style="display:none; position:fixed; bottom:20px; left:20px; color:var(--primary); font-size:11px; font-weight:800; z-index:5000; opacity: 0.9; background: rgba(0,0,0,0.7); padding: 10px 16px; border-radius: 20px; backdrop-filter: blur(10px); border: 1px solid var(--glass-border); box-shadow: 0 4px 15px rgba(0,0,0,0.5);"></div>
         
-        <!-- COMPACT & COLLAPSIBLE LOGIN WIDGET -->
+        <!-- COMPACT & COLLAPSIBLE LOGIN WIDGET (SCOREPUNKT) -->
         <div id="login-widget" class="glass-panel collapsed">
-            <!-- HEADER / TAB ZA OTVARANJE -->
             <div class="login-header-tab" onclick="toggleLoginWidget()">
                 <div style="display:flex; align-items:center; gap: 8px;">
-                    <h3 style="margin:0; font-family:'Oswald'; color:var(--primary); font-size:18px; letter-spacing:1px;">MA<span style="color:white;">PLAY</span></h3>
+                    <h3 style="margin:0; font-family:'Oswald'; color:var(--primary); font-size:18px; letter-spacing:1px;">SCORE<span style="color:white;">PUNKT</span></h3>
                     <span id="login-toggle-icon">▼</span>
                 </div>
                 
@@ -541,7 +543,6 @@
                 </div>
             </div>
             
-            <!-- SADRŽAJ (POLJA) -->
             <div class="login-content">
                 <input type="email" id="email" placeholder="EMAIL ADDRESS" style="padding:12px; font-size:13px!important;">
                 <input type="password" id="password" placeholder="PASSWORD" style="padding:12px; font-size:13px!important;">
@@ -727,7 +728,7 @@
                 backBtnIcon.innerHTML = `<svg viewBox="0 0 24 24" width="22" height="22" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>`;
             } else { 
                 updateUILanguage(); 
-                loginWidget.style.display = 'flex'; // Zadržava class "collapsed" pa se vidi samo tab
+                loginWidget.style.display = 'flex'; 
                 userIndicator.style.display = 'none';
                 backBtnIcon.style.display = 'none';
             } 
@@ -766,7 +767,15 @@
                 opacity: 0.8, noWrap: true, bounds: bounds
             }).addTo(map);
             
-            rangeCircle = L.circle([sLat, sLng], { radius: 30000, color: 'var(--primary)', weight: 1, fillOpacity: 0.03, interactive: false, className: 'animated-range-circle' }).addTo(map);
+            rangeCircle = L.circle([sLat, sLng], { 
+                radius: 30000, 
+                color: 'var(--primary)', 
+                weight: 2, 
+                fillColor: 'var(--primary)', 
+                fillOpacity: 0.05, 
+                interactive: false, 
+                className: 'animated-range-circle' 
+            }).addTo(map);
 
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(pos => {
@@ -776,7 +785,7 @@
 
             map.on('move', () => { 
                 let c = map.getCenter(); rangeCircle.setLatLng(c); 
-                if(map.getZoom() > 10) rangeCircle.setStyle({opacity: 0, fillOpacity: 0}); else rangeCircle.setStyle({opacity: 1, fillOpacity: 0.03}); 
+                if(map.getZoom() > 10) rangeCircle.setStyle({opacity: 0, fillOpacity: 0}); else rangeCircle.setStyle({opacity: 1, fillOpacity: 0.05}); 
             });
             map.on('moveend', () => { 
                 let c = map.getCenter(); localStorage.setItem('lastLat', c.lat); localStorage.setItem('lastLng', c.lng); localStorage.setItem('lastZoom', map.getZoom()); renderMarkers(); 
