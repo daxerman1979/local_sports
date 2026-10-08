@@ -20,13 +20,12 @@
     
     <style>
         :root {
-            /* Pro Sports Colors */
-            --primary: #ccff00; /* Neon Volt Green */
+            --primary: #ccff00; 
             --primary-glow: rgba(204, 255, 0, 0.4);
             --bg-dark: #09090b;
             --glass-bg: rgba(15, 15, 20, 0.85);
             --glass-border: rgba(255, 255, 255, 0.1);
-            --danger: #ff2a2a; /* Live Red */
+            --danger: #ff2a2a; 
             --danger-glow: rgba(255, 42, 42, 0.4);
             --text-main: #ffffff;
             --text-muted: #a1a1aa;
@@ -124,7 +123,7 @@
         .lang-dropdown-container.open .arrow { transform: rotate(180deg); }
         
         .lang-list { 
-            position: absolute; top: 100%; right: 0; margin-top: 5px; 
+            position: absolute; bottom: 100%; top: auto; right: 0; margin-bottom: 8px; 
             background: rgba(15, 15, 20, 0.95); border: 1px solid var(--glass-border); 
             border-radius: 8px; display: none; flex-direction: column; overflow: hidden; 
             z-index: 1000; min-width: 90px; backdrop-filter: blur(10px);
@@ -178,25 +177,67 @@
         
         .back-btn { top: 20px; width: 48px; height: 48px; background: var(--glass-bg); color: white; font-weight: bold; font-size: 18px; }
 
-        /* MALI EKRAN ZA PRIJAVU IZNAD MAPE */
+        /* ---------------- SLIDING LOGIN WIDGET ---------------- */
         #login-widget {
             position: absolute;
             bottom: 20px;
             left: 20px;
-            width: calc(100% - 100px); /* Ostavlja prostor za dugme lokacije s desne strane */
+            width: calc(100% - 100px); 
             max-width: 300px;
             z-index: 5500;
-            padding: 16px;
             display: none; 
+            flex-direction: column;
+            padding: 0; 
+            transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+
+        #login-widget.collapsed {
+            transform: translateY(calc(100% - 52px)); /* Sakriva panel, ostavlja samo zaglavlje od 52px */
+        }
+
+        .login-header-tab {
+            height: 52px;
+            padding: 0 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            border-radius: 24px 24px 0 0;
+            transition: border-radius 0.3s;
+        }
+
+        #login-widget.collapsed .login-header-tab {
+            border-radius: 24px;
+            border-bottom: 1px solid transparent;
+        }
+
+        .login-content {
+            padding: 16px;
+            display: flex;
             flex-direction: column;
             gap: 12px;
         }
+
+        #login-toggle-icon {
+            color: var(--text-muted);
+            font-size: 14px;
+            transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #login-widget.collapsed #login-toggle-icon {
+            transform: rotate(180deg);
+        }
+        /* -------------------------------------------------------- */
 
         .sport-marker-wrapper { display: flex; flex-direction: column; align-items: center; position: relative; }
         .marker-content-box { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; pointer-events: none; z-index: 30;}
         .marker-content-box > * { pointer-events: auto; }
 
-        /* ----------- DUPLO MANJE LOPTICE + ANIMACIJA ----------- */
         @keyframes ball-pulse { 
             0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.2); } 
             70% { box-shadow: 0 0 0 6px rgba(255, 255, 255, 0); } 
@@ -220,9 +261,7 @@
             border-color: var(--primary); 
             animation: live-ball-pulse 1.5s infinite; 
         }
-        /* -------------------------------------------------------- */
 
-        /* ---------------- TV SCORE BUG STYLES (MAPLAY PRO) ---------------- */
         .tv-card {
             background: rgba(15, 15, 20, 0.95);
             backdrop-filter: blur(15px);
@@ -276,7 +315,6 @@
             min-width: 70px;
         }
 
-        /* ---------------- STROGE DIMENZIJE ZA SIMETRIJU SCORE-A ---------------- */
         .tv-team-score, .tv-period-score, .tv-curr-score {
             flex-shrink: 0; 
             box-sizing: border-box;
@@ -311,7 +349,6 @@
             color: #ff9500;
             background: rgba(255, 149, 0, 0.1);
         }
-        /* ----------------------------------------------------------------------- */
 
         .tv-bottom-bar {
             background: rgba(0,0,0,0.6);
@@ -340,7 +377,6 @@
         }
 
         @keyframes pulse-live { 0%, 100% { opacity: 1; text-shadow: 0 0 5px rgba(255,42,42,0.5); } 50% { opacity: 0.5; text-shadow: 0 0 15px rgba(255,42,42,0.8); } }
-        /* ------------------------------------------------------------------ */
 
         #match-details-view { 
             position: fixed; bottom: -100%; left: 0; width: 100%; max-height: 90vh; 
@@ -484,26 +520,33 @@
         
         <div id="user-indicator" style="display:none; position:fixed; bottom:20px; left:20px; color:var(--primary); font-size:11px; font-weight:800; z-index:5000; opacity: 0.9; background: rgba(0,0,0,0.7); padding: 10px 16px; border-radius: 20px; backdrop-filter: blur(10px); border: 1px solid var(--glass-border); box-shadow: 0 4px 15px rgba(0,0,0,0.5);"></div>
         
-        <!-- COMPACT LOGIN WIDGET IN BOTTOM LEFT SA ZASTAVAMA -->
-        <div id="login-widget" class="glass-panel">
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:12px;">
-                <h3 style="margin:0; font-family:'Oswald'; color:var(--primary); font-size:18px; letter-spacing:1px;">MA<span style="color:white;">PLAY</span></h3>
+        <!-- COMPACT & COLLAPSIBLE LOGIN WIDGET -->
+        <div id="login-widget" class="glass-panel collapsed">
+            <!-- HEADER / TAB ZA OTVARANJE -->
+            <div class="login-header-tab" onclick="toggleLoginWidget()">
+                <div style="display:flex; align-items:center; gap: 8px;">
+                    <h3 style="margin:0; font-family:'Oswald'; color:var(--primary); font-size:18px; letter-spacing:1px;">MA<span style="color:white;">PLAY</span></h3>
+                    <span id="login-toggle-icon">▼</span>
+                </div>
                 
                 <div id="lang-dropdown" class="lang-dropdown-container" onclick="toggleLangDropdown(event)">
-                    <div class="current-lang">
+                    <div class="current-lang" style="padding: 4px 8px; font-size: 10px;">
                         <span id="current-lang-text">🇬🇧 ENG</span>
-                        <span class="arrow">▼</span>
+                        <span class="arrow">▲</span>
                     </div>
                     <div class="lang-list">
                         <div class="lang-option" onclick="setLanguage('en'); toggleLangDropdown(event);">🇬🇧 ENG</div>
                         <div class="lang-option" onclick="setLanguage('sr'); toggleLangDropdown(event);">🇷🇸 SRB</div>
                     </div>
                 </div>
-
             </div>
-            <input type="email" id="email" placeholder="EMAIL ADDRESS" style="padding:12px; font-size:13px!important;">
-            <input type="password" id="password" placeholder="PASSWORD" style="padding:12px; font-size:13px!important;">
-            <button class="btn-primary" id="btn-login" onclick="handleAuth()" style="padding:14px; font-size:14px!important;">ULAZ U SISTEM</button>
+            
+            <!-- SADRŽAJ (POLJA) -->
+            <div class="login-content">
+                <input type="email" id="email" placeholder="EMAIL ADDRESS" style="padding:12px; font-size:13px!important;">
+                <input type="password" id="password" placeholder="PASSWORD" style="padding:12px; font-size:13px!important;">
+                <button class="btn-primary" id="btn-login" onclick="handleAuth()" style="padding:14px; font-size:14px!important;">ULAZ U SISTEM</button>
+            </div>
         </div>
     </div>
 
@@ -604,7 +647,7 @@
         const auth = firebase.auth(), db = firebase.database();
 
         let map, userMarker, currentLat, currentLon, currentAdminKey = null, allTereni = [], rangeCircle = null;
-        let currentLang = localStorage.getItem('lang') || 'en'; // Engleski je sada default
+        let currentLang = localStorage.getItem('lang') || 'en'; 
         const sportEmojis = { "FUDBAL": "⚽", "KOŠARKA": "🏀", "ODBOJKA": "🏐", "TENIS": "🎾", "RUKOMET": "🤾" };
         const tennisPoints = ["0", "15", "30", "40", "AD"];
 
@@ -620,6 +663,10 @@
                 periods: { FUDBAL: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "OT"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } 
             }
         };
+
+        function toggleLoginWidget() {
+            document.getElementById('login-widget').classList.toggle('collapsed');
+        }
 
         function toggleLangDropdown(e) {
             if(e) e.stopPropagation();
@@ -680,7 +727,7 @@
                 backBtnIcon.innerHTML = `<svg viewBox="0 0 24 24" width="22" height="22" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>`;
             } else { 
                 updateUILanguage(); 
-                loginWidget.style.display = 'flex';
+                loginWidget.style.display = 'flex'; // Zadržava class "collapsed" pa se vidi samo tab
                 userIndicator.style.display = 'none';
                 backBtnIcon.style.display = 'none';
             } 
