@@ -170,7 +170,7 @@
 
         #map { width: 100vw; height: 100vh; background: #09090b; display: block; }
         
-        /* -------------- BLAGO ZATAMNJENJE MAPE BEZ KRUGA -------------- */
+        /* -------------- BLAGO ZATAMNJENJE MAPE -------------- */
         .leaflet-tile-pane {
             filter: brightness(80%) contrast(105%);
             transition: filter 0.5s ease;
@@ -191,27 +191,26 @@
             position: absolute; right: 20px; z-index: 5500;
             display: flex; justify-content: center; align-items: center; 
             cursor: pointer; backdrop-filter: blur(12px);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-            border-radius: 50%; border: 1px solid var(--glass-border);
-            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 50%; transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .floating-action-btn:active { transform: scale(0.9); }
         
+        /* SUPTILNO DUGME ZA LOKACIJU */
         .location-btn { 
-            bottom: 40px; width: 56px; height: 56px; 
-            background: var(--primary); border: none; 
-            box-shadow: 0 8px 24px var(--primary-glow); 
+            bottom: 20px; width: 40px; height: 40px; 
+            background: rgba(15, 15, 20, 0.7); border: 1px solid var(--glass-border); 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5); 
         }
-        .location-btn img { filter: brightness(0); width: 24px; }
+        .location-btn img { filter: brightness(0) invert(1); width: 18px; opacity: 0.8; }
         
-        .back-btn { top: 20px; width: 48px; height: 48px; background: var(--glass-bg); color: white; font-weight: bold; font-size: 18px; }
+        .back-btn { top: 20px; width: 48px; height: 48px; background: var(--glass-bg); color: white; font-weight: bold; font-size: 18px; border: 1px solid var(--glass-border); box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
 
         /* ---------------- SLIDING LOGIN WIDGET ---------------- */
         #login-widget {
             position: absolute;
             bottom: 20px;
             left: 20px;
-            width: calc(100% - 100px); 
+            width: calc(100% - 80px); 
             max-width: 300px;
             z-index: 5500;
             display: none; 
@@ -543,13 +542,13 @@
         
         <div class="floating-action-btn back-btn" onclick="goBackToLogin()" id="btn-back-icon" style="display:none;">
         </div>
+        
         <div class="floating-action-btn location-btn" onclick="goToMyLocation()">
             <img src="https://cdn-icons-png.flaticon.com/512/1865/1865269.png" alt="Location">
         </div>
         
         <div id="user-indicator" style="display:none; position:fixed; bottom:20px; left:20px; color:var(--primary); font-size:11px; font-weight:800; z-index:5000; opacity: 0.9; background: rgba(0,0,0,0.7); padding: 10px 16px; border-radius: 20px; backdrop-filter: blur(10px); border: 1px solid var(--glass-border); box-shadow: 0 4px 15px rgba(0,0,0,0.5);"></div>
         
-        <!-- COMPACT & COLLAPSIBLE LOGIN WIDGET (SCOREPUNKT) -->
         <div id="login-widget" class="glass-panel collapsed">
             <div class="login-header-tab" onclick="toggleLoginWidget()">
                 <div style="display:flex; align-items:center; gap: 8px;">
@@ -890,8 +889,14 @@
                 const html = `<div class="sport-marker-wrapper ${isLive?'status-live-wrapper':''} ${zoomNear?'zoom-near':''}"><div class="marker-content-box"><div class="marker-ball-only">${ball}</div>${cardBody}</div></div>`;
                 L.marker([d.lat, d.lng], { icon: L.divIcon({ className: '', html, iconSize: [0,0], iconAnchor: [0, 0] }) }).addTo(map).on('click', e => { 
                     L.DomEvent.stopPropagation(e); 
-                    if (auth.currentUser && d.owner === auth.currentUser.uid) openAdmin(d.key); 
-                    else openDetails(d.key); 
+                    if (map.getZoom() <= 12) {
+                        // Ako je odzumirano, klikom se samo zumira na lokaciju meča
+                        map.flyTo([d.lat, d.lng], 15);
+                    } else {
+                        // Ako je zumirano, otvara se detaljna kartica ili admin panel
+                        if (auth.currentUser && d.owner === auth.currentUser.uid) openAdmin(d.key); 
+                        else openDetails(d.key); 
+                    }
                 });
             });
         }
