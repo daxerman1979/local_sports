@@ -461,11 +461,11 @@
         .radar-wave-circle path {
             transform-origin: center;
             transform-box: fill-box;
-            animation: sonar-wave 3s cubic-bezier(0.2, 0, 0.2, 1) infinite;
+            animation: sonar-wave 3s cubic-bezier(0.1, 0, 0.3, 1) infinite;
         }
         @keyframes sonar-wave {
-            0% { transform: scale(0.01); stroke-opacity: 0.25; fill-opacity: 0.08; }
-            70% { stroke-opacity: 0.1; fill-opacity: 0.02; }
+            0% { transform: scale(0.01); stroke-opacity: 0.35; fill-opacity: 0; }
+            50% { stroke-opacity: 0.2; fill-opacity: 0; }
             100% { transform: scale(1); stroke-opacity: 0; fill-opacity: 0; }
         }
         /* -------------------------------------------------------- */
@@ -788,9 +788,9 @@
                 opacity: 0.8, noWrap: true, bounds: bounds
             }).addTo(map);
 
-            // Samo radarski talasasti krug koji se širi do 30km (uklonjen statični krug)
+            // Kreiranje isključivo radarskog talasa koji se širi i jedva vidi
             rangeCircleWave = L.circle([sLat, sLng], { 
-                radius: 30000, color: 'var(--primary)', weight: 1, fillColor: 'var(--primary)', interactive: false, className: 'radar-wave-circle' 
+                radius: 30000, color: 'var(--primary)', weight: 1.5, opacity: 0.3, fill: false, interactive: false, className: 'radar-wave-circle' 
             }).addTo(map);
 
             if (navigator.geolocation) {
@@ -803,9 +803,9 @@
                 let c = map.getCenter(); 
                 rangeCircleWave.setLatLng(c);
                 if(map.getZoom() > 10) {
-                    rangeCircleWave.setStyle({opacity: 0, fillOpacity: 0});
+                    rangeCircleWave.setStyle({opacity: 0});
                 } else {
-                    rangeCircleWave.setStyle({opacity: 1, fillOpacity: 1});
+                    rangeCircleWave.setStyle({opacity: 0.3});
                 }
             });
 
