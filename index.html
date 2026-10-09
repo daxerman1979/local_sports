@@ -464,8 +464,8 @@
             animation: sonar-wave 3s cubic-bezier(0.2, 0, 0.2, 1) infinite;
         }
         @keyframes sonar-wave {
-            0% { transform: scale(0.01); stroke-opacity: 1; fill-opacity: 0.4; }
-            80% { stroke-opacity: 0.5; fill-opacity: 0.05; }
+            0% { transform: scale(0.01); stroke-opacity: 0.25; fill-opacity: 0.08; }
+            70% { stroke-opacity: 0.1; fill-opacity: 0.02; }
             100% { transform: scale(1); stroke-opacity: 0; fill-opacity: 0; }
         }
         /* -------------------------------------------------------- */
@@ -664,7 +664,7 @@
         const auth = firebase.auth(), db = firebase.database();
 
         let map, userMarker, currentLat, currentLon, currentAdminKey = null, allTereni = [];
-        let rangeCircleStatic = null, rangeCircleWave = null;
+        let rangeCircleWave = null;
         
         let currentLang = localStorage.getItem('lang') || 'en'; 
         const sportEmojis = { "FUDBAL": "⚽", "KOŠARKA": "🏀", "ODBOJKA": "🏐", "TENIS": "🎾", "RUKOMET": "🤾" };
@@ -788,13 +788,9 @@
                 opacity: 0.8, noWrap: true, bounds: bounds
             }).addTo(map);
 
-            // Kreiranje radarskih krugova
-            rangeCircleStatic = L.circle([sLat, sLng], { 
-                radius: 30000, color: 'var(--primary)', weight: 1, fillOpacity: 0, interactive: false 
-            }).addTo(map);
-
+            // Samo radarski talasasti krug koji se širi do 30km (uklonjen statični krug)
             rangeCircleWave = L.circle([sLat, sLng], { 
-                radius: 30000, color: 'var(--primary)', weight: 2, fillColor: 'var(--primary)', interactive: false, className: 'radar-wave-circle' 
+                radius: 30000, color: 'var(--primary)', weight: 1, fillColor: 'var(--primary)', interactive: false, className: 'radar-wave-circle' 
             }).addTo(map);
 
             if (navigator.geolocation) {
@@ -805,14 +801,11 @@
 
             map.on('move', () => { 
                 let c = map.getCenter(); 
-                rangeCircleStatic.setLatLng(c); 
                 rangeCircleWave.setLatLng(c);
                 if(map.getZoom() > 10) {
-                    rangeCircleStatic.setStyle({opacity: 0});
                     rangeCircleWave.setStyle({opacity: 0, fillOpacity: 0});
                 } else {
-                    rangeCircleStatic.setStyle({opacity: 0.2});
-                    rangeCircleWave.setStyle({opacity: 1, fillOpacity: 0.2});
+                    rangeCircleWave.setStyle({opacity: 1, fillOpacity: 1});
                 }
             });
 
