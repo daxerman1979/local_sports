@@ -7,9 +7,16 @@
   "theme_color": "#ccff00",
   "icons": [
     {
-      "src": "scicon.ico",
-      "sizes": "64x64 192x192 512x512",
-      "type": "image/x-icon"
+      "src": "scicon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "scicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
