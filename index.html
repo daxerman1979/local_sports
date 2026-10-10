@@ -124,15 +124,7 @@
 
         @keyframes pulse-live { 0%, 100% { opacity: 1; text-shadow: 0 0 5px rgba(255,42,42,0.5); } 50% { opacity: 0.5; text-shadow: 0 0 15px rgba(255,42,42,0.8); } }
         
-        /* OPTIMIZACIJA: GPU ubrzanje za Admin Panel izbjegavanjem left/right */
-        #admin-panel { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: var(--bg-dark); z-index: 9000; 
-            transform: translateX(100%);
-            transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94); 
-            display: flex; flex-direction: column; overflow-y: auto; 
-            will-change: transform; visibility: hidden;
-        }
+        #admin-panel { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-dark); z-index: 9000; transform: translateX(100%); transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94); display: flex; flex-direction: column; overflow-y: auto; will-change: transform; visibility: hidden; }
         #admin-panel.active { transform: translateX(0); visibility: visible; }
         .admin-header { padding: 20px 24px; background: rgba(0,0,0,0.7); border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10; backdrop-filter: blur(20px); }
         .admin-content-scroll { padding: 24px; display: flex; flex-direction: column; gap: 16px; flex-grow: 1; }
@@ -159,7 +151,6 @@
         @keyframes slideUpFade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .user-location-dot { background: #0a84ff; width: 16px; height: 16px; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 15px #0a84ff; }
         
-        /* OPTIMIZACIJA: Uklonjen težak blur sa popup-a koji ruši mobitele */
         .leaflet-popup-content-wrapper { background: rgba(15, 15, 20, 0.98); color: white; border-radius: 24px; border: 1px solid var(--glass-border); padding: 5px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.9) !important; }
         .leaflet-popup-tip { background: rgba(15, 15, 20, 0.98); border: 1px solid var(--glass-border); }
         .leaflet-popup-content { margin: 15px; min-width: 240px !important; }
@@ -267,6 +258,12 @@
                 
                 <div id="adm-sport-controls"></div>
                 <div id="adm-events-manager" class="adm-event-list mt-3"></div>
+                
+                <!-- UNOS KOMENTARA ZA SVE SPORTOVE -->
+                <div class="mt-3" style="display:flex; gap: 8px; background: rgba(0,0,0,0.5); padding: 12px; border-radius: 12px; border: 1px solid var(--glass-border);">
+                    <input type="text" id="adm-comment-input" placeholder="KOMENTAR (MAX 30 SLOVA)" maxlength="30" style="padding: 12px; font-size: 12px !important; margin: 0;">
+                    <button class="btn-primary" onclick="saveComment()" style="padding: 0 16px; margin: 0; font-size: 18px !important;">✔</button>
+                </div>
                 
                 <div class="action-btn-row mt-3" style="display:flex; flex-direction:column; gap:12px;">
                     <button class="btn-secondary" style="border-color: rgba(204,255,0,0.4); color:var(--primary);" onclick="triggerLogic('period')" id="btn-save-period">SAČUVAJ PERIOD / SET</button>
@@ -382,6 +379,10 @@
             document.getElementById('btn-schedule').innerText = t.schedule; document.getElementById('btn-delete-court').innerText = t.deleteCourt; 
             document.getElementById('adm-league-input').placeholder = t.league; document.getElementById('adm-t1').placeholder = t.team1 + " (MAX 10)"; 
             document.getElementById('adm-t2').placeholder = t.team2 + " (MAX 10)"; 
+            
+            const commentInput = document.getElementById('adm-comment-input');
+            if(commentInput) commentInput.placeholder = currentLang === 'en' ? "COMMENT (MAX 30 CHARS)" : "KOMENTAR (MAX 30 SLOVA)";
+
             if(auth.currentUser) document.getElementById('user-indicator').innerText = `${t.loggedAs} ${auth.currentUser.email}`; 
         }
 
@@ -434,12 +435,11 @@
                 delete allTereniData[key]; removeMarker(key);
             });
 
-            // OPTIMIZACIJA 2: Radar se ažurira samo kad korisnik fizički vuče kartu, izbjegavajući računarske (flyTo) animacije
             map.on('drag', () => { rangeCircleWave.setLatLng(map.getCenter()); });
             
             map.on('moveend', () => { 
                 let c = map.getCenter(); localStorage.setItem('lastLat', c.lat); localStorage.setItem('lastLng', c.lng); localStorage.setItem('lastZoom', map.getZoom()); 
-                rangeCircleWave.setLatLng(c); // Precizno centriranje na kraju leta
+                rangeCircleWave.setLatLng(c); 
                 if (map.getZoom() > 12) { if(map.hasLayer(rangeCircleWave)) map.removeLayer(rangeCircleWave); } 
                 else { if(!map.hasLayer(rangeCircleWave)) map.addLayer(rangeCircleWave); }
                 geoQuery.updateCriteria({ center: [c.lat, c.lng], radius: 30 });
@@ -482,7 +482,16 @@
                         if(ev.team == 1) eH += `<div style="font-size:11px; margin-bottom:4px; font-weight:600;"><span style="font-size:14px;">${ev.emoji}</span> ${ev.player}</div>`;
                         else eA += `<div style="font-size:11px; margin-bottom:4px; text-align:right; font-weight:600;">${ev.player} <span style="font-size:14px;">${ev.emoji}</span></div>`;
                     });
-                    eventsHtml = `<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;"><div>${eH}</div><div>${eA}</div></div>`;
+                    eventsHtml = `<div style="background:rgba(0,0,0,0.4); border-radius:8px; padding:8px; border: 1px solid var(--glass-border); margin-top:4px;">
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:6px; margin-bottom:6px;">
+                            <div style="font-size:10px; font-weight:800; color:var(--text-muted);">${(d.t1 || t.team1).substring(0,10)}</div>
+                            <div style="font-size:10px; font-weight:800; color:var(--text-muted); text-align:right;">${(d.t2 || t.team2).substring(0,10)}</div>
+                        </div>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                            <div>${eH}</div>
+                            <div>${eA}</div>
+                        </div>
+                    </div>`;
                 }
 
                 let curr1 = "", curr2 = "";
@@ -496,9 +505,21 @@
 
                 const sportName = (t.sports && t.sports[d.sport]) ? t.sports[d.sport] : d.sport;
                 let inlineDetails = "";
-                if (d.sport === "FUDBAL") { inlineDetails = `<div class="tv-card-details" id="inline-${d.key}">${periodsHtml}${eventsHtml}${!periodsHtml && !eventsHtml ? `<div style="text-align:center; font-size:10px; font-weight:700; color:var(--text-muted); padding: 8px 0;">${t.noData}</div>` : ''}</div>`; }
+                let hasDetails = (periodsHtml || eventsHtml || d.comment);
+                
+                if (hasDetails) { 
+                    let commentHtml = d.comment ? `<div style="text-align:center; font-size:12px; font-weight:800; color:var(--danger); padding:6px; border-radius:6px; background:rgba(255,42,42,0.1); border:1px solid rgba(255,42,42,0.3); margin-top:4px; text-transform:uppercase;">${d.comment}</div>` : '';
+                    inlineDetails = `<div class="tv-card-details" id="inline-${d.key}">
+                        ${periodsHtml}
+                        ${eventsHtml}
+                        ${(!periodsHtml && !eventsHtml && !d.comment) ? `<div style="text-align:center; font-size:10px; font-weight:700; color:var(--text-muted); padding: 8px 0;">${t.noData}</div>` : ''}
+                        ${commentHtml}
+                    </div>`; 
+                }
 
-                let isOwner = auth.currentUser && d.owner === auth.currentUser.uid; let isClickable = isOwner || d.sport === "FUDBAL"; let cursorStyle = isClickable ? "cursor: pointer;" : "cursor: default;";
+                let isOwner = auth.currentUser && d.owner === auth.currentUser.uid; 
+                let isClickable = isOwner || hasDetails; 
+                let cursorStyle = isClickable ? "cursor: pointer;" : "cursor: default;";
 
                 cardBody = `<div class="tv-card-wrapper" style="${cursorStyle}"><div class="tv-card ${isLive?'tv-live':''}"><div class="tv-league">${d.league || t.localMatch}</div><div class="tv-team-row"><div class="tv-team-name">${(d.t1 || t.team1).substring(0,10)}</div><div class="tv-team-score">${s1}</div>${p1Html}${curr1}</div><div class="tv-team-row" style="border-bottom:none;"><div class="tv-team-name">${(d.t2 || t.team2).substring(0,10)}</div><div class="tv-team-score">${s2}</div>${p2Html}${curr2}</div><div class="tv-bottom-bar"><span style="display:flex; align-items:center; gap:4px;">${ball} ${sportName}</span><span>${statusText}</span></div></div>${inlineDetails}</div><div class="marker-pointer"></div>`;
             } else {
@@ -514,8 +535,20 @@
                 let marker = L.marker([d.lat, d.lng], { icon: L.divIcon({ className: '', html, iconSize: [0,0], iconAnchor: [0, 0] }) }).addTo(map);
                 marker.on('click', e => { 
                     L.DomEvent.stopPropagation(e); 
+                    let hasDetails = (d.sub_details || d.events || d.comment);
                     if (map.getZoom() <= 12) { map.flyTo([d.lat, d.lng], 15); } 
-                    else { if (auth.currentUser && d.owner === auth.currentUser.uid) { openAdmin(d.key); } else if (d.sport === "FUDBAL") { let inlineEl = document.getElementById('inline-' + d.key); if (inlineEl) inlineEl.style.display = inlineEl.style.display === 'flex' ? 'none' : 'flex'; } }
+                    else { 
+                        if (auth.currentUser && d.owner === auth.currentUser.uid) { 
+                            openAdmin(d.key); 
+                        } else if (hasDetails) { 
+                            let inlineEl = document.getElementById('inline-' + d.key); 
+                            if (inlineEl) {
+                                let wasOpen = inlineEl.style.display === 'flex';
+                                document.querySelectorAll('.tv-card-details').forEach(el => el.style.display = 'none');
+                                inlineEl.style.display = wasOpen ? 'none' : 'flex';
+                            } 
+                        } 
+                    }
                 });
                 activeMarkers[key] = marker;
             }
@@ -525,6 +558,17 @@
         function reRenderAllMarkers() { Object.keys(allTereniData).forEach(key => renderSingleMarker(key)); }
 
         function handleMapClick(e) { 
+            // 1. ZATVARANJE DODATNIH KARTICA AKO SU OTVORENE
+            let anyOpen = false;
+            document.querySelectorAll('.tv-card-details').forEach(el => {
+                if (el.style.display === 'flex') {
+                    el.style.display = 'none';
+                    anyOpen = true;
+                }
+            });
+            if (anyOpen) return;
+
+            // 2. KREIRANJE NOVOG TERENA
             if (!auth.currentUser) return; 
             const t = translations[currentLang]; const clickPos = e.latlng; 
             const isTooClose = Object.values(allTereniData).some(court => { return clickPos.distanceTo(L.latLng(court.lat, court.lng)) < 200; });
@@ -556,6 +600,11 @@
             const t = translations[currentLang];
             document.getElementById('adm-name').innerText = d.name; document.getElementById('adm-main-score').innerText = `${d.score1 || 0} : ${d.score2 || 0}`;
             
+            // Postavi vrijednost komentara (ali ne fokusiraj ako korisnik trenutno kuca)
+            if (document.activeElement !== document.getElementById('adm-comment-input')) {
+                document.getElementById('adm-comment-input').value = d.comment || "";
+            }
+
             let subS = d.sub_details ? Object.values(d.sub_details).join(' | ') : ""; 
             if(d.sport === "ODBOJKA") subS = t.points + `: ${d.p1 || 0}:${d.p2 || 0} | ` + subS; 
             if(d.sport === "TENIS") { const isTB = (d.g1 === 6 && d.g2 === 6); const pts1 = isTB ? (d.p1 || 0) : (tennisPoints[d.p1] || "0"); const pts2 = isTB ? (d.p2 || 0) : (tennisPoints[d.p2] || "0"); subS = t.games + `: ${d.g1 || 0}:${d.g2 || 0} (${pts1}:${pts2}) | ` + subS; }
@@ -596,11 +645,18 @@
             showAppConfirm(t.confirmDelete, () => { db.ref(`tereni/${currentAdminKey}/events/${ekey}`).remove(); }, true);
         }
         
+        function saveComment() {
+            if(!currentAdminKey) return;
+            const val = document.getElementById('adm-comment-input').value.toUpperCase();
+            db.ref(`tereni/${currentAdminKey}`).update({ comment: val });
+            showAppAlert(currentLang === 'en' ? "COMMENT SAVED!" : "KOMENTAR SAČUVAN!");
+        }
+        
         async function setupMatch() { 
             let l = document.getElementById('adm-league-input').value.toUpperCase(), t1 = document.getElementById('adm-t1').value.toUpperCase().substring(0, 10), t2 = document.getElementById('adm-t2').value.toUpperCase().substring(0, 10), time = document.getElementById('adm-time').value; 
             if(!t1 || !t2) return; 
             saveSuggestion('leagues', l); saveSuggestion('teams', t1); saveSuggestion('teams', t2); 
-            await db.ref(`tereni/${currentAdminKey}`).update({ league: l, t1, t2, match_time: time, status: 'upcoming', score1: 0, score2: 0, events: null, sub_details: null, p1: 0, p2: 0, g1: 0, g2: 0 }); 
+            await db.ref(`tereni/${currentAdminKey}`).update({ league: l, t1, t2, match_time: time, status: 'upcoming', score1: 0, score2: 0, events: null, sub_details: null, p1: 0, p2: 0, g1: 0, g2: 0, comment: null }); 
         }
         
         function adminStatus(s) { db.ref(`tereni/${currentAdminKey}`).update({ status: s }); }
@@ -613,7 +669,7 @@
             }, true);
         }
         
-        function resetMatch() { db.ref(`tereni/${currentAdminKey}`).update({ status: 'upcoming', score1: 0, score2: 0, sub_details: null, events: null, p1: 0, p2: 0, g1: 0, g2: 0 }); }
+        function resetMatch() { db.ref(`tereni/${currentAdminKey}`).update({ status: 'upcoming', score1: 0, score2: 0, sub_details: null, events: null, p1: 0, p2: 0, g1: 0, g2: 0, comment: null }); }
         
         function trackGPS() { if(!navigator.geolocation) return; navigator.geolocation.watchPosition(pos => { currentLat = pos.coords.latitude; currentLon = pos.coords.longitude; if(!userMarker) { userMarker = L.marker([currentLat, currentLon], { icon: L.divIcon({ className: 'user-location-dot', iconSize: [16, 16] }) }).addTo(map); } else { userMarker.setLatLng([currentLat, currentLon]); } }, null, { enableHighAccuracy: true }); }
         function goToMyLocation() { if(currentLat) map.flyTo([currentLat, currentLon], 18); }
