@@ -50,7 +50,6 @@
 
         .mb-2 { margin-bottom: 8px; } .mb-3 { margin-bottom: 12px; } .mt-3 { margin-top: 12px; } .w-full { width: 100%; }
         
-        /* ---------------- DROPDOWN ZA JEZIKE ---------------- */
         .lang-dropdown-container { position: relative; display: inline-block; cursor: pointer; user-select: none; }
         .current-lang { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 800; color: white; transition: 0.2s; }
         .current-lang:active { transform: scale(0.95); }
@@ -83,7 +82,6 @@
         #login-widget.collapsed .login-header-tab { border-radius: 24px; border-bottom: 1px solid transparent; }
         .login-content { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
 
-        /* ---------------- MARKERI I TOOLTIPI ---------------- */
         .sport-marker-wrapper { display: flex; flex-direction: column; align-items: center; position: relative; }
         .marker-content-box { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; pointer-events: none; z-index: 30;}
         .marker-content-box > * { pointer-events: auto; }
@@ -121,14 +119,21 @@
         .zoom-near .marker-pointer { display: block; }
         .status-live-wrapper .marker-pointer { border-top-color: var(--danger); filter: drop-shadow(0 5px 10px rgba(255,42,42,0.6)); }
 
-        /* -------------- RADARSKI TALAS (Samo linija) -------------- */
         .radar-wave-circle { transform-origin: center; transform-box: fill-box; animation: sonar-wave 3s cubic-bezier(0.1, 0, 0.3, 1) infinite; }
         @keyframes sonar-wave { 0% { transform: scale(0); stroke-opacity: 1; fill: none; } 100% { transform: scale(1); stroke-opacity: 0; fill: none; } }
 
         @keyframes pulse-live { 0%, 100% { opacity: 1; text-shadow: 0 0 5px rgba(255,42,42,0.5); } 50% { opacity: 0.5; text-shadow: 0 0 15px rgba(255,42,42,0.8); } }
         
-        #admin-panel { position: fixed; top: 0; left: 100%; width: 100%; height: 100%; background: var(--bg-dark); z-index: 9000; transition: left 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); display: flex; flex-direction: column; overflow-y: auto; }
-        #admin-panel.active { left: 0; }
+        /* OPTIMIZACIJA: GPU ubrzanje za Admin Panel izbjegavanjem left/right */
+        #admin-panel { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: var(--bg-dark); z-index: 9000; 
+            transform: translateX(100%);
+            transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94); 
+            display: flex; flex-direction: column; overflow-y: auto; 
+            will-change: transform; visibility: hidden;
+        }
+        #admin-panel.active { transform: translateX(0); visibility: visible; }
         .admin-header { padding: 20px 24px; background: rgba(0,0,0,0.7); border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10; backdrop-filter: blur(20px); }
         .admin-content-scroll { padding: 24px; display: flex; flex-direction: column; gap: 16px; flex-grow: 1; }
         .admin-score-hero { background: linear-gradient(145deg, rgba(30,30,35,1) 0%, rgba(15,15,20,1) 100%); border: 1px solid var(--primary); padding: 30px 20px; text-align: center; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.5), inset 0 2px 0 rgba(255,255,255,0.05); position: relative; overflow: hidden; transition: 0.3s; }
@@ -154,12 +159,12 @@
         @keyframes slideUpFade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .user-location-dot { background: #0a84ff; width: 16px; height: 16px; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 15px #0a84ff; }
         
-        .leaflet-popup-content-wrapper { background: rgba(15, 15, 20, 0.95); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); color: white; border-radius: 24px; border: 1px solid var(--glass-border); padding: 5px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.9) !important; }
-        .leaflet-popup-tip { background: rgba(15, 15, 20, 0.95); border: 1px solid var(--glass-border); }
+        /* OPTIMIZACIJA: Uklonjen težak blur sa popup-a koji ruši mobitele */
+        .leaflet-popup-content-wrapper { background: rgba(15, 15, 20, 0.98); color: white; border-radius: 24px; border: 1px solid var(--glass-border); padding: 5px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.9) !important; }
+        .leaflet-popup-tip { background: rgba(15, 15, 20, 0.98); border: 1px solid var(--glass-border); }
         .leaflet-popup-content { margin: 15px; min-width: 240px !important; }
         .leaflet-popup-close-button { color: var(--text-muted) !important; font-size: 28px !important; padding: 10px !important; width: 40px !important; height: 40px !important; display: flex; align-items: center; justify-content: center; transition: color 0.2s; }
 
-        /* -------------- CUSTOM APP MODAL -------------- */
         #custom-modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
         #custom-modal-overlay.show { opacity: 1; pointer-events: auto; }
         .app-modal { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 24px; width: 85%; max-width: 340px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.9); transform: scale(0.9); transition: transform 0.3s; }
@@ -168,7 +173,6 @@
         .modal-btn-row { display: flex; gap: 12px; justify-content: center; }
         .modal-btn-row button { flex: 1; padding: 14px; font-size: 14px !important; }
 
-        /* -------------- MOBILE RESPONSIVENESS -------------- */
         @media (max-width: 767px) {
             .tv-card { min-width: 150px; max-width: 85vw; }
             .tv-team-name { font-size: 12px; min-width: 50px; }
@@ -185,8 +189,8 @@
             .admin-content-scroll { padding: 16px; }
         }
         @media (min-width: 768px) {
-            #admin-panel { width: 450px; left: auto; right: -450px; border-left: 1px solid var(--glass-border); box-shadow: -15px 0 40px rgba(0,0,0,0.6); }
-            #admin-panel.active { right: 0; left: auto; }
+            #admin-panel { width: 450px; left: auto; right: 0; transform: translateX(100%); border-left: 1px solid var(--glass-border); box-shadow: -15px 0 40px rgba(0,0,0,0.6); }
+            #admin-panel.active { transform: translateX(0); }
             #search-container.expanded { width: 350px; }
         }
     </style>
@@ -430,9 +434,12 @@
                 delete allTereniData[key]; removeMarker(key);
             });
 
-            map.on('move', () => { rangeCircleWave.setLatLng(map.getCenter()); });
+            // OPTIMIZACIJA 2: Radar se ažurira samo kad korisnik fizički vuče kartu, izbjegavajući računarske (flyTo) animacije
+            map.on('drag', () => { rangeCircleWave.setLatLng(map.getCenter()); });
+            
             map.on('moveend', () => { 
                 let c = map.getCenter(); localStorage.setItem('lastLat', c.lat); localStorage.setItem('lastLng', c.lng); localStorage.setItem('lastZoom', map.getZoom()); 
+                rangeCircleWave.setLatLng(c); // Precizno centriranje na kraju leta
                 if (map.getZoom() > 12) { if(map.hasLayer(rangeCircleWave)) map.removeLayer(rangeCircleWave); } 
                 else { if(!map.hasLayer(rangeCircleWave)) map.addLayer(rangeCircleWave); }
                 geoQuery.updateCriteria({ center: [c.lat, c.lng], radius: 30 });
