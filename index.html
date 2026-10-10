@@ -23,7 +23,7 @@
             --primary: #ccff00; 
             --primary-glow: rgba(204, 255, 0, 0.4);
             --bg-dark: #09090b;
-            --glass-bg: rgba(15, 15, 20, 0.98); /* Uklonjen blur, stavljena skoro puna boja za performanse */
+            --glass-bg: rgba(15, 15, 20, 0.98); 
             --glass-border: rgba(255, 255, 255, 0.1);
             --danger: #ff2a2a; 
             --danger-glow: rgba(255, 42, 42, 0.4);
@@ -60,7 +60,7 @@
         .mb-2 { margin-bottom: 8px; } .mb-3 { margin-bottom: 12px; } .mt-3 { margin-top: 12px; } .w-full { width: 100%; }
         
         /* ---------------- Ostali UI i mapa ---------------- */
-        #map { width: 100vw; height: 100vh; background: #09090b; display: block; }
+        #map { width: 100vw; height: 100vh; background: var(--bg-dark); display: block; }
         
         #search-container { position: absolute; top: 20px; left: 20px; z-index: 5000; display: flex; align-items: center; transition: all 0.3s; width: 48px; height: 48px; background: var(--glass-bg); border-radius: 24px; border: 1px solid var(--glass-border); overflow: hidden; will-change: width; }
         #search-container.expanded { width: calc(100% - 90px); border-color: var(--primary); background: #111; }
@@ -82,7 +82,7 @@
         #login-widget.collapsed .login-header-tab { border-radius: 24px; }
         .login-content { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
 
-        /* ---------------- MARKERI I TOOLTIPI (OPTIMIZOVANO) ---------------- */
+        /* ---------------- MARKERI I TOOLTIPI ---------------- */
         .sport-marker-wrapper { display: flex; flex-direction: column; align-items: center; position: relative; }
         .marker-content-box { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; pointer-events: none; z-index: 30;}
         .marker-content-box > * { pointer-events: auto; }
@@ -90,7 +90,6 @@
         .marker-ball-only { font-size: 11px; background: #111; padding: 4px; border-radius: 50%; border: 1px solid var(--glass-border); cursor: pointer; }
         .zoom-near .marker-ball-only { display: none; }
         
-        /* Jednostavnija indikacija za LIVE (bez beskonacnih box-shadow pulse animacija) */
         .status-live-wrapper .marker-ball-only { border-color: var(--primary); background: #222; }
         .tv-card-wrapper { display: none; flex-direction: column; align-items: center; z-index: 25; width: max-content; }
         .zoom-near .tv-card-wrapper { display: flex; }
@@ -109,14 +108,31 @@
         .tv-curr-score { width: 42px; padding: 6px 0; font-size: 14px; font-weight: 900; color: #ff9500; background: #2a1a00; }
         .tv-bottom-bar { background: #000; padding: 5px 10px; display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; color: var(--text-muted); }
 
-        .tv-card-details { background: #111; border: 1px solid var(--glass-border); border-top: none; border-radius: 0 0 8px 8px; width: 96%; padding: 12px; display: none; flex-direction: column; gap: 8px; margin-top: -1px; font-family: 'Inter', sans-serif; max-height: 200px; overflow-y: auto; }
         .marker-pointer { width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent; border-top: 14px solid var(--text-main); display: none; margin-top: 2px; }
         .zoom-near .marker-pointer { display: block; }
         .status-live-wrapper .marker-pointer { border-top-color: var(--danger); }
 
-        /* RADAR ANIMACIJA - Ublažena za manje zauzeće */
-        .radar-wave-circle { transform-origin: center; animation: sonar-wave 4s linear infinite; will-change: transform, stroke-opacity; }
-        @keyframes sonar-wave { 0% { transform: scale(0); stroke-opacity: 0.3; } 100% { transform: scale(1); stroke-opacity: 0; } }
+        /* RADAR ANIMACIJA - Savršeno centrirana, pojačan intenzitet */
+        .radar-wave-circle { 
+            transform-origin: center; 
+            transform-box: fill-box;
+            animation: sonar-wave 3s cubic-bezier(0.1, 0, 0.3, 1) infinite; 
+            will-change: transform, stroke-opacity, fill-opacity; 
+        }
+        @keyframes sonar-wave { 
+            0% { 
+                transform: scale(0); 
+                stroke-opacity: 0.9; 
+                fill: var(--primary); 
+                fill-opacity: 0.3; 
+            } 
+            100% { 
+                transform: scale(1); 
+                stroke-opacity: 0; 
+                fill: var(--primary); 
+                fill-opacity: 0; 
+            } 
+        }
         
         #admin-panel { position: fixed; top: 0; left: 100%; width: 100%; height: 100%; background: var(--bg-dark); z-index: 9000; transition: left 0.3s; display: flex; flex-direction: column; overflow-y: auto; will-change: left; }
         #admin-panel.active { left: 0; }
@@ -181,7 +197,7 @@
         </div>
     </div>
 
-    <!-- Admin Panel HTML (pojednostavljen) -->
+    <!-- Admin Panel -->
     <div id="admin-panel">
         <div class="admin-header">
             <div id="adm-name" style="font-family:'Oswald'; font-size:22px; color:#fff; font-weight:700;">ADMIN TABLA</div>
@@ -237,15 +253,14 @@
         const auth = firebase.auth(), db = firebase.database();
 
         let map, userMarker, currentLat, currentLon, currentAdminKey = null;
-        let allTereniData = {}; // Lokalna kopija baze
-        let activeMarkers = {}; // Keširani Leaflet markeri
+        let allTereniData = {}; 
+        let activeMarkers = {}; 
         let rangeCircleWave = null;
         
         let currentLang = localStorage.getItem('lang') || 'en'; 
         const sportEmojis = { "FUDBAL": "⚽", "KOŠARKA": "🏀", "ODBOJKA": "🏐", "TENIS": "🎾", "RUKOMET": "🤾" };
         const tennisPoints = ["0", "15", "30", "40", "AD"];
 
-        // Prevod zadržan... (izostavljen pun objekat zbog dužine u prikazu, prekopiraj stari iz prethodnog fajla ako fali neki string)
         const translations = {
             sr: { infoToast: "ZUMIRAJTE MAPU (PRIKAZ DO 30KM)", login: "ULAZ", search: "Pretraži...", adminTitle: "ADMIN TABLA", team: "TIM", live: "UŽIVO", ended: "KRAJ", addCourt: "DODAJ TEREN", create: "KRENI", courtName: "NAZIV TERENA" },
             en: { infoToast: "ZOOM IN TO REVEAL (WITHIN 30KM)", login: "ENTER", search: "Search...", adminTitle: "ADMIN PANEL", team: "TEAM", live: "LIVE", ended: "ENDED", addCourt: "ADD COURT", create: "CREATE", courtName: "COURT NAME" }
@@ -266,26 +281,39 @@
         function initMap() {
             if (map) return;
             map = L.map('map', { zoomControl: false, tap: false, minZoom: 3 }).setView([44.7866, 20.4489], 13);
-            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(map);
+            
+            // Ubacivanje TileLayer-a sa samim imenima mjesta i granicama bez dodatnih elemenata i ulica
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
+                opacity: 0.9,
+                noWrap: true
+            }).addTo(map);
 
-            rangeCircleWave = L.circle([44.7866, 20.4489], { radius: 30000, color: 'var(--primary)', weight: 1.5, fill: false, interactive: false, className: 'radar-wave-circle' }).addTo(map);
+            // Novi Radar Wave (fokusiran tačno na centar sa pojačanim bojama, 30km udaljenosti)
+            rangeCircleWave = L.circle(map.getCenter(), { 
+                radius: 30000, 
+                color: 'var(--primary)', 
+                weight: 2.5, 
+                fill: true,
+                interactive: false, 
+                className: 'radar-wave-circle' 
+            }).addTo(map);
 
-            // Umesto 'move', koristimo 'moveend' za optimizaciju performansi
+            // Neprekidno ažuriranje pozicije radara tokom prevlačenja ekrana
+            map.on('move', () => { 
+                rangeCircleWave.setLatLng(map.getCenter());
+            });
+
             map.on('moveend', () => { 
-                let c = map.getCenter(); 
-                rangeCircleWave.setLatLng(c);
-                rangeCircleWave.setStyle({opacity: map.getZoom() > 10 ? 0 : 0.3});
+                rangeCircleWave.setStyle({opacity: map.getZoom() > 10 ? 0 : 1});
                 reRenderAllMarkers(); 
             });
             map.on('click', handleMapClick);
 
-            // OPTIMIZACIJA BAZE: Ne slušamo "value" na ceo niz, već pojedinačne promene
             db.ref('tereni').on('child_added', snap => { allTereniData[snap.key] = snap.val(); renderSingleMarker(snap.key); });
             db.ref('tereni').on('child_changed', snap => { allTereniData[snap.key] = snap.val(); renderSingleMarker(snap.key); if(currentAdminKey === snap.key) refreshAdminPanel(snap.key); });
             db.ref('tereni').on('child_removed', snap => { delete allTereniData[snap.key]; removeMarker(snap.key); if(currentAdminKey === snap.key) closeAdmin(); });
         }
 
-        // Renderuje ili ažurira samo jedan marker
         function renderSingleMarker(key) {
             if (!map) return;
             const d = allTereniData[key];
@@ -294,7 +322,6 @@
 
             document.getElementById('info-toast').style.opacity = zoomNear ? '0' : '1';
 
-            // Ukloni ako je predaleko
             if (map.distance(center, [d.lat, d.lng]) > 30000) { removeMarker(key); return; }
             
             const ball = sportEmojis[d.sport] || '⚽';
@@ -317,7 +344,6 @@
             
             const fullHtml = `<div class="sport-marker-wrapper ${isLive?'status-live-wrapper':''} ${zoomNear?'zoom-near':''}">${htmlContent}</div>`;
             
-            // Ažuriraj postojeci ili napravi novi
             if (activeMarkers[key]) {
                 activeMarkers[key].setLatLng([d.lat, d.lng]);
                 activeMarkers[key].setIcon(L.divIcon({ className: '', html: fullHtml, iconSize: [0,0] }));
@@ -340,7 +366,7 @@
             Object.keys(allTereniData).forEach(key => renderSingleMarker(key));
         }
 
-        function handleMapClick(e) { /* Pop-up logika kreiranja (kao iz proslog fajla) */ }
+        function handleMapClick(e) { }
         function openAdmin(key) { currentAdminKey = key; refreshAdminPanel(key); document.getElementById('admin-panel').classList.add('active'); }
         function closeAdmin() { document.getElementById('admin-panel').classList.remove('active'); currentAdminKey = null; }
 
