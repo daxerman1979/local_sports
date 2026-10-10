@@ -31,175 +31,55 @@
             --text-muted: #a1a1aa;
         }
 
-        * { 
-            box-sizing: border-box; 
-            -webkit-tap-highlight-color: transparent; 
-            touch-action: pan-x pan-y; 
-            margin: 0; padding: 0;
-        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; touch-action: pan-x pan-y; margin: 0; padding: 0; }
+        html, body { height: 100%; width: 100%; overflow: hidden; background: var(--bg-dark); font-family: 'Inter', sans-serif; position: fixed; color: var(--text-main); }
 
-        html, body { 
-            height: 100%; width: 100%; overflow: hidden; 
-            background: var(--bg-dark); 
-            font-family: 'Inter', sans-serif; 
-            position: fixed; 
-            color: var(--text-main);
-        }
+        .glass-panel { background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8); }
 
-        .glass-panel {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
-        }
-
-        input, select, textarea, datalist { 
-            font-size: 15px !important; outline: none !important; text-transform: uppercase; 
-            background: rgba(0, 0, 0, 0.5); color: white; border: 1px solid var(--glass-border); 
-            padding: 16px; border-radius: 14px; font-family: 'Inter', sans-serif; width: 100%;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.3);
-            -webkit-appearance: none;
-        }
-        
-        input:focus, select:focus { 
-            border-color: var(--primary); 
-            background: rgba(204, 255, 0, 0.05); 
-            box-shadow: 0 0 0 3px var(--primary-glow), inset 0 2px 5px rgba(0,0,0,0.2);
-        }
-
+        input, select, textarea, datalist { font-size: 15px !important; outline: none !important; text-transform: uppercase; background: rgba(0, 0, 0, 0.5); color: white; border: 1px solid var(--glass-border); padding: 16px; border-radius: 14px; font-family: 'Inter', sans-serif; width: 100%; transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease; box-shadow: inset 0 2px 5px rgba(0,0,0,0.3); -webkit-appearance: none; }
+        input:focus, select:focus { border-color: var(--primary); background: rgba(204, 255, 0, 0.05); box-shadow: 0 0 0 3px var(--primary-glow), inset 0 2px 5px rgba(0,0,0,0.2); }
         select option { background-color: #1a1a1f; color: #ffffff; font-weight: 500; }
         
-        button { 
-            font-family: 'Inter', sans-serif;
-            font-size: 16px !important; outline: none !important; 
-            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease, background-color 0.2s ease; 
-            position: relative; overflow: hidden; 
-            cursor: pointer;
-            border-radius: 14px;
-            display: flex; justify-content: center; align-items: center; gap: 8px;
-        }
+        button { font-family: 'Inter', sans-serif; font-size: 16px !important; outline: none !important; transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease, background-color 0.2s ease; position: relative; overflow: hidden; cursor: pointer; border-radius: 14px; display: flex; justify-content: center; align-items: center; gap: 8px; }
         button:active { transform: scale(0.96); }
         button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
 
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary) 0%, #aacc00 100%);
-            color: #000; border: none; padding: 18px; font-weight: 900; 
-            text-transform: uppercase; font-family: 'Oswald', sans-serif; 
-            box-shadow: 0 10px 20px var(--primary-glow);
-            letter-spacing: 0.5px;
-        }
+        .btn-primary { background: linear-gradient(135deg, var(--primary) 0%, #aacc00 100%); color: #000; border: none; padding: 18px; font-weight: 900; text-transform: uppercase; font-family: 'Oswald', sans-serif; box-shadow: 0 10px 20px var(--primary-glow); letter-spacing: 0.5px; }
         .btn-primary:active { box-shadow: 0 5px 10px var(--primary-glow); }
+        .btn-secondary { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border); color: var(--text-main); padding: 16px; font-weight: 700; }
 
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--glass-border);
-            color: var(--text-main);
-            padding: 16px; font-weight: 700;
-        }
-
-        .mb-2 { margin-bottom: 8px; }
-        .mb-3 { margin-bottom: 12px; }
-        .mt-3 { margin-top: 12px; }
-        .w-full { width: 100%; }
+        .mb-2 { margin-bottom: 8px; } .mb-3 { margin-bottom: 12px; } .mt-3 { margin-top: 12px; } .w-full { width: 100%; }
         
         /* ---------------- DROPDOWN ZA JEZIKE ---------------- */
         .lang-dropdown-container { position: relative; display: inline-block; cursor: pointer; user-select: none; }
-        .current-lang { 
-            display: flex; align-items: center; gap: 6px; 
-            background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); 
-            padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 800; 
-            color: white; transition: 0.2s; 
-        }
+        .current-lang { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 800; color: white; transition: 0.2s; }
         .current-lang:active { transform: scale(0.95); }
-        .lang-list { 
-            position: absolute; bottom: 100%; right: 0; margin-bottom: 8px; 
-            background: rgba(15, 15, 20, 0.95); border: 1px solid var(--glass-border); 
-            border-radius: 8px; display: none; flex-direction: column; overflow: hidden; 
-            z-index: 1000; min-width: 70px; backdrop-filter: blur(10px);
-        }
+        .lang-list { position: absolute; bottom: 100%; right: 0; margin-bottom: 8px; background: rgba(15, 15, 20, 0.95); border: 1px solid var(--glass-border); border-radius: 8px; display: none; flex-direction: column; overflow: hidden; z-index: 1000; min-width: 70px; backdrop-filter: blur(10px); }
         .lang-dropdown-container.open .lang-list { display: flex; animation: slideUpFade 0.2s ease-out; }
-        .lang-option { 
-            padding: 10px 12px; font-size: 11px; font-weight: 800; color: white; 
-            display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; 
-        }
+        .lang-option { padding: 10px 12px; font-size: 11px; font-weight: 800; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
         .lang-option:hover { background: rgba(255,255,255,0.1); color: var(--primary); }
 
-        #search-container { 
-            position: absolute; top: 20px; left: 20px; z-index: 5000; 
-            display: flex; align-items: center; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-            width: 48px; height: 48px; background: var(--glass-bg); 
-            border-radius: 24px; backdrop-filter: blur(12px); overflow: hidden; 
-            border: 1px solid var(--glass-border); box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-        }
+        #search-container { position: absolute; top: 20px; left: 20px; z-index: 5000; display: flex; align-items: center; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); width: 48px; height: 48px; background: var(--glass-bg); border-radius: 24px; backdrop-filter: blur(12px); overflow: hidden; border: 1px solid var(--glass-border); box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
         #search-container.expanded { width: calc(100% - 90px); border-color: var(--primary); background: rgba(10,10,15,0.9); }
-        #city-search { 
-            width: 100%; border: none; background: transparent; color: white; 
-            padding: 12px 60px 12px 48px; 
-            font-size: 16px; outline: none; 
-            opacity: 0; transition: 0.3s; pointer-events: none;
-        }
+        #city-search { width: 100%; border: none; background: transparent; color: white; padding: 12px 60px 12px 48px; font-size: 16px; outline: none; opacity: 0; transition: 0.3s; pointer-events: none; }
         #search-container.expanded #city-search { opacity: 1; pointer-events: all; }
-        .search-icon { 
-            position: absolute; left: 14px; width: 20px; height: 20px; 
-            filter: brightness(0) invert(1); opacity: 0.8; cursor: pointer; z-index: 5001; 
-        }
-        
-        .search-go-btn {
-            position: absolute; right: 5px; top: 5px; bottom: 5px;
-            background: var(--primary); color: #000; border: none; border-radius: 20px;
-            padding: 0 14px; font-weight: 900; font-family: 'Oswald', sans-serif; font-size: 12px !important; 
-            opacity: 0; pointer-events: none; transition: 0.3s;
-        }
+        .search-icon { position: absolute; left: 14px; width: 20px; height: 20px; filter: brightness(0) invert(1); opacity: 0.8; cursor: pointer; z-index: 5001; }
+        .search-go-btn { position: absolute; right: 5px; top: 5px; bottom: 5px; background: var(--primary); color: #000; border: none; border-radius: 20px; padding: 0 14px; font-weight: 900; font-family: 'Oswald', sans-serif; font-size: 12px !important; opacity: 0; pointer-events: none; transition: 0.3s; }
         #search-container.expanded .search-go-btn { opacity: 1; pointer-events: all; }
 
         #map { width: 100vw; height: 100vh; background: #09090b; display: block; }
+        .leaflet-tile-pane { filter: brightness(80%) contrast(105%); }
         
-        .leaflet-tile-pane {
-            filter: brightness(80%) contrast(105%);
-        }
-        
-        #info-toast {
-            position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
-            background: rgba(0,0,0,0.6); color: white; font-size: 11px; font-weight: 700;
-            padding: 8px 16px; border-radius: 20px; border: 1px solid var(--glass-border);
-            backdrop-filter: blur(10px); z-index: 4500; pointer-events: none;
-            text-align: center; white-space: nowrap; font-family: 'Inter', sans-serif;
-            letter-spacing: 0.5px; transition: opacity 0.3s ease;
-        }
+        #info-toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.6); color: white; font-size: 11px; font-weight: 700; padding: 8px 16px; border-radius: 20px; border: 1px solid var(--glass-border); backdrop-filter: blur(10px); z-index: 4500; pointer-events: none; text-align: center; white-space: nowrap; font-family: 'Inter', sans-serif; letter-spacing: 0.5px; transition: opacity 0.3s ease; }
 
-        .floating-action-btn {
-            position: absolute; right: 20px; z-index: 5500;
-            display: flex; justify-content: center; align-items: center; 
-            cursor: pointer; backdrop-filter: blur(12px);
-            border-radius: 50%; transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .location-btn { 
-            bottom: 20px; width: 40px; height: 40px; 
-            background: rgba(15, 15, 20, 0.7); border: 1px solid var(--glass-border); 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5); 
-        }
+        .floating-action-btn { position: absolute; right: 20px; z-index: 5500; display: flex; justify-content: center; align-items: center; cursor: pointer; backdrop-filter: blur(12px); border-radius: 50%; transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .location-btn { bottom: 20px; width: 40px; height: 40px; background: rgba(15, 15, 20, 0.7); border: 1px solid var(--glass-border); box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
         .location-btn img { filter: brightness(0) invert(1); width: 18px; opacity: 0.8; }
-        
         .back-btn { top: 20px; width: 48px; height: 48px; background: var(--glass-bg); color: white; font-weight: bold; font-size: 18px; border: 1px solid var(--glass-border); box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
 
-        #login-widget {
-            position: absolute; bottom: 20px; left: 20px;
-            width: calc(100% - 80px); max-width: 300px;
-            z-index: 5500; display: none; flex-direction: column;
-            padding: 0; transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
-        }
-
+        #login-widget { position: absolute; bottom: 20px; left: 20px; width: calc(100% - 80px); max-width: 300px; z-index: 5500; display: none; flex-direction: column; padding: 0; transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1); }
         #login-widget.collapsed { transform: translateY(calc(100% - 52px)); }
-        .login-header-tab {
-            height: 52px; padding: 0 16px; display: flex; justify-content: space-between;
-            align-items: center; cursor: pointer; background: rgba(0,0,0,0.3);
-            border-bottom: 1px solid rgba(255,255,255,0.05); border-radius: 24px 24px 0 0;
-            transition: border-radius 0.3s;
-        }
+        .login-header-tab { height: 52px; padding: 0 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: rgba(0,0,0,0.3); border-bottom: 1px solid rgba(255,255,255,0.05); border-radius: 24px 24px 0 0; transition: border-radius 0.3s; }
         #login-widget.collapsed .login-header-tab { border-radius: 24px; border-bottom: 1px solid transparent; }
         .login-content { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
 
@@ -208,47 +88,21 @@
         .marker-content-box { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; pointer-events: none; z-index: 30;}
         .marker-content-box > * { pointer-events: auto; }
 
-        @keyframes live-ball-pulse { 
-            0% { box-shadow: 0 0 0 0 var(--primary-glow); } 
-            70% { box-shadow: 0 0 0 10px rgba(204, 255, 0, 0); } 
-            100% { box-shadow: 0 0 0 0 rgba(204, 255, 0, 0); } 
-        }
+        @keyframes live-ball-pulse { 0% { box-shadow: 0 0 0 0 var(--primary-glow); } 70% { box-shadow: 0 0 0 10px rgba(204, 255, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(204, 255, 0, 0); } }
 
-        .marker-ball-only { 
-            position: relative; font-size: 11px; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.5)); 
-            display: block; background: var(--glass-bg); backdrop-filter: blur(4px);
-            padding: 4px; border-radius: 50%; border: 1px solid var(--glass-border); 
-            transition: all 0.3s; cursor: pointer;
-        }
+        .marker-ball-only { position: relative; font-size: 11px; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.5)); display: block; background: var(--glass-bg); backdrop-filter: blur(4px); padding: 4px; border-radius: 50%; border: 1px solid var(--glass-border); transition: all 0.3s; cursor: pointer; }
         .zoom-near .marker-ball-only { display: none; }
-        .status-live-wrapper .marker-ball-only { 
-            border-color: var(--primary); 
-            animation: live-ball-pulse 1.5s infinite; 
-        }
+        .status-live-wrapper .marker-ball-only { border-color: var(--primary); animation: live-ball-pulse 1.5s infinite; }
 
-        .hover-tooltip {
-            position: absolute; bottom: 120%; left: 50%; transform: translateX(-50%);
-            background: rgba(15, 15, 20, 0.95); border: 1px solid var(--primary); color: white;
-            padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800;
-            white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.8); font-family: 'Oswald', sans-serif;
-        }
+        .hover-tooltip { position: absolute; bottom: 120%; left: 50%; transform: translateX(-50%); background: rgba(15, 15, 20, 0.95); border: 1px solid var(--primary); color: white; padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.8); font-family: 'Oswald', sans-serif; }
         .zoom-near .hover-tooltip { display: none !important; }
         .marker-ball-only:hover .hover-tooltip { opacity: 1; transform: translateX(-50%) translateY(-3px); }
 
-        .tv-card-wrapper {
-            display: none; flex-direction: column; align-items: center; z-index: 25; width: max-content;
-        }
+        .tv-card-wrapper { display: none; flex-direction: column; align-items: center; z-index: 25; width: max-content; }
         .zoom-near .tv-card-wrapper { display: flex; animation: slideUpFade 0.3s ease-out; }
 
-        .tv-card {
-            background: rgba(15, 15, 20, 0.95); backdrop-filter: blur(15px); border-radius: 8px; 
-            display: flex; flex-direction: column; color: white; box-shadow: 0 15px 35px rgba(0,0,0,0.9); 
-            position: relative; border: 1px solid var(--glass-border); overflow: hidden; 
-            min-width: 180px; width: 100%;
-        }
+        .tv-card { background: rgba(15, 15, 20, 0.95); backdrop-filter: blur(15px); border-radius: 8px; display: flex; flex-direction: column; color: white; box-shadow: 0 15px 35px rgba(0,0,0,0.9); position: relative; border: 1px solid var(--glass-border); overflow: hidden; min-width: 180px; width: 100%; }
         .tv-live { border-top: 3px solid var(--danger); }
-        
         .tv-league { background: rgba(255,255,255,0.05); color: var(--text-muted); font-size: 10px; font-weight: 800; padding: 4px 10px; text-transform: uppercase; }
         .tv-live .tv-league { background: rgba(255,42,42,0.15); color: var(--danger); }
         
@@ -258,75 +112,34 @@
         .tv-team-score, .tv-period-score, .tv-curr-score { flex-shrink: 0; box-sizing: border-box; display: flex; justify-content: center; align-items: center; border-left: 1px solid rgba(255,255,255,0.05); }
         .tv-team-score { width: 40px; background: rgba(0,0,0,0.8); padding: 6px 0; font-size: 16px; font-weight: 900; color: white; font-family: 'Oswald', sans-serif; }
         .tv-live .tv-team-score { color: var(--primary); }
-        
         .tv-period-score { width: 32px; padding: 6px 0; font-size: 14px; font-weight: 700; color: var(--text-muted); }
         .tv-curr-score { width: 42px; padding: 6px 0; font-size: 14px; font-weight: 900; color: #ff9500; background: rgba(255, 149, 0, 0.1); }
-
         .tv-bottom-bar { background: rgba(0,0,0,0.6); padding: 5px 10px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 700; color: var(--text-muted); }
 
-        .tv-card-details {
-            background: rgba(10, 10, 15, 0.98); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-top: none;
-            border-radius: 0 0 8px 8px; width: 96%; padding: 12px; display: none; flex-direction: column; gap: 8px;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.9); color: white; max-height: 250px; overflow-y: auto; margin-top: -1px; font-family: 'Inter', sans-serif;
-        }
-
-        .marker-pointer {
-            width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent;
-            border-top: 14px solid var(--text-main); display: none; margin-top: 2px; filter: drop-shadow(0 5px 8px rgba(0,0,0,0.8));
-        }
+        .tv-card-details { background: rgba(10, 10, 15, 0.98); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-top: none; border-radius: 0 0 8px 8px; width: 96%; padding: 12px; display: none; flex-direction: column; gap: 8px; box-shadow: 0 15px 30px rgba(0,0,0,0.9); color: white; max-height: 250px; overflow-y: auto; margin-top: -1px; font-family: 'Inter', sans-serif; }
+        .marker-pointer { width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent; border-top: 14px solid var(--text-main); display: none; margin-top: 2px; filter: drop-shadow(0 5px 8px rgba(0,0,0,0.8)); }
         .zoom-near .marker-pointer { display: block; }
         .status-live-wrapper .marker-pointer { border-top-color: var(--danger); filter: drop-shadow(0 5px 10px rgba(255,42,42,0.6)); }
 
         /* -------------- RADARSKI TALAS (Samo linija) -------------- */
-        .radar-wave-circle {
-            transform-origin: center;
-            transform-box: fill-box;
-            animation: sonar-wave 3s cubic-bezier(0.1, 0, 0.3, 1) infinite;
-        }
-        @keyframes sonar-wave {
-            0% { transform: scale(0); stroke-opacity: 1; fill: none; }
-            100% { transform: scale(1); stroke-opacity: 0; fill: none; }
-        }
+        .radar-wave-circle { transform-origin: center; transform-box: fill-box; animation: sonar-wave 3s cubic-bezier(0.1, 0, 0.3, 1) infinite; }
+        @keyframes sonar-wave { 0% { transform: scale(0); stroke-opacity: 1; fill: none; } 100% { transform: scale(1); stroke-opacity: 0; fill: none; } }
 
         @keyframes pulse-live { 0%, 100% { opacity: 1; text-shadow: 0 0 5px rgba(255,42,42,0.5); } 50% { opacity: 0.5; text-shadow: 0 0 15px rgba(255,42,42,0.8); } }
         
-        #admin-panel { 
-            position: fixed; top: 0; left: 100%; width: 100%; height: 100%; background: var(--bg-dark); z-index: 9000; 
-            transition: left 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); 
-            display: flex; flex-direction: column; overflow-y: auto; 
-        }
+        #admin-panel { position: fixed; top: 0; left: 100%; width: 100%; height: 100%; background: var(--bg-dark); z-index: 9000; transition: left 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); display: flex; flex-direction: column; overflow-y: auto; }
         #admin-panel.active { left: 0; }
-
-        .admin-header {
-            padding: 20px 24px; background: rgba(0,0,0,0.7); border-bottom: 1px solid var(--glass-border);
-            display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10;
-            backdrop-filter: blur(20px);
-        }
-        
+        .admin-header { padding: 20px 24px; background: rgba(0,0,0,0.7); border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10; backdrop-filter: blur(20px); }
         .admin-content-scroll { padding: 24px; display: flex; flex-direction: column; gap: 16px; flex-grow: 1; }
-
-        .admin-score-hero {
-            background: linear-gradient(145deg, rgba(30,30,35,1) 0%, rgba(15,15,20,1) 100%);
-            border: 1px solid var(--primary); padding: 30px 20px; text-align: center; border-radius: 20px; 
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5), inset 0 2px 0 rgba(255,255,255,0.05); position: relative; overflow: hidden; transition: 0.3s;
-        }
-
-        @keyframes pulse-score {
-            0% { transform: scale(1); box-shadow: inset 0 0 0px var(--primary-glow); }
-            50% { transform: scale(1.05); box-shadow: inset 0 0 30px var(--primary-glow); border-color: #fff; }
-            100% { transform: scale(1); box-shadow: inset 0 0 0px var(--primary-glow); }
-        }
+        .admin-score-hero { background: linear-gradient(145deg, rgba(30,30,35,1) 0%, rgba(15,15,20,1) 100%); border: 1px solid var(--primary); padding: 30px 20px; text-align: center; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.5), inset 0 2px 0 rgba(255,255,255,0.05); position: relative; overflow: hidden; transition: 0.3s; }
+        @keyframes pulse-score { 0% { transform: scale(1); box-shadow: inset 0 0 0px var(--primary-glow); } 50% { transform: scale(1.05); box-shadow: inset 0 0 30px var(--primary-glow); border-color: #fff; } 100% { transform: scale(1); box-shadow: inset 0 0 0px var(--primary-glow); } }
         .anim-score { animation: pulse-score 0.6s ease-out; }
 
         .score-ctrl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
         .team-ctrl-card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 16px; padding: 16px; text-align: center; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
         .team-ctrl-lbl { font-size: 13px; color: var(--text-muted); font-weight: 800; text-transform: uppercase; margin-bottom: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .ctrl-btn-group { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
-
-        .btn-ctrl {
-            width: 50px; height: 50px; border-radius: 12px; font-size: 24px !important; font-family: 'Oswald', sans-serif; font-weight: 500;
-            display: flex; justify-content: center; align-items: center; border: none; cursor: pointer; transition: transform 0.1s, background 0.2s;
-        }
+        .btn-ctrl { width: 50px; height: 50px; border-radius: 12px; font-size: 24px !important; font-family: 'Oswald', sans-serif; font-weight: 500; display: flex; justify-content: center; align-items: center; border: none; cursor: pointer; transition: transform 0.1s, background 0.2s; }
         .btn-ctrl.minus { background: rgba(255,255,255,0.1); color: white; }
         .btn-ctrl.minus:active { background: rgba(255,255,255,0.2); transform: scale(0.9); }
         .btn-ctrl.plus { background: var(--primary); color: #000; box-shadow: 0 4px 15px var(--primary-glow); font-weight: bold; }
@@ -339,7 +152,6 @@
         .adm-event-remove:active { transform: scale(0.9); background: rgba(255,42,42,0.3); }
         
         @keyframes slideUpFade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
         .user-location-dot { background: #0a84ff; width: 16px; height: 16px; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 15px #0a84ff; }
         
         @media (min-width: 768px) {
@@ -348,32 +160,15 @@
             #search-container.expanded { width: 350px; }
         }
 
-        .leaflet-popup-content-wrapper { 
-            background: rgba(15, 15, 20, 0.95); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            color: white; border-radius: 24px; border: 1px solid var(--glass-border); padding: 5px; 
-            overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.9) !important;
-        }
+        .leaflet-popup-content-wrapper { background: rgba(15, 15, 20, 0.95); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); color: white; border-radius: 24px; border: 1px solid var(--glass-border); padding: 5px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.9) !important; }
         .leaflet-popup-tip { background: rgba(15, 15, 20, 0.95); border: 1px solid var(--glass-border); }
         .leaflet-popup-content { margin: 15px; min-width: 240px !important; }
-        .leaflet-popup-close-button {
-            color: var(--text-muted) !important; font-size: 28px !important; padding: 10px !important; width: 40px !important; height: 40px !important;
-            display: flex; align-items: center; justify-content: center; transition: color 0.2s;
-        }
+        .leaflet-popup-close-button { color: var(--text-muted) !important; font-size: 28px !important; padding: 10px !important; width: 40px !important; height: 40px !important; display: flex; align-items: center; justify-content: center; transition: color 0.2s; }
 
-        /* -------------- CUSTOM APP MODAL (ZAMJENA ZA ALERT/CONFIRM) -------------- */
-        #custom-modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0,0,0,0.7); backdrop-filter: blur(5px);
-            display: flex; justify-content: center; align-items: center; z-index: 9999;
-            opacity: 0; pointer-events: none; transition: opacity 0.3s;
-        }
+        /* -------------- CUSTOM APP MODAL -------------- */
+        #custom-modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
         #custom-modal-overlay.show { opacity: 1; pointer-events: auto; }
-        .app-modal {
-            background: var(--glass-bg); border: 1px solid var(--glass-border);
-            border-radius: 20px; padding: 24px; width: 85%; max-width: 340px;
-            text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.9);
-            transform: scale(0.9); transition: transform 0.3s;
-        }
+        .app-modal { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 24px; width: 85%; max-width: 340px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.9); transform: scale(0.9); transition: transform 0.3s; }
         #custom-modal-overlay.show .app-modal { transform: scale(1); }
         .modal-text { color: white; font-size: 15px; font-weight: 600; margin-bottom: 24px; font-family: 'Inter', sans-serif; line-height: 1.4; }
         .modal-btn-row { display: flex; gap: 12px; justify-content: center; }
@@ -384,7 +179,6 @@
 
     <div id="map"></div>
     
-    <!-- Custom Modal umjesto standardnih pregledničkih upozorenja -->
     <div id="custom-modal-overlay">
         <div class="app-modal">
             <div class="modal-text" id="modal-msg"></div>
@@ -404,8 +198,7 @@
             <button class="search-go-btn" onclick="executeSearch()">GO</button>
         </div>
         
-        <div class="floating-action-btn back-btn" onclick="goBackToLogin()" id="btn-back-icon" style="display:none;">
-        </div>
+        <div class="floating-action-btn back-btn" onclick="goBackToLogin()" id="btn-back-icon" style="display:none;"></div>
         
         <div class="floating-action-btn location-btn" onclick="goToMyLocation()">
             <img src="https://cdn-icons-png.flaticon.com/512/1865/1865269.png" alt="Location">
@@ -413,7 +206,6 @@
         
         <div id="user-indicator" style="display:none; position:fixed; bottom:20px; left:20px; color:var(--primary); font-size:11px; font-weight:800; z-index:5000; opacity: 0.9; background: rgba(0,0,0,0.7); padding: 10px 16px; border-radius: 20px; backdrop-filter: blur(10px); border: 1px solid var(--glass-border); box-shadow: 0 4px 15px rgba(0,0,0,0.5);"></div>
         
-        <!-- COMPACT & COLLAPSIBLE LOGIN WIDGET (SCOREPUNKT) -->
         <div id="login-widget" class="glass-panel collapsed">
             <div class="login-header-tab" onclick="toggleLoginWidget()">
                 <div style="display:flex; align-items:center; gap: 8px;">
@@ -448,14 +240,12 @@
         
         <div class="admin-content-scroll">
             <div id="adm-score-view" style="display:none; flex-direction:column;">
-                
                 <div class="admin-score-hero mb-3" id="admin-score-container">
                     <div id="adm-main-score" style="font-size:64px; font-family:'Oswald'; font-weight:900; color:var(--primary); line-height:1.1;">0 : 0</div>
                     <div id="adm-sub-display" style="color:var(--text-main); font-weight:800; font-family:'Oswald'; margin-top:12px; letter-spacing:1px; font-size: 14px;"></div>
                 </div>
                 
                 <div id="adm-sport-controls"></div>
-                
                 <div id="adm-events-manager" class="adm-event-list mt-3"></div>
                 
                 <div class="action-btn-row mt-3" style="display:flex; flex-direction:column; gap:12px;">
@@ -477,12 +267,10 @@
                         <input type="text" id="adm-t2" placeholder="TIM 2 (MAX 10)" maxlength="10" list="team-list">
                     </div>
                     <datalist id="team-list"></datalist>
-                    
                     <input type="datetime-local" id="adm-time">
                     <button class="btn-primary mt-3" onclick="setupMatch()" id="btn-schedule">ZAKAŽI MEČ</button>
                 </div>
             </div>
-            
             <button class="btn-secondary" style="margin-top:auto; color: var(--danger); border-color: rgba(255,42,42,0.2);" onclick="adminDelete()" id="btn-delete-court">OBRIŠI TEREN</button>
         </div>
     </div>
@@ -491,6 +279,8 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- GEOFRIRE - NOVO ZA SKALIRANJE NA HILJADE KORISNIKA -->
+    <script src="https://unpkg.com/geofire@5.0.1/dist/geofire.min.js"></script>
 
     <script>
         const firebaseConfig = { 
@@ -502,8 +292,13 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth(), db = firebase.database();
 
-        let map, userMarker, currentLat, currentLon, currentAdminKey = null, allTereni = [];
+        let map, userMarker, currentLat, currentLon, currentAdminKey = null;
+        let allTereniData = {}; 
+        let activeMarkers = {}; 
+        let activeListeners = {}; // Ograničeni listeneri (GeoFire)
         let rangeCircleWave = null;
+        let geoQuery = null;
+        let geoFireRef = null;
         
         let currentLang = localStorage.getItem('lang') || 'en'; 
         const sportEmojis = { "FUDBAL": "⚽", "KOŠARKA": "🏀", "ODBOJKA": "🏐", "TENIS": "🎾", "RUKOMET": "🤾" };
@@ -512,7 +307,7 @@
         const translations = {
             sr: { 
                 infoToast: "ZUMIRAJTE MAPU (PRIKAZ DO 30KM OD CENTRA)",
-                login: "ULAZ U SISTEM", search: "Pretraži...", adminTitle: "ADMIN TABLA", savePeriod: "SAČUVAJ PERIOD / SET", goLive: "KRENI UŽIVO", endMatch: "ZAVRŠI MEČ", resetMatch: "RESET / NOVI MEČ", schedule: "ZAKAŽI MEČ", deleteCourt: "OBRIŠI TEREN", zoneOccupied: "ZONA ZAUZETA!", create: "KRENI", courtName: "NAZIV TERENA", player: "IME IGRAČA", team: "TIM", loggedAs: "ULOGOVAN KAO:", localMatch: "LOKALNI MEČ", points: "POENI", games: "GEMOVI", league: "LIGA (NOVA)", team1: "TIM 1", team2: "TIM 2", goal: "GOL", yellow: "ŽUTI", red: "CRVENI", confirmDelete: "DA LI STE SIGURNI DA ŽELITE OBRISATI?", live: "UŽIVO", ended: "KRAJ", limitReached: "LIMIT OD 3 TERENA JE DOSTIGNUT!", addCourt: "DODAJ TEREN", noData: "NEMA DODATNIH PODATAKA",
+                login: "ULAZ U SISTEM", search: "Pretraži...", adminTitle: "ADMIN TABLA", savePeriod: "SAČUVAJ PERIOD / SET", goLive: "KRENI UŽIVO", endMatch: "ZAVRŠI MEČ", resetMatch: "RESET / NOVI MEČ", schedule: "ZAKAŽI MEČ", deleteCourt: "OBRIŠI TEREN", zoneOccupied: "ZONA JE ZAUZETA!", create: "KRENI", courtName: "NAZIV TERENA", player: "IME IGRAČA", team: "TIM", loggedAs: "ULOGOVAN KAO:", localMatch: "LOKALNI MEČ", points: "POENI", games: "GEMOVI", league: "LIGA (NOVA)", team1: "TIM 1", team2: "TIM 2", goal: "GOL", yellow: "ŽUTI", red: "CRVENI", confirmDelete: "DA LI STE SIGURNI DA ŽELITE OBRISATI?", live: "UŽIVO", ended: "KRAJ", limitReached: "LIMIT OD 3 TERENA JE DOSTIGNUT!", addCourt: "DODAJ TEREN", noData: "NEMA DODATNIH PODATAKA",
                 sports: { "FUDBAL": "FUDBAL", "KOŠARKA": "KOŠARKA", "ODBOJKA": "ODBOJKA", "TENIS": "TENIS", "RUKOMET": "RUKOMET" },
                 periods: { FUDBAL: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "PROD"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } 
             },
@@ -524,7 +319,6 @@
             }
         };
 
-        // Custom Modal Logic
         let modalConfirmCallback = null;
         function showAppAlert(msg) {
             document.getElementById('modal-msg').innerText = msg;
@@ -540,7 +334,6 @@
             document.getElementById('modal-cancel-btn').style.display = 'block';
             document.getElementById('modal-ok-btn').innerText = currentLang === 'en' ? 'YES' : 'DA';
             document.getElementById('modal-cancel-btn').innerText = currentLang === 'en' ? 'NO' : 'NE';
-            
             if(isDanger) {
                 document.getElementById('modal-ok-btn').style.background = 'var(--danger)';
                 document.getElementById('modal-ok-btn').style.color = 'white';
@@ -548,7 +341,6 @@
                 document.getElementById('modal-ok-btn').style.background = 'var(--primary)';
                 document.getElementById('modal-ok-btn').style.color = '#000';
             }
-            
             document.getElementById('custom-modal-overlay').classList.add('show');
             modalConfirmCallback = callback;
         }
@@ -556,30 +348,22 @@
         function confirmAppModal() { closeAppModal(); if(modalConfirmCallback) modalConfirmCallback(); }
 
         function toggleLoginWidget() { document.getElementById('login-widget').classList.toggle('collapsed'); }
-
-        function toggleLangDropdown(e) {
-            if(e) e.stopPropagation();
-            document.getElementById('lang-dropdown').classList.toggle('open');
-        }
-
+        function toggleLangDropdown(e) { if(e) e.stopPropagation(); document.getElementById('lang-dropdown').classList.toggle('open'); }
+        
         document.addEventListener('click', (e) => {
             const dd = document.getElementById('lang-dropdown');
-            if (dd && dd.classList.contains('open') && !dd.contains(e.target)) {
-                dd.classList.remove('open');
-            }
+            if (dd && dd.classList.contains('open') && !dd.contains(e.target)) dd.classList.remove('open');
         });
 
         function setLanguage(lang) { 
             currentLang = lang; localStorage.setItem('lang', lang); updateUILanguage(); 
             if(currentAdminKey) refreshAdminPanel(currentAdminKey); 
-            renderMarkers();
+            reRenderAllMarkers();
         }
         
         function updateUILanguage() { 
             const t = translations[currentLang]; 
-            const flag = currentLang === 'en' ? 'ENG' : 'SRB';
-            document.getElementById('current-lang-text').innerText = flag;
-
+            document.getElementById('current-lang-text').innerText = currentLang === 'en' ? 'ENG' : 'SRB';
             document.getElementById('info-toast').innerText = t.infoToast;
             document.getElementById('btn-login').innerText = t.login; 
             document.getElementById('city-search').placeholder = t.search; 
@@ -593,33 +377,22 @@
             document.getElementById('adm-league-input').placeholder = t.league; 
             document.getElementById('adm-t1').placeholder = t.team1 + " (MAX 10)"; 
             document.getElementById('adm-t2').placeholder = t.team2 + " (MAX 10)"; 
-            
             if(auth.currentUser) document.getElementById('user-indicator').innerText = `${t.loggedAs} ${auth.currentUser.email}`; 
         }
 
         function goBackToLogin() { auth.signOut(); location.reload(); }
 
-        window.onload = () => {
-            initMap();
-            updateUILanguage();
-            loadSuggestions();
-        };
+        window.onload = () => { initMap(); updateUILanguage(); loadSuggestions(); };
         
         auth.onAuthStateChanged(user => { 
             const backBtnIcon = document.getElementById('btn-back-icon');
             const loginWidget = document.getElementById('login-widget');
             const userIndicator = document.getElementById('user-indicator');
-            
             if (user) { 
-                loginWidget.style.display = 'none';
-                userIndicator.style.display = 'block';
-                backBtnIcon.style.display = 'flex';
+                loginWidget.style.display = 'none'; userIndicator.style.display = 'block'; backBtnIcon.style.display = 'flex';
                 backBtnIcon.innerHTML = `<svg viewBox="0 0 24 24" width="22" height="22" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>`;
             } else { 
-                updateUILanguage(); 
-                loginWidget.style.display = 'flex'; 
-                userIndicator.style.display = 'none';
-                backBtnIcon.style.display = 'none';
+                updateUILanguage(); loginWidget.style.display = 'flex'; userIndicator.style.display = 'none'; backBtnIcon.style.display = 'none';
             } 
         });
         
@@ -642,539 +415,276 @@
         function initMap() {
             if (map) return;
             const sLat = localStorage.getItem('lastLat') || 44.7866, sLng = localStorage.getItem('lastLng') || 20.4489, sZoom = localStorage.getItem('lastZoom') || 13;
-            
             const bounds = [ [-90, -180], [90, 180] ];
             
-            map = L.map('map', { 
-                zoomControl: false, tap: false, minZoom: 3, maxBounds: bounds, maxBoundsViscosity: 1.0 
-            }).setView([sLat, sLng], sZoom);
+            map = L.map('map', { zoomControl: false, tap: false, minZoom: 3, maxBounds: bounds, maxBoundsViscosity: 1.0 }).setView([sLat, sLng], sZoom);
             
-            // OVO JE ORIGINALNI SATELITSKI SLOJ KOJI SAM SLUČAJNO OBKISAO - SADA JE VRAĆEN
-            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-                noWrap: true, bounds: bounds
-            }).addTo(map);
-            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', { 
-                opacity: 0.8, noWrap: true, bounds: bounds
-            }).addTo(map);
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { noWrap: true, bounds: bounds }).addTo(map);
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', { opacity: 0.8, noWrap: true, bounds: bounds }).addTo(map);
 
-            rangeCircleWave = L.circle(map.getCenter(), { 
-                radius: 30000, color: 'var(--primary)', weight: 2.5, opacity: 1, fill: false, interactive: false, className: 'radar-wave-circle' 
-            }).addTo(map);
+            rangeCircleWave = L.circle(map.getCenter(), { radius: 30000, color: 'var(--primary)', weight: 2.5, opacity: 1, fill: false, interactive: false, className: 'radar-wave-circle' }).addTo(map);
 
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(pos => {
-                    map.setView([pos.coords.latitude, pos.coords.longitude], 15);
-                }, () => {}, { timeout: 5000 });
+                navigator.geolocation.getCurrentPosition(pos => { map.setView([pos.coords.latitude, pos.coords.longitude], 15); }, () => {}, { timeout: 5000 });
             }
 
-            map.on('move', () => { 
-                rangeCircleWave.setLatLng(map.getCenter());
+            // GEOFRIRE INTEGRACIJA ZA SKALIRANJE
+            geoFireRef = new geofire.GeoFire(db.ref('geolocations'));
+            geoQuery = geoFireRef.query({
+                center: [parseFloat(sLat), parseFloat(sLng)],
+                radius: 30
             });
 
+            geoQuery.on("key_entered", function(key, location, distance) {
+                if (!activeListeners[key]) {
+                    activeListeners[key] = db.ref('tereni/' + key).on('value', snap => {
+                        if (snap.exists()) {
+                            let d = snap.val();
+                            d.key = key;
+                            allTereniData[key] = d;
+                            renderSingleMarker(key);
+                            if(currentAdminKey === key) refreshAdminPanel(key);
+                        } else {
+                            delete allTereniData[key];
+                            removeMarker(key);
+                        }
+                    });
+                }
+            });
+
+            geoQuery.on("key_exited", function(key, location, distance) {
+                if (activeListeners[key]) {
+                    db.ref('tereni/' + key).off('value', activeListeners[key]);
+                    delete activeListeners[key];
+                }
+                delete allTereniData[key];
+                removeMarker(key);
+            });
+
+            map.on('move', () => { rangeCircleWave.setLatLng(map.getCenter()); });
+
             map.on('moveend', () => { 
-                let c = map.getCenter(); localStorage.setItem('lastLat', c.lat); localStorage.setItem('lastLng', c.lng); localStorage.setItem('lastZoom', map.getZoom()); 
+                let c = map.getCenter(); 
+                localStorage.setItem('lastLat', c.lat); localStorage.setItem('lastLng', c.lng); localStorage.setItem('lastZoom', map.getZoom()); 
                 
-                // SKRIVANJE KRUGA KADA JE ZUM VEĆI OD 12 (kako si tražio)
                 if (map.getZoom() > 12) {
                     if(map.hasLayer(rangeCircleWave)) map.removeLayer(rangeCircleWave);
                 } else {
                     if(!map.hasLayer(rangeCircleWave)) map.addLayer(rangeCircleWave);
                 }
-
-                renderMarkers(); 
+                
+                // Ažuriraj zonu skeniranja - GeoFire dinamički vuče nove podatke
+                geoQuery.updateCriteria({ center: [c.lat, c.lng], radius: 30 });
+                reRenderAllMarkers(); 
             });
             
             map.on('click', handleMapClick);
-            db.ref('tereni').on('value', snap => { 
-                allTereni = []; snap.forEach(c => { let d = c.val(); d.key = c.key; allTereni.push(d); }); 
-                renderMarkers(); if(currentAdminKey) refreshAdminPanel(currentAdminKey); 
-            });
             trackGPS();
         }
 
-        function renderMarkers() {
+        function renderSingleMarker(key) {
             if (!map) return;
-            const center = map.getCenter();
-            map.eachLayer(l => { if(l instanceof L.Marker && l !== userMarker) map.removeLayer(l); });
+            const d = allTereniData[key];
+            if (!d) return; // Prevent render ako su podaci obrisani
             const zoomNear = map.getZoom() > 12;
             const t = translations[currentLang];
-            
+
             const infoToast = document.getElementById('info-toast');
-            if(infoToast) {
-                infoToast.style.opacity = zoomNear ? '0' : '1';
+            if(infoToast) infoToast.style.opacity = zoomNear ? '0' : '1';
+            
+            const isLive = d.status === 'live', isEnded = d.status === 'ended', isUpcoming = d.status === 'upcoming' && d.t1;
+            const ball = sportEmojis[d.sport] || '⚽';
+            
+            let cardBody = ""; let periodsHtml = ""; let eventsHtml = "";
+            
+            if (isLive || isEnded || isUpcoming) {
+                let s1 = (isLive || isEnded) ? (d.score1 || 0) : "-";
+                let s2 = (isLive || isEnded) ? (d.score2 || 0) : "-";
+                let statusText = isLive ? `<span style="color:var(--danger); animation: pulse-live 1.5s infinite;">● ${t.live}</span>` : (isEnded ? t.ended : new Date(d.match_time).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}));
+                
+                let p1Html = "", p2Html = "";
+                if (d.sub_details) {
+                    Object.values(d.sub_details).forEach(v => {
+                        let match = v.match(/(\d+):(\d+)$/);
+                        p1Html += `<div class="tv-period-score">${match ? match[1] : '-'}</div>`;
+                        p2Html += `<div class="tv-period-score">${match ? match[2] : '-'}</div>`;
+                    });
+                    periodsHtml += `<div style="background:rgba(0,0,0,0.4); border-radius:8px; padding:8px; border: 1px solid var(--glass-border);"><div style="display:flex; border-bottom:1px solid rgba(255,255,255,0.1); margin-bottom:4px; padding-bottom:4px;"><div style="flex:2; font-size:9px; color:var(--text-muted);">${t.team}</div>`;
+                    Object.values(d.sub_details).forEach(v => { periodsHtml += `<div style="flex:1; text-align:center; font-size:9px; color:var(--primary);">${v.split(' ')[0] || '-'}</div>`; });
+                    periodsHtml += `</div><div style="display:flex; margin-bottom:4px;"><div style="flex:2; font-size:11px; font-weight:800;">${(d.t1 || t.team1).substring(0,8)}</div>`;
+                    Object.values(d.sub_details).forEach(v => { let match = v.match(/(\d+):(\d+)$/); periodsHtml += `<div style="flex:1; text-align:center; font-size:11px; font-weight:700;">${match ? match[1] : '-'}</div>`; });
+                    periodsHtml += `</div><div style="display:flex;"><div style="flex:2; font-size:11px; font-weight:800;">${(d.t2 || t.team2).substring(0,8)}</div>`;
+                    Object.values(d.sub_details).forEach(v => { let match = v.match(/(\d+):(\d+)$/); periodsHtml += `<div style="flex:1; text-align:center; font-size:11px; font-weight:700;">${match ? match[2] : '-'}</div>`; });
+                    periodsHtml += `</div></div>`;
+                }
+
+                if (d.events) {
+                    let eH = "", eA = "";
+                    Object.values(d.events).forEach(ev => {
+                        if(ev.team == 1) eH += `<div style="font-size:11px; margin-bottom:4px; font-weight:600;"><span style="font-size:14px;">${ev.emoji}</span> ${ev.player}</div>`;
+                        else eA += `<div style="font-size:11px; margin-bottom:4px; text-align:right; font-weight:600;">${ev.player} <span style="font-size:14px;">${ev.emoji}</span></div>`;
+                    });
+                    eventsHtml = `<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;"><div>${eH}</div><div>${eA}</div></div>`;
+                }
+
+                let curr1 = "", curr2 = "";
+                if (isLive && (d.sport === "TENIS" || d.sport === "ODBOJKA")) {
+                    const isTB = (d.g1 === 6 && d.g2 === 6);
+                    const pt1 = d.sport === "TENIS" ? (isTB ? (d.p1||0) : (tennisPoints[d.p1]||"0")) : (d.p1||0);
+                    const pt2 = d.sport === "TENIS" ? (isTB ? (d.p2||0) : (tennisPoints[d.p2]||"0")) : (d.p2||0);
+                    if (d.sport === "TENIS") { p1Html += `<div class="tv-period-score" style="color: white;">${d.g1||0}</div>`; p2Html += `<div class="tv-period-score" style="color: white;">${d.g2||0}</div>`; }
+                    curr1 = `<div class="tv-curr-score">${pt1}</div>`; curr2 = `<div class="tv-curr-score">${pt2}</div>`;
+                }
+
+                const sportName = (t.sports && t.sports[d.sport]) ? t.sports[d.sport] : d.sport;
+                let inlineDetails = "";
+                if (d.sport === "FUDBAL") {
+                    inlineDetails = `<div class="tv-card-details" id="inline-${d.key}">${periodsHtml}${eventsHtml}${!periodsHtml && !eventsHtml ? `<div style="text-align:center; font-size:10px; font-weight:700; color:var(--text-muted); padding: 8px 0;">${t.noData}</div>` : ''}</div>`;
+                }
+
+                let isOwner = auth.currentUser && d.owner === auth.currentUser.uid;
+                let isClickable = isOwner || d.sport === "FUDBAL";
+                let cursorStyle = isClickable ? "cursor: pointer;" : "cursor: default;";
+
+                cardBody = `
+                <div class="tv-card-wrapper" style="${cursorStyle}">
+                    <div class="tv-card ${isLive?'tv-live':''}">
+                        <div class="tv-league">${d.league || t.localMatch}</div>
+                        <div class="tv-team-row"><div class="tv-team-name">${(d.t1 || t.team1).substring(0,10)}</div><div class="tv-team-score">${s1}</div>${p1Html}${curr1}</div>
+                        <div class="tv-team-row" style="border-bottom:none;"><div class="tv-team-name">${(d.t2 || t.team2).substring(0,10)}</div><div class="tv-team-score">${s2}</div>${p2Html}${curr2}</div>
+                        <div class="tv-bottom-bar"><span style="display:flex; align-items:center; gap:4px;">${ball} ${sportName}</span><span>${statusText}</span></div>
+                    </div>${inlineDetails}
+                </div><div class="marker-pointer"></div>`;
+            } else {
+                cardBody = `<div class="tv-card-wrapper"><div class="tv-card" style="padding:14px; text-align:center; font-weight:800; font-size:13px; color:var(--primary); border-left:4px solid rgba(255,255,255,0.2);">${ball} ${d.name}</div></div><div class="marker-pointer"></div>`;
             }
             
-            allTereni.forEach(d => {
-                if (map.distance(center, [d.lat, d.lng]) > 30000) return;
-                
-                const isLive = d.status === 'live', isEnded = d.status === 'ended', isUpcoming = d.status === 'upcoming' && d.t1;
-                const ball = sportEmojis[d.sport] || '⚽';
-                
-                let cardBody = "";
-                let periodsHtml = "";
-                let eventsHtml = "";
-                
-                if (isLive || isEnded || isUpcoming) {
-                    let s1 = (isLive || isEnded) ? (d.score1 || 0) : "-";
-                    let s2 = (isLive || isEnded) ? (d.score2 || 0) : "-";
-                    let statusText = isLive ? `<span style="color:var(--danger); animation: pulse-live 1.5s infinite;">● ${t.live}</span>` : (isEnded ? t.ended : new Date(d.match_time).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}));
-                    
-                    let p1Html = "", p2Html = "";
-                    if (d.sub_details) {
-                        Object.values(d.sub_details).forEach(v => {
-                            let match = v.match(/(\d+):(\d+)$/);
-                            let pts1 = match ? match[1] : '-';
-                            let pts2 = match ? match[2] : '-';
-                            p1Html += `<div class="tv-period-score">${pts1}</div>`;
-                            p2Html += `<div class="tv-period-score">${pts2}</div>`;
-                        });
-
-                        periodsHtml += `<div style="background:rgba(0,0,0,0.4); border-radius:8px; padding:8px; border: 1px solid var(--glass-border);">`;
-                        periodsHtml += `<div style="display:flex; border-bottom:1px solid rgba(255,255,255,0.1); margin-bottom:4px; padding-bottom:4px;"><div style="flex:2; font-size:9px; color:var(--text-muted);">${t.team}</div>`;
-                        Object.values(d.sub_details).forEach(v => {
-                            periodsHtml += `<div style="flex:1; text-align:center; font-size:9px; color:var(--primary);">${v.split(' ')[0] || '-'}</div>`;
-                        });
-                        periodsHtml += `</div>`;
-                        periodsHtml += `<div style="display:flex; margin-bottom:4px;"><div style="flex:2; font-size:11px; font-weight:800;">${(d.t1 || t.team1).substring(0,8)}</div>`;
-                        Object.values(d.sub_details).forEach(v => {
-                            let match = v.match(/(\d+):(\d+)$/);
-                            periodsHtml += `<div style="flex:1; text-align:center; font-size:11px; font-weight:700;">${match ? match[1] : '-'}</div>`;
-                        });
-                        periodsHtml += `</div>`;
-                        periodsHtml += `<div style="display:flex;"><div style="flex:2; font-size:11px; font-weight:800;">${(d.t2 || t.team2).substring(0,8)}</div>`;
-                        Object.values(d.sub_details).forEach(v => {
-                            let match = v.match(/(\d+):(\d+)$/);
-                            periodsHtml += `<div style="flex:1; text-align:center; font-size:11px; font-weight:700;">${match ? match[2] : '-'}</div>`;
-                        });
-                        periodsHtml += `</div></div>`;
-                    }
-
-                    if (d.events) {
-                        let eH = "", eA = "";
-                        Object.values(d.events).forEach(ev => {
-                            if(ev.team == 1) {
-                                eH += `<div style="font-size:11px; margin-bottom:4px; font-weight:600;"><span style="font-size:14px;">${ev.emoji}</span> ${ev.player}</div>`;
-                            } else {
-                                eA += `<div style="font-size:11px; margin-bottom:4px; text-align:right; font-weight:600;">${ev.player} <span style="font-size:14px;">${ev.emoji}</span></div>`;
-                            }
-                        });
-                        eventsHtml = `<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;"><div>${eH}</div><div>${eA}</div></div>`;
-                    }
-
-                    let curr1 = "", curr2 = "";
-                    if (isLive && (d.sport === "TENIS" || d.sport === "ODBOJKA")) {
-                        const isTB = (d.g1 === 6 && d.g2 === 6);
-                        const pt1 = d.sport === "TENIS" ? (isTB ? (d.p1||0) : (tennisPoints[d.p1]||"0")) : (d.p1||0);
-                        const pt2 = d.sport === "TENIS" ? (isTB ? (d.p2||0) : (tennisPoints[d.p2]||"0")) : (d.p2||0);
-                        
-                        if (d.sport === "TENIS") {
-                            p1Html += `<div class="tv-period-score" style="color: white;">${d.g1||0}</div>`;
-                            p2Html += `<div class="tv-period-score" style="color: white;">${d.g2||0}</div>`;
-                        }
-
-                        curr1 = `<div class="tv-curr-score">${pt1}</div>`;
-                        curr2 = `<div class="tv-curr-score">${pt2}</div>`;
-                    }
-
-                    const sportName = (t.sports && t.sports[d.sport]) ? t.sports[d.sport] : d.sport;
-
-                    let inlineDetails = "";
-                    if (d.sport === "FUDBAL") {
-                        inlineDetails = `<div class="tv-card-details" id="inline-${d.key}">
-                            ${periodsHtml}
-                            ${eventsHtml}
-                            ${!periodsHtml && !eventsHtml ? `<div style="text-align:center; font-size:10px; font-weight:700; color:var(--text-muted); padding: 8px 0;">${t.noData}</div>` : ''}
-                        </div>`;
-                    }
-
-                    let isOwner = auth.currentUser && d.owner === auth.currentUser.uid;
-                    let isClickable = isOwner || d.sport === "FUDBAL";
-                    let cursorStyle = isClickable ? "cursor: pointer;" : "cursor: default;";
-
-                    cardBody = `
-                    <div class="tv-card-wrapper" style="${cursorStyle}">
-                        <div class="tv-card ${isLive?'tv-live':''}">
-                            <div class="tv-league">${d.league || t.localMatch}</div>
-                            <div class="tv-team-row">
-                                <div class="tv-team-name">${(d.t1 || t.team1).substring(0,10)}</div>
-                                <div class="tv-team-score">${s1}</div>
-                                ${p1Html}
-                                ${curr1}
-                            </div>
-                            <div class="tv-team-row" style="border-bottom:none;">
-                                <div class="tv-team-name">${(d.t2 || t.team2).substring(0,10)}</div>
-                                <div class="tv-team-score">${s2}</div>
-                                ${p2Html}
-                                ${curr2}
-                            </div>
-                            <div class="tv-bottom-bar">
-                                <span style="display:flex; align-items:center; gap:4px;">${ball} ${sportName}</span>
-                                <span>${statusText}</span>
-                            </div>
-                        </div>
-                        ${inlineDetails}
-                    </div><div class="marker-pointer"></div>`;
-                } else {
-                    cardBody = `
-                    <div class="tv-card-wrapper">
-                        <div class="tv-card" style="padding:14px; text-align:center; font-weight:800; font-size:13px; color:var(--primary); border-left:4px solid rgba(255,255,255,0.2);">
-                            ${ball} ${d.name}
-                        </div>
-                    </div><div class="marker-pointer"></div>`;
-                }
-                
-                const hoverHtml = `<div class="hover-tooltip">${d.t1 || t.team1} <span style="color:var(--primary); font-size:8px;">VS</span> ${d.t2 || t.team2}</div>`;
-                const html = `<div class="sport-marker-wrapper ${isLive?'status-live-wrapper':''} ${zoomNear?'zoom-near':''}"><div class="marker-content-box"><div class="marker-ball-only">${ball}${hoverHtml}</div>${cardBody}</div></div>`;
-                
+            const hoverHtml = `<div class="hover-tooltip">${d.t1 || t.team1} <span style="color:var(--primary); font-size:8px;">VS</span> ${d.t2 || t.team2}</div>`;
+            const html = `<div class="sport-marker-wrapper ${isLive?'status-live-wrapper':''} ${zoomNear?'zoom-near':''}"><div class="marker-content-box"><div class="marker-ball-only">${ball}${hoverHtml}</div>${cardBody}</div></div>`;
+            
+            if (activeMarkers[key]) {
+                activeMarkers[key].setLatLng([d.lat, d.lng]);
+                activeMarkers[key].setIcon(L.divIcon({ className: '', html, iconSize: [0,0], iconAnchor: [0, 0] }));
+            } else {
                 let marker = L.marker([d.lat, d.lng], { icon: L.divIcon({ className: '', html, iconSize: [0,0], iconAnchor: [0, 0] }) }).addTo(map);
-                
                 marker.on('click', e => { 
                     L.DomEvent.stopPropagation(e); 
-                    if (map.getZoom() <= 12) {
-                        map.flyTo([d.lat, d.lng], 15);
-                    } else {
-                        if (auth.currentUser && d.owner === auth.currentUser.uid) {
-                            openAdmin(d.key); 
-                        } else if (d.sport === "FUDBAL") {
+                    if (map.getZoom() <= 12) { map.flyTo([d.lat, d.lng], 15); } 
+                    else {
+                        if (auth.currentUser && d.owner === auth.currentUser.uid) { openAdmin(d.key); } 
+                        else if (d.sport === "FUDBAL") {
                             let inlineEl = document.getElementById('inline-' + d.key);
-                            if (inlineEl) {
-                                inlineEl.style.display = inlineEl.style.display === 'flex' ? 'none' : 'flex';
-                            }
+                            if (inlineEl) inlineEl.style.display = inlineEl.style.display === 'flex' ? 'none' : 'flex';
                         }
                     }
                 });
-            });
+                activeMarkers[key] = marker;
+            }
         }
+
+        function removeMarker(key) { if (activeMarkers[key]) { map.removeLayer(activeMarkers[key]); delete activeMarkers[key]; } }
+        function reRenderAllMarkers() { Object.keys(allTereniData).forEach(key => renderSingleMarker(key)); }
 
         function handleMapClick(e) { 
             if (!auth.currentUser) return; 
-            const t = translations[currentLang]; 
-            const clickPos = e.latlng; 
-            const isTooClose = allTereni.some(court => { const courtLatLng = L.latLng(court.lat, court.lng); return clickPos.distanceTo(courtLatLng) < 200; });
-            
-            // CUSTOM APP ALERT UMJESTO STANDARDNOG
+            const t = translations[currentLang]; const clickPos = e.latlng; 
+            const isTooClose = Object.values(allTereniData).some(court => { return clickPos.distanceTo(L.latLng(court.lat, court.lng)) < 200; });
             if (isTooClose) { showAppAlert(t.zoneOccupied); return; } 
             
             const sp = t.sports || { "FUDBAL": "FUDBAL", "KOŠARKA": "KOŠARKA", "ODBOJKA": "ODBOJKA", "TENIS": "TENIS", "RUKOMET": "RUKOMET" };
-
-            const html = `
-                <div style="padding:12px 6px; text-align:center; display: flex; flex-direction: column; gap: 16px;">
-                    <h3 style="margin: 0; font-family:'Oswald', sans-serif; color:var(--primary); font-size:18px; letter-spacing: 1px;">${t.addCourt || 'DODAJ TEREN'}</h3>
-                    <select id="p_sport" style="width: 100%; margin: 0; padding: 14px; font-size:15px!important; border-radius:12px;">
-                        <option value="FUDBAL">⚽ ${sp.FUDBAL}</option>
-                        <option value="KOŠARKA">🏀 ${sp.KOŠARKA}</option>
-                        <option value="ODBOJKA">🏐 ${sp.ODBOJKA}</option>
-                        <option value="TENIS">🎾 ${sp.TENIS}</option>
-                        <option value="RUKOMET">🤾 ${sp.RUKOMET}</option>
-                    </select>
-                    <input type="text" id="p_name" placeholder="${t.courtName}" maxlength="15" style="width: 100%; margin: 0; padding: 14px; font-size:15px!important; border-radius:12px;">
-                    <button onclick="saveTeren(${e.latlng.lat}, ${e.latlng.lng})" class="btn-primary" style="width: 100%; margin: 0; padding: 16px; font-size:16px!important; border-radius:12px;">${t.create}</button>
-                </div>`; 
+            const html = `<div style="padding:12px 6px; text-align:center; display: flex; flex-direction: column; gap: 16px;"><h3 style="margin: 0; font-family:'Oswald', sans-serif; color:var(--primary); font-size:18px; letter-spacing: 1px;">${t.addCourt || 'DODAJ TEREN'}</h3><select id="p_sport" style="width: 100%; margin: 0; padding: 14px; font-size:15px!important; border-radius:12px;"><option value="FUDBAL">⚽ ${sp.FUDBAL}</option><option value="KOŠARKA">🏀 ${sp.KOŠARKA}</option><option value="ODBOJKA">🏐 ${sp.ODBOJKA}</option><option value="TENIS">🎾 ${sp.TENIS}</option><option value="RUKOMET">🤾 ${sp.RUKOMET}</option></select><input type="text" id="p_name" placeholder="${t.courtName}" maxlength="15" style="width: 100%; margin: 0; padding: 14px; font-size:15px!important; border-radius:12px;"><button onclick="saveTeren(${e.latlng.lat}, ${e.latlng.lng})" class="btn-primary" style="width: 100%; margin: 0; padding: 16px; font-size:16px!important; border-radius:12px;">${t.create}</button></div>`; 
             L.popup().setLatLng(e.latlng).setContent(html).openOn(map); 
         }
 
-        function openAdmin(key) { 
-            currentAdminKey = key; 
-            refreshAdminPanel(key); 
-            document.getElementById('admin-panel').classList.add('active'); 
-        }
-        function closeAdmin() { 
-            document.getElementById('admin-panel').classList.remove('active'); 
-            currentAdminKey = null; 
-        }
-        
-        function triggerGoalAnim() {
-            const el = document.getElementById('admin-score-container');
-            el.classList.remove('anim-score');
-            void el.offsetWidth;
-            el.classList.add('anim-score');
+        async function saveTeren(lat, lng) { 
+            const n = document.getElementById('p_name').value.toUpperCase();
+            const myCourts = Object.values(allTereniData).filter(t => t.owner === auth.currentUser.uid);
+            if (myCourts.length >= 3) { showAppAlert(translations[currentLang].limitReached); return; }
+            
+            // Push podataka i GeoFire lokacije
+            const newRef = db.ref('tereni').push();
+            await newRef.set({ name: n, lat, lng, owner: auth.currentUser.uid, sport: document.getElementById('p_sport').value, status: 'upcoming', score1: 0, score2: 0 }); 
+            await geoFireRef.set(newRef.key, [lat, lng]);
+            map.closePopup(); 
         }
 
+        function openAdmin(key) { currentAdminKey = key; refreshAdminPanel(key); document.getElementById('admin-panel').classList.add('active'); }
+        function closeAdmin() { document.getElementById('admin-panel').classList.remove('active'); currentAdminKey = null; }
+        
+        function triggerGoalAnim() { const el = document.getElementById('admin-score-container'); el.classList.remove('anim-score'); void el.offsetWidth; el.classList.add('anim-score'); }
+
         function refreshAdminPanel(key) {
-            const d = allTereni.find(x => x.key === key); if(!d) return; 
+            const d = allTereniData[key]; if(!d) return; 
             const t = translations[currentLang];
-            
-            document.getElementById('adm-name').innerText = d.name; 
-            document.getElementById('adm-main-score').innerText = `${d.score1 || 0} : ${d.score2 || 0}`;
+            document.getElementById('adm-name').innerText = d.name; document.getElementById('adm-main-score').innerText = `${d.score1 || 0} : ${d.score2 || 0}`;
             
             let subS = d.sub_details ? Object.values(d.sub_details).join(' | ') : ""; 
             if(d.sport === "ODBOJKA") subS = t.points + `: ${d.p1 || 0}:${d.p2 || 0} | ` + subS; 
-            if(d.sport === "TENIS") { 
-                const isTB = (d.g1 === 6 && d.g2 === 6); 
-                const pts1 = isTB ? (d.p1 || 0) : (tennisPoints[d.p1] || "0"); 
-                const pts2 = isTB ? (d.p2 || 0) : (tennisPoints[d.p2] || "0"); 
-                subS = t.games + `: ${d.g1 || 0}:${d.g2 || 0} (${pts1}:${pts2}) | ` + subS; 
-            }
+            if(d.sport === "TENIS") { const isTB = (d.g1 === 6 && d.g2 === 6); const pts1 = isTB ? (d.p1 || 0) : (tennisPoints[d.p1] || "0"); const pts2 = isTB ? (d.p2 || 0) : (tennisPoints[d.p2] || "0"); subS = t.games + `: ${d.g1 || 0}:${d.g2 || 0} (${pts1}:${pts2}) | ` + subS; }
             document.getElementById('adm-sub-display').innerText = subS;
             
-            const saveBtn = document.getElementById('btn-save-period'); 
-            saveBtn.disabled = (d.status !== 'live');
+            const saveBtn = document.getElementById('btn-save-period'); saveBtn.disabled = (d.status !== 'live');
+            saveBtn.style.display = (d.sport === "TENIS" || d.sport === "ODBOJKA") ? 'none' : 'block';
 
-            if(d.sport === "TENIS" || d.sport === "ODBOJKA") {
-                saveBtn.style.display = 'none';
-            } else {
-                saveBtn.style.display = 'block';
-            }
-
-            const ctrl = document.getElementById('adm-sport-controls'); 
-            ctrl.innerHTML = "";
-
+            const ctrl = document.getElementById('adm-sport-controls'); ctrl.innerHTML = "";
             if(d.sport === "KOŠARKA") {
-                ctrl.innerHTML = `
-                    <div class="score-ctrl-grid mb-3">
-                        <div class="team-ctrl-card">
-                            <div class="team-ctrl-lbl">${d.t1 || t.team1}</div>
-                            <div class="ctrl-btn-group" style="flex-wrap: wrap;">
-                                <button class="btn-ctrl minus" onclick="proScore(1,-1)">-1</button>
-                                <button class="btn-ctrl plus" onclick="proScore(1,1)">+1</button>
-                                <button class="btn-ctrl plus" onclick="proScore(1,2)">+2</button>
-                                <button class="btn-ctrl plus" onclick="proScore(1,3)">+3</button>
-                            </div>
-                        </div>
-                        <div class="team-ctrl-card">
-                            <div class="team-ctrl-lbl">${d.t2 || t.team2}</div>
-                            <div class="ctrl-btn-group" style="flex-wrap: wrap;">
-                                <button class="btn-ctrl minus" onclick="proScore(2,-1)">-1</button>
-                                <button class="btn-ctrl plus" onclick="proScore(2,1)">+1</button>
-                                <button class="btn-ctrl plus" onclick="proScore(2,2)">+2</button>
-                                <button class="btn-ctrl plus" onclick="proScore(2,3)">+3</button>
-                            </div>
-                        </div>
-                    </div>`;
+                ctrl.innerHTML = `<div class="score-ctrl-grid mb-3"><div class="team-ctrl-card"><div class="team-ctrl-lbl">${d.t1 || t.team1}</div><div class="ctrl-btn-group" style="flex-wrap: wrap;"><button class="btn-ctrl minus" onclick="proScore(1,-1)">-1</button><button class="btn-ctrl plus" onclick="proScore(1,1)">+1</button><button class="btn-ctrl plus" onclick="proScore(1,2)">+2</button><button class="btn-ctrl plus" onclick="proScore(1,3)">+3</button></div></div><div class="team-ctrl-card"><div class="team-ctrl-lbl">${d.t2 || t.team2}</div><div class="ctrl-btn-group" style="flex-wrap: wrap;"><button class="btn-ctrl minus" onclick="proScore(2,-1)">-1</button><button class="btn-ctrl plus" onclick="proScore(2,1)">+1</button><button class="btn-ctrl plus" onclick="proScore(2,2)">+2</button><button class="btn-ctrl plus" onclick="proScore(2,3)">+3</button></div></div></div>`;
             } else if(d.sport === "FUDBAL") {
-                ctrl.innerHTML = `
-                    <div class="glass-panel" style="padding: 24px; box-shadow: 0 10px 20px rgba(0,0,0,0.5);">
-                        <h4 style="color:var(--text-main); font-family:'Oswald'; text-align:center; margin-bottom:16px; font-size:15px; letter-spacing:1px;">UNOS DOGAĐAJA</h4>
-                        <input type="text" id="event-player" placeholder="${t.player}" class="mb-3">
-                        <select id="event-team" class="mb-3">
-                            <option value="1">${d.t1 || t.team1}</option>
-                            <option value="2">${d.t2 || t.team2}</option>
-                        </select>
-                        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;">
-                            <button onclick="addEvent('⚽')" class="btn-secondary" style="font-size:14px!important; padding:14px; border-color:var(--primary); color:var(--primary); font-weight:900;">⚽ ${t.goal}</button>
-                            <button onclick="addEvent('🟨')" class="btn-secondary" style="font-size:14px!important; padding:14px; color:#ffcc00; border-color:rgba(255,204,0,0.3);">🟨 ${t.yellow}</button>
-                            <button onclick="addEvent('🟥')" class="btn-secondary" style="font-size:14px!important; padding:14px; color:var(--danger); border-color:rgba(255,42,42,0.3);">🟥 ${t.red}</button>
-                        </div>
-                    </div>`;
+                ctrl.innerHTML = `<div class="glass-panel" style="padding: 24px; box-shadow: 0 10px 20px rgba(0,0,0,0.5);"><h4 style="color:var(--text-main); font-family:'Oswald'; text-align:center; margin-bottom:16px; font-size:15px; letter-spacing:1px;">UNOS DOGAĐAJA</h4><input type="text" id="event-player" placeholder="${t.player}" class="mb-3"><select id="event-team" class="mb-3"><option value="1">${d.t1 || t.team1}</option><option value="2">${d.t2 || t.team2}</option></select><div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;"><button onclick="addEvent('⚽')" class="btn-secondary" style="font-size:14px!important; padding:14px; border-color:var(--primary); color:var(--primary); font-weight:900;">⚽ ${t.goal}</button><button onclick="addEvent('🟨')" class="btn-secondary" style="font-size:14px!important; padding:14px; color:#ffcc00; border-color:rgba(255,204,0,0.3);">🟨 ${t.yellow}</button><button onclick="addEvent('🟥')" class="btn-secondary" style="font-size:14px!important; padding:14px; color:var(--danger); border-color:rgba(255,42,42,0.3);">🟥 ${t.red}</button></div></div>`;
             } else {
-                ctrl.innerHTML = `
-                    <div class="score-ctrl-grid mb-3">
-                        <div class="team-ctrl-card">
-                            <div class="team-ctrl-lbl">${d.t1 || t.team1}</div>
-                            <div class="ctrl-btn-group">
-                                <button class="btn-ctrl minus" onclick="proScore(1,-1)">-</button>
-                                <button class="btn-ctrl plus" onclick="proScore(1,1)">+</button>
-                            </div>
-                        </div>
-                        <div class="team-ctrl-card">
-                            <div class="team-ctrl-lbl">${d.t2 || t.team2}</div>
-                            <div class="ctrl-btn-group">
-                                <button class="btn-ctrl minus" onclick="proScore(2,-1)">-</button>
-                                <button class="btn-ctrl plus" onclick="proScore(2,1)">+</button>
-                            </div>
-                        </div>
-                    </div>`;
+                ctrl.innerHTML = `<div class="score-ctrl-grid mb-3"><div class="team-ctrl-card"><div class="team-ctrl-lbl">${d.t1 || t.team1}</div><div class="ctrl-btn-group"><button class="btn-ctrl minus" onclick="proScore(1,-1)">-</button><button class="btn-ctrl plus" onclick="proScore(1,1)">+</button></div></div><div class="team-ctrl-card"><div class="team-ctrl-lbl">${d.t2 || t.team2}</div><div class="ctrl-btn-group"><button class="btn-ctrl minus" onclick="proScore(2,-1)">-</button><button class="btn-ctrl plus" onclick="proScore(2,1)">+</button></div></div></div>`;
             }
 
             const evMgr = document.getElementById('adm-events-manager'); evMgr.innerHTML = "";
-            if(d.events) {
-                Object.keys(d.events).forEach(ekey => {
-                    const ev = d.events[ekey];
-                    evMgr.innerHTML += `
-                        <div class="adm-event-item">
-                            <span>${ev.emoji} ${ev.player}</span>
-                            <div class="adm-event-remove" onclick="removeEvent('${ekey}')">&times;</div>
-                        </div>`;
-                });
-            }
+            if(d.events) { Object.keys(d.events).forEach(ekey => { const ev = d.events[ekey]; evMgr.innerHTML += `<div class="adm-event-item"><span>${ev.emoji} ${ev.player}</span><div class="adm-event-remove" onclick="removeEvent('${ekey}')">&times;</div></div>`; }); }
 
-            if(d.t1) { 
-                document.getElementById('adm-score-view').style.display = 'flex'; 
-                document.getElementById('match-setup').style.display = 'none'; 
-                document.getElementById('start-live-btn').style.display = d.status==='upcoming' ? 'flex' : 'none'; 
-                document.getElementById('end-match-btn').style.display = d.status==='live' ? 'flex' : 'none'; 
-                document.getElementById('reset-match-btn').style.display = d.status==='ended' ? 'flex' : 'none'; 
-            } else { 
-                document.getElementById('adm-score-view').style.display = 'none'; 
-                document.getElementById('match-setup').style.display = 'flex'; 
-            }
+            if(d.t1) { document.getElementById('adm-score-view').style.display = 'flex'; document.getElementById('match-setup').style.display = 'none'; document.getElementById('start-live-btn').style.display = d.status==='upcoming' ? 'flex' : 'none'; document.getElementById('end-match-btn').style.display = d.status==='live' ? 'flex' : 'none'; document.getElementById('reset-match-btn').style.display = d.status==='ended' ? 'flex' : 'none'; } else { document.getElementById('adm-score-view').style.display = 'none'; document.getElementById('match-setup').style.display = 'flex'; }
         }
 
         function proScore(team, sign) { 
-            const d = allTereni.find(x => x.key === currentAdminKey); 
-            if(!d || d.status !== 'live') return; 
-            
+            const d = allTereniData[currentAdminKey]; if(!d || d.status !== 'live') return; 
             if (sign > 0) triggerGoalAnim();
-
-            if(d.sport === "ODBOJKA") { 
-                let p1 = d.p1 || 0, p2 = d.p2 || 0; 
-                if(team === 1) p1 = Math.max(0, p1 + sign); else p2 = Math.max(0, p2 + sign); 
-                let ts = (d.score1 || 0) + (d.score2 || 0); 
-                let target = (ts === 4) ? 15 : 25; 
-                if((p1 >= target && (p1 - p2) >= 2)) { autoSaveSet(d, p1, p2, 1); return; } 
-                else if ((p2 >= target && (p2 - p1) >= 2)) { autoSaveSet(d, p1, p2, 2); return; } 
-                db.ref(`tereni/${currentAdminKey}`).update({ p1, p2 }); 
-            } else if(d.sport === "TENIS") { 
-                let p1 = d.p1 || 0, p2 = d.p2 || 0, g1 = d.g1 || 0, g2 = d.g2 || 0; 
-                if(g1 === 6 && g2 === 6) { 
-                    if(team === 1) p1 = Math.max(0, p1 + sign); else p2 = Math.max(0, p2 + sign); 
-                    if(p1 >= 7 && (p1 - p2) >= 2) { autoSaveTennisSet(d, 7, 6, 1); return; } 
-                    else if(p2 >= 7 && (p2 - p1) >= 2) { autoSaveTennisSet(d, 6, 7, 2); return; } 
-                } else { 
-                    if(sign === 1) { 
-                        if(team === 1) { 
-                            if(p1 === 3 && p2 < 3) { g1++; p1=0; p2=0; } 
-                            else if(p1 === 3 && p2 === 3) p1 = 4; 
-                            else if(p1 === 3 && p2 === 4) p2 = 3; 
-                            else if(p1 === 4) { g1++; p1=0; p2=0; } else p1++; 
-                        } else { 
-                            if(p2 === 3 && p1 < 3) { g2++; p1=0; p2=0; } 
-                            else if(p2 === 3 && p1 === 3) p2 = 4; 
-                            else if(p2 === 3 && p1 === 4) p1 = 3; 
-                            else if(p2 === 4) { g2++; p1=0; p2=0; } else p2++; 
-                        } 
-                    } else { p1 = Math.max(0, p1 - 1); p2 = Math.max(0, p2 - 1); } 
-                    if((g1 >= 6 && (g1 - g2) >= 2) || g1 === 7) { autoSaveTennisSet(d, g1, g2, 1); return; } 
-                    else if((g2 >= 6 && (g2 - g1) >= 2) || g2 === 7) { autoSaveTennisSet(d, g1, g2, 2); return; } 
-                } 
-                db.ref(`tereni/${currentAdminKey}`).update({ p1, p2, g1, g2 }); 
-            } else {
-                db.ref(`tereni/${currentAdminKey}`).update({ [`score${team}`]: Math.max(0, (d[`score${team}`] || 0) + sign) }); 
-            }
+            if(d.sport === "ODBOJKA") { let p1 = d.p1 || 0, p2 = d.p2 || 0; if(team === 1) p1 = Math.max(0, p1 + sign); else p2 = Math.max(0, p2 + sign); let ts = (d.score1 || 0) + (d.score2 || 0); let target = (ts === 4) ? 15 : 25; if((p1 >= target && (p1 - p2) >= 2)) { autoSaveSet(d, p1, p2, 1); return; } else if ((p2 >= target && (p2 - p1) >= 2)) { autoSaveSet(d, p1, p2, 2); return; } db.ref(`tereni/${currentAdminKey}`).update({ p1, p2 }); } else if(d.sport === "TENIS") { let p1 = d.p1 || 0, p2 = d.p2 || 0, g1 = d.g1 || 0, g2 = d.g2 || 0; if(g1 === 6 && g2 === 6) { if(team === 1) p1 = Math.max(0, p1 + sign); else p2 = Math.max(0, p2 + sign); if(p1 >= 7 && (p1 - p2) >= 2) { autoSaveTennisSet(d, 7, 6, 1); return; } else if(p2 >= 7 && (p2 - p1) >= 2) { autoSaveTennisSet(d, 6, 7, 2); return; } } else { if(sign === 1) { if(team === 1) { if(p1 === 3 && p2 < 3) { g1++; p1=0; p2=0; } else if(p1 === 3 && p2 === 3) p1 = 4; else if(p1 === 3 && p2 === 4) p2 = 3; else if(p1 === 4) { g1++; p1=0; p2=0; } else p1++; } else { if(p2 === 3 && p1 < 3) { g2++; p1=0; p2=0; } else if(p2 === 3 && p1 === 3) p2 = 4; else if(p2 === 3 && p1 === 4) p1 = 3; else if(p2 === 4) { g2++; p1=0; p2=0; } else p2++; } } else { p1 = Math.max(0, p1 - 1); p2 = Math.max(0, p2 - 1); } if((g1 >= 6 && (g1 - g2) >= 2) || g1 === 7) { autoSaveTennisSet(d, g1, g2, 1); return; } else if((g2 >= 6 && (g2 - g1) >= 2) || g2 === 7) { autoSaveTennisSet(d, g1, g2, 2); return; } } db.ref(`tereni/${currentAdminKey}`).update({ p1, p2, g1, g2 }); } else { db.ref(`tereni/${currentAdminKey}`).update({ [`score${team}`]: Math.max(0, (d[`score${team}`] || 0) + sign) }); }
         }
 
-        function autoSaveSet(d, p1, p2, win) { 
-            let sub = d.sub_details || {}; 
-            let n = Object.keys(sub).length; 
-            const label = translations[currentLang].periods[d.sport][n] || "S"+(n+1); 
-            sub["S"+n] = `${label} ${p1}:${p2}`; 
-            db.ref(`tereni/${currentAdminKey}`).update({ p1: 0, p2: 0, score1: win === 1 ? ((d.score1||0) + 1) : (d.score1||0), score2: win === 2 ? ((d.score2||0) + 1) : (d.score2||0), sub_details: sub }); 
-        }
+        function autoSaveSet(d, p1, p2, win) { let sub = d.sub_details || {}; let n = Object.keys(sub).length; const label = translations[currentLang].periods[d.sport][n] || "S"+(n+1); sub["S"+n] = `${label} ${p1}:${p2}`; db.ref(`tereni/${currentAdminKey}`).update({ p1: 0, p2: 0, score1: win === 1 ? ((d.score1||0) + 1) : (d.score1||0), score2: win === 2 ? ((d.score2||0) + 1) : (d.score2||0), sub_details: sub }); }
+        function autoSaveTennisSet(d, g1, g2, win) { let sub = d.sub_details || {}; let n = Object.keys(sub).length; const label = translations[currentLang].periods[d.sport][n] || "S"+(n+1); sub["S"+n] = `${label} ${g1}:${g2}`; db.ref(`tereni/${currentAdminKey}`).update({ p1: 0, p2: 0, g1: 0, g2: 0, score1: win === 1 ? ((d.score1||0) + 1) : (d.score1||0), score2: win === 2 ? ((d.score2||0) + 1) : (d.score2||0), sub_details: sub }); }
+        function triggerLogic(type) { const d = allTereniData[currentAdminKey]; if(type === 'period') { if (d.status !== 'live') return; let sub = d.sub_details || {}; let n = Object.keys(sub).length; const limits = { "FUDBAL": 5, "KOŠARKA": 5, "ODBOJKA": 5, "TENIS": 5, "RUKOMET": 5 }; if (n >= (limits[d.sport] || 5)) return; const label = translations[currentLang].periods[d.sport][n] || "P"+(n+1); let ph = 0, pa = 0; Object.values(sub).forEach(v => { let match = v.match(/(\d+):(\d+)$/); if(match) { ph += parseInt(match[1]); pa += parseInt(match[2]); } }); sub["P"+n] = `${label} ${(d.score1||0)-ph}:${(d.score2||0)-pa}`; db.ref(`tereni/${currentAdminKey}`).update({ sub_details: sub }); } else if(type === 'end') { db.ref(`tereni/${currentAdminKey}`).update({ status: 'ended' }); } }
 
-        function autoSaveTennisSet(d, g1, g2, win) { 
-            let sub = d.sub_details || {}; 
-            let n = Object.keys(sub).length; 
-            const label = translations[currentLang].periods[d.sport][n] || "S"+(n+1); 
-            sub["S"+n] = `${label} ${g1}:${g2}`; 
-            db.ref(`tereni/${currentAdminKey}`).update({ p1: 0, p2: 0, g1: 0, g2: 0, score1: win === 1 ? ((d.score1||0) + 1) : (d.score1||0), score2: win === 2 ? ((d.score2||0) + 1) : (d.score2||0), sub_details: sub }); 
-        }
-
-        function triggerLogic(type) { 
-            const d = allTereni.find(x => x.key === currentAdminKey); 
-            if(type === 'period') { 
-                if (d.status !== 'live') return;
-                let sub = d.sub_details || {}; let n = Object.keys(sub).length; 
-                const limits = { "FUDBAL": 5, "KOŠARKA": 5, "ODBOJKA": 5, "TENIS": 5, "RUKOMET": 5 };
-                if (n >= (limits[d.sport] || 5)) return;
-                const label = translations[currentLang].periods[d.sport][n] || "P"+(n+1); 
-                let ph = 0, pa = 0; 
-                Object.values(sub).forEach(v => { 
-                    let match = v.match(/(\d+):(\d+)$/); 
-                    if(match) { ph += parseInt(match[1]); pa += parseInt(match[2]); } 
-                }); 
-                sub["P"+n] = `${label} ${(d.score1||0)-ph}:${(d.score2||0)-pa}`; 
-                db.ref(`tereni/${currentAdminKey}`).update({ sub_details: sub }); 
-            } else if(type === 'end') {
-                db.ref(`tereni/${currentAdminKey}`).update({ status: 'ended' }); 
-            }
-        }
-
-        function addEvent(emoji) { 
-            const p = document.getElementById('event-player').value.toUpperCase(), t = document.getElementById('event-team').value; 
-            if(!p) return; 
-            db.ref(`tereni/${currentAdminKey}/events`).push({ player: p, team: t, emoji: emoji }); 
-            document.getElementById('event-player').value = ""; 
-
-            if(emoji === '⚽') {
-                proScore(parseInt(t), 1);
-            }
-        }
+        function addEvent(emoji) { const p = document.getElementById('event-player').value.toUpperCase(), t = document.getElementById('event-team').value; if(!p) return; db.ref(`tereni/${currentAdminKey}/events`).push({ player: p, team: t, emoji: emoji }); document.getElementById('event-player').value = ""; if(emoji === '⚽') { proScore(parseInt(t), 1); } }
         
         function removeEvent(ekey) { 
             if(!ekey) return; const t = translations[currentLang]; 
-            showAppConfirm(t.confirmDelete, () => {
-                db.ref(`tereni/${currentAdminKey}/events/${ekey}`).remove();
-            }, true);
+            showAppConfirm(t.confirmDelete, () => { db.ref(`tereni/${currentAdminKey}/events/${ekey}`).remove(); }, true);
         }
         
         async function setupMatch() { 
-            let l = document.getElementById('adm-league-input').value.toUpperCase(), 
-                t1 = document.getElementById('adm-t1').value.toUpperCase().substring(0, 10), 
-                t2 = document.getElementById('adm-t2').value.toUpperCase().substring(0, 10), 
-                time = document.getElementById('adm-time').value; 
+            let l = document.getElementById('adm-league-input').value.toUpperCase(), t1 = document.getElementById('adm-t1').value.toUpperCase().substring(0, 10), t2 = document.getElementById('adm-t2').value.toUpperCase().substring(0, 10), time = document.getElementById('adm-time').value; 
             if(!t1 || !t2) return; 
             saveSuggestion('leagues', l); saveSuggestion('teams', t1); saveSuggestion('teams', t2); 
             await db.ref(`tereni/${currentAdminKey}`).update({ league: l, t1, t2, match_time: time, status: 'upcoming', score1: 0, score2: 0, events: null, sub_details: null, p1: 0, p2: 0, g1: 0, g2: 0 }); 
         }
         
-        function trackGPS() { 
-            if(!navigator.geolocation) return; 
-            navigator.geolocation.watchPosition(pos => { 
-                currentLat = pos.coords.latitude; currentLon = pos.coords.longitude; 
-                if(!userMarker) { 
-                    userMarker = L.marker([currentLat, currentLon], { icon: L.divIcon({ className: 'user-location-dot', iconSize: [16, 16] }) }).addTo(map); 
-                } else {
-                    userMarker.setLatLng([currentLat, currentLon]); 
-                }
-            }, null, { enableHighAccuracy: true }); 
-        }
-        
-        function goToMyLocation() { if(currentLat) map.flyTo([currentLat, currentLon], 18); }
-        
-        function executeSearch() {
-            let val = document.getElementById('city-search').value;
-            if(!val) return;
-            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${val}`)
-            .then(r => r.json()).then(data => { 
-                if(data[0]) { map.flyTo([data[0].lat, data[0].lon], 15); toggleSearch(); } 
-            }); 
-        }
-
-        function handleSearch(e) { 
-            if(e.key === "Enter") { 
-                executeSearch();
-            } 
-        }
-        
-        async function handleAuth() { 
-            let e = document.getElementById('email').value, p = document.getElementById('password').value; 
-            try { 
-                await auth.signInWithEmailAndPassword(e, p); 
-            } catch { 
-                try { 
-                    await auth.createUserWithEmailAndPassword(e, p); 
-                } catch(err) { 
-                    showAppAlert(err.message); 
-                } 
-            } 
-        }
-
-        async function saveTeren(lat, lng) { 
-            const n = document.getElementById('p_name').value.toUpperCase();
-            const myCourts = allTereni.filter(t => t.owner === auth.currentUser.uid);
-            
-            // CUSTOM APP ALERT UMJESTO STANDARDNOG
-            if (myCourts.length >= 3) { showAppAlert(translations[currentLang].limitReached); return; }
-            
-            await db.ref('tereni').push({ name: n, lat, lng, owner: auth.currentUser.uid, sport: document.getElementById('p_sport').value, status: 'upcoming', score1: 0, score2: 0 }); 
-            map.closePopup(); 
-        }
-        
         function adminStatus(s) { db.ref(`tereni/${currentAdminKey}`).update({ status: s }); }
         
         function adminDelete() { 
-            // CUSTOM APP CONFIRM UMJESTO STANDARDNOG
             showAppConfirm(translations[currentLang].confirmDelete, () => {
-                db.ref(`tereni/${currentAdminKey}`).remove(); closeAdmin(); 
+                db.ref(`tereni/${currentAdminKey}`).remove();
+                geoFireRef.remove(currentAdminKey);
+                closeAdmin(); 
             }, true);
         }
         
         function resetMatch() { db.ref(`tereni/${currentAdminKey}`).update({ status: 'upcoming', score1: 0, score2: 0, sub_details: null, events: null, p1: 0, p2: 0, g1: 0, g2: 0 }); }
         
-        function toggleSearch() { 
-            document.getElementById('search-container').classList.toggle('expanded'); 
-            if(document.getElementById('search-container').classList.contains('expanded')) document.getElementById('city-search').focus(); 
-        }
+        function trackGPS() { if(!navigator.geolocation) return; navigator.geolocation.watchPosition(pos => { currentLat = pos.coords.latitude; currentLon = pos.coords.longitude; if(!userMarker) { userMarker = L.marker([currentLat, currentLon], { icon: L.divIcon({ className: 'user-location-dot', iconSize: [16, 16] }) }).addTo(map); } else { userMarker.setLatLng([currentLat, currentLon]); } }, null, { enableHighAccuracy: true }); }
+        function goToMyLocation() { if(currentLat) map.flyTo([currentLat, currentLon], 18); }
+        
+        function executeSearch() { let val = document.getElementById('city-search').value; if(!val) return; fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${val}`).then(r => r.json()).then(data => { if(data[0]) { map.flyTo([data[0].lat, data[0].lon], 15); toggleSearch(); } }); }
+        function handleSearch(e) { if(e.key === "Enter") { executeSearch(); } }
+        
+        async function handleAuth() { let e = document.getElementById('email').value, p = document.getElementById('password').value; try { await auth.signInWithEmailAndPassword(e, p); } catch { try { await auth.createUserWithEmailAndPassword(e, p); } catch(err) { showAppAlert(err.message); } } }
+        function toggleSearch() { document.getElementById('search-container').classList.toggle('expanded'); if(document.getElementById('search-container').classList.contains('expanded')) document.getElementById('city-search').focus(); }
     </script>
 </body>
 </html>
