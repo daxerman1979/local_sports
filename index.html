@@ -321,12 +321,12 @@
 
         const translations = {
             sr: { 
-                infoToast: "ZUMIRAJTE MAPU (PRIKAZ DO 30KM OD CENTRA)", login: "ULAZ U SISTEM", search: "Pretraži...", adminTitle: "ADMIN TABLA", savePeriod: "SAČUVAJ PERIOD / SET", goLive: "KRENI UŽIVO", endMatch: "ZAVRŠI MEČ", resetMatch: "RESET / NOVI MEČ", schedule: "ZAKAŽI MEČ", deleteCourt: "OBRIŠI TEREN", create: "KRENI", courtName: "NAZIV TERENA", player: "IME IGRAČA", team: "TIM", loggedAs: "ULOGOVAN KAO:", localMatch: "LOKALNI MEČ", points: "POENI", games: "GEMOVI", league: "LIGA (NOVA)", team1: "TIM 1", team2: "TIM 2", goal: "GOL", yellow: "ŽUTI", red: "CRVENI", confirmDelete: "DA LI STE SIGURNI DA ŽELITE OBRISATI?", live: "UŽIVO", ended: "KRAJ", limitReached: "LIMIT OD 3 TERENA JE DOSTIGNUT!", addCourt: "DODAJ TEREN", noData: "NEMA DODATNIH PODATAKA",
+                infoToast: "ZUMIRAJTE MAPU (PRIKAZ DO 30KM OD CENTRA)", login: "ULAZ U SISTEM", search: "Pretraži...", adminTitle: "ADMIN TABLA", savePeriod: "SAČUVAJ PERIOD / SET", goLive: "KRENI UŽIVO", endMatch: "ZAVRŠI MEČ", resetMatch: "RESET / NOVI MEČ", schedule: "ZAKAŽI MEČ", deleteCourt: "OBRIŠI TEREN", zoneOccupied: "ZONA JE ZAUZETA (UNUTAR 100M)!", create: "KRENI", courtName: "NAZIV TERENA", player: "IME IGRAČA", team: "TIM", loggedAs: "ULOGOVAN KAO:", localMatch: "LOKALNI MEČ", points: "POENI", games: "GEMOVI", league: "LIGA (NOVA)", team1: "TIM 1", team2: "TIM 2", goal: "GOL", yellow: "ŽUTI", red: "CRVENI", confirmDelete: "DA LI STE SIGURNI DA ŽELITE OBRISATI?", live: "UŽIVO", ended: "KRAJ", limitReached: "LIMIT OD 3 TERENA JE DOSTIGNUT!", addCourt: "DODAJ TEREN", noData: "NEMA DODATNIH PODATAKA",
                 sports: { "FUDBAL": "FUDBAL", "KOŠARKA": "KOŠARKA", "ODBOJKA": "ODBOJKA", "TENIS": "TENIS", "RUKOMET": "RUKOMET" },
                 periods: { FUDBAL: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "PROD"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } 
             },
             en: { 
-                infoToast: "ZOOM IN TO REVEAL (MATCHES WITHIN 30KM)", login: "ENTER SYSTEM", search: "Search...", adminTitle: "ADMIN PANEL", savePeriod: "SAVE PERIOD / SET", goLive: "GO LIVE", endMatch: "END MATCH", resetMatch: "RESET / NEW MATCH", schedule: "SCHEDULE MATCH", deleteCourt: "DELETE COURT", create: "CREATE", courtName: "COURT NAME", player: "PLAYER NAME", team: "TEAM", loggedAs: "LOGGED AS:", localMatch: "LOCAL MATCH", points: "POINTS", games: "GAMES", league: "LEAGUE (NEW)", team1: "TEAM 1", team2: "TEAM 2", goal: "GOAL", yellow: "YELLOW", red: "RED", confirmDelete: "ARE YOU SURE YOU WANT TO DELETE?", live: "LIVE", ended: "ENDED", limitReached: "LIMIT OF 3 COURTS REACHED!", addCourt: "ADD COURT", noData: "NO ADDITIONAL DATA",
+                infoToast: "ZOOM IN TO REVEAL (MATCHES WITHIN 30KM)", login: "ENTER SYSTEM", search: "Search...", adminTitle: "ADMIN PANEL", savePeriod: "SAVE PERIOD / SET", goLive: "GO LIVE", endMatch: "END MATCH", resetMatch: "RESET / NEW MATCH", schedule: "SCHEDULE MATCH", deleteCourt: "DELETE COURT", zoneOccupied: "ZONE OCCUPIED (WITHIN 100M)!", create: "CREATE", courtName: "COURT NAME", player: "PLAYER NAME", team: "TEAM", loggedAs: "LOGGED AS:", localMatch: "LOCAL MATCH", points: "POINTS", games: "GAMES", league: "LEAGUE (NEW)", team1: "TEAM 1", team2: "TEAM 2", goal: "GOAL", yellow: "YELLOW", red: "RED", confirmDelete: "ARE YOU SURE YOU WANT TO DELETE?", live: "LIVE", ended: "ENDED", limitReached: "LIMIT OF 3 COURTS REACHED!", addCourt: "ADD COURT", noData: "NO ADDITIONAL DATA",
                 sports: { "FUDBAL": "FOOTBALL", "KOŠARKA": "BASKETBALL", "ODBOJKA": "VOLLEYBALL", "TENIS": "TENNIS", "RUKOMET": "HANDBALL" },
                 periods: { FUDBAL: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "OT"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } 
             }
@@ -463,7 +463,6 @@
             const isLive = d.status === 'live', isEnded = d.status === 'ended', isUpcoming = d.status === 'upcoming' && d.t1;
             const ball = sportEmojis[d.sport] || '⚽';
             
-            // Izračunaj automatski faktor smanjivanja kartice ako ima bliskih terena u krugu od 80 metara
             let nearbyCount = 0;
             const currentPt = L.latLng(d.lat, d.lng);
             Object.values(allTereniData).forEach(other => {
@@ -576,7 +575,12 @@
 
         function handleMapClick(e) { 
             if (!auth.currentUser) return; 
-            const t = translations[currentLang]; 
+            const t = translations[currentLang]; const clickPos = e.latlng; 
+            
+            // Ograničenje blizine na 100 metara za novi teren
+            const isTooClose = Object.values(allTereniData).some(court => { return clickPos.distanceTo(L.latLng(court.lat, court.lng)) < 100; });
+            if (isTooClose) { showAppAlert(t.zoneOccupied); return; } 
+
             const sp = t.sports || { "FUDBAL": "FUDBAL", "KOŠARKA": "KOŠARKA", "ODBOJKA": "ODBOJKA", "TENIS": "TENIS", "RUKOMET": "RUKOMET" };
             const html = `<div style="padding:12px 6px; text-align:center; display: flex; flex-direction: column; gap: 16px;"><h3 style="margin: 0; font-family:'Oswald', sans-serif; color:var(--primary); font-size:18px; letter-spacing: 1px;">${t.addCourt || 'DODAJ TEREN'}</h3><select id="p_sport" style="width: 100%; margin: 0; padding: 14px; font-size:15px!important; border-radius:12px;"><option value="FUDBAL">⚽ ${sp.FUDBAL}</option><option value="KOŠARKA">🏀 ${sp.KOŠARKA}</option><option value="ODBOJKA">🏐 ${sp.ODBOJKA}</option><option value="TENIS">🎾 ${sp.TENIS}</option><option value="RUKOMET">🤾 ${sp.RUKOMET}</option></select><input type="text" id="p_name" placeholder="${t.courtName}" maxlength="15" style="width: 100%; margin: 0; padding: 14px; font-size:15px!important; border-radius:12px;"><button onclick="saveTeren(${e.latlng.lat}, ${e.latlng.lng})" class="btn-primary" style="width: 100%; margin: 0; padding: 16px; font-size:16px!important; border-radius:12px;">${t.create}</button></div>`; 
             L.popup().setLatLng(e.latlng).setContent(html).openOn(map); 
