@@ -310,6 +310,7 @@
         let map, userMarker, currentLat, currentLon, currentAdminKey = null;
         let allTereniData = {}; 
         let activeMarkers = {}; 
+        let activeLines = {};
         let activeListeners = {};
         let rangeCircleWave = null;
         let geoQuery = null;
@@ -448,23 +449,72 @@
             map.on('click', handleMapClick); trackGPS();
         }
 
-        // Pomoćna funkcija koja automatski blago razmiče markere ako dele iste koordinate
-        function getAdjustedCoordinates(key) {
-            const d = allTereniData[key];
-            if (!d) return [0, 0];
+        // Napredno grupisanje terena u krug (do 150m) sa izračunavanjem pozicija
+        function calculateLayoutMap() {
             const keys = Object.keys(allTereniData);
-            let sameSpots = keys.filter(k => {
-                const item = allTereniData[k];
-                return item && Math.abs(item.lat - d.lat) < 0.00001 && Math.abs(item.lng - d.lng) < 0.00001;
+            let processed = new Set();
+            let groups = [];
+
+            keys.forEach(k1 => {
+                if (processed.has(k1)) return;
+                let group = [k1];
+                let c1 = allTereniData[k1];
+                let pt1 = L.latLng(c1.lat, c1.lng);
+
+                keys.forEach(k2 => {
+                    if (k1 === k2 || processed.has(k2)) return;
+                    let c2 = allTereniData[k2];
+                    let pt2 = L.latLng(c2.lat, c2.lng);
+                    if (pt1.distanceTo(pt2) <= 150) {
+                        group.push(k2);
+                    }
+                });
+
+                group.forEach(g => processed.add(g));
+                groups.push(group);
             });
-            if (sameSpots.length <= 1) return [d.lat, d.lng];
-            let index = sameSpots.indexOf(key);
-            let angle = (index / sameSpots.length) * 2 * Math.PI;
-            let offset = 0.00015; // blagi radijus razmicanja
-            return [d.lat + offset * Math.cos(angle), d.lng + offset * Math.sin(angle)];
+
+            let adjustedMap = {};
+            groups.forEach(group => {
+                if (group.length === 1) {
+                    let k = group[0];
+                    adjustedMap[k] = { lat: allTereniData[k].lat, lng: allTereniData[k].lng, isMoved: false };
+                } else {
+                    let sumLat = 0, sumLng = 0;
+                    group.forEach(k => {
+                        sumLat += allTereniData[k].lat;
+                        sumLng += allTereniData[k].lng;
+                    });
+                    let centerLat = sumLat / group.length;
+                    let centerLng = sumLng / group.length;
+
+                    group.forEach((k, index) => {
+                        let angle = (index / group.length) * 2 * Math.PI;
+                        let radiusOffset = 0.00045; // Vidljiv odmak u krug
+                        adjustedMap[k] = {
+                            lat: centerLat + radiusOffset * Math.cos(angle),
+                            lng: centerLng + radiusOffset * Math.sin(angle),
+                            isMoved: true
+                        };
+                    });
+                }
+            });
+
+            return adjustedMap;
         }
 
-        function renderSingleMarker(key) {
+        function reRenderAllMarkers() {
+            // Ukloni stare linije
+            Object.values(activeLines).forEach(line => map.removeLayer(line));
+            activeLines = {};
+
+            const layout = calculateLayoutMap();
+            Object.keys(allTereniData).forEach(key => {
+                renderSingleMarker(key, layout[key]);
+            });
+        }
+
+        function renderSingleMarker(key, posData) {
             if (!map) return;
             const d = allTereniData[key]; if (!d) return; 
             const zoomNear = map.getZoom() > 12; const t = translations[currentLang];
@@ -540,17 +590,28 @@
             const hoverHtml = `<div class="hover-tooltip">${d.t1 || t.team1} <span style="color:var(--primary); font-size:8px;">VS</span> ${d.t2 || t.team2}</div>`;
             const html = `<div class="sport-marker-wrapper ${isLive?'status-live-wrapper':''} ${zoomNear?'zoom-near':''}"><div class="marker-content-box"><div class="marker-ball-only">${ball}${hoverHtml}</div>${cardBody}</div></div>`;
             
-            const adjustedCoords = getAdjustedCoordinates(key);
+            const targetCoords = [posData.lat, posData.lng];
+
+            // Ako je teren pomeren iz kruga, nacrtaj tanku liniju ka originalnoj lokaciji
+            if (posData.isMoved) {
+                let line = L.polyline([[d.lat, d.lng], targetCoords], {
+                    color: '#f59e0b',
+                    weight: 1.5,
+                    opacity: 0.7,
+                    dashArray: '4, 4'
+                }).addTo(map);
+                activeLines[key] = line;
+            }
 
             if (activeMarkers[key]) {
-                activeMarkers[key].setLatLng(adjustedCoords); 
+                activeMarkers[key].setLatLng(targetCoords); 
                 activeMarkers[key].setIcon(L.divIcon({ className: '', html, iconSize: [0,0], iconAnchor: [0, 0] }));
             } else {
-                let marker = L.marker(adjustedCoords, { icon: L.divIcon({ className: '', html, iconSize: [0,0], iconAnchor: [0, 0] }) }).addTo(map);
+                let marker = L.marker(targetCoords, { icon: L.divIcon({ className: '', html, iconSize: [0,0], iconAnchor: [0, 0] }) }).addTo(map);
                 marker.on('click', e => { 
                     L.DomEvent.stopPropagation(e); 
                     let hasDetails = (d.sub_details || d.events || d.comment);
-                    if (map.getZoom() <= 12) { map.flyTo(adjustedCoords, 15); } 
+                    if (map.getZoom() <= 12) { map.flyTo(targetCoords, 15); } 
                     else { 
                         if (auth.currentUser && d.owner === auth.currentUser.uid) { 
                             openAdmin(d.key); 
@@ -559,7 +620,6 @@
                             if (inlineEl) {
                                 let wasOpen = inlineEl.style.display === 'flex';
                                 document.querySelectorAll('.tv-card-details').forEach(el => el.style.display = 'none');
-                                // Zatvara se/otvara se ISKLJUČIVO klikom na ovaj prozor (nema zatvaranja na klik mape)
                                 inlineEl.style.display = wasOpen ? 'none' : 'flex';
                             } 
                         } 
@@ -569,11 +629,12 @@
             }
         }
 
-        function removeMarker(key) { if (activeMarkers[key]) { map.removeLayer(activeMarkers[key]); delete activeMarkers[key]; } }
-        function reRenderAllMarkers() { Object.keys(allTereniData).forEach(key => renderSingleMarker(key)); }
+        function removeMarker(key) { 
+            if (activeMarkers[key]) { map.removeLayer(activeMarkers[key]); delete activeMarkers[key]; }
+            if (activeLines[key]) { map.removeLayer(activeLines[key]); delete activeLines[key]; }
+        }
 
         function handleMapClick(e) { 
-            // Uklonjeno zatvaranje prozora na klik mape. Prozor ostaje otvoren dok se ne klikne ponovo na njega.
             if (!auth.currentUser) return; 
             const t = translations[currentLang]; 
             const sp = t.sports || { "FUDBAL": "FUDBAL", "KOŠARKA": "KOŠARKA", "ODBOJKA": "ODBOJKA", "TENIS": "TENIS", "RUKOMET": "RUKOMET" };
