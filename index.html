@@ -310,7 +310,6 @@
         let map, userMarker, currentLat, currentLon, currentAdminKey = null;
         let allTereniData = {}; 
         let activeMarkers = {}; 
-        let activeLines = {};
         let activeListeners = {};
         let rangeCircleWave = null;
         let geoQuery = null;
@@ -449,72 +448,13 @@
             map.on('click', handleMapClick); trackGPS();
         }
 
-        // Napredno grupisanje terena u krug (do 150m) sa izračunavanjem pozicija
-        function calculateLayoutMap() {
-            const keys = Object.keys(allTereniData);
-            let processed = new Set();
-            let groups = [];
-
-            keys.forEach(k1 => {
-                if (processed.has(k1)) return;
-                let group = [k1];
-                let c1 = allTereniData[k1];
-                let pt1 = L.latLng(c1.lat, c1.lng);
-
-                keys.forEach(k2 => {
-                    if (k1 === k2 || processed.has(k2)) return;
-                    let c2 = allTereniData[k2];
-                    let pt2 = L.latLng(c2.lat, c2.lng);
-                    if (pt1.distanceTo(pt2) <= 150) {
-                        group.push(k2);
-                    }
-                });
-
-                group.forEach(g => processed.add(g));
-                groups.push(group);
-            });
-
-            let adjustedMap = {};
-            groups.forEach(group => {
-                if (group.length === 1) {
-                    let k = group[0];
-                    adjustedMap[k] = { lat: allTereniData[k].lat, lng: allTereniData[k].lng, isMoved: false };
-                } else {
-                    let sumLat = 0, sumLng = 0;
-                    group.forEach(k => {
-                        sumLat += allTereniData[k].lat;
-                        sumLng += allTereniData[k].lng;
-                    });
-                    let centerLat = sumLat / group.length;
-                    let centerLng = sumLng / group.length;
-
-                    group.forEach((k, index) => {
-                        let angle = (index / group.length) * 2 * Math.PI;
-                        let radiusOffset = 0.00045; // Vidljiv odmak u krug
-                        adjustedMap[k] = {
-                            lat: centerLat + radiusOffset * Math.cos(angle),
-                            lng: centerLng + radiusOffset * Math.sin(angle),
-                            isMoved: true
-                        };
-                    });
-                }
-            });
-
-            return adjustedMap;
-        }
-
         function reRenderAllMarkers() {
-            // Ukloni stare linije
-            Object.values(activeLines).forEach(line => map.removeLayer(line));
-            activeLines = {};
-
-            const layout = calculateLayoutMap();
             Object.keys(allTereniData).forEach(key => {
-                renderSingleMarker(key, layout[key]);
+                renderSingleMarker(key);
             });
         }
 
-        function renderSingleMarker(key, posData) {
+        function renderSingleMarker(key) {
             if (!map) return;
             const d = allTereniData[key]; if (!d) return; 
             const zoomNear = map.getZoom() > 12; const t = translations[currentLang];
@@ -522,6 +462,18 @@
             const infoToast = document.getElementById('info-toast'); if(infoToast) infoToast.style.opacity = zoomNear ? '0' : '1';
             const isLive = d.status === 'live', isEnded = d.status === 'ended', isUpcoming = d.status === 'upcoming' && d.t1;
             const ball = sportEmojis[d.sport] || '⚽';
+            
+            // Izračunaj automatski faktor smanjivanja kartice ako ima bliskih terena u krugu od 80 metara
+            let nearbyCount = 0;
+            const currentPt = L.latLng(d.lat, d.lng);
+            Object.values(allTereniData).forEach(other => {
+                if (other.key !== d.key) {
+                    if (currentPt.distanceTo(L.latLng(other.lat, other.lng)) < 80) {
+                        nearbyCount++;
+                    }
+                }
+            });
+            let scaleFactor = nearbyCount > 0 ? Math.max(0.6, 1 - (nearbyCount * 0.15)) : 1;
             
             let cardBody = ""; let periodsHtml = ""; let eventsHtml = "";
             
@@ -582,26 +534,15 @@
                     </div>`; 
                 }
 
-                cardBody = `<div class="tv-card-wrapper"><div class="tv-card ${isLive?'tv-live':''}"><div class="tv-league">${d.league || t.localMatch}</div><div class="tv-team-row"><div class="tv-team-name">${(d.t1 || t.team1).substring(0,10)}</div><div class="tv-team-score">${s1}</div>${p1Html}${curr1}</div><div class="tv-team-row" style="border-bottom:none;"><div class="tv-team-name">${(d.t2 || t.team2).substring(0,10)}</div><div class="tv-team-score">${s2}</div>${p2Html}${curr2}</div><div class="tv-bottom-bar"><span style="display:flex; align-items:center; gap:4px;">${ball} ${sportName}</span><span>${statusText}</span></div></div>${inlineDetails}</div><div class="marker-pointer"></div>`;
+                cardBody = `<div class="tv-card-wrapper" style="transform: scale(${scaleFactor}); transform-origin: bottom center;"><div class="tv-card ${isLive?'tv-live':''}"><div class="tv-league">${d.league || t.localMatch}</div><div class="tv-team-row"><div class="tv-team-name">${(d.t1 || t.team1).substring(0,10)}</div><div class="tv-team-score">${s1}</div>${p1Html}${curr1}</div><div class="tv-team-row" style="border-bottom:none;"><div class="tv-team-name">${(d.t2 || t.team2).substring(0,10)}</div><div class="tv-team-score">${s2}</div>${p2Html}${curr2}</div><div class="tv-bottom-bar"><span style="display:flex; align-items:center; gap:4px;">${ball} ${sportName}</span><span>${statusText}</span></div></div>${inlineDetails}</div><div class="marker-pointer"></div>`;
             } else {
-                cardBody = `<div class="tv-card-wrapper"><div class="tv-card" style="padding:14px; text-align:center; font-weight:800; font-size:13px; color:var(--primary); border-left:4px solid rgba(245,158,11,0.3);">${ball} ${d.name}</div></div><div class="marker-pointer"></div>`;
+                cardBody = `<div class="tv-card-wrapper" style="transform: scale(${scaleFactor}); transform-origin: bottom center;"><div class="tv-card" style="padding:14px; text-align:center; font-weight:800; font-size:13px; color:var(--primary); border-left:4px solid rgba(245,158,11,0.3);">${ball} ${d.name}</div></div><div class="marker-pointer"></div>`;
             }
             
             const hoverHtml = `<div class="hover-tooltip">${d.t1 || t.team1} <span style="color:var(--primary); font-size:8px;">VS</span> ${d.t2 || t.team2}</div>`;
             const html = `<div class="sport-marker-wrapper ${isLive?'status-live-wrapper':''} ${zoomNear?'zoom-near':''}"><div class="marker-content-box"><div class="marker-ball-only">${ball}${hoverHtml}</div>${cardBody}</div></div>`;
             
-            const targetCoords = [posData.lat, posData.lng];
-
-            // Ako je teren pomeren iz kruga, nacrtaj tanku liniju ka originalnoj lokaciji
-            if (posData.isMoved) {
-                let line = L.polyline([[d.lat, d.lng], targetCoords], {
-                    color: '#f59e0b',
-                    weight: 1.5,
-                    opacity: 0.7,
-                    dashArray: '4, 4'
-                }).addTo(map);
-                activeLines[key] = line;
-            }
+            const targetCoords = [d.lat, d.lng];
 
             if (activeMarkers[key]) {
                 activeMarkers[key].setLatLng(targetCoords); 
@@ -631,7 +572,6 @@
 
         function removeMarker(key) { 
             if (activeMarkers[key]) { map.removeLayer(activeMarkers[key]); delete activeMarkers[key]; }
-            if (activeLines[key]) { map.removeLayer(activeLines[key]); delete activeLines[key]; }
         }
 
         function handleMapClick(e) { 
