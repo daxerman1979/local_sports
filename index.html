@@ -20,15 +20,15 @@
     
     <style>
         :root {
-            --primary: #ccff00; 
-            --primary-glow: rgba(204, 255, 0, 0.4);
-            --bg-dark: #09090b;
-            --glass-bg: rgba(15, 15, 20, 0.85);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --danger: #ff2a2a; 
-            --danger-glow: rgba(255, 42, 42, 0.4);
-            --text-main: #ffffff;
-            --text-muted: #a1a1aa;
+            --primary: #f59e0b; /* Topla zlatna / ćilibar */
+            --primary-glow: rgba(245, 158, 11, 0.4);
+            --bg-dark: #1c1512; /* Duboka topla jesenja braon-siva podloga */
+            --glass-bg: rgba(35, 27, 24, 0.85);
+            --glass-border: rgba(245, 158, 11, 0.2);
+            --danger: #e11d48; /* Topla zagasito crvena */
+            --danger-glow: rgba(225, 29, 72, 0.4);
+            --text-main: #fef3c7; /* Topla krem bela */
+            --text-muted: #d97706; /* Topla narandžasto-siva */
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; touch-action: pan-x pan-y; margin: 0; padding: 0; }
@@ -36,49 +36,49 @@
 
         .glass-panel { background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8); }
 
-        input, select, textarea, datalist { font-size: 15px !important; outline: none !important; text-transform: uppercase; background: rgba(0, 0, 0, 0.5); color: white; border: 1px solid var(--glass-border); padding: 16px; border-radius: 14px; font-family: 'Inter', sans-serif; width: 100%; transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease; box-shadow: inset 0 2px 5px rgba(0,0,0,0.3); -webkit-appearance: none; }
-        input:focus, select:focus { border-color: var(--primary); background: rgba(204, 255, 0, 0.05); box-shadow: 0 0 0 3px var(--primary-glow), inset 0 2px 5px rgba(0,0,0,0.2); }
-        select option { background-color: #1a1a1f; color: #ffffff; font-weight: 500; }
+        input, select, textarea, datalist { font-size: 15px !important; outline: none !important; text-transform: uppercase; background: rgba(20, 15, 12, 0.7); color: var(--text-main); border: 1px solid var(--glass-border); padding: 16px; border-radius: 14px; font-family: 'Inter', sans-serif; width: 100%; transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease; box-shadow: inset 0 2px 5px rgba(0,0,0,0.5); -webkit-appearance: none; }
+        input:focus, select:focus { border-color: var(--primary); background: rgba(245, 158, 11, 0.05); box-shadow: 0 0 0 3px var(--primary-glow), inset 0 2px 5px rgba(0,0,0,0.3); }
+        select option { background-color: #231b18; color: #fef3c7; font-weight: 500; }
         
         button { font-family: 'Inter', sans-serif; font-size: 16px !important; outline: none !important; transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease, background-color 0.2s ease; position: relative; overflow: hidden; cursor: pointer; border-radius: 14px; display: flex; justify-content: center; align-items: center; gap: 8px; }
         button:active { transform: scale(0.96); }
         button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
 
-        .btn-primary { background: linear-gradient(135deg, var(--primary) 0%, #aacc00 100%); color: #000; border: none; padding: 18px; font-weight: 900; text-transform: uppercase; font-family: 'Oswald', sans-serif; box-shadow: 0 10px 20px var(--primary-glow); letter-spacing: 0.5px; }
+        .btn-primary { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #1c1512; border: none; padding: 18px; font-weight: 900; text-transform: uppercase; font-family: 'Oswald', sans-serif; box-shadow: 0 10px 20px var(--primary-glow); letter-spacing: 0.5px; }
         .btn-primary:active { box-shadow: 0 5px 10px var(--primary-glow); }
-        .btn-secondary { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border); color: var(--text-main); padding: 16px; font-weight: 700; }
+        .btn-secondary { background: rgba(245, 158, 11, 0.05); border: 1px solid var(--glass-border); color: var(--text-main); padding: 16px; font-weight: 700; }
 
         .mb-2 { margin-bottom: 8px; } .mb-3 { margin-bottom: 12px; } .mt-3 { margin-top: 12px; } .w-full { width: 100%; }
         
         .lang-dropdown-container { position: relative; display: inline-block; cursor: pointer; user-select: none; }
-        .current-lang { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 800; color: white; transition: 0.2s; }
+        .current-lang { display: flex; align-items: center; gap: 6px; background: rgba(245,158,11,0.08); border: 1px solid var(--glass-border); padding: 6px 10px; border-radius: 8px; font-size: 11px; font-weight: 800; color: var(--text-main); transition: 0.2s; }
         .current-lang:active { transform: scale(0.95); }
-        .lang-list { position: absolute; bottom: 100%; right: 0; margin-bottom: 8px; background: rgba(15, 15, 20, 0.95); border: 1px solid var(--glass-border); border-radius: 8px; display: none; flex-direction: column; overflow: hidden; z-index: 1000; min-width: 70px; backdrop-filter: blur(10px); }
+        .lang-list { position: absolute; bottom: 100%; right: 0; margin-bottom: 8px; background: rgba(35, 27, 24, 0.95); border: 1px solid var(--glass-border); border-radius: 8px; display: none; flex-direction: column; overflow: hidden; z-index: 1000; min-width: 70px; backdrop-filter: blur(10px); }
         .lang-dropdown-container.open .lang-list { display: flex; animation: slideUpFade 0.2s ease-out; }
-        .lang-option { padding: 10px 12px; font-size: 11px; font-weight: 800; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
-        .lang-option:hover { background: rgba(255,255,255,0.1); color: var(--primary); }
+        .lang-option { padding: 10px 12px; font-size: 11px; font-weight: 800; color: var(--text-main); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
+        .lang-option:hover { background: rgba(245,158,11,0.15); color: var(--primary); }
 
-        #search-container { position: absolute; top: 20px; left: 20px; z-index: 5000; display: flex; align-items: center; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); width: 48px; height: 48px; background: var(--glass-bg); border-radius: 24px; backdrop-filter: blur(12px); overflow: hidden; border: 1px solid var(--glass-border); box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
-        #search-container.expanded { width: calc(100vw - 90px); border-color: var(--primary); background: rgba(10,10,15,0.9); }
-        #city-search { width: 100%; border: none; background: transparent; color: white; padding: 12px 60px 12px 48px; font-size: 16px; outline: none; opacity: 0; transition: 0.3s; pointer-events: none; }
+        #search-container { position: absolute; top: 20px; left: 20px; z-index: 5000; display: flex; align-items: center; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); width: 48px; height: 48px; background: var(--glass-bg); border-radius: 24px; backdrop-filter: blur(12px); overflow: hidden; border: 1px solid var(--glass-border); box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
+        #search-container.expanded { width: calc(100vw - 90px); border-color: var(--primary); background: rgba(28, 21, 18, 0.95); }
+        #city-search { width: 100%; border: none; background: transparent; color: var(--text-main); padding: 12px 60px 12px 48px; font-size: 16px; outline: none; opacity: 0; transition: 0.3s; pointer-events: none; }
         #search-container.expanded #city-search { opacity: 1; pointer-events: all; }
-        .search-icon { position: absolute; left: 14px; width: 20px; height: 20px; filter: brightness(0) invert(1); opacity: 0.8; cursor: pointer; z-index: 5001; }
-        .search-go-btn { position: absolute; right: 5px; top: 5px; bottom: 5px; background: var(--primary); color: #000; border: none; border-radius: 20px; padding: 0 14px; font-weight: 900; font-family: 'Oswald', sans-serif; font-size: 12px !important; opacity: 0; pointer-events: none; transition: 0.3s; }
+        .search-icon { position: absolute; left: 14px; width: 20px; height: 20px; filter: sepia(1) hue-rotate(5deg) saturate(3); opacity: 0.9; cursor: pointer; z-index: 5001; }
+        .search-go-btn { position: absolute; right: 5px; top: 5px; bottom: 5px; background: var(--primary); color: #1c1512; border: none; border-radius: 20px; padding: 0 14px; font-weight: 900; font-family: 'Oswald', sans-serif; font-size: 12px !important; opacity: 0; pointer-events: none; transition: 0.3s; }
         #search-container.expanded .search-go-btn { opacity: 1; pointer-events: all; }
 
-        #map { width: 100vw; height: 100vh; background: #09090b; display: block; }
-        .leaflet-tile-pane { filter: brightness(80%) contrast(105%); }
+        #map { width: 100vw; height: 100vh; background: #1c1512; display: block; }
+        .leaflet-tile-pane { filter: sepia(40%) brightness(75%) contrast(105%) saturate(120%); }
         
-        #info-toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.6); color: white; font-size: 11px; font-weight: 700; padding: 8px 16px; border-radius: 20px; border: 1px solid var(--glass-border); backdrop-filter: blur(10px); z-index: 4500; pointer-events: none; text-align: center; white-space: nowrap; font-family: 'Inter', sans-serif; letter-spacing: 0.5px; transition: opacity 0.3s ease; }
+        #info-toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: rgba(35, 27, 24, 0.8); color: var(--text-main); font-size: 11px; font-weight: 700; padding: 8px 16px; border-radius: 20px; border: 1px solid var(--glass-border); backdrop-filter: blur(10px); z-index: 4500; pointer-events: none; text-align: center; white-space: nowrap; font-family: 'Inter', sans-serif; letter-spacing: 0.5px; transition: opacity 0.3s ease; }
 
         .floating-action-btn { position: absolute; right: 20px; z-index: 5500; display: flex; justify-content: center; align-items: center; cursor: pointer; backdrop-filter: blur(12px); border-radius: 50%; transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
-        .location-btn { bottom: 20px; width: 40px; height: 40px; background: rgba(15, 15, 20, 0.7); border: 1px solid var(--glass-border); box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
-        .location-btn img { filter: brightness(0) invert(1); width: 18px; opacity: 0.8; }
-        .back-btn { top: 20px; width: 48px; height: 48px; background: var(--glass-bg); color: white; font-weight: bold; font-size: 18px; border: 1px solid var(--glass-border); box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+        .location-btn { bottom: 20px; width: 40px; height: 40px; background: rgba(35, 27, 24, 0.8); border: 1px solid var(--glass-border); box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+        .location-btn img { filter: sepia(1) hue-rotate(5deg) saturate(3); width: 18px; opacity: 0.9; }
+        .back-btn { top: 20px; width: 48px; height: 48px; background: var(--glass-bg); color: var(--text-main); font-weight: bold; font-size: 18px; border: 1px solid var(--glass-border); box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
 
         #login-widget { position: absolute; bottom: 20px; left: 20px; width: calc(100vw - 80px); max-width: 300px; z-index: 5500; display: none; flex-direction: column; padding: 0; transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1); }
         #login-widget.collapsed { transform: translateY(calc(100% - 52px)); }
-        .login-header-tab { height: 52px; padding: 0 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: rgba(0,0,0,0.3); border-bottom: 1px solid rgba(255,255,255,0.05); border-radius: 24px 24px 0 0; transition: border-radius 0.3s; }
+        .login-header-tab { height: 52px; padding: 0 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: rgba(20, 15, 12, 0.6); border-bottom: 1px solid var(--glass-border); border-radius: 24px 24px 0 0; transition: border-radius 0.3s; }
         #login-widget.collapsed .login-header-tab { border-radius: 24px; border-bottom: 1px solid transparent; }
         .login-content { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
 
@@ -86,50 +86,50 @@
         .marker-content-box { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; pointer-events: none; z-index: 30;}
         .marker-content-box > * { pointer-events: auto; }
 
-        @keyframes live-ball-pulse { 0% { box-shadow: 0 0 0 0 var(--primary-glow); } 70% { box-shadow: 0 0 0 10px rgba(204, 255, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(204, 255, 0, 0); } }
+        @keyframes live-ball-pulse { 0% { box-shadow: 0 0 0 0 var(--primary-glow); } 70% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); } 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); } }
 
         .marker-ball-only { position: relative; font-size: 11px; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.5)); display: block; background: var(--glass-bg); backdrop-filter: blur(4px); padding: 4px; border-radius: 50%; border: 1px solid var(--glass-border); transition: all 0.3s; cursor: pointer; }
         .zoom-near .marker-ball-only { display: none; }
         .status-live-wrapper .marker-ball-only { border-color: var(--primary); animation: live-ball-pulse 1.5s infinite; }
 
-        .hover-tooltip { position: absolute; bottom: 120%; left: 50%; transform: translateX(-50%); background: rgba(15, 15, 20, 0.95); border: 1px solid var(--primary); color: white; padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.8); font-family: 'Oswald', sans-serif; }
+        .hover-tooltip { position: absolute; bottom: 120%; left: 50%; transform: translateX(-50%); background: rgba(35, 27, 24, 0.95); border: 1px solid var(--primary); color: var(--text-main); padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.8); font-family: 'Oswald', sans-serif; }
         .zoom-near .hover-tooltip { display: none !important; }
         .marker-ball-only:hover .hover-tooltip { opacity: 1; transform: translateX(-50%) translateY(-3px); }
 
         .tv-card-wrapper { display: none; flex-direction: column; align-items: center; z-index: 25; width: max-content; }
         .zoom-near .tv-card-wrapper { display: flex; animation: slideUpFade 0.3s ease-out; }
 
-        .tv-card { background: rgba(15, 15, 20, 0.95); backdrop-filter: blur(15px); border-radius: 8px; display: flex; flex-direction: column; color: white; box-shadow: 0 15px 35px rgba(0,0,0,0.9); position: relative; border: 1px solid var(--glass-border); overflow: hidden; min-width: 180px; width: 100%; }
+        .tv-card { background: rgba(35, 27, 24, 0.95); backdrop-filter: blur(15px); border-radius: 8px; display: flex; flex-direction: column; color: var(--text-main); box-shadow: 0 15px 35px rgba(0,0,0,0.8); position: relative; border: 1px solid var(--glass-border); overflow: hidden; min-width: 180px; width: 100%; }
         .tv-live { border-top: 3px solid var(--danger); }
-        .tv-league { background: rgba(255,255,255,0.05); color: var(--text-muted); font-size: 10px; font-weight: 800; padding: 4px 10px; text-transform: uppercase; }
-        .tv-live .tv-league { background: rgba(255,42,42,0.15); color: var(--danger); }
+        .tv-league { background: rgba(245,158,11,0.08); color: var(--text-muted); font-size: 10px; font-weight: 800; padding: 4px 10px; text-transform: uppercase; }
+        .tv-live .tv-league { background: rgba(225,29,72,0.15); color: var(--danger); }
         
-        .tv-team-row { display: flex; align-items: stretch; border-bottom: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.4); }
-        .tv-team-name { flex: 1; padding: 6px 10px; color: white; font-weight: 800; font-size: 14px; font-family: 'Oswald', sans-serif; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; min-width: 70px; }
+        .tv-team-row { display: flex; align-items: stretch; border-bottom: 1px solid rgba(245,158,11,0.1); background: rgba(20, 15, 12, 0.5); }
+        .tv-team-name { flex: 1; padding: 6px 10px; color: var(--text-main); font-weight: 800; font-size: 14px; font-family: 'Oswald', sans-serif; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; min-width: 70px; }
 
-        .tv-team-score, .tv-period-score, .tv-curr-score { flex-shrink: 0; box-sizing: border-box; display: flex; justify-content: center; align-items: center; border-left: 1px solid rgba(255,255,255,0.05); }
-        .tv-team-score { width: 40px; background: rgba(0,0,0,0.8); padding: 6px 0; font-size: 16px; font-weight: 900; color: white; font-family: 'Oswald', sans-serif; }
+        .tv-team-score, .tv-period-score, .tv-curr-score { flex-shrink: 0; box-sizing: border-box; display: flex; justify-content: center; align-items: center; border-left: 1px solid rgba(245,158,11,0.1); }
+        .tv-team-score { width: 40px; background: rgba(15, 10, 8, 0.8); padding: 6px 0; font-size: 16px; font-weight: 900; color: var(--text-main); font-family: 'Oswald', sans-serif; }
         .tv-live .tv-team-score { color: var(--primary); }
         .tv-period-score { width: 32px; padding: 6px 0; font-size: 14px; font-weight: 700; color: var(--text-muted); }
-        .tv-curr-score { width: 42px; padding: 6px 0; font-size: 14px; font-weight: 900; color: #ff9500; background: rgba(255, 149, 0, 0.1); }
-        .tv-bottom-bar { background: rgba(0,0,0,0.6); padding: 5px 10px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 700; color: var(--text-muted); }
+        .tv-curr-score { width: 42px; padding: 6px 0; font-size: 14px; font-weight: 900; color: #fbbf24; background: rgba(245, 158, 11, 0.15); }
+        .tv-bottom-bar { background: rgba(20, 15, 12, 0.7); padding: 5px 10px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 700; color: var(--text-muted); }
 
-        .tv-card-details { background: rgba(10, 10, 15, 0.98); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-top: none; border-radius: 0 0 8px 8px; width: 96%; padding: 12px; display: none; flex-direction: column; gap: 8px; box-shadow: 0 15px 30px rgba(0,0,0,0.9); color: white; max-height: 250px; overflow-y: auto; margin-top: -1px; font-family: 'Inter', sans-serif; }
-        .marker-pointer { width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent; border-top: 14px solid var(--text-main); display: none; margin-top: 2px; filter: drop-shadow(0 5px 8px rgba(0,0,0,0.8)); }
+        .tv-card-details { background: rgba(25, 18, 15, 0.98); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-top: none; border-radius: 0 0 8px 8px; width: 96%; padding: 12px; display: none; flex-direction: column; gap: 8px; box-shadow: 0 15px 30px rgba(0,0,0,0.8); color: var(--text-main); max-height: 250px; overflow-y: auto; margin-top: -1px; font-family: 'Inter', sans-serif; }
+        .marker-pointer { width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent; border-top: 14px solid var(--glass-bg); display: none; margin-top: 2px; filter: drop-shadow(0 5px 8px rgba(0,0,0,0.8)); }
         .zoom-near .marker-pointer { display: block; }
-        .status-live-wrapper .marker-pointer { border-top-color: var(--danger); filter: drop-shadow(0 5px 10px rgba(255,42,42,0.6)); }
+        .status-live-wrapper .marker-pointer { border-top-color: var(--danger); filter: drop-shadow(0 5px 10px rgba(225,29,72,0.6)); }
 
         .radar-wave-circle { transform-origin: center; transform-box: fill-box; animation: sonar-wave 3s cubic-bezier(0.1, 0, 0.3, 1) infinite; }
         @keyframes sonar-wave { 0% { transform: scale(0); stroke-opacity: 1; fill: none; } 100% { transform: scale(1); stroke-opacity: 0; fill: none; } }
 
-        @keyframes pulse-live { 0%, 100% { opacity: 1; text-shadow: 0 0 5px rgba(255,42,42,0.5); } 50% { opacity: 0.5; text-shadow: 0 0 15px rgba(255,42,42,0.8); } }
+        @keyframes pulse-live { 0%, 100% { opacity: 1; text-shadow: 0 0 5px rgba(225,29,72,0.5); } 50% { opacity: 0.5; text-shadow: 0 0 15px rgba(225,29,72,0.8); } }
         
         #admin-panel { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-dark); z-index: 9000; transform: translateX(100%); transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94); display: flex; flex-direction: column; overflow-y: auto; will-change: transform; visibility: hidden; }
         #admin-panel.active { transform: translateX(0); visibility: visible; }
-        .admin-header { padding: 20px 24px; background: rgba(0,0,0,0.7); border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10; backdrop-filter: blur(20px); }
+        .admin-header { padding: 20px 24px; background: rgba(20, 15, 12, 0.8); border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10; backdrop-filter: blur(20px); }
         .admin-content-scroll { padding: 24px; display: flex; flex-direction: column; gap: 16px; flex-grow: 1; }
-        .admin-score-hero { background: linear-gradient(145deg, rgba(30,30,35,1) 0%, rgba(15,15,20,1) 100%); border: 1px solid var(--primary); padding: 30px 20px; text-align: center; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.5), inset 0 2px 0 rgba(255,255,255,0.05); position: relative; overflow: hidden; transition: 0.3s; }
-        @keyframes pulse-score { 0% { transform: scale(1); box-shadow: inset 0 0 0px var(--primary-glow); } 50% { transform: scale(1.05); box-shadow: inset 0 0 30px var(--primary-glow); border-color: #fff; } 100% { transform: scale(1); box-shadow: inset 0 0 0px var(--primary-glow); } }
+        .admin-score-hero { background: linear-gradient(145deg, rgba(40, 30, 25, 1) 0%, rgba(20, 15, 12, 1) 100%); border: 1px solid var(--primary); padding: 30px 20px; text-align: center; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.5), inset 0 2px 0 rgba(245,158,11,0.1); position: relative; overflow: hidden; transition: 0.3s; }
+        @keyframes pulse-score { 0% { transform: scale(1); box-shadow: inset 0 0 0px var(--primary-glow); } 50% { transform: scale(1.05); box-shadow: inset 0 0 30px var(--primary-glow); border-color: #fef3c7; } 100% { transform: scale(1); box-shadow: inset 0 0 0px var(--primary-glow); } }
         .anim-score { animation: pulse-score 0.6s ease-out; }
 
         .score-ctrl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
@@ -137,30 +137,30 @@
         .team-ctrl-lbl { font-size: 13px; color: var(--text-muted); font-weight: 800; text-transform: uppercase; margin-bottom: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .ctrl-btn-group { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
         .btn-ctrl { width: 50px; height: 50px; border-radius: 12px; font-size: 24px !important; font-family: 'Oswald', sans-serif; font-weight: 500; display: flex; justify-content: center; align-items: center; border: none; cursor: pointer; transition: transform 0.1s, background 0.2s; }
-        .btn-ctrl.minus { background: rgba(255,255,255,0.1); color: white; }
-        .btn-ctrl.minus:active { background: rgba(255,255,255,0.2); transform: scale(0.9); }
-        .btn-ctrl.plus { background: var(--primary); color: #000; box-shadow: 0 4px 15px var(--primary-glow); font-weight: bold; }
+        .btn-ctrl.minus { background: rgba(245,158,11,0.1); color: var(--text-main); }
+        .btn-ctrl.minus:active { background: rgba(245,158,11,0.2); transform: scale(0.9); }
+        .btn-ctrl.plus { background: var(--primary); color: #1c1512; box-shadow: 0 4px 15px var(--primary-glow); font-weight: bold; }
         .btn-ctrl.plus:active { transform: scale(0.9); box-shadow: 0 2px 8px var(--primary-glow); }
 
         .adm-event-list { display: flex; flex-direction: column; gap: 8px; max-height: 250px; overflow-y: auto; }
-        .adm-event-item { background: rgba(0,0,0,0.5); padding: 12px 16px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--glass-border); border-left: 3px solid var(--primary); }
-        .adm-event-item span { font-size: 14px; font-weight: 700; color: #fff; text-transform: uppercase; }
-        .adm-event-remove { color: var(--danger); font-size: 22px; cursor: pointer; width: 32px; height: 32px; display: flex; justify-content: center; align-items: center; background: rgba(255,42,42,0.1); border-radius: 8px; transition: 0.2s; }
-        .adm-event-remove:active { transform: scale(0.9); background: rgba(255,42,42,0.3); }
+        .adm-event-item { background: rgba(20, 15, 12, 0.6); padding: 12px 16px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--glass-border); border-left: 3px solid var(--primary); }
+        .adm-event-item span { font-size: 14px; font-weight: 700; color: var(--text-main); text-transform: uppercase; }
+        .adm-event-remove { color: var(--danger); font-size: 22px; cursor: pointer; width: 32px; height: 32px; display: flex; justify-content: center; align-items: center; background: rgba(225,29,72,0.1); border-radius: 8px; transition: 0.2s; }
+        .adm-event-remove:active { transform: scale(0.9); background: rgba(225,29,72,0.3); }
         
         @keyframes slideUpFade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .user-location-dot { background: #0a84ff; width: 16px; height: 16px; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 15px #0a84ff; }
+        .user-location-dot { background: #d97706; width: 16px; height: 16px; border: 3px solid var(--text-main); border-radius: 50%; box-shadow: 0 0 15px #f59e0b; }
         
-        .leaflet-popup-content-wrapper { background: rgba(15, 15, 20, 0.98); color: white; border-radius: 24px; border: 1px solid var(--glass-border); padding: 5px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.9) !important; }
-        .leaflet-popup-tip { background: rgba(15, 15, 20, 0.98); border: 1px solid var(--glass-border); }
+        .leaflet-popup-content-wrapper { background: rgba(35, 27, 24, 0.98); color: var(--text-main); border-radius: 24px; border: 1px solid var(--glass-border); padding: 5px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.8) !important; }
+        .leaflet-popup-tip { background: rgba(35, 27, 24, 0.98); border: 1px solid var(--glass-border); }
         .leaflet-popup-content { margin: 15px; min-width: 240px !important; }
         .leaflet-popup-close-button { color: var(--text-muted) !important; font-size: 28px !important; padding: 10px !important; width: 40px !important; height: 40px !important; display: flex; align-items: center; justify-content: center; transition: color 0.2s; }
 
         #custom-modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
         #custom-modal-overlay.show { opacity: 1; pointer-events: auto; }
-        .app-modal { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 24px; width: 85%; max-width: 340px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.9); transform: scale(0.9); transition: transform 0.3s; }
+        .app-modal { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 20px; padding: 24px; width: 85%; max-width: 340px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.8); transform: scale(0.9); transition: transform 0.3s; }
         #custom-modal-overlay.show .app-modal { transform: scale(1); }
-        .modal-text { color: white; font-size: 15px; font-weight: 600; margin-bottom: 24px; font-family: 'Inter', sans-serif; line-height: 1.4; }
+        .modal-text { color: var(--text-main); font-size: 15px; font-weight: 600; margin-bottom: 24px; font-family: 'Inter', sans-serif; line-height: 1.4; }
         .modal-btn-row { display: flex; gap: 12px; justify-content: center; }
         .modal-btn-row button { flex: 1; padding: 14px; font-size: 14px !important; }
 
@@ -194,7 +194,7 @@
         <div class="app-modal">
             <div class="modal-text" id="modal-msg"></div>
             <div class="modal-btn-row">
-                <button class="btn-secondary" id="modal-cancel-btn" onclick="closeAppModal()" style="display:none; color: white;">NE</button>
+                <button class="btn-secondary" id="modal-cancel-btn" onclick="closeAppModal()" style="display:none; color: var(--text-main);">NE</button>
                 <button class="btn-primary" id="modal-ok-btn" onclick="confirmAppModal()" style="font-family:'Oswald', sans-serif;">DA</button>
             </div>
         </div>
@@ -215,12 +215,12 @@
             <img src="https://cdn-icons-png.flaticon.com/512/1865/1865269.png" alt="Location">
         </div>
         
-        <div id="user-indicator" style="display:none; position:fixed; bottom:20px; left:20px; color:var(--primary); font-size:11px; font-weight:800; z-index:5000; opacity: 0.9; background: rgba(0,0,0,0.7); padding: 10px 16px; border-radius: 20px; backdrop-filter: blur(10px); border: 1px solid var(--glass-border); box-shadow: 0 4px 15px rgba(0,0,0,0.5);"></div>
+        <div id="user-indicator" style="display:none; position:fixed; bottom:20px; left:20px; color:var(--primary); font-size:11px; font-weight:800; z-index:5000; opacity: 0.95; background: rgba(35,27,24,0.85); padding: 10px 16px; border-radius: 20px; backdrop-filter: blur(10px); border: 1px solid var(--glass-border); box-shadow: 0 4px 15px rgba(0,0,0,0.5);"></div>
         
         <div id="login-widget" class="glass-panel collapsed">
             <div class="login-header-tab" onclick="toggleLoginWidget()">
                 <div style="display:flex; align-items:center; gap: 8px;">
-                    <h3 style="margin:0; font-family:'Oswald'; color:var(--primary); font-size:18px; letter-spacing:1px;">SCORE<span style="color:white;">PUNKT</span></h3>
+                    <h3 style="margin:0; font-family:'Oswald'; color:var(--primary); font-size:18px; letter-spacing:1px;">SCORE<span style="color:var(--text-main);">PUNKT</span></h3>
                 </div>
                 
                 <div id="lang-dropdown" class="lang-dropdown-container" onclick="toggleLangDropdown(event)">
@@ -245,7 +245,7 @@
 
     <div id="admin-panel">
         <div class="admin-header">
-            <div id="adm-name" style="font-family:'Oswald'; font-size:22px; color:#fff; font-weight:700; text-transform:uppercase;">ADMIN TABLA</div>
+            <div id="adm-name" style="font-family:'Oswald'; font-size:22px; color:var(--text-main); font-weight:700; text-transform:uppercase;">ADMIN TABLA</div>
             <div onclick="closeAdmin()" style="font-size:32px; color:var(--text-muted); cursor:pointer; line-height:1;">&times;</div>
         </div>
         
@@ -259,23 +259,22 @@
                 <div id="adm-sport-controls"></div>
                 <div id="adm-events-manager" class="adm-event-list mt-3"></div>
                 
-                <!-- UNOS KOMENTARA ZA SVE SPORTOVE -->
-                <div class="mt-3" style="display:flex; gap: 8px; background: rgba(0,0,0,0.5); padding: 12px; border-radius: 12px; border: 1px solid var(--glass-border);">
+                <div class="mt-3" style="display:flex; gap: 8px; background: rgba(20,15,12,0.6); padding: 12px; border-radius: 12px; border: 1px solid var(--glass-border);">
                     <input type="text" id="adm-comment-input" placeholder="KOMENTAR (MAX 30 SLOVA)" maxlength="30" style="padding: 12px; font-size: 12px !important; margin: 0;">
                     <button class="btn-primary" onclick="saveComment()" style="padding: 0 16px; margin: 0; font-size: 18px !important;">✔</button>
                 </div>
                 
                 <div class="action-btn-row mt-3" style="display:flex; flex-direction:column; gap:12px;">
-                    <button class="btn-secondary" style="border-color: rgba(204,255,0,0.4); color:var(--primary);" onclick="triggerLogic('period')" id="btn-save-period">SAČUVAJ PERIOD / SET</button>
+                    <button class="btn-secondary" style="border-color: rgba(245,158,11,0.4); color:var(--primary);" onclick="triggerLogic('period')" id="btn-save-period">SAČUVAJ PERIOD / SET</button>
                     <button id="start-live-btn" class="btn-primary" onclick="adminStatus('live')">KRENI UŽIVO</button>
-                    <button id="end-match-btn" class="btn-primary" style="background:var(--danger); color:white; box-shadow: 0 10px 20px var(--danger-glow); display:none;" onclick="triggerLogic('end')">ZAVRŠI MEČ</button>
+                    <button id="end-match-btn" class="btn-primary" style="background:var(--danger); color:var(--text-main); box-shadow: 0 10px 20px var(--danger-glow); display:none;" onclick="triggerLogic('end')">ZAVRŠI MEČ</button>
                     <button id="reset-match-btn" class="btn-secondary" style="display:none;" onclick="resetMatch()">RESET / NOVI MEČ</button>
                 </div>
             </div>
 
             <div id="match-setup" style="display:none; flex-direction:column; gap:16px;">
                 <div class="glass-panel" style="padding: 24px; display:flex; flex-direction:column; gap:16px;">
-                    <h3 style="font-family:'Oswald'; color:white; margin-bottom: 8px;">ZAKAZIVANJE</h3>
+                    <h3 style="font-family:'Oswald'; color:var(--text-main); margin-bottom: 8px;">ZAKAZIVANJE</h3>
                     <input type="text" id="adm-league-input" placeholder="LIGA (NOVA)" list="league-list">
                     <datalist id="league-list"></datalist>
                     
@@ -288,7 +287,7 @@
                     <button class="btn-primary mt-3" onclick="setupMatch()" id="btn-schedule">ZAKAŽI MEČ</button>
                 </div>
             </div>
-            <button class="btn-secondary" style="margin-top:auto; color: var(--danger); border-color: rgba(255,42,42,0.2);" onclick="adminDelete()" id="btn-delete-court">OBRIŠI TEREN</button>
+            <button class="btn-secondary" style="margin-top:auto; color: var(--danger); border-color: rgba(225,29,72,0.3);" onclick="adminDelete()" id="btn-delete-court">OBRIŠI TEREN</button>
         </div>
     </div>
 
@@ -339,7 +338,7 @@
             document.getElementById('modal-cancel-btn').style.display = 'none';
             document.getElementById('modal-ok-btn').innerText = 'OK';
             document.getElementById('modal-ok-btn').style.background = 'var(--primary)';
-            document.getElementById('modal-ok-btn').style.color = '#000';
+            document.getElementById('modal-ok-btn').style.color = '#1c1512';
             document.getElementById('custom-modal-overlay').classList.add('show');
             modalConfirmCallback = null;
         }
@@ -348,8 +347,8 @@
             document.getElementById('modal-cancel-btn').style.display = 'block';
             document.getElementById('modal-ok-btn').innerText = currentLang === 'en' ? 'YES' : 'DA';
             document.getElementById('modal-cancel-btn').innerText = currentLang === 'en' ? 'NO' : 'NE';
-            if(isDanger) { document.getElementById('modal-ok-btn').style.background = 'var(--danger)'; document.getElementById('modal-ok-btn').style.color = 'white'; } 
-            else { document.getElementById('modal-ok-btn').style.background = 'var(--primary)'; document.getElementById('modal-ok-btn').style.color = '#000'; }
+            if(isDanger) { document.getElementById('modal-ok-btn').style.background = 'var(--danger)'; document.getElementById('modal-ok-btn').style.color = 'var(--text-main)'; } 
+            else { document.getElementById('modal-ok-btn').style.background = 'var(--primary)'; document.getElementById('modal-ok-btn').style.color = '#1c1512'; }
             document.getElementById('custom-modal-overlay').classList.add('show');
             modalConfirmCallback = callback;
         }
@@ -395,7 +394,7 @@
             const userIndicator = document.getElementById('user-indicator');
             if (user) { 
                 loginWidget.style.display = 'none'; userIndicator.style.display = 'block'; backBtnIcon.style.display = 'flex';
-                backBtnIcon.innerHTML = `<svg viewBox="0 0 24 24" width="22" height="22" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>`;
+                backBtnIcon.innerHTML = `<svg viewBox="0 0 24 24" width="22" height="22" stroke="var(--text-main)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>`;
             } else { updateUILanguage(); loginWidget.style.display = 'flex'; userIndicator.style.display = 'none'; backBtnIcon.style.display = 'none'; } 
         });
         
@@ -467,7 +466,7 @@
                 let p1Html = "", p2Html = "";
                 if (d.sub_details) {
                     Object.values(d.sub_details).forEach(v => { let match = v.match(/(\d+):(\d+)$/); p1Html += `<div class="tv-period-score">${match ? match[1] : '-'}</div>`; p2Html += `<div class="tv-period-score">${match ? match[2] : '-'}</div>`; });
-                    periodsHtml += `<div style="background:rgba(0,0,0,0.4); border-radius:8px; padding:8px; border: 1px solid var(--glass-border);"><div style="display:flex; border-bottom:1px solid rgba(255,255,255,0.1); margin-bottom:4px; padding-bottom:4px;"><div style="flex:2; font-size:9px; color:var(--text-muted);">${t.team}</div>`;
+                    periodsHtml += `<div style="background:rgba(20,15,12,0.5); border-radius:8px; padding:8px; border: 1px solid var(--glass-border);"><div style="display:flex; border-bottom:1px solid rgba(245,158,11,0.1); margin-bottom:4px; padding-bottom:4px;"><div style="flex:2; font-size:9px; color:var(--text-muted);">${t.team}</div>`;
                     Object.values(d.sub_details).forEach(v => { periodsHtml += `<div style="flex:1; text-align:center; font-size:9px; color:var(--primary);">${v.split(' ')[0] || '-'}</div>`; });
                     periodsHtml += `</div><div style="display:flex; margin-bottom:4px;"><div style="flex:2; font-size:11px; font-weight:800;">${(d.t1 || t.team1).substring(0,8)}</div>`;
                     Object.values(d.sub_details).forEach(v => { let match = v.match(/(\d+):(\d+)$/); periodsHtml += `<div style="flex:1; text-align:center; font-size:11px; font-weight:700;">${match ? match[1] : '-'}</div>`; });
@@ -482,8 +481,8 @@
                         if(ev.team == 1) eH += `<div style="font-size:11px; margin-bottom:4px; font-weight:600;"><span style="font-size:14px;">${ev.emoji}</span> ${ev.player}</div>`;
                         else eA += `<div style="font-size:11px; margin-bottom:4px; text-align:right; font-weight:600;">${ev.player} <span style="font-size:14px;">${ev.emoji}</span></div>`;
                     });
-                    eventsHtml = `<div style="background:rgba(0,0,0,0.4); border-radius:8px; padding:8px; border: 1px solid var(--glass-border); margin-top:4px;">
-                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:6px; margin-bottom:6px;">
+                    eventsHtml = `<div style="background:rgba(20,15,12,0.5); border-radius:8px; padding:8px; border: 1px solid var(--glass-border); margin-top:4px;">
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; border-bottom:1px solid rgba(245,158,11,0.1); padding-bottom:6px; margin-bottom:6px;">
                             <div style="font-size:10px; font-weight:800; color:var(--text-muted);">${(d.t1 || t.team1).substring(0,10)}</div>
                             <div style="font-size:10px; font-weight:800; color:var(--text-muted); text-align:right;">${(d.t2 || t.team2).substring(0,10)}</div>
                         </div>
@@ -499,7 +498,7 @@
                     const isTB = (d.g1 === 6 && d.g2 === 6);
                     const pt1 = d.sport === "TENIS" ? (isTB ? (d.p1||0) : (tennisPoints[d.p1]||"0")) : (d.p1||0);
                     const pt2 = d.sport === "TENIS" ? (isTB ? (d.p2||0) : (tennisPoints[d.p2]||"0")) : (d.p2||0);
-                    if (d.sport === "TENIS") { p1Html += `<div class="tv-period-score" style="color: white;">${d.g1||0}</div>`; p2Html += `<div class="tv-period-score" style="color: white;">${d.g2||0}</div>`; }
+                    if (d.sport === "TENIS") { p1Html += `<div class="tv-period-score" style="color: var(--text-main);">${d.g1||0}</div>`; p2Html += `<div class="tv-period-score" style="color: var(--text-main);">${d.g2||0}</div>`; }
                     curr1 = `<div class="tv-curr-score">${pt1}</div>`; curr2 = `<div class="tv-curr-score">${pt2}</div>`;
                 }
 
@@ -508,7 +507,7 @@
                 let hasDetails = (periodsHtml || eventsHtml || d.comment);
                 
                 if (hasDetails) { 
-                    let commentHtml = d.comment ? `<div style="text-align:center; font-size:12px; font-weight:800; color:var(--danger); padding:6px; border-radius:6px; background:rgba(255,42,42,0.1); border:1px solid rgba(255,42,42,0.3); margin-top:4px; text-transform:uppercase;">${d.comment}</div>` : '';
+                    let commentHtml = d.comment ? `<div style="text-align:center; font-size:12px; font-weight:800; color:var(--danger); padding:6px; border-radius:6px; background:rgba(225,29,72,0.1); border:1px solid rgba(225,29,72,0.3); margin-top:4px; text-transform:uppercase;">${d.comment}</div>` : '';
                     inlineDetails = `<div class="tv-card-details" id="inline-${d.key}">
                         ${periodsHtml}
                         ${eventsHtml}
@@ -523,7 +522,7 @@
 
                 cardBody = `<div class="tv-card-wrapper" style="${cursorStyle}"><div class="tv-card ${isLive?'tv-live':''}"><div class="tv-league">${d.league || t.localMatch}</div><div class="tv-team-row"><div class="tv-team-name">${(d.t1 || t.team1).substring(0,10)}</div><div class="tv-team-score">${s1}</div>${p1Html}${curr1}</div><div class="tv-team-row" style="border-bottom:none;"><div class="tv-team-name">${(d.t2 || t.team2).substring(0,10)}</div><div class="tv-team-score">${s2}</div>${p2Html}${curr2}</div><div class="tv-bottom-bar"><span style="display:flex; align-items:center; gap:4px;">${ball} ${sportName}</span><span>${statusText}</span></div></div>${inlineDetails}</div><div class="marker-pointer"></div>`;
             } else {
-                cardBody = `<div class="tv-card-wrapper"><div class="tv-card" style="padding:14px; text-align:center; font-weight:800; font-size:13px; color:var(--primary); border-left:4px solid rgba(255,255,255,0.2);">${ball} ${d.name}</div></div><div class="marker-pointer"></div>`;
+                cardBody = `<div class="tv-card-wrapper"><div class="tv-card" style="padding:14px; text-align:center; font-weight:800; font-size:13px; color:var(--primary); border-left:4px solid rgba(245,158,11,0.3);">${ball} ${d.name}</div></div><div class="marker-pointer"></div>`;
             }
             
             const hoverHtml = `<div class="hover-tooltip">${d.t1 || t.team1} <span style="color:var(--primary); font-size:8px;">VS</span> ${d.t2 || t.team2}</div>`;
@@ -558,7 +557,6 @@
         function reRenderAllMarkers() { Object.keys(allTereniData).forEach(key => renderSingleMarker(key)); }
 
         function handleMapClick(e) { 
-            // 1. ZATVARANJE DODATNIH KARTICA AKO SU OTVORENE
             let anyOpen = false;
             document.querySelectorAll('.tv-card-details').forEach(el => {
                 if (el.style.display === 'flex') {
@@ -568,7 +566,6 @@
             });
             if (anyOpen) return;
 
-            // 2. KREIRANJE NOVOG TERENA
             if (!auth.currentUser) return; 
             const t = translations[currentLang]; const clickPos = e.latlng; 
             const isTooClose = Object.values(allTereniData).some(court => { return clickPos.distanceTo(L.latLng(court.lat, court.lng)) < 200; });
@@ -600,7 +597,6 @@
             const t = translations[currentLang];
             document.getElementById('adm-name').innerText = d.name; document.getElementById('adm-main-score').innerText = `${d.score1 || 0} : ${d.score2 || 0}`;
             
-            // Postavi vrijednost komentara (ali ne fokusiraj ako korisnik trenutno kuca)
             if (document.activeElement !== document.getElementById('adm-comment-input')) {
                 document.getElementById('adm-comment-input').value = d.comment || "";
             }
@@ -617,7 +613,7 @@
             if(d.sport === "KOŠARKA") {
                 ctrl.innerHTML = `<div class="score-ctrl-grid mb-3"><div class="team-ctrl-card"><div class="team-ctrl-lbl">${d.t1 || t.team1}</div><div class="ctrl-btn-group" style="flex-wrap: wrap;"><button class="btn-ctrl minus" onclick="proScore(1,-1)">-1</button><button class="btn-ctrl plus" onclick="proScore(1,1)">+1</button><button class="btn-ctrl plus" onclick="proScore(1,2)">+2</button><button class="btn-ctrl plus" onclick="proScore(1,3)">+3</button></div></div><div class="team-ctrl-card"><div class="team-ctrl-lbl">${d.t2 || t.team2}</div><div class="ctrl-btn-group" style="flex-wrap: wrap;"><button class="btn-ctrl minus" onclick="proScore(2,-1)">-1</button><button class="btn-ctrl plus" onclick="proScore(2,1)">+1</button><button class="btn-ctrl plus" onclick="proScore(2,2)">+2</button><button class="btn-ctrl plus" onclick="proScore(2,3)">+3</button></div></div></div>`;
             } else if(d.sport === "FUDBAL") {
-                ctrl.innerHTML = `<div class="glass-panel" style="padding: 24px; box-shadow: 0 10px 20px rgba(0,0,0,0.5);"><h4 style="color:var(--text-main); font-family:'Oswald'; text-align:center; margin-bottom:16px; font-size:15px; letter-spacing:1px;">UNOS DOGAĐAJA</h4><input type="text" id="event-player" placeholder="${t.player}" class="mb-3"><select id="event-team" class="mb-3"><option value="1">${d.t1 || t.team1}</option><option value="2">${d.t2 || t.team2}</option></select><div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;"><button onclick="addEvent('⚽')" class="btn-secondary" style="font-size:14px!important; padding:14px; border-color:var(--primary); color:var(--primary); font-weight:900;">⚽ ${t.goal}</button><button onclick="addEvent('🟨')" class="btn-secondary" style="font-size:14px!important; padding:14px; color:#ffcc00; border-color:rgba(255,204,0,0.3);">🟨 ${t.yellow}</button><button onclick="addEvent('🟥')" class="btn-secondary" style="font-size:14px!important; padding:14px; color:var(--danger); border-color:rgba(255,42,42,0.3);">🟥 ${t.red}</button></div></div>`;
+                ctrl.innerHTML = `<div class="glass-panel" style="padding: 24px; box-shadow: 0 10px 20px rgba(0,0,0,0.5);"><h4 style="color:var(--text-main); font-family:'Oswald'; text-align:center; margin-bottom:16px; font-size:15px; letter-spacing:1px;">UNOS DOGAĐAJA</h4><input type="text" id="event-player" placeholder="${t.player}" class="mb-3"><select id="event-team" class="mb-3"><option value="1">${d.t1 || t.team1}</option><option value="2">${d.t2 || t.team2}</option></select><div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;"><button onclick="addEvent('⚽')" class="btn-secondary" style="font-size:14px!important; padding:14px; border-color:var(--primary); color:var(--primary); font-weight:900;">⚽ ${t.goal}</button><button onclick="addEvent('🟨')" class="btn-secondary" style="font-size:14px!important; padding:14px; color:#fbbf24; border-color:rgba(251,191,36,0.3);">🟨 ${t.yellow}</button><button onclick="addEvent('🟥')" class="btn-secondary" style="font-size:14px!important; padding:14px; color:var(--danger); border-color:rgba(225,29,72,0.3);">🟥 ${t.red}</button></div></div>`;
             } else {
                 ctrl.innerHTML = `<div class="score-ctrl-grid mb-3"><div class="team-ctrl-card"><div class="team-ctrl-lbl">${d.t1 || t.team1}</div><div class="ctrl-btn-group"><button class="btn-ctrl minus" onclick="proScore(1,-1)">-</button><button class="btn-ctrl plus" onclick="proScore(1,1)">+</button></div></div><div class="team-ctrl-card"><div class="team-ctrl-lbl">${d.t2 || t.team2}</div><div class="ctrl-btn-group"><button class="btn-ctrl minus" onclick="proScore(2,-1)">-</button><button class="btn-ctrl plus" onclick="proScore(2,1)">+</button></div></div></div>`;
             }
