@@ -23,8 +23,8 @@
             --primary: #f59e0b; 
             --primary-glow: rgba(245, 158, 11, 0.4);
             --bg-dark: #1c1512; 
-            --glass-bg: rgba(35, 27, 24, 0.90);
-            --glass-border: rgba(245, 158, 11, 0.3);
+            --glass-bg: rgba(35, 27, 24, 0.85);
+            --glass-border: rgba(245, 158, 11, 0.4);
             --danger: #e11d48; 
             --danger-glow: rgba(225, 29, 72, 0.4);
             --text-main: #fef3c7; 
@@ -34,7 +34,7 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; touch-action: pan-x pan-y; margin: 0; padding: 0; }
         html, body { height: 100%; height: 100dvh; width: 100%; overflow: hidden; background: var(--bg-dark); font-family: 'Inter', sans-serif; position: fixed; color: var(--text-main); }
 
-        .glass-panel { background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8); }
+        .glass-panel { background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8); }
 
         input, select, textarea, datalist { font-size: 15px !important; outline: none !important; text-transform: uppercase; background: rgba(20, 15, 12, 0.8); color: var(--text-main); border: 1px solid var(--glass-border); padding: 14px; border-radius: 12px; font-family: 'Inter', sans-serif; width: 100%; transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease; box-shadow: inset 0 2px 5px rgba(0,0,0,0.5); -webkit-appearance: none; }
         input:focus, select:focus { border-color: var(--primary); background: rgba(245, 158, 11, 0.08); box-shadow: 0 0 0 3px var(--primary-glow); }
@@ -48,7 +48,59 @@
         .btn-secondary { background: rgba(245, 158, 11, 0.08); border: 1px solid var(--glass-border); color: var(--text-main); padding: 14px; font-weight: 700; }
 
         .mb-2 { margin-bottom: 8px; } .mb-3 { margin-bottom: 12px; } .mt-3 { margin-top: 12px; } .w-full { width: 100%; }
+
+        #map { width: 100vw; height: 100vh; background: #1c1512; display: block; }
+        .leaflet-tile-pane { filter: sepia(40%) brightness(75%) contrast(105%) saturate(120%); }
         
+        #info-toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(35, 27, 24, 0.85); color: var(--text-main); font-size: 11px; font-weight: 700; padding: 8px 16px; border-radius: 20px; border: 1px solid var(--glass-border); backdrop-filter: blur(10px); z-index: 4500; pointer-events: none; text-align: center; white-space: nowrap; font-family: 'Inter', sans-serif; letter-spacing: 0.5px; transition: opacity 0.3s ease; }
+
+        /* BOČNI JEZIČCI (TABS) */
+        .side-tab-wrapper {
+            position: fixed;
+            left: 0;
+            z-index: 5500;
+            display: flex;
+            align-items: flex-start;
+            transform: translateX(calc(-100% + 48px)); /* Vidi se 48px jezička */
+            transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.6));
+        }
+        .side-tab-wrapper.open {
+            transform: translateX(0);
+        }
+        .side-tab-content {
+            width: 260px;
+            background: rgba(30, 22, 19, 0.95);
+            backdrop-filter: blur(15px);
+            border: 1.5px solid var(--primary);
+            border-left: none;
+            border-radius: 0 0 16px 0;
+            padding: 16px;
+        }
+        .side-tab-handle {
+            width: 48px;
+            height: 56px;
+            background: rgba(20, 15, 12, 0.95);
+            border: 1.5px solid var(--primary);
+            border-left: none;
+            border-radius: 0 16px 16px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.5);
+            position: relative;
+        }
+        /* Mali highlight na jezičku */
+        .side-tab-handle::before {
+            content: ''; position: absolute; left: 0; top: 10px; bottom: 10px; width: 3px; background: var(--primary); border-radius: 0 2px 2px 0; opacity: 0.7;
+        }
+        .side-tab-handle img {
+            width: 22px;
+            filter: sepia(1) hue-rotate(5deg) saturate(3);
+            opacity: 0.9;
+        }
+
         .lang-dropdown-container { position: relative; display: inline-block; cursor: pointer; user-select: none; }
         .current-lang { display: flex; align-items: center; gap: 6px; background: rgba(245,158,11,0.1); border: 1px solid var(--glass-border); padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; color: var(--text-main); transition: 0.2s; }
         .current-lang:active { transform: scale(0.95); }
@@ -56,34 +108,6 @@
         .lang-dropdown-container.open .lang-list { display: flex; animation: slideUpFade 0.2s ease-out; }
         .lang-option { padding: 8px 10px; font-size: 10px; font-weight: 800; color: var(--text-main); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
         .lang-option:hover { background: rgba(245,158,11,0.2); color: var(--primary); }
-
-        /* LEVA GORNJA GRUPA: Search iznad, Login ispod */
-        #left-ui-group { position: absolute; top: 20px; left: 20px; z-index: 5000; display: flex; flex-direction: column; gap: 12px; width: 280px; max-width: calc(100vw - 40px); }
-
-        #search-container { display: flex; align-items: center; width: 100%; height: 48px; background: rgba(35, 27, 24, 0.92); border-radius: 24px; backdrop-filter: blur(12px); overflow: hidden; border: 1.5px solid var(--primary); box-shadow: 0 8px 30px rgba(0,0,0,0.6); position: relative; }
-        #city-search { width: 100%; border: none; background: transparent; color: var(--text-main); padding: 10px 50px 10px 44px; font-size: 14px; outline: none; box-shadow: none; text-transform: uppercase; }
-        .search-icon { position: absolute; left: 14px; width: 18px; height: 18px; filter: sepia(1) hue-rotate(5deg) saturate(3); opacity: 0.9; cursor: pointer; z-index: 5001; }
-        .search-go-btn { position: absolute; right: 4px; top: 4px; bottom: 4px; background: var(--primary); color: #1c1512; border: none; border-radius: 20px; padding: 0 12px; font-weight: 900; font-family: 'Oswald', sans-serif; font-size: 11px !important; }
-
-        /* Login widget kao bočni tab koji viri */
-        #login-widget { width: 100%; background: var(--glass-bg); border: 1.5px solid var(--glass-border); border-radius: 16px; backdrop-filter: blur(15px); box-shadow: 0 10px 30px rgba(0,0,0,0.6); overflow: hidden; transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1), max-height 0.3s ease; }
-        #login-widget.collapsed { transform: translateX(calc(-100% + 46px)); }
-        
-        .login-header-tab { height: 46px; padding: 0 14px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: rgba(20, 15, 12, 0.7); border-bottom: 1px solid rgba(245,158,11,0.15); }
-        .login-content { padding: 14px; display: flex; flex-direction: column; gap: 10px; }
-
-        /* Dugme za lokaciju ispod levog bloka */
-        .location-btn-left { width: 46px; height: 46px; background: rgba(35, 27, 24, 0.92); border: 1.5px solid var(--primary); border-radius: 50%; box-shadow: 0 6px 20px rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; cursor: pointer; transition: transform 0.2s; z-index: 5000; }
-        .location-btn-left:active { transform: scale(0.92); }
-        .location-btn-left img { filter: sepia(1) hue-rotate(5deg) saturate(3); width: 20px; opacity: 0.9; }
-
-        #map { width: 100vw; height: 100vh; background: #1c1512; display: block; }
-        .leaflet-tile-pane { filter: sepia(40%) brightness(75%) contrast(105%) saturate(120%); }
-        
-        #info-toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(35, 27, 24, 0.85); color: var(--text-main); font-size: 11px; font-weight: 700; padding: 8px 16px; border-radius: 20px; border: 1px solid var(--glass-border); backdrop-filter: blur(10px); z-index: 4500; pointer-events: none; text-align: center; white-space: nowrap; font-family: 'Inter', sans-serif; letter-spacing: 0.5px; transition: opacity 0.3s ease; }
-
-        .floating-action-btn { position: absolute; right: 20px; z-index: 5500; display: flex; justify-content: center; align-items: center; cursor: pointer; backdrop-filter: blur(12px); border-radius: 50%; transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
-        .back-btn { top: 20px; width: 48px; height: 48px; background: var(--glass-bg); color: var(--text-main); font-weight: bold; font-size: 18px; border: 1px solid var(--glass-border); box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
 
         .sport-marker-wrapper { display: flex; flex-direction: column; align-items: center; position: relative; }
         .marker-content-box { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; pointer-events: none; z-index: 30;}
@@ -177,14 +201,12 @@
             .admin-score-hero { padding: 20px 10px; }
             .btn-ctrl { width: 44px; height: 44px; font-size: 20px !important; }
             .leaflet-popup-content { min-width: 200px !important; margin: 10px; }
-            #left-ui-group { width: calc(100vw - 40px); }
             .app-modal { width: 92%; padding: 20px; }
             .admin-content-scroll { padding: 16px; }
         }
         @media (min-width: 768px) {
             #admin-panel { width: 450px; left: auto; right: 0; transform: translateX(100%); border-left: 1px solid var(--glass-border); box-shadow: -15px 0 40px rgba(0,0,0,0.6); }
             #admin-panel.active { transform: translateX(0); }
-            #left-ui-group { width: 300px; }
         }
     </style>
 </head>
@@ -205,19 +227,22 @@
     <div id="ui-controls">
         <div id="info-toast">ZOOM IN TO REVEAL (MATCHES WITHIN 30KM)</div>
 
-        <!-- LEVI BLOK: SEARCH IZNAD, LOGIN ISPOD, DUGME ZA LOKACIJU ISPOD -->
-        <div id="left-ui-group">
-            <div id="search-container">
-                <img src="https://cdn-icons-png.flaticon.com/512/622/622669.png" class="search-icon" onclick="executeSearch()" alt="Search">
-                <input type="text" id="city-search" placeholder="PRETRAŽI..." onkeypress="handleSearch(event)">
-                <button class="search-go-btn" onclick="executeSearch()">GO</button>
+        <!-- 1. TAB: PRETRAGA (SEARCH) -->
+        <div id="tab-search" class="side-tab-wrapper" style="top: 20px;">
+            <div class="side-tab-content" style="display:flex; gap:8px;">
+                <input type="text" id="city-search" placeholder="PRETRAŽI..." onkeypress="handleSearch(event)" style="padding:10px; font-size:12px!important; margin:0;">
+                <button class="btn-primary" onclick="executeSearch()" style="padding:0 14px; font-size:12px!important; margin:0; border-radius: 10px;">GO</button>
             </div>
-            
-            <div id="login-widget" class="glass-panel collapsed">
-                <div class="login-header-tab" onclick="toggleLoginWidget()">
-                    <div style="display:flex; align-items:center; gap: 8px;">
-                        <h3 style="margin:0; font-family:'Oswald'; color:var(--primary); font-size:16px; letter-spacing:1px;">SCORE<span style="color:var(--text-main);">PUNKT</span></h3>
-                    </div>
+            <div class="side-tab-handle" onclick="toggleSideTab('tab-search')">
+                <img src="https://cdn-icons-png.flaticon.com/512/622/622669.png" alt="Search">
+            </div>
+        </div>
+
+        <!-- 2. TAB: LOGIN / PROFIL -->
+        <div id="tab-login" class="side-tab-wrapper" style="top: 86px;">
+            <div class="side-tab-content">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                    <h3 style="margin:0; font-family:'Oswald'; color:var(--primary); font-size:16px; letter-spacing:1px;">SCORE<span style="color:var(--text-main);">PUNKT</span></h3>
                     
                     <div id="lang-dropdown" class="lang-dropdown-container" onclick="toggleLangDropdown(event)">
                         <div class="current-lang">
@@ -231,21 +256,32 @@
                     </div>
                 </div>
                 
-                <div class="login-content">
-                    <input type="email" id="email" placeholder="EMAIL ADDRESS" style="padding:10px; font-size:12px!important;">
-                    <input type="password" id="password" placeholder="PASSWORD" style="padding:10px; font-size:12px!important;">
-                    <button class="btn-primary" id="btn-login" onclick="handleAuth()" style="padding:12px; font-size:13px!important;">ULAZ U SISTEM</button>
+                <div id="login-form-area" style="display:flex; flex-direction:column; gap:10px;">
+                    <input type="email" id="email" placeholder="EMAIL ADDRESS" style="padding:12px; font-size:12px!important; margin:0;">
+                    <input type="password" id="password" placeholder="PASSWORD" style="padding:12px; font-size:12px!important; margin:0;">
+                    <button class="btn-primary" id="btn-login" onclick="handleAuth()" style="padding:12px; font-size:13px!important; margin:0;">ULAZ U SISTEM</button>
+                </div>
+
+                <div id="logged-in-area" style="display:none; flex-direction:column; gap:10px;">
+                    <div id="user-indicator-text" style="font-size:11px; font-weight:800; color:var(--text-main); word-break:break-all; text-align:center; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 10px;"></div>
+                    <button class="btn-secondary" id="btn-logout" onclick="goBackToLogin()" style="padding:12px; font-size:13px!important; margin:0; border-color:rgba(225,29,72,0.5); color:var(--danger);">ODJAVA</button>
                 </div>
             </div>
+            <div class="side-tab-handle" onclick="toggleSideTab('tab-login')">
+                <img id="login-handle-icon" src="https://cdn-icons-png.flaticon.com/512/1077/1077063.png" alt="User">
+            </div>
+        </div>
 
-            <div class="location-btn-left" onclick="goToMyLocation()" title="Moja lokacija">
+        <!-- 3. TAB: LOKACIJA -->
+        <div id="tab-location" class="side-tab-wrapper" style="top: 152px;">
+            <div class="side-tab-content">
+                <button class="btn-primary" id="btn-loc-text" onclick="goToMyLocation(); toggleSideTab('tab-location');" style="width:100%; padding:14px; font-size:13px!important; margin:0;">📍 MOJA LOKACIJA</button>
+            </div>
+            <div class="side-tab-handle" onclick="toggleSideTab('tab-location')">
                 <img src="https://cdn-icons-png.flaticon.com/512/1865/1865269.png" alt="Location">
             </div>
         </div>
-        
-        <div class="floating-action-btn back-btn" onclick="goBackToLogin()" id="btn-back-icon" style="display:none;"></div>
-        
-        <div id="user-indicator" style="display:none; position:fixed; bottom:20px; left:20px; color:var(--primary); font-size:11px; font-weight:800; z-index:5000; opacity: 0.95; background: rgba(35,27,24,0.85); padding: 10px 16px; border-radius: 20px; backdrop-filter: blur(10px); border: 1px solid var(--glass-border); box-shadow: 0 4px 15px rgba(0,0,0,0.5);"></div>
+
     </div>
 
     <div id="admin-panel">
@@ -326,16 +362,23 @@
 
         const translations = {
             sr: { 
-                infoToast: "ZUMIRAJTE MAPU (PRIKAZ DO 30KM OD CENTRA)", login: "ULAZ U SISTEM", search: "Pretraži...", adminTitle: "ADMIN TABLA", savePeriod: "SAČUVAJ PERIOD / SET", goLive: "KRENI UŽIVO", endMatch: "ZAVRŠI MEČ", resetMatch: "RESET / NOVI MEČ", schedule: "ZAKAŽI MEČ", deleteCourt: "OBRIŠI TEREN", zoneOccupied: "ZONA JE ZAUZETA (UNUTAR 100M)!", create: "KRENI", courtName: "NAZIV TERENA", player: "IME IGRAČA", team: "TIM", loggedAs: "ULOGOVAN KAO:", localMatch: "LOKALNI MEČ", points: "POENI", games: "GEMOVI", league: "LIGA (NOVA)", team1: "TIM 1", team2: "TIM 2", goal: "GOL", yellow: "ŽUTI", red: "CRVENI", confirmDelete: "DA LI STE SIGURNI DA ŽELITE OBRISATI?", live: "UŽIVO", ended: "KRAJ", limitReached: "LIMIT OD 3 TERENA JE DOSTIGNUT!", addCourt: "DODAJ TEREN", noData: "NEMA DODATNIH PODATAKA",
+                infoToast: "ZUMIRAJTE MAPU (PRIKAZ DO 30KM OD CENTRA)", login: "ULAZ U SISTEM", logout: "ODJAVA", myLocation: "📍 MOJA LOKACIJA", search: "PRETRAŽI...", adminTitle: "ADMIN TABLA", savePeriod: "SAČUVAJ PERIOD / SET", goLive: "KRENI UŽIVO", endMatch: "ZAVRŠI MEČ", resetMatch: "RESET / NOVI MEČ", schedule: "ZAKAŽI MEČ", deleteCourt: "OBRIŠI TEREN", zoneOccupied: "ZONA JE ZAUZETA (UNUTAR 100M)!", create: "KRENI", courtName: "NAZIV TERENA", player: "IME IGRAČA", team: "TIM", loggedAs: "ULOGOVAN KAO:", localMatch: "LOKALNI MEČ", points: "POENI", games: "GEMOVI", league: "LIGA (NOVA)", team1: "TIM 1", team2: "TIM 2", goal: "GOL", yellow: "ŽUTI", red: "CRVENI", confirmDelete: "DA LI STE SIGURNI DA ŽELITE OBRISATI?", live: "UŽIVO", ended: "KRAJ", limitReached: "LIMIT OD 3 TERENA JE DOSTIGNUT!", addCourt: "DODAJ TEREN", noData: "NEMA DODATNIH PODATAKA",
                 sports: { "FUDBAL": "FUDBAL", "KOŠARKA": "KOŠARKA", "ODBOJKA": "ODBOJKA", "TENIS": "TENIS", "RUKOMET": "RUKOMET" },
                 periods: { FUDBAL: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "PROD"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } 
             },
             en: { 
-                infoToast: "ZOOM IN TO REVEAL (MATCHES WITHIN 30KM)", login: "ENTER SYSTEM", search: "Search...", adminTitle: "ADMIN PANEL", savePeriod: "SAVE PERIOD / SET", goLive: "GO LIVE", endMatch: "END MATCH", resetMatch: "RESET / NEW MATCH", schedule: "SCHEDULE MATCH", deleteCourt: "DELETE COURT", zoneOccupied: "ZONE OCCUPIED (WITHIN 100M)!", create: "CREATE", courtName: "COURT NAME", player: "PLAYER NAME", team: "TEAM", loggedAs: "LOGGED AS:", localMatch: "LOCAL MATCH", points: "POINTS", games: "GAMES", league: "LEAGUE (NEW)", team1: "TEAM 1", team2: "TEAM 2", goal: "GOAL", yellow: "YELLOW", red: "RED", confirmDelete: "ARE YOU SURE YOU WANT TO DELETE?", live: "LIVE", ended: "ENDED", limitReached: "LIMIT OF 3 COURTS REACHED!", addCourt: "ADD COURT", noData: "NO ADDITIONAL DATA",
+                infoToast: "ZOOM IN TO REVEAL (MATCHES WITHIN 30KM)", login: "ENTER SYSTEM", logout: "LOGOUT", myLocation: "📍 MY LOCATION", search: "SEARCH...", adminTitle: "ADMIN PANEL", savePeriod: "SAVE PERIOD / SET", goLive: "GO LIVE", endMatch: "END MATCH", resetMatch: "RESET / NEW MATCH", schedule: "SCHEDULE MATCH", deleteCourt: "DELETE COURT", zoneOccupied: "ZONE OCCUPIED (WITHIN 100M)!", create: "CREATE", courtName: "COURT NAME", player: "PLAYER NAME", team: "TEAM", loggedAs: "LOGGED AS:", localMatch: "LOCAL MATCH", points: "POINTS", games: "GAMES", league: "LEAGUE (NEW)", team1: "TEAM 1", team2: "TEAM 2", goal: "GOAL", yellow: "YELLOW", red: "RED", confirmDelete: "ARE YOU SURE YOU WANT TO DELETE?", live: "LIVE", ended: "ENDED", limitReached: "LIMIT OF 3 COURTS REACHED!", addCourt: "ADD COURT", noData: "NO ADDITIONAL DATA",
                 sports: { "FUDBAL": "FOOTBALL", "KOŠARKA": "BASKETBALL", "ODBOJKA": "VOLLEYBALL", "TENIS": "TENNIS", "RUKOMET": "HANDBALL" },
                 periods: { FUDBAL: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "OT"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } 
             }
         };
+
+        function toggleSideTab(id) {
+            document.querySelectorAll('.side-tab-wrapper').forEach(el => {
+                if(el.id === id) el.classList.toggle('open');
+                else el.classList.remove('open');
+            });
+        }
 
         let modalConfirmCallback = null;
         function showAppAlert(msg) {
@@ -360,7 +403,6 @@
         function closeAppModal() { document.getElementById('custom-modal-overlay').classList.remove('show'); }
         function confirmAppModal() { closeAppModal(); if(modalConfirmCallback) modalConfirmCallback(); }
 
-        function toggleLoginWidget() { document.getElementById('login-widget').classList.toggle('collapsed'); }
         function toggleLangDropdown(e) { if(e) e.stopPropagation(); document.getElementById('lang-dropdown').classList.toggle('open'); }
         
         document.addEventListener('click', (e) => {
@@ -376,31 +418,50 @@
         
         function updateUILanguage() { 
             const t = translations[currentLang]; document.getElementById('current-lang-text').innerText = currentLang === 'en' ? 'ENG' : 'SRB';
-            document.getElementById('info-toast').innerText = t.infoToast; document.getElementById('btn-login').innerText = t.login; 
-            document.getElementById('city-search').placeholder = t.search; document.getElementById('adm-name').innerText = t.adminTitle; 
-            document.getElementById('btn-save-period').innerText = t.savePeriod; document.getElementById('start-live-btn').innerText = t.goLive; 
-            document.getElementById('end-match-btn').innerText = t.endMatch; document.getElementById('reset-match-btn').innerText = t.resetMatch; 
-            document.getElementById('btn-schedule').innerText = t.schedule; document.getElementById('btn-delete-court').innerText = t.deleteCourt; 
-            document.getElementById('adm-league-input').placeholder = t.league; document.getElementById('adm-t1').placeholder = t.team1 + " (MAX 10)"; 
+            document.getElementById('info-toast').innerText = t.infoToast; 
+            document.getElementById('btn-login').innerText = t.login; 
+            document.getElementById('btn-logout').innerText = t.logout; 
+            document.getElementById('btn-loc-text').innerText = t.myLocation; 
+            document.getElementById('city-search').placeholder = t.search; 
+            document.getElementById('adm-name').innerText = t.adminTitle; 
+            document.getElementById('btn-save-period').innerText = t.savePeriod; 
+            document.getElementById('start-live-btn').innerText = t.goLive; 
+            document.getElementById('end-match-btn').innerText = t.endMatch; 
+            document.getElementById('reset-match-btn').innerText = t.resetMatch; 
+            document.getElementById('btn-schedule').innerText = t.schedule; 
+            document.getElementById('btn-delete-court').innerText = t.deleteCourt; 
+            document.getElementById('adm-league-input').placeholder = t.league; 
+            document.getElementById('adm-t1').placeholder = t.team1 + " (MAX 10)"; 
             document.getElementById('adm-t2').placeholder = t.team2 + " (MAX 10)"; 
             
             const commentInput = document.getElementById('adm-comment-input');
             if(commentInput) commentInput.placeholder = currentLang === 'en' ? "COMMENT (MAX 30 CHARS)" : "KOMENTAR (MAX 30 SLOVA)";
 
-            if(auth.currentUser) document.getElementById('user-indicator').innerText = `${t.loggedAs} ${auth.currentUser.email}`; 
+            if(auth.currentUser) {
+                document.getElementById('user-indicator-text').innerText = `${t.loggedAs} ${auth.currentUser.email}`; 
+            }
         }
 
         function goBackToLogin() { auth.signOut(); location.reload(); }
         window.onload = () => { initMap(); updateUILanguage(); loadSuggestions(); };
         
         auth.onAuthStateChanged(user => { 
-            const backBtnIcon = document.getElementById('btn-back-icon');
-            const loginWidget = document.getElementById('login-widget');
-            const userIndicator = document.getElementById('user-indicator');
+            const loginForm = document.getElementById('login-form-area');
+            const loggedInArea = document.getElementById('logged-in-area');
+            const indicatorText = document.getElementById('user-indicator-text');
+            const handleImg = document.getElementById('login-handle-icon');
+
             if (user) { 
-                loginWidget.style.display = 'none'; userIndicator.style.display = 'block'; backBtnIcon.style.display = 'flex';
-                backBtnIcon.innerHTML = `<svg viewBox="0 0 24 24" width="22" height="22" stroke="var(--text-main)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>`;
-            } else { updateUILanguage(); loginWidget.style.display = 'flex'; userIndicator.style.display = 'none'; backBtnIcon.style.display = 'none'; } 
+                loginForm.style.display = 'none'; 
+                loggedInArea.style.display = 'flex'; 
+                indicatorText.innerText = translations[currentLang].loggedAs + " " + user.email;
+                handleImg.src = "https://cdn-icons-png.flaticon.com/512/1077/1077114.png"; // Prijavljen icon
+            } else { 
+                updateUILanguage(); 
+                loginForm.style.display = 'flex'; 
+                loggedInArea.style.display = 'none'; 
+                handleImg.src = "https://cdn-icons-png.flaticon.com/512/1077/1077063.png"; // Odjavljen icon
+            } 
         });
         
         function loadSuggestions() { 
@@ -411,8 +472,10 @@
 
         function initMap() {
             if (map) return;
-            // Pamćenje poslednje pozicije (Wels po defaultu ako nema sačuvane)
-            const sLat = localStorage.getItem('lastLat') || 48.1566, sLng = localStorage.getItem('lastLng') || 14.1543, sZoom = localStorage.getItem('lastZoom') || 13;
+            // Aplikacija sada učitava i pamti isključivo tvoju poslednju poznatu poziciju.
+            const sLat = localStorage.getItem('lastLat') || 48.1566;
+            const sLng = localStorage.getItem('lastLng') || 14.1543;
+            const sZoom = localStorage.getItem('lastZoom') || 13;
             const bounds = [ [-90, -180], [90, 180] ];
             
             map = L.map('map', { zoomControl: false, tap: false, minZoom: 3, maxBounds: bounds, maxBoundsViscosity: 1.0 }).setView([sLat, sLng], sZoom);
@@ -449,7 +512,12 @@
                 reRenderAllMarkers(); 
             });
             
-            map.on('click', handleMapClick); trackGPS();
+            map.on('click', (e) => {
+                document.querySelectorAll('.side-tab-wrapper').forEach(el => el.classList.remove('open'));
+                handleMapClick(e);
+            }); 
+            
+            trackGPS();
         }
 
         function reRenderAllMarkers() {
@@ -578,6 +646,15 @@
         }
 
         function handleMapClick(e) { 
+            let anyOpen = false;
+            document.querySelectorAll('.tv-card-details').forEach(el => {
+                if (el.style.display === 'flex') {
+                    el.style.display = 'none';
+                    anyOpen = true;
+                }
+            });
+            if (anyOpen) return;
+
             if (!auth.currentUser) return; 
             const t = translations[currentLang]; const clickPos = e.latlng; 
             
@@ -713,6 +790,7 @@
             fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${val}`).then(r => r.json()).then(data => { 
                 if(data[0]) { 
                     map.flyTo([data[0].lat, data[0].lon], 15); 
+                    toggleSideTab('tab-search');
                 } 
             }); 
         }
@@ -723,9 +801,11 @@
             let e = document.getElementById('email').value, p = document.getElementById('password').value; 
             try { 
                 await auth.signInWithEmailAndPassword(e, p); 
+                toggleSideTab('tab-login');
             } catch { 
                 try { 
                     await auth.createUserWithEmailAndPassword(e, p); 
+                    toggleSideTab('tab-login');
                 } catch(err) { 
                     showAppAlert(err.message); 
                 } 
