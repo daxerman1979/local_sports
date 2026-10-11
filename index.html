@@ -20,15 +20,15 @@
     
     <style>
         :root {
-            --primary: #f59e0b; /* Topla zlatna / ćilibar */
+            --primary: #f59e0b; 
             --primary-glow: rgba(245, 158, 11, 0.4);
-            --bg-dark: #1c1512; /* Duboka topla jesenja braon-siva podloga */
+            --bg-dark: #1c1512; 
             --glass-bg: rgba(35, 27, 24, 0.85);
             --glass-border: rgba(245, 158, 11, 0.2);
-            --danger: #e11d48; /* Topla zagasito crvena */
+            --danger: #e11d48; 
             --danger-glow: rgba(225, 29, 72, 0.4);
-            --text-main: #fef3c7; /* Topla krem bela */
-            --text-muted: #d97706; /* Topla narandžasto-siva */
+            --text-main: #fef3c7; 
+            --text-muted: #d97706; 
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; touch-action: pan-x pan-y; margin: 0; padding: 0; }
@@ -321,12 +321,12 @@
 
         const translations = {
             sr: { 
-                infoToast: "ZUMIRAJTE MAPU (PRIKAZ DO 30KM OD CENTRA)", login: "ULAZ U SISTEM", search: "Pretraži...", adminTitle: "ADMIN TABLA", savePeriod: "SAČUVAJ PERIOD / SET", goLive: "KRENI UŽIVO", endMatch: "ZAVRŠI MEČ", resetMatch: "RESET / NOVI MEČ", schedule: "ZAKAŽI MEČ", deleteCourt: "OBRIŠI TEREN", zoneOccupied: "ZONA JE ZAUZETA!", create: "KRENI", courtName: "NAZIV TERENA", player: "IME IGRAČA", team: "TIM", loggedAs: "ULOGOVAN KAO:", localMatch: "LOKALNI MEČ", points: "POENI", games: "GEMOVI", league: "LIGA (NOVA)", team1: "TIM 1", team2: "TIM 2", goal: "GOL", yellow: "ŽUTI", red: "CRVENI", confirmDelete: "DA LI STE SIGURNI DA ŽELITE OBRISATI?", live: "UŽIVO", ended: "KRAJ", limitReached: "LIMIT OD 3 TERENA JE DOSTIGNUT!", addCourt: "DODAJ TEREN", noData: "NEMA DODATNIH PODATAKA",
+                infoToast: "ZUMIRAJTE MAPU (PRIKAZ DO 30KM OD CENTRA)", login: "ULAZ U SISTEM", search: "Pretraži...", adminTitle: "ADMIN TABLA", savePeriod: "SAČUVAJ PERIOD / SET", goLive: "KRENI UŽIVO", endMatch: "ZAVRŠI MEČ", resetMatch: "RESET / NOVI MEČ", schedule: "ZAKAŽI MEČ", deleteCourt: "OBRIŠI TEREN", create: "KRENI", courtName: "NAZIV TERENA", player: "IME IGRAČA", team: "TIM", loggedAs: "ULOGOVAN KAO:", localMatch: "LOKALNI MEČ", points: "POENI", games: "GEMOVI", league: "LIGA (NOVA)", team1: "TIM 1", team2: "TIM 2", goal: "GOL", yellow: "ŽUTI", red: "CRVENI", confirmDelete: "DA LI STE SIGURNI DA ŽELITE OBRISATI?", live: "UŽIVO", ended: "KRAJ", limitReached: "LIMIT OD 3 TERENA JE DOSTIGNUT!", addCourt: "DODAJ TEREN", noData: "NEMA DODATNIH PODATAKA",
                 sports: { "FUDBAL": "FUDBAL", "KOŠARKA": "KOŠARKA", "ODBOJKA": "ODBOJKA", "TENIS": "TENIS", "RUKOMET": "RUKOMET" },
                 periods: { FUDBAL: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "PROD"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } 
             },
             en: { 
-                infoToast: "ZOOM IN TO REVEAL (MATCHES WITHIN 30KM)", login: "ENTER SYSTEM", search: "Search...", adminTitle: "ADMIN PANEL", savePeriod: "SAVE PERIOD / SET", goLive: "GO LIVE", endMatch: "END MATCH", resetMatch: "RESET / NEW MATCH", schedule: "SCHEDULE MATCH", deleteCourt: "DELETE COURT", zoneOccupied: "ZONE OCCUPIED!", create: "CREATE", courtName: "COURT NAME", player: "PLAYER NAME", team: "TEAM", loggedAs: "LOGGED AS:", localMatch: "LOCAL MATCH", points: "POINTS", games: "GAMES", league: "LEAGUE (NEW)", team1: "TEAM 1", team2: "TEAM 2", goal: "GOAL", yellow: "YELLOW", red: "RED", confirmDelete: "ARE YOU SURE YOU WANT TO DELETE?", live: "LIVE", ended: "ENDED", limitReached: "LIMIT OF 3 COURTS REACHED!", addCourt: "ADD COURT", noData: "NO ADDITIONAL DATA",
+                infoToast: "ZOOM IN TO REVEAL (MATCHES WITHIN 30KM)", login: "ENTER SYSTEM", search: "Search...", adminTitle: "ADMIN PANEL", savePeriod: "SAVE PERIOD / SET", goLive: "GO LIVE", endMatch: "END MATCH", resetMatch: "RESET / NEW MATCH", schedule: "SCHEDULE MATCH", deleteCourt: "DELETE COURT", create: "CREATE", courtName: "COURT NAME", player: "PLAYER NAME", team: "TEAM", loggedAs: "LOGGED AS:", localMatch: "LOCAL MATCH", points: "POINTS", games: "GAMES", league: "LEAGUE (NEW)", team1: "TEAM 1", team2: "TEAM 2", goal: "GOAL", yellow: "YELLOW", red: "RED", confirmDelete: "ARE YOU SURE YOU WANT TO DELETE?", live: "LIVE", ended: "ENDED", limitReached: "LIMIT OF 3 COURTS REACHED!", addCourt: "ADD COURT", noData: "NO ADDITIONAL DATA",
                 sports: { "FUDBAL": "FOOTBALL", "KOŠARKA": "BASKETBALL", "ODBOJKA": "VOLLEYBALL", "TENIS": "TENNIS", "RUKOMET": "HANDBALL" },
                 periods: { FUDBAL: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "OT"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } 
             }
@@ -423,7 +423,7 @@
             geoQuery.on("key_entered", function(key, location, distance) {
                 if (!activeListeners[key]) {
                     activeListeners[key] = db.ref('tereni/' + key).on('value', snap => {
-                        if (snap.exists()) { let d = snap.val(); d.key = key; allTereniData[key] = d; renderSingleMarker(key); if(currentAdminKey === key) refreshAdminPanel(key); } 
+                        if (snap.exists()) { let d = snap.val(); d.key = key; allTereniData[key] = d; reRenderAllMarkers(); if(currentAdminKey === key) refreshAdminPanel(key); } 
                         else { delete allTereniData[key]; removeMarker(key); }
                     });
                 }
@@ -446,6 +446,22 @@
             });
             
             map.on('click', handleMapClick); trackGPS();
+        }
+
+        // Pomoćna funkcija koja automatski blago razmiče markere ako dele iste koordinate
+        function getAdjustedCoordinates(key) {
+            const d = allTereniData[key];
+            if (!d) return [0, 0];
+            const keys = Object.keys(allTereniData);
+            let sameSpots = keys.filter(k => {
+                const item = allTereniData[k];
+                return item && Math.abs(item.lat - d.lat) < 0.00001 && Math.abs(item.lng - d.lng) < 0.00001;
+            });
+            if (sameSpots.length <= 1) return [d.lat, d.lng];
+            let index = sameSpots.indexOf(key);
+            let angle = (index / sameSpots.length) * 2 * Math.PI;
+            let offset = 0.00015; // blagi radijus razmicanja
+            return [d.lat + offset * Math.cos(angle), d.lng + offset * Math.sin(angle)];
         }
 
         function renderSingleMarker(key) {
@@ -516,11 +532,7 @@
                     </div>`; 
                 }
 
-                let isOwner = auth.currentUser && d.owner === auth.currentUser.uid; 
-                let isClickable = isOwner || hasDetails; 
-                let cursorStyle = isClickable ? "cursor: pointer;" : "cursor: default;";
-
-                cardBody = `<div class="tv-card-wrapper" style="${cursorStyle}"><div class="tv-card ${isLive?'tv-live':''}"><div class="tv-league">${d.league || t.localMatch}</div><div class="tv-team-row"><div class="tv-team-name">${(d.t1 || t.team1).substring(0,10)}</div><div class="tv-team-score">${s1}</div>${p1Html}${curr1}</div><div class="tv-team-row" style="border-bottom:none;"><div class="tv-team-name">${(d.t2 || t.team2).substring(0,10)}</div><div class="tv-team-score">${s2}</div>${p2Html}${curr2}</div><div class="tv-bottom-bar"><span style="display:flex; align-items:center; gap:4px;">${ball} ${sportName}</span><span>${statusText}</span></div></div>${inlineDetails}</div><div class="marker-pointer"></div>`;
+                cardBody = `<div class="tv-card-wrapper"><div class="tv-card ${isLive?'tv-live':''}"><div class="tv-league">${d.league || t.localMatch}</div><div class="tv-team-row"><div class="tv-team-name">${(d.t1 || t.team1).substring(0,10)}</div><div class="tv-team-score">${s1}</div>${p1Html}${curr1}</div><div class="tv-team-row" style="border-bottom:none;"><div class="tv-team-name">${(d.t2 || t.team2).substring(0,10)}</div><div class="tv-team-score">${s2}</div>${p2Html}${curr2}</div><div class="tv-bottom-bar"><span style="display:flex; align-items:center; gap:4px;">${ball} ${sportName}</span><span>${statusText}</span></div></div>${inlineDetails}</div><div class="marker-pointer"></div>`;
             } else {
                 cardBody = `<div class="tv-card-wrapper"><div class="tv-card" style="padding:14px; text-align:center; font-weight:800; font-size:13px; color:var(--primary); border-left:4px solid rgba(245,158,11,0.3);">${ball} ${d.name}</div></div><div class="marker-pointer"></div>`;
             }
@@ -528,14 +540,17 @@
             const hoverHtml = `<div class="hover-tooltip">${d.t1 || t.team1} <span style="color:var(--primary); font-size:8px;">VS</span> ${d.t2 || t.team2}</div>`;
             const html = `<div class="sport-marker-wrapper ${isLive?'status-live-wrapper':''} ${zoomNear?'zoom-near':''}"><div class="marker-content-box"><div class="marker-ball-only">${ball}${hoverHtml}</div>${cardBody}</div></div>`;
             
+            const adjustedCoords = getAdjustedCoordinates(key);
+
             if (activeMarkers[key]) {
-                activeMarkers[key].setLatLng([d.lat, d.lng]); activeMarkers[key].setIcon(L.divIcon({ className: '', html, iconSize: [0,0], iconAnchor: [0, 0] }));
+                activeMarkers[key].setLatLng(adjustedCoords); 
+                activeMarkers[key].setIcon(L.divIcon({ className: '', html, iconSize: [0,0], iconAnchor: [0, 0] }));
             } else {
-                let marker = L.marker([d.lat, d.lng], { icon: L.divIcon({ className: '', html, iconSize: [0,0], iconAnchor: [0, 0] }) }).addTo(map);
+                let marker = L.marker(adjustedCoords, { icon: L.divIcon({ className: '', html, iconSize: [0,0], iconAnchor: [0, 0] }) }).addTo(map);
                 marker.on('click', e => { 
                     L.DomEvent.stopPropagation(e); 
                     let hasDetails = (d.sub_details || d.events || d.comment);
-                    if (map.getZoom() <= 12) { map.flyTo([d.lat, d.lng], 15); } 
+                    if (map.getZoom() <= 12) { map.flyTo(adjustedCoords, 15); } 
                     else { 
                         if (auth.currentUser && d.owner === auth.currentUser.uid) { 
                             openAdmin(d.key); 
@@ -544,6 +559,7 @@
                             if (inlineEl) {
                                 let wasOpen = inlineEl.style.display === 'flex';
                                 document.querySelectorAll('.tv-card-details').forEach(el => el.style.display = 'none');
+                                // Zatvara se/otvara se ISKLJUČIVO klikom na ovaj prozor (nema zatvaranja na klik mape)
                                 inlineEl.style.display = wasOpen ? 'none' : 'flex';
                             } 
                         } 
@@ -557,20 +573,9 @@
         function reRenderAllMarkers() { Object.keys(allTereniData).forEach(key => renderSingleMarker(key)); }
 
         function handleMapClick(e) { 
-            let anyOpen = false;
-            document.querySelectorAll('.tv-card-details').forEach(el => {
-                if (el.style.display === 'flex') {
-                    el.style.display = 'none';
-                    anyOpen = true;
-                }
-            });
-            if (anyOpen) return;
-
+            // Uklonjeno zatvaranje prozora na klik mape. Prozor ostaje otvoren dok se ne klikne ponovo na njega.
             if (!auth.currentUser) return; 
-            const t = translations[currentLang]; const clickPos = e.latlng; 
-            const isTooClose = Object.values(allTereniData).some(court => { return clickPos.distanceTo(L.latLng(court.lat, court.lng)) < 200; });
-            if (isTooClose) { showAppAlert(t.zoneOccupied); return; } 
-            
+            const t = translations[currentLang]; 
             const sp = t.sports || { "FUDBAL": "FUDBAL", "KOŠARKA": "KOŠARKA", "ODBOJKA": "ODBOJKA", "TENIS": "TENIS", "RUKOMET": "RUKOMET" };
             const html = `<div style="padding:12px 6px; text-align:center; display: flex; flex-direction: column; gap: 16px;"><h3 style="margin: 0; font-family:'Oswald', sans-serif; color:var(--primary); font-size:18px; letter-spacing: 1px;">${t.addCourt || 'DODAJ TEREN'}</h3><select id="p_sport" style="width: 100%; margin: 0; padding: 14px; font-size:15px!important; border-radius:12px;"><option value="FUDBAL">⚽ ${sp.FUDBAL}</option><option value="KOŠARKA">🏀 ${sp.KOŠARKA}</option><option value="ODBOJKA">🏐 ${sp.ODBOJKA}</option><option value="TENIS">🎾 ${sp.TENIS}</option><option value="RUKOMET">🤾 ${sp.RUKOMET}</option></select><input type="text" id="p_name" placeholder="${t.courtName}" maxlength="15" style="width: 100%; margin: 0; padding: 14px; font-size:15px!important; border-radius:12px;"><button onclick="saveTeren(${e.latlng.lat}, ${e.latlng.lng})" class="btn-primary" style="width: 100%; margin: 0; padding: 16px; font-size:16px!important; border-radius:12px;">${t.create}</button></div>`; 
             L.popup().setLatLng(e.latlng).setContent(html).openOn(map); 
