@@ -314,6 +314,7 @@
         let rangeCircleWave = null;
         let geoQuery = null;
         let geoFireRef = null;
+        let moveTimeout = null;
         
         let currentLang = localStorage.getItem('lang') || 'en'; 
         const sportEmojis = { "FUDBAL": "⚽", "KOŠARKA": "🏀", "ODBOJKA": "🏐", "TENIS": "🎾", "RUKOMET": "🤾" };
@@ -437,12 +438,19 @@
             map.on('drag', () => { rangeCircleWave.setLatLng(map.getCenter()); });
             
             map.on('moveend', () => { 
-                let c = map.getCenter(); localStorage.setItem('lastLat', c.lat); localStorage.setItem('lastLng', c.lng); localStorage.setItem('lastZoom', map.getZoom()); 
+                let c = map.getCenter(); 
+                localStorage.setItem('lastLat', c.lat); 
+                localStorage.setItem('lastLng', c.lng); 
+                localStorage.setItem('lastZoom', map.getZoom()); 
                 rangeCircleWave.setLatLng(c); 
                 if (map.getZoom() > 12) { if(map.hasLayer(rangeCircleWave)) map.removeLayer(rangeCircleWave); } 
                 else { if(!map.hasLayer(rangeCircleWave)) map.addLayer(rangeCircleWave); }
-                geoQuery.updateCriteria({ center: [c.lat, c.lng], radius: 30 });
-                reRenderAllMarkers(); 
+                
+                if (moveTimeout) clearTimeout(moveTimeout);
+                moveTimeout = setTimeout(() => {
+                    geoQuery.updateCriteria({ center: [c.lat, c.lng], radius: 30 });
+                    reRenderAllMarkers(); 
+                }, 1000);
             });
             
             map.on('click', handleMapClick); trackGPS();
@@ -495,17 +503,17 @@
                 if (d.events) {
                     let eH = "", eA = "";
                     Object.values(d.events).forEach(ev => {
-                        if(ev.team == 1) eH += `<div style="font-size:11px; margin-bottom:4px; font-weight:600;"><span style="font-size:14px;">${ev.emoji}</span> ${ev.player}</div>`;
-                        else eA += `<div style="font-size:11px; margin-bottom:4px; text-align:right; font-weight:600;">${ev.player} <span style="font-size:14px;">${ev.emoji}</span></div>`;
+                        if(ev.team == 1) eH += `<div style="font-size:9px; margin-bottom:4px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"><span style="font-size:11px;">${ev.emoji}</span> ${ev.player}</div>`;
+                        else eA += `<div style="font-size:9px; margin-bottom:4px; text-align:right; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${ev.player} <span style="font-size:11px;">${ev.emoji}</span></div>`;
                     });
                     eventsHtml = `<div style="background:rgba(20,15,12,0.5); border-radius:8px; padding:8px; border: 1px solid var(--glass-border); margin-top:4px;">
                         <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; border-bottom:1px solid rgba(245,158,11,0.1); padding-bottom:6px; margin-bottom:6px;">
-                            <div style="font-size:10px; font-weight:800; color:var(--text-muted);">${(d.t1 || t.team1).substring(0,10)}</div>
-                            <div style="font-size:10px; font-weight:800; color:var(--text-muted); text-align:right;">${(d.t2 || t.team2).substring(0,10)}</div>
+                            <div style="font-size:9px; font-weight:800; color:var(--text-muted);">${(d.t1 || t.team1).substring(0,10)}</div>
+                            <div style="font-size:9px; font-weight:800; color:var(--text-muted); text-align:right;">${(d.t2 || t.team2).substring(0,10)}</div>
                         </div>
-                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                            <div>${eH}</div>
-                            <div>${eA}</div>
+                        <div style="display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:10px; overflow:hidden;">
+                            <div style="overflow:hidden;">${eH}</div>
+                            <div style="overflow:hidden;">${eA}</div>
                         </div>
                     </div>`;
                 }
