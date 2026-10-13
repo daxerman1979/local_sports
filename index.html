@@ -62,7 +62,7 @@
         #search-container.expanded { width: calc(100vw - 90px); border-color: var(--primary); background: rgba(28, 21, 18, 0.95); }
         #city-search { width: 100%; border: none; background: transparent; color: var(--text-main); padding: 12px 60px 12px 48px; font-size: 16px; outline: none; opacity: 0; transition: 0.3s; pointer-events: none; }
         #search-container.expanded #city-search { opacity: 1; pointer-events: all; }
-        .search-icon { position: absolute; left: 14px; width: 20px; height: 20px; filter: sepia(1) hue-rotate(5deg) saturate(3); opacity: 0.9; cursor: pointer; z-index: 5001; }
+        .search-icon { position: absolute; left: 14px; width: 20px; height: 20px; cursor: pointer; z-index: 5001; transition: 0.3s; }
         .search-go-btn { position: absolute; right: 5px; top: 5px; bottom: 5px; background: var(--primary); color: #1c1512; border: none; border-radius: 20px; padding: 0 14px; font-weight: 900; font-family: 'Oswald', sans-serif; font-size: 12px !important; opacity: 0; pointer-events: none; transition: 0.3s; }
         #search-container.expanded .search-go-btn { opacity: 1; pointer-events: all; }
 
@@ -224,7 +224,10 @@
         <div id="info-toast">ZOOM IN TO REVEAL (MATCHES WITHIN 30KM)</div>
 
         <div id="search-container">
-            <img src="https://cdn-icons-png.flaticon.com/512/622/622669.png" class="search-icon" onclick="toggleSearch()" alt="Search">
+            <svg viewBox="0 0 24 24" class="search-icon" onclick="toggleSearch()" stroke="#f59e0b" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
             <input type="text" id="city-search" placeholder="Pretraži..." onkeypress="handleSearch(event)">
             <button class="search-go-btn" onclick="executeSearch()">GO</button>
         </div>
@@ -342,12 +345,12 @@
 
         const translations = {
             sr: { 
-                infoToast: "ZUMIRAJTE MAPU (PRIKAZ DO 30KM OD CENTRA)", login: "ULAZ U SISTEM", search: "Pretraži...", adminTitle: "ADMIN TABLA", savePeriod: "SAČUVAJ PERIOD / SET", goLive: "KRENI UŽIVO", endMatch: "ZAVRŠI MEČ", resetMatch: "RESET / NOVI MEČ", schedule: "ZAKAŽI MEČ", deleteCourt: "OBRIŠI TEREN", zoneOccupied: "ZONA JE ZAUZETA (UNUTAR 100M)!", create: "KRENI", courtName: "NAZIV TERENA", player: "IME IGRAČA", team: "TIM", loggedAs: "ULOGOVAN KAO:", localMatch: "LOKALNI MEČ", points: "POENI", games: "GEMOVI", league: "LIGA (NOVA)", team1: "TIM 1", team2: "TIM 2", goal: "GOL", yellow: "ŽUTI", red: "CRVENI", confirmDelete: "DA LI STE SIGURNI DA ŽELITE OBRISATI?", live: "UŽIVO", ended: "KRAJ", limitReached: "LIMIT OD 3 TERENA JE DOSTIGNUT!", addCourt: "DODAJ TEREN", noData: "NEMA DODATNIH PODATAKA",
+                infoToast: "ZUMIRAJTE MAPU (PRIKAZ DO 30KM OD CENTRA)", login: "ULAZ U SISTEM", search: "Pretraži...", adminTitle: "ADMIN TABLA", savePeriod: "SAČUVAJ PERIOD / SET", goLive: "KRENI UŽIVO", endMatch: "ZAVRŠI MEČ", resetMatch: "RESET / NOVI MEČ", schedule: "ZAKAŽI MEČ", deleteCourt: "OBRIŠI TEREN", zoneOccupied: "ZONA JE ZAUZETA (UNUTAR 100M)!", create: "KRENI", courtName: "NAZIV TERENA", player: "IME IGRAČA", team: "TIM", loggedAs: "ULOGOVAN KAO:", localMatch: "LOKALNI MEČ", points: "POENI", games: "GEMOVI", league: "LIGA (NOVA)", team1: "TIM 1", team2: "TIM 2", goal: "GOL", yellow: "ŽUTI", red: "CRVENI", confirmDelete: "DA LI STE SIGURNI DA ŽELITE OBRISATI?", live: "UŽIVO", ended: "KRAJ", limitReached: "LIMIT OD 3 TERENA JE DOSTIGNUT!", addCourt: "DODAJ TEREN", noData: "NEMA DODATNIH PODATAKA", periodsLabel: "PERIODI",
                 sports: { "FUDBAL": "FUDBAL", "KOŠARKA": "KOŠARKA", "ODBOJKA": "ODBOJKA", "TENIS": "TENIS", "RUKOMET": "RUKOMET" },
                 periods: { FUDBAL: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "PROD"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1.POL", "2.POL", "PROD 1", "PROD 2", "PENALI"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } 
             },
             en: { 
-                infoToast: "ZOOM IN TO REVEAL (MATCHES WITHIN 30KM)", login: "ENTER SYSTEM", search: "Search...", adminTitle: "ADMIN PANEL", savePeriod: "SAVE PERIOD / SET", goLive: "GO LIVE", endMatch: "END MATCH", resetMatch: "RESET / NEW MATCH", schedule: "SCHEDULE MATCH", deleteCourt: "DELETE COURT", zoneOccupied: "ZONE OCCUPIED (WITHIN 100M)!", create: "CREATE", courtName: "COURT NAME", player: "PLAYER NAME", team: "TEAM", loggedAs: "LOGGED AS:", localMatch: "LOCAL MATCH", points: "POINTS", games: "GAMES", league: "LEAGUE (NEW)", team1: "TEAM 1", team2: "TEAM 2", goal: "GOAL", yellow: "YELLOW", red: "RED", confirmDelete: "ARE YOU SURE YOU WANT TO DELETE?", live: "LIVE", ended: "ENDED", limitReached: "LIMIT OF 3 COURTS REACHED!", addCourt: "ADD COURT", noData: "NO ADDITIONAL DATA",
+                infoToast: "ZOOM IN TO REVEAL (MATCHES WITHIN 30KM)", login: "ENTER SYSTEM", search: "Search...", adminTitle: "ADMIN PANEL", savePeriod: "SAVE PERIOD / SET", goLive: "GO LIVE", endMatch: "END MATCH", resetMatch: "RESET / NEW MATCH", schedule: "SCHEDULE MATCH", deleteCourt: "DELETE COURT", zoneOccupied: "ZONE OCCUPIED (WITHIN 100M)!", create: "CREATE", courtName: "COURT NAME", player: "PLAYER NAME", team: "TEAM", loggedAs: "LOGGED AS:", localMatch: "LOCAL MATCH", points: "POINTS", games: "GAMES", league: "LEAGUE (NEW)", team1: "TEAM 1", team2: "TEAM 2", goal: "GOAL", yellow: "YELLOW", red: "RED", confirmDelete: "ARE YOU SURE YOU WANT TO DELETE?", live: "LIVE", ended: "ENDED", limitReached: "LIMIT OF 3 COURTS REACHED!", addCourt: "ADD COURT", noData: "NO ADDITIONAL DATA", periodsLabel: "PERIODS",
                 sports: { "FUDBAL": "FOOTBALL", "KOŠARKA": "BASKETBALL", "ODBOJKA": "VOLLEYBALL", "TENIS": "TENNIS", "RUKOMET": "HANDBALL" },
                 periods: { FUDBAL: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], KOŠARKA: ["Q1", "Q2", "Q3", "Q4", "OT"], ODBOJKA: ["S1", "S2", "S3", "S4", "S5"], RUKOMET: ["1ST H", "2ND H", "ET 1", "ET 2", "PEN"], TENIS: ["S1", "S2", "S3", "S4", "S5"] } 
             }
@@ -501,18 +504,32 @@
             let scaleFactor = nearbyCount > 0 ? Math.max(0.6, 1 - (nearbyCount * 0.15)) : 1;
             
             let cardBody = ""; let periodsHtml = ""; let eventsHtml = "";
+            let periodsHeaderHtml = "";
             
             if (isLive || isEnded || isUpcoming) {
                 let s1 = (isLive || isEnded) ? (d.score1 || 0) : "-"; let s2 = (isLive || isEnded) ? (d.score2 || 0) : "-";
                 let statusText = isLive ? `<span style="color:var(--danger); animation: pulse-live 1.5s infinite;">● ${t.live}</span>` : (isEnded ? t.ended : new Date(d.match_time).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}));
                 
                 let p1Html = "", p2Html = "";
-                if (d.sub_details) {
-                    Object.values(d.sub_details).forEach(v => { 
-                        let match = v.match(/(\d+):(\d+)$/); 
-                        p1Html += `<div class="tv-period-score">${match ? match[1] : '-'}</div>`; 
-                        p2Html += `<div class="tv-period-score">${match ? match[2] : '-'}</div>`; 
-                    });
+                if (d.sub_details || (isLive && (d.sport === "TENIS" || d.sport === "ODBOJKA"))) {
+                    periodsHeaderHtml = `<div style="display:flex; align-items: stretch; background: rgba(15, 10, 8, 0.6); border-bottom: 1px solid rgba(245,158,11,0.1);">
+                        <div style="flex: 1; min-width: 70px; padding: 4px 10px; font-size:9px; color:var(--text-muted); font-weight:800; text-transform:uppercase;">${t.periodsLabel || 'PERIODS'}</div>
+                        <div style="width: 40px; box-sizing: border-box; border-left: 1px solid rgba(245,158,11,0.1);"></div>`;
+                    
+                    if (d.sub_details) {
+                        Object.values(d.sub_details).forEach(v => { 
+                            let label = v.split(' ')[0];
+                            periodsHeaderHtml += `<div style="width: 32px; box-sizing: border-box; text-align:center; padding: 4px 0; font-size:9px; font-weight:800; color:var(--text-muted); border-left: 1px solid rgba(245,158,11,0.1);">${label}</div>`;
+                            
+                            let match = v.match(/(\d+):(\d+)$/); 
+                            p1Html += `<div class="tv-period-score">${match ? match[1] : '-'}</div>`; 
+                            p2Html += `<div class="tv-period-score">${match ? match[2] : '-'}</div>`; 
+                        });
+                    }
+                    if (isLive && (d.sport === "TENIS" || d.sport === "ODBOJKA")) {
+                        periodsHeaderHtml += `<div style="width: 42px; box-sizing: border-box; text-align:center; padding: 4px 0; font-size:9px; font-weight:800; color:var(--primary); border-left: 1px solid rgba(245,158,11,0.1);">PTS</div>`;
+                    }
+                    periodsHeaderHtml += `</div>`;
                 }
 
                 if (d.events) {
@@ -555,7 +572,7 @@
                     </div>`; 
                 }
 
-                cardBody = `<div class="tv-card-wrapper" style="transform: scale(${scaleFactor}); transform-origin: bottom center;"><div class="tv-card ${isLive?'tv-live':''}"><div class="tv-league">${d.league || t.localMatch}</div><div class="tv-team-row"><div class="tv-team-name">${(d.t1 || t.team1).substring(0,10)}</div><div class="tv-team-score">${s1}</div>${p1Html}${curr1}</div><div class="tv-team-row" style="border-bottom:none;"><div class="tv-team-name">${(d.t2 || t.team2).substring(0,10)}</div><div class="tv-team-score">${s2}</div>${p2Html}${curr2}</div><div class="tv-bottom-bar"><span style="display:flex; align-items:center; gap:4px;">${ball} ${sportName}</span><span>${statusText}</span></div></div>${inlineDetails}</div><div class="marker-pointer"></div>`;
+                cardBody = `<div class="tv-card-wrapper" style="transform: scale(${scaleFactor}); transform-origin: bottom center;"><div class="tv-card ${isLive?'tv-live':''}"><div class="tv-league">${d.league || t.localMatch}</div>${periodsHeaderHtml}<div class="tv-team-row"><div class="tv-team-name">${(d.t1 || t.team1).substring(0,10)}</div><div class="tv-team-score">${s1}</div>${p1Html}${curr1}</div><div class="tv-team-row" style="border-bottom:none;"><div class="tv-team-name">${(d.t2 || t.team2).substring(0,10)}</div><div class="tv-team-score">${s2}</div>${p2Html}${curr2}</div><div class="tv-bottom-bar"><span style="display:flex; align-items:center; gap:4px;">${ball} ${sportName}</span><span>${statusText}</span></div></div>${inlineDetails}</div><div class="marker-pointer"></div>`;
             } else {
                 cardBody = `<div class="tv-card-wrapper" style="transform: scale(${scaleFactor}); transform-origin: bottom center;"><div class="tv-card" style="padding:14px; text-align:center; font-weight:800; font-size:13px; color:var(--primary); border-left:4px solid rgba(245,158,11,0.3);">${ball} ${d.name}</div></div><div class="marker-pointer"></div>`;
             }
