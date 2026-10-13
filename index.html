@@ -470,7 +470,7 @@
                 moveTimeout = setTimeout(() => {
                     geoQuery.updateCriteria({ center: [c.lat, c.lng], radius: 30 });
                     reRenderAllMarkers(); 
-                }, 1000);
+                }, 1500);
             });
             
             map.on('click', handleMapClick); trackGPS();
