@@ -436,8 +436,6 @@
 
             rangeCircleWave = L.circle(map.getCenter(), { radius: 30000, color: 'var(--primary)', weight: 2.5, opacity: 1, fill: false, interactive: false, className: 'radar-wave-circle' }).addTo(map);
 
-            if (navigator.geolocation) { navigator.geolocation.getCurrentPosition(pos => { map.setView([pos.coords.latitude, pos.coords.longitude], 15); }, () => {}, { timeout: 5000 }); }
-
             geoFireRef = new geofire.GeoFire(db.ref('geolocations'));
             geoQuery = geoFireRef.query({ center: [parseFloat(sLat), parseFloat(sLng)], radius: 30 });
 
@@ -470,7 +468,7 @@
                 moveTimeout = setTimeout(() => {
                     geoQuery.updateCriteria({ center: [c.lat, c.lng], radius: 30 });
                     reRenderAllMarkers(); 
-                }, 1500);
+                }, 2000);
             });
             
             map.on('click', handleMapClick); trackGPS();
@@ -510,14 +508,11 @@
                 
                 let p1Html = "", p2Html = "";
                 if (d.sub_details) {
-                    Object.values(d.sub_details).forEach(v => { let match = v.match(/(\d+):(\d+)$/); p1Html += `<div class="tv-period-score">${match ? match[1] : '-'}</div>`; p2Html += `<div class="tv-period-score">${match ? match[2] : '-'}</div>`; });
-                    periodsHtml += `<div style="background:rgba(20,15,12,0.5); border-radius:8px; padding:8px; border: 1px solid var(--glass-border);"><div style="display:flex; border-bottom:1px solid rgba(245,158,11,0.1); margin-bottom:4px; padding-bottom:4px;"><div style="flex:2; font-size:9px; color:var(--text-muted);">${t.team}</div>`;
-                    Object.values(d.sub_details).forEach(v => { periodsHtml += `<div style="flex:1; text-align:center; font-size:9px; color:var(--primary);">${v.split(' ')[0] || '-'}</div>`; });
-                    periodsHtml += `</div><div style="display:flex; margin-bottom:4px;"><div style="flex:2; font-size:11px; font-weight:800;">${(d.t1 || t.team1).substring(0,8)}</div>`;
-                    Object.values(d.sub_details).forEach(v => { let match = v.match(/(\d+):(\d+)$/); periodsHtml += `<div style="flex:1; text-align:center; font-size:11px; font-weight:700;">${match ? match[1] : '-'}</div>`; });
-                    periodsHtml += `</div><div style="display:flex;"><div style="flex:2; font-size:11px; font-weight:800;">${(d.t2 || t.team2).substring(0,8)}</div>`;
-                    Object.values(d.sub_details).forEach(v => { let match = v.match(/(\d+):(\d+)$/); periodsHtml += `<div style="flex:1; text-align:center; font-size:11px; font-weight:700;">${match ? match[2] : '-'}</div>`; });
-                    periodsHtml += `</div></div>`;
+                    Object.values(d.sub_details).forEach(v => { 
+                        let match = v.match(/(\d+):(\d+)$/); 
+                        p1Html += `<div class="tv-period-score">${match ? match[1] : '-'}</div>`; 
+                        p2Html += `<div class="tv-period-score">${match ? match[2] : '-'}</div>`; 
+                    });
                 }
 
                 if (d.events) {
@@ -549,14 +544,13 @@
 
                 const sportName = (t.sports && t.sports[d.sport]) ? t.sports[d.sport] : d.sport;
                 let inlineDetails = "";
-                let hasDetails = (periodsHtml || eventsHtml || d.comment);
+                let hasDetails = (eventsHtml || d.comment);
                 
                 if (hasDetails) { 
                     let commentHtml = d.comment ? `<div style="text-align:center; font-size:12px; font-weight:800; color:var(--danger); padding:6px; border-radius:6px; background:rgba(225,29,72,0.1); border:1px solid rgba(225,29,72,0.3); margin-top:4px; text-transform:uppercase;">${d.comment}</div>` : '';
                     inlineDetails = `<div class="tv-card-details" id="inline-${d.key}">
-                        ${periodsHtml}
                         ${eventsHtml}
-                        ${(!periodsHtml && !eventsHtml && !d.comment) ? `<div style="text-align:center; font-size:10px; font-weight:700; color:var(--text-muted); padding: 8px 0;">${t.noData}</div>` : ''}
+                        ${(!eventsHtml && !d.comment) ? `<div style="text-align:center; font-size:10px; font-weight:700; color:var(--text-muted); padding: 8px 0;">${t.noData}</div>` : ''}
                         ${commentHtml}
                     </div>`; 
                 }
@@ -578,7 +572,7 @@
                 let marker = L.marker(targetCoords, { icon: L.divIcon({ className: '', html, iconSize: [0,0], iconAnchor: [0, 0] }) }).addTo(map);
                 marker.on('click', e => { 
                     L.DomEvent.stopPropagation(e); 
-                    let hasDetails = (d.sub_details || d.events || d.comment);
+                    let hasDetails = (d.events || d.comment);
                     if (map.getZoom() <= 12) { map.flyTo(targetCoords, 15); } 
                     else { 
                         if (auth.currentUser && d.owner === auth.currentUser.uid) { 
