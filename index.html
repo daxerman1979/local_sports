@@ -114,7 +114,27 @@
         .tv-curr-score { width: 42px; padding: 6px 0; font-size: 14px; font-weight: 900; color: #fbbf24; background: rgba(245, 158, 11, 0.15); }
         .tv-bottom-bar { background: rgba(20, 15, 12, 0.7); padding: 5px 10px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 700; color: var(--text-muted); }
 
-        .tv-card-details { background: rgba(25, 18, 15, 0.98); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-top: none; border-radius: 0 0 8px 8px; width: 96%; padding: 12px; display: none; flex-direction: column; gap: 8px; box-shadow: 0 15px 30px rgba(0,0,0,0.8); color: var(--text-main); max-height: 250px; overflow-y: auto; margin-top: -1px; font-family: 'Inter', sans-serif; }
+        .tv-card-details { 
+            background: rgba(25, 18, 15, 0.98); 
+            backdrop-filter: blur(20px); 
+            border: 1px solid var(--glass-border); 
+            border-top: none; 
+            border-radius: 0 0 8px 8px; 
+            width: 100%; 
+            min-width: max-content; 
+            box-sizing: border-box; 
+            padding: 12px; 
+            display: none; 
+            flex-direction: column; 
+            gap: 8px; 
+            box-shadow: 0 15px 30px rgba(0,0,0,0.8); 
+            color: var(--text-main); 
+            max-height: 250px; 
+            overflow-y: auto; 
+            margin-top: -1px; 
+            font-family: 'Inter', sans-serif; 
+        }
+        
         .marker-pointer { width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent; border-top: 14px solid var(--glass-bg); display: none; margin-top: 2px; filter: drop-shadow(0 5px 8px rgba(0,0,0,0.8)); }
         .zoom-near .marker-pointer { display: block; }
         .status-live-wrapper .marker-pointer { border-top-color: var(--danger); filter: drop-shadow(0 5px 10px rgba(225,29,72,0.6)); }
@@ -503,17 +523,17 @@
                 if (d.events) {
                     let eH = "", eA = "";
                     Object.values(d.events).forEach(ev => {
-                        if(ev.team == 1) eH += `<div style="font-size:9px; margin-bottom:4px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"><span style="font-size:11px;">${ev.emoji}</span> ${ev.player}</div>`;
-                        else eA += `<div style="font-size:9px; margin-bottom:4px; text-align:right; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${ev.player} <span style="font-size:11px;">${ev.emoji}</span></div>`;
+                        if(ev.team == 1) eH += `<div style="font-size:9px; margin-bottom:4px; font-weight:600; white-space:nowrap;"><span style="font-size:11px;">${ev.emoji}</span> ${ev.player}</div>`;
+                        else eA += `<div style="font-size:9px; margin-bottom:4px; text-align:right; font-weight:600; white-space:nowrap;">${ev.player} <span style="font-size:11px;">${ev.emoji}</span></div>`;
                     });
                     eventsHtml = `<div style="background:rgba(20,15,12,0.5); border-radius:8px; padding:8px; border: 1px solid var(--glass-border); margin-top:4px;">
-                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; border-bottom:1px solid rgba(245,158,11,0.1); padding-bottom:6px; margin-bottom:6px;">
+                        <div style="display:flex; justify-content: space-between; gap:20px; border-bottom:1px solid rgba(245,158,11,0.1); padding-bottom:6px; margin-bottom:6px;">
                             <div style="font-size:9px; font-weight:800; color:var(--text-muted);">${(d.t1 || t.team1).substring(0,10)}</div>
                             <div style="font-size:9px; font-weight:800; color:var(--text-muted); text-align:right;">${(d.t2 || t.team2).substring(0,10)}</div>
                         </div>
-                        <div style="display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:10px; overflow:hidden;">
-                            <div style="overflow:hidden;">${eH}</div>
-                            <div style="overflow:hidden;">${eA}</div>
+                        <div style="display:flex; justify-content: space-between; gap:20px;">
+                            <div style="display:flex; flex-direction:column; align-items:flex-start;">${eH}</div>
+                            <div style="display:flex; flex-direction:column; align-items:flex-end;">${eA}</div>
                         </div>
                     </div>`;
                 }
